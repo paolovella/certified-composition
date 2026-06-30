@@ -89,3 +89,41 @@ coincidence that hid the conflation). Two compose to Lipschitz-4:
   data-processing inequality / Dobrushin coefficient, which mathlib lacks — a
   genuine from-scratch formalization (century-old probability, *not* the novel
   part). The interface only has to *receive* it; accumulation is already proved.
+
+## Scope — the boundary, and what it is *not*
+
+Three fitting instances (`Nat`, `Lipschitz`, `Hölder`) and zero counterexamples
+is **not** "the interface is correct" — it is "not yet refuted." Correctness for
+an abstraction is the absence of a counterexample you have not found; the content
+is the boundary, not the catalogue of things that fit. A fourth fitting instance
+buys almost nothing.
+
+**The load-bearing assumption is one line:** `Bridge.comp` sets
+`cert := mul g.cert f.cert` — the composite's certificate is a function of the two
+component certificates *alone*. So `GradedAction` captures exactly **functorial
+accumulation**: the certificate must be a *composable invariant* (a monoid acting
+on the distance). This is the transport-side restatement of **separability** from
+`../conf-typing`: `mul`-existence here ≙ "`J` of the join is determined by `J` of
+the parts" there.
+
+**Differential privacy is the instructive non-boundary.** It looks like a
+counterexample — advanced composition's `√k` bound is sublinear, not a fixed
+binary op, and `(ε, δ)` provably does not compose (two mechanisms with equal
+`(ε,δ)` but different privacy-loss distributions compose differently). But that is
+a defect of the *certificate*, not the interface: switch to the **Rényi / zCDP /
+f-DP** certificate and composition becomes a clean monoid (ρ adds; curves add /
+tensor), with the `√k` recovered as additivity in `ε ≈ √ρ` coordinates. DP is
+*inside* — the interface even forces you to find the composable invariant, which
+is exactly what modern DP theory is. `(ε,δ)` is the lossy summary, the precise
+analog of the non-separable per-channel summary that `J_ε` exposed. Writing "DP"
+here as a non-example would be the same over-collapse the `conf-typing` arc kept
+catching — recorded so it is not mistakenly added later.
+
+**What would genuinely fall outside: non-functorial / non-associative
+accumulation** — a composition theorem whose composite certificate is determined
+by *no* composable invariant, even after reparametrization. **No such witness is
+proved here.** That slot — the transport analog of `conf-typing`'s `Rbad` — is
+**empty**, and filling it (or proving it cannot be filled for some class) is the
+real correctness frontier. Until then the honest claim is the one the top-level
+README already makes: a common interface that several independent theorems
+instantiate — earned by instances, not asserted by naming.
