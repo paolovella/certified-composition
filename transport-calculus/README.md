@@ -106,18 +106,29 @@ on the distance). This is the transport-side restatement of **separability** fro
 `../conf-typing`: `mul`-existence here ≙ "`J` of the join is determined by `J` of
 the parts" there.
 
-**Differential privacy is the instructive non-boundary.** It looks like a
-counterexample — advanced composition's `√k` bound is sublinear, not a fixed
-binary op, and `(ε, δ)` provably does not compose (two mechanisms with equal
-`(ε,δ)` but different privacy-loss distributions compose differently). But that is
-a defect of the *certificate*, not the interface: switch to the **Rényi / zCDP /
-f-DP** certificate and composition becomes a clean monoid (ρ adds; curves add /
-tensor), with the `√k` recovered as additivity in `ε ≈ √ρ` coordinates. DP is
-*inside* — the interface even forces you to find the composable invariant, which
-is exactly what modern DP theory is. `(ε,δ)` is the lossy summary, the precise
-analog of the non-separable per-channel summary that `J_ε` exposed. Writing "DP"
-here as a non-example would be the same over-collapse the `conf-typing` arc kept
-catching — recorded so it is not mistakenly added later.
+**Differential privacy — two rows, not one.** DP must be filed under *two*
+certificates, because filing it flatly as "inside via Rényi" buries the half that
+does not fit:
+
+- **f-DP / privacy-loss distribution — inside.** The trade-off function is a
+  *composable invariant*: it tensors associatively (Dong–Roth–Su), and advanced
+  composition is a corollary. Advanced composition's `√k` bound is *uniform over
+  all `(ε,δ)` mechanisms* — it depends on the count and the certificates, **not**
+  on the maps — so it factors through this invariant. Rényi / zCDP are the same
+  invariant in additive coordinates (`ρ` adds; `√k` is `ε ≈ √ρ`).
+- **`(ε, δ)` — a lossy projection that does not compose.** Two mechanisms with
+  equal `(ε,δ)` but different privacy-loss distributions compose to different
+  `(ε',δ')`, so `(ε,δ)` admits **no** `mul`. This is not a non-example of the
+  *interface* (the invariant, f-DP, fits) — it is a non-example of "`(ε,δ)` is a
+  composable invariant," the precise analog of the non-separable per-channel
+  summary `J_ε` exposed. Advanced composition is **not** the boundary; it factors.
+  The boundary it *seems* to be is an artifact of choosing the lossy summary.
+
+`summary_not_composable` proves this in miniature, mathlib-free: a composable
+monoid (`ℕ×ℕ, +`) whose lossy summary (product of coordinates) provably admits no
+`mul` — `(1,2)` and `(2,1)` share summary `2` but compose to summaries `4 ≠ 3`.
+That is the located transport-side `Rbad`: the genuine non-example is a **lossy
+summary**, not a phenomenon, and it sits one level down from `GradedAction`.
 
 **The non-associativity hunt resolves negatively — with a proof, not a search.**
 A natural guess for "what falls outside" is *non-associative* accumulation. It is
@@ -131,16 +142,20 @@ would be unprovable). So non-associativity is not a place a counterexample can
 live. (This corrects an earlier framing here that paired "non-associative" with
 "non-functorial" as if both were available; only the latter is.)
 
-**So the boundary is purely non-*factorization*.** The genuinely-outside class is
-a composition whose composite distance-bound is *not a function of (component
-certificates, intermediate distance)* — admitting **no** composable invariant,
-not even a sound loose one, even after reparametrization. **No such witness is
-proved here**, and the obstruction is real: anything with a genuine per-map
-contraction bound *does* compose soundly (`L_{f∘g} ≤ L_f · L_g` always holds), so
-the escapees, if any, must lack a per-map bound entirely — at which point they
-are arguably not contraction-transport at all. That slot — the transport analog
-of `conf-typing`'s `Rbad` — remains **empty**, now with one candidate class
-(non-associativity) *proved* empty rather than merely unsearched. Filling it, or
-characterizing why it cannot be filled, is the real correctness frontier. The
-honest claim stays the one the top-level README makes: a common interface that
-several independent theorems instantiate — earned by instances, not by naming.
+`mul_assoc_of_faithful` is the strongest result here: not "we tried instances and
+they fit" but **faithfulness forces associativity** — the headline characterization,
+the transport-side `simA3_iff_respectsCoarsening`.
+
+**So the boundary is non-*factorization*, and it lives in the certificate, not the
+phenomenon.** The located non-example is `summary_not_composable`: a lossy summary
+of a composable invariant that admits no `mul`. The `(ε,δ)`-DP case is exactly
+this, one level up. So the transport `Rbad` is *not* empty — but what fills it is a
+**lossy summary**, not a phenomenon outside the interface; the invariant always
+fits. A phenomenon with **no** composable invariant at all (not even f-DP-style)
+would be the stronger object, and **none is proved here** — the obstruction is real
+(anything with a genuine per-map contraction bound composes soundly,
+`L_{f∘g} ≤ L_f · L_g`), so an escapee must lack a per-map bound entirely, at which
+point it is arguably not contraction-transport. *That* slot stays empty, with
+non-associativity *proved* empty rather than merely unsearched. The honest claim
+stays the one the top-level README makes: a common interface that several
+independent theorems instantiate — earned by instances, not by naming.

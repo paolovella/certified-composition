@@ -94,6 +94,49 @@ theorem GradedAction.mul_assoc_of_faithful {M D : Type} (GA : GradedAction M D)
     (a b c : M) : GA.mul (GA.mul a b) c = GA.mul a (GA.mul b c) :=
   faithful _ _ (fun d => GA.act_assoc a b c d)
 
+/-! ## Where non-factorization actually lives: lossy summaries, not phenomena
+
+The DP case locates the real boundary precisely, and it is *not* a phenomenon.
+
+- The privacy-loss distribution / f-DP trade-off function is a **composable
+  invariant**: it tensors associatively (Dong–Roth–Su), and advanced composition
+  is a *corollary*. Advanced composition's bound is uniform over all `(ε,δ)`
+  mechanisms — it depends on the count and the certificates, not on the maps — so
+  it factors through this invariant. DP, on the f-DP/PLD certificate, is **inside**.
+- `(ε, δ)` is a **lossy projection** of that invariant. Two mechanisms with equal
+  `(ε,δ)` but different privacy-loss distributions compose to different `(ε',δ')`,
+  so `(ε,δ)` admits **no** `mul` reconstructing the composite — it is not a
+  composable invariant.
+
+So non-factorization is a property of the *chosen summary*, not the phenomenon —
+the exact separability story of `../conf-typing` (the join composes; the lossy
+per-channel projection does not), now a third time. The witness below makes it
+abstract and mathlib-free: a composable monoid whose lossy summary provably
+does not compose. -/
+
+/-- The composable invariant: `ℕ × ℕ` under coordinatewise addition (associative,
+    a clean monoid — stands in for the PLD / the join). -/
+def invar (a b : Nat × Nat) : Nat × Nat := (a.1 + b.1, a.2 + b.2)
+
+/-- A lossy (non-injective) summary of it: the product of coordinates — stands in
+    for `(ε,δ)` / a per-channel projection. -/
+def summary (a : Nat × Nat) : Nat := a.1 * a.2
+
+/-- **The summary is not a composable invariant.** No binary operation on
+    summaries reconstructs the composite summary from the components': `(1,2)` and
+    `(2,1)` share summary `2`, yet composed (via `invar`) with `(1,0)` their
+    summaries diverge — `4 ≠ 3`. This is the `(ε,δ)`-vs-PLD obstruction in
+    miniature, and the transport-side instance of `conf-typing`'s separability: a
+    lossy projection of a composable invariant need not itself compose. The
+    *invariant* fits the interface; the *summary* is the genuine non-example — and
+    it is a non-example of "this summary composes," not of `GradedAction`. -/
+theorem summary_not_composable :
+    ¬ ∃ muS : Nat → Nat → Nat, ∀ a b, muS (summary a) (summary b) = summary (invar a b) := by
+  rintro ⟨muS, h⟩
+  have h1 : muS 2 0 = 4 := h (1, 2) (1, 0)
+  have h2 : muS 2 0 = 3 := h (2, 1) (1, 0)
+  omega
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*
