@@ -1,0 +1,5 @@
+name = "TransportCalculus"
+defaultTargets = ["TransportCalculus"]
+
+[[lean_lib]]
+name = "TransportCalculus"

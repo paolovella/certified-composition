@@ -1,0 +1,5 @@
+name = "ConfTyping"
+defaultTargets = ["ConfTyping"]
+
+[[lean_lib]]
+name = "ConfTyping"
