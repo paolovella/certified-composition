@@ -204,6 +204,39 @@ theorem GradedAction.repr_mul {M D : Type} (GA : GradedAction M D) (a b : M) :
     GA.repr (GA.mul a b) = (GA.repr a).comp (GA.repr b) :=
   Mono.ext (funext (fun d => GA.act_mul a b d))
 
+/-! ## The non-monotone frontier dissolves into Cayley over a complete lattice
+
+`f` factors through `universalGA` iff it has a *monotone dominator*, and the
+canonical one is the modulus of continuity `ω_f(t) = ⨆ {dist(fx,fy) : dist x y ≤ t}`
+— monotone by construction, dominating, **whenever the sup exists**. So the whole
+"non-monotone escapee" question collapses to one line: does `D` have the suprema?
+
+If `D` is a complete lattice (`sSup` on predicate-sets with the two universal
+laws — passed explicitly, so the boundary is visible in the statement), `ω_f`
+always exists, so **every** map factors. `ℝ≥0∞`, `ℕ∞`, every standard extended-
+metric codomain is a complete lattice, so the escapee **cannot live in any
+standard metric space** — it would need a `D` that is *not* a complete lattice,
+with a modulus-set bounded but lacking a least upper bound. -/
+
+def factors_of_completeness {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a)
+    (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (sSup : (D → Prop) → D)
+    (le_sSup : ∀ (S : D → Prop) a, S a → le a (sSup S))
+    (sSup_le : ∀ (S : D → Prop) b, (∀ a, S a → le a b) → le (sSup S) b)
+    (dist : X → X → D) (f : X → X) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist := by
+  refine Bridge.ofModulus (le := le) (dist := dist) le_trans f ?φ ?bound
+  case φ =>
+    refine ⟨fun t => sSup (fun d => ∃ x y, le (dist x y) t ∧ d = dist (f x) (f y)), ?_⟩
+    intro a b hab
+    refine sSup_le _ _ (fun c hc => ?_)
+    obtain ⟨x, y, hxy, rfl⟩ := hc
+    exact le_sSup _ _ ⟨x, y, le_trans hxy hab, rfl⟩
+  case bound =>
+    intro x y
+    exact le_sSup _ _ ⟨x, y, le_refl _, rfl⟩
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

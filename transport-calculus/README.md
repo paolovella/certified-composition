@@ -163,13 +163,26 @@ construction, so **every monotone-bounded contraction-transport phenomenon facto
 result. (`universalGA` and `Bridge.ofModulus` are **axiom-free**; `repr_mul` uses
 only `Quot.sound`.)
 
-**Where a true escapee must live, now located precisely.** Not in associativity
-(proved unavailable), not in a lossy summary (`summary_not_composable` — that is
-the certificate's fault, not the interface's). It must be a phenomenon whose
-distance `D` admits **no monotone modulus at all** — a `D` lacking the suprema to
-form one — so that `universalGA` has nothing to represent. That slot remains
-**empty and unproven either way**, but it is no longer a vague "open frontier": it
-is the precise question of whether a contraction-like phenomenon can exist with no
-monotone per-map bound. The honest claim stays the one the top-level README makes —
-a common interface several independent theorems instantiate — now with its reach
-*characterized*: complete for monotone-bounded transport, via the universal instance.
+**The non-monotone frontier: case (a) is now a theorem.** A map factors iff it has
+a *monotone* dominator, and the canonical one is the modulus of continuity
+`ω_f(t) = ⨆ {dist(fx,fy) : dist x y ≤ t}` — monotone and dominating *whenever the
+sup exists*. So the whole question collapses to: does `D` have the suprema?
+`factors_of_completeness` (**axiom-free**) settles it for complete lattices: if `D`
+has `sSup` with the two universal laws, `ω_f` always exists and **every** map
+factors. `ℝ≥0∞`, `ℕ∞`, every standard extended-metric codomain *is* a complete
+lattice — so the non-monotone escapee **cannot live in any standard metric space**;
+there the frontier dissolves into Cayley outright.
+
+**Where a true escapee must now live, narrowed twice.** It needs a distance `D`
+that is **not a complete lattice**, *and* a map whose modulus-set is bounded but
+has **no least upper bound** (unboundedness would make it non-contraction, not an
+escapee). That is the precise, doubly-narrowed habitat — exotic (non-conditionally-
+complete distance codomains), and **empty and unproven either way**. Of your three
+branches: **(a) is proved** (complete `D` ⇒ all factor); **(c)** ("always factors,
+even incomplete") is *not* obviously true — the modulus needs suprema over
+down-sets, which directedness of the distance monoid does not supply — so I do not
+claim it; **(b)** (an inhabited escapee in incomplete `D`) is the genuine residual,
+now a sharp order-theoretic question rather than a vague frontier. The honest claim
+stays the top-level README's — a common interface several independent theorems
+instantiate — now with its reach *characterized*: complete for all complete-lattice
+(hence all standard metric) transport, via the universal instance.
