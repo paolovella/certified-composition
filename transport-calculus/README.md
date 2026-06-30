@@ -127,8 +127,12 @@ does not fit:
 `summary_not_composable` proves this in miniature, mathlib-free: a composable
 monoid (`ℕ×ℕ, +`) whose lossy summary (product of coordinates) provably admits no
 `mul` — `(1,2)` and `(2,1)` share summary `2` but compose to summaries `4 ≠ 3`.
-That is the located transport-side `Rbad`: the genuine non-example is a **lossy
-summary**, not a phenomenon, and it sits one level down from `GradedAction`.
+It is **not** the interface's `Rbad` — the invariant (`ℕ×ℕ, +`) fits fine; the
+summary was *built* outside by projecting away the structure that composes. What
+it proves is sharper and more useful: it explains *why the search for an interface
+`Rbad` keeps coming up empty* — every candidate so far is a lossy summary of a
+phenomenon that itself factors, and lossiness is **optional**. When a summary does
+not compose, the fix is "don't summarize," not "the interface failed."
 
 **The non-associativity hunt resolves negatively — with a proof, not a search.**
 A natural guess for "what falls outside" is *non-associative* accumulation. It is
@@ -142,20 +146,30 @@ would be unprovable). So non-associativity is not a place a counterexample can
 live. (This corrects an earlier framing here that paired "non-associative" with
 "non-functorial" as if both were available; only the latter is.)
 
-`mul_assoc_of_faithful` is the strongest result here: not "we tried instances and
-they fit" but **faithfulness forces associativity** — the headline characterization,
-the transport-side `simA3_iff_respectsCoarsening`.
+**The headline: factorization is *forced*, via a universal instance — the
+transport Cayley theorem.** The monotone self-maps of `D` under composition form a
+`GradedAction` (`universalGA`, `act_mul` definitional), and **every** `GradedAction`'s
+`act` is a monoid homomorphism into it (`repr`, `repr_mul`). So the certificates of
+any instance are a *representation* of monotone-self-map monoids, and the two prior
+results fall out as standard facts about a representation:
 
-**So the boundary is non-*factorization*, and it lives in the certificate, not the
-phenomenon.** The located non-example is `summary_not_composable`: a lossy summary
-of a composable invariant that admits no `mul`. The `(ε,δ)`-DP case is exactly
-this, one level up. So the transport `Rbad` is *not* empty — but what fills it is a
-**lossy summary**, not a phenomenon outside the interface; the invariant always
-fits. A phenomenon with **no** composable invariant at all (not even f-DP-style)
-would be the stronger object, and **none is proved here** — the obstruction is real
-(anything with a genuine per-map contraction bound composes soundly,
-`L_{f∘g} ≤ L_f · L_g`), so an escapee must lack a per-map bound entirely, at which
-point it is arguably not contraction-transport. *That* slot stays empty, with
-non-associativity *proved* empty rather than merely unsearched. The honest claim
-stays the one the top-level README makes: a common interface that several
-independent theorems instantiate — earned by instances, not by naming.
+- `act_assoc` = the representation lands in an associative monoid (`∘`);
+- `mul_assoc_of_faithful` = a *faithful* representation is injective (Cayley).
+
+And `Bridge.ofModulus`: any map carrying a monotone `D`-bound on its distance
+effect is a `Bridge` in `universalGA`. The modulus of continuity is such a bound by
+construction, so **every monotone-bounded contraction-transport phenomenon factors**
+— the interface's `Rbad` is empty *as a theorem on this class*, not as a search
+result. (`universalGA` and `Bridge.ofModulus` are **axiom-free**; `repr_mul` uses
+only `Quot.sound`.)
+
+**Where a true escapee must live, now located precisely.** Not in associativity
+(proved unavailable), not in a lossy summary (`summary_not_composable` — that is
+the certificate's fault, not the interface's). It must be a phenomenon whose
+distance `D` admits **no monotone modulus at all** — a `D` lacking the suprema to
+form one — so that `universalGA` has nothing to represent. That slot remains
+**empty and unproven either way**, but it is no longer a vague "open frontier": it
+is the precise question of whether a contraction-like phenomenon can exist with no
+monotone per-map bound. The honest claim stays the one the top-level README makes —
+a common interface several independent theorems instantiate — now with its reach
+*characterized*: complete for monotone-bounded transport, via the universal instance.

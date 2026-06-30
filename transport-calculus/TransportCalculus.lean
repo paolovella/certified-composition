@@ -137,6 +137,73 @@ theorem summary_not_composable :
   have h2 : muS 2 0 = 3 := h (2, 1) (1, 0)
   omega
 
+/-! ## The universal `GradedAction` — factorization is *forced* (the transport Cayley)
+
+"Is factorizability forced, the way faithfulness forces associativity?" Yes — via
+a universal instance. The monotone self-maps of `D` under composition form a
+`GradedAction`, and **every** `GradedAction`'s `act` is a monoid homomorphism into
+it (`repr`, `repr_mul`). So the certificates of any instance are a *representation*
+of monotone-self-map monoids; `act_assoc` is that representation landing in an
+associative monoid (`∘`), and `mul_assoc_of_faithful` is a faithful representation
+being injective — literally Cayley.
+
+Consequence (`Bridge.ofModulus`): any map carrying a monotone `D`-bound on its
+distance effect — and the *modulus of continuity* is one, by construction — is a
+`Bridge` in `universalGA`. So every **monotone-bounded** contraction-transport
+phenomenon factors: the interface's `Rbad` is empty *as a theorem* on this class,
+not as a search result. What is **not** ruled out: a phenomenon whose distance
+admits no monotone modulus at all (a `D` lacking the suprema to form one) — there
+the universal instance has nothing to represent, and that is exactly where any true
+escapee must live. Located, not closed. -/
+
+/-- Monotone self-maps of `(D, le)`. -/
+structure Mono (D : Type) (le : D → D → Prop) where
+  toFun : D → D
+  mono  : ∀ {a b}, le a b → le (toFun a) (toFun b)
+
+def Mono.comp {D : Type} {le : D → D → Prop} (φ ψ : Mono D le) : Mono D le where
+  toFun := fun d => φ.toFun (ψ.toFun d)
+  mono  := fun h => φ.mono (ψ.mono h)
+
+theorem Mono.ext {D : Type} {le : D → D → Prop} {φ ψ : Mono D le}
+    (h : φ.toFun = ψ.toFun) : φ = ψ := by
+  cases φ; cases ψ; cases h; rfl
+
+/-- **The universal `GradedAction`:** monotone self-maps of `D` under composition.
+    `act_mul` is *definitional* — it is function composition. -/
+def universalGA {D : Type} (le : D → D → Prop)
+    (le_trans : ∀ {a b c}, le a b → le b c → le a c) : GradedAction (Mono D le) D where
+  mul      := Mono.comp
+  le       := le
+  act      := fun φ d => φ.toFun d
+  le_trans := le_trans
+  act_mul  := fun _ _ _ => rfl
+  act_mono := fun φ {_ _} h => φ.mono h
+
+/-- **Factorization is forced.** Any map with a monotone modulus `φ` is a `Bridge`
+    in `universalGA` — no proof work beyond the bound. The modulus of continuity is
+    monotone by construction, so every monotone-bounded phenomenon factors. -/
+def Bridge.ofModulus {X D : Type} {le : D → D → Prop}
+    (le_trans : ∀ {a b c}, le a b → le b c → le a c) {dist : X → X → D}
+    (f : X → X) (φ : Mono D le)
+    (bound : ∀ x y, le (dist (f x) (f y)) (φ.toFun (dist x y))) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist where
+  map       := f
+  cert      := φ
+  contracts := bound
+
+/-- `act` packaged as a monotone self-map: the representation of a certificate. -/
+def GradedAction.repr {M D : Type} (GA : GradedAction M D) (m : M) : Mono D GA.le :=
+  ⟨GA.act m, fun h => GA.act_mono m h⟩
+
+/-- **`act` is the representation homomorphism.** For any `GradedAction`, sending a
+    certificate to its action is a monoid hom into `universalGA`. So every
+    instance's certificates *represent* monotone-self-map monoids; `act_assoc` and
+    `mul_assoc_of_faithful` are the standard facts about such a representation. -/
+theorem GradedAction.repr_mul {M D : Type} (GA : GradedAction M D) (a b : M) :
+    GA.repr (GA.mul a b) = (GA.repr a).comp (GA.repr b) :=
+  Mono.ext (funext (fun d => GA.act_mul a b d))
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*
