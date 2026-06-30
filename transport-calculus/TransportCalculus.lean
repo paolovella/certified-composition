@@ -306,6 +306,45 @@ theorem escapee_not_in_universalGA :
   rw [hB] at hc
   exact hc
 
+/-! ## Strengthening the interface: require a *directed* distance
+
+A directed distance has a chosen common upper bound `cub a b` for any two elements
+— which a positively-ordered monoid supplies for free (`cub a b := a + b`, with
+`a, b ≤ a + b` by positivity). Every genuine `+`-distance is directed; `D3` is not.
+Requiring directedness **excludes the escapee by fiat** (`no_directed_on_D3`), and
+buys factorization for every map with a *globally bounded* output
+(`factors_of_global_bound`) — which directedness supplies whenever the output range
+is finite. What it does **not** settle: unbounded-output maps over a non-complete
+directed `D` (the infinite obstruction) — that is the residual `(c)`. -/
+
+/-- The strengthening: a chosen common upper bound, i.e. directedness. -/
+structure Directed (D : Type) (le : D → D → Prop) where
+  cub          : D → D → D
+  le_cub_left  : ∀ a b, le a (cub a b)
+  le_cub_right : ∀ a b, le b (cub a b)
+
+/-- **Strengthening excludes the escapee.** `(D3, le3)` admits no `Directed`
+    structure: `cub dP dQ` would be the common upper bound `no_common_ub` forbids.
+    So an interface requiring a directed distance cannot host the `(b)` witness. -/
+theorem no_directed_on_D3 : Directed D3 le3 → False :=
+  fun dir => no_common_ub
+    ⟨dir.cub .dP .dQ, dir.le_cub_left .dP .dQ, dir.le_cub_right .dP .dQ⟩
+
+/-- **What directedness buys.** A single global upper bound `T` on all output
+    distances ⇒ the map factors, via the *constant* modulus `φ ≡ T`. A directed
+    `D` supplies such a `T` whenever the output range is finite (iterated `cub`);
+    the escapee precisely lacks one — `dP`, `dQ` have no common bound, which a
+    directed distance would always provide. -/
+def factors_of_global_bound {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a)
+    (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dist : X → X → D) (f : X → X)
+    (T : D) (hT : ∀ x y, le (dist (f x) (f y)) T) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist := by
+  refine Bridge.ofModulus (le := le) (dist := dist) le_trans f ⟨fun _ => T, ?_⟩ ?_
+  · intro _ _ _; exact le_refl T
+  · intro x y; exact hT x y
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

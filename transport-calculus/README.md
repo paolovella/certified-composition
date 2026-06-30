@@ -203,3 +203,37 @@ exact:
 So the interface's reach is now bracketed from both sides: complete-lattice `D` ⇒
 always factors; non-directed `D` ⇒ can fail; the boundary runs through
 *directedness*, and where exactly is the open frontier.
+
+**Strengthening the interface — require a directed distance.** A `Directed D le`
+is a chosen common upper bound `cub a b` for any two elements; a positively-ordered
+monoid supplies it for free (`cub a b := a + b`, with `a, b ≤ a + b`), so every
+genuine `+`-distance is directed. The strengthening does exactly what was asked:
+
+- **It excludes the escapee by fiat** — `no_directed_on_D3` (`propext` only):
+  `(D3, le3)` admits *no* `Directed` structure, since `cub dP dQ` would be the
+  common upper bound `no_common_ub` forbids. The `(b)` witness cannot instantiate
+  a directed interface.
+- **It buys factorization for bounded maps** — `factors_of_global_bound`
+  (axiom-free): a single global upper bound `T` on all output distances makes the
+  map factor via the *constant* modulus `φ ≡ T`. A directed `D` supplies such a
+  `T` whenever the output range is finite (iterated `cub`). The escapee precisely
+  lacked a global bound; directedness restores it for bounded maps.
+
+**What directedness does *not* close — the honest residual (c).** It kills *finite*
+obstructions (a single `cub`, or iterated `cub` over a finite range) but not
+*down-set suprema*, which the modulus needs in general. So an **unbounded-output**
+map over a **non-complete directed** `D` — bounded on each down-set but with no
+global bound and no down-set sups — is not covered by `factors_of_global_bound`,
+and whether such an infinite escapee exists is **open**. Single ascending chains
+are safe (iterated `cub` tracks them); the danger, if any, is infinite *branching*
+whose limit sup is missing. That lone question is now the entire residual of the
+transport line:
+
+- complete-lattice `D` ⇒ factors (`factors_of_completeness`);
+- directed `D` + bounded output ⇒ factors (`factors_of_global_bound`);
+- non-directed `D` ⇒ escapee (`escapee_no_monotone_dominator`);
+- directed `D` + unbounded output, `D` incomplete ⇒ **open**.
+
+The interface, strengthened to a directed distance, has no known escapee; the only
+gap between it and a full completeness theorem is the infinite-branching case over
+an incomplete directed `D`.
