@@ -237,6 +237,75 @@ def factors_of_completeness {X D : Type} (le : D → D → Prop)
     intro x y
     exact le_sSup _ _ ⟨x, y, le_refl _, rfl⟩
 
+/-! ## Case (b), inhabited: an escapee over an incomplete distance
+
+A map that factors through **no** `GradedAction`. The distance `D3` has a bottom
+`dB` and two incomparable maximal elements `dP`, `dQ` with **no common upper
+bound** — so `(D3, le3)` is not a complete lattice (`dP ⊔ dQ` does not exist). The
+map `fP` expands the `dB`-pair to `dP` and the `dP`-pair to `dQ`; with `dB ≤ dP`,
+monotonicity forces any dominator to satisfy `φ dP ≥ dP` **and** `φ dP ≥ dQ`, a
+join `no_common_ub` forbids. So no monotone dominator exists — and since every
+`GradedAction`'s `act` is monotone (`act_mono`), `fP` is hosted by none.
+
+`fP` *does* have a sound non-monotone bound (each pair's image distance is a
+concrete element), so it is a genuine bounded phenomenon, not a degenerate
+unbounded one — exactly case (b). **Honest caveat:** `D3` is not a distance
+*monoid* — a positively-ordered monoid would give `dP` and `dQ` the common upper
+bound `dP + dQ`, restoring directedness and killing this (finite) obstruction. So
+the escapee inhabits the interface *as formalized* (preorder `D`), and pinpoints
+that directedness is the missing hypothesis; whether directedness kills *every*
+escapee (an infinite obstruction may survive) is the residual. -/
+
+inductive D3 where
+  | dB | dP | dQ
+deriving DecidableEq
+
+def le3 : D3 → D3 → Prop
+  | .dB, _   => True
+  | .dP, .dP => True
+  | .dQ, .dQ => True
+  | _, _     => False
+
+theorem le3_refl : ∀ a, le3 a a := by intro a; cases a <;> trivial
+
+theorem le3_trans : ∀ {a b c}, le3 a b → le3 b c → le3 a c := by
+  intro a b c h1 h2; cases a <;> cases b <;> cases c <;> simp_all [le3]
+
+/-- `dP` and `dQ` have no common upper bound — `(D3, le3)` lacks the join. -/
+theorem no_common_ub : ¬ ∃ u, le3 .dP u ∧ le3 .dQ u := by
+  rintro ⟨u, hp, hq⟩; cases u <;> simp_all [le3]
+
+inductive P4 where | a | b | c | e
+deriving DecidableEq
+
+def distP : P4 → P4 → D3
+  | .a, .b => .dB
+  | .c, .e => .dP
+  | .a, .c => .dQ
+  | _, _   => .dB
+
+def fP : P4 → P4
+  | .a => .c | .b => .e | .c => .a | .e => .c
+
+/-- **The escapee: no monotone dominator.** Hence `fP` is a `Bridge` in no
+    `GradedAction` over `(D3, le3)` — the transport `Rbad` is *inhabited*. -/
+theorem escapee_no_monotone_dominator :
+    ¬ ∃ φ : Mono D3 le3, ∀ x y, le3 (distP (fP x) (fP y)) (φ.toFun (distP x y)) := by
+  rintro ⟨φ, h⟩
+  have h1 : le3 .dP (φ.toFun .dB) := h .a .b
+  have h2 : le3 .dQ (φ.toFun .dP) := h .c .e
+  have hmono : le3 (φ.toFun .dB) (φ.toFun .dP) := φ.mono (show le3 .dB .dP from trivial)
+  exact no_common_ub ⟨φ.toFun .dP, le3_trans h1 hmono, h2⟩
+
+/-- The same, in interface terms: no `Bridge` in `universalGA` has map `fP`. -/
+theorem escapee_not_in_universalGA :
+    ¬ ∃ B : Bridge P4 (Mono D3 le3) D3 (universalGA le3 @le3_trans) distP, B.map = fP := by
+  rintro ⟨B, hB⟩
+  refine escapee_no_monotone_dominator ⟨B.cert, fun x y => ?_⟩
+  have hc := B.contracts x y
+  rw [hB] at hc
+  exact hc
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

@@ -173,16 +173,33 @@ factors. `ℝ≥0∞`, `ℕ∞`, every standard extended-metric codomain *is* a 
 lattice — so the non-monotone escapee **cannot live in any standard metric space**;
 there the frontier dissolves into Cayley outright.
 
-**Where a true escapee must now live, narrowed twice.** It needs a distance `D`
-that is **not a complete lattice**, *and* a map whose modulus-set is bounded but
-has **no least upper bound** (unboundedness would make it non-contraction, not an
-escapee). That is the precise, doubly-narrowed habitat — exotic (non-conditionally-
-complete distance codomains), and **empty and unproven either way**. Of your three
-branches: **(a) is proved** (complete `D` ⇒ all factor); **(c)** ("always factors,
-even incomplete") is *not* obviously true — the modulus needs suprema over
-down-sets, which directedness of the distance monoid does not supply — so I do not
-claim it; **(b)** (an inhabited escapee in incomplete `D`) is the genuine residual,
-now a sharp order-theoretic question rather than a vague frontier. The honest claim
-stays the top-level README's — a common interface several independent theorems
-instantiate — now with its reach *characterized*: complete for all complete-lattice
-(hence all standard metric) transport, via the universal instance.
+**Case (b) is inhabited — the `Rbad` is no longer empty.** `escapee_no_monotone_dominator`
+(`propext` only) exhibits a map `fP` over a 3-element distance `D3` (`dB ≤ dP`,
+with `dP`, `dQ` incomparable and **no common upper bound**) that has a sound
+non-monotone bound yet **no monotone dominator** — so it is a `Bridge` in *no*
+`GradedAction` (`escapee_not_in_universalGA`). The obstruction is exactly the
+missing join: `fP` expands the `dB`-pair to `dP` and the `dP`-pair to `dQ`, and
+`dB ≤ dP` forces `φ dP ≥ dP ∧ φ dP ≥ dQ`, which `D3` forbids. So the transport
+`Rbad` is *genuinely inhabited*, finitely, no exotic infinitary `D` needed.
+
+**But the witness locates the boundary precisely, and it is honest about it.**
+`D3` is not a distance *monoid*: a positively-ordered monoid gives `dP`, `dQ` the
+common upper bound `dP + dQ`, restoring directedness and killing this (finite)
+obstruction. So the escapee inhabits the interface **as formalized** — where `D`
+is only a preorder — and pinpoints the missing hypothesis: **directedness** (which
+a genuine `+`-distance supplies for free). The map of the three branches is now
+exact:
+
+- **(a) proved** — over any *complete lattice* `D`, every map factors
+  (`factors_of_completeness`).
+- **(b) inhabited** — over a *non-directed* preorder `D`, an escapee exists
+  (`escapee_no_monotone_dominator`).
+- **(c) the live residual** — does *directedness* (a `+`-distance monoid, which
+  gives finite joins but not down-set suprema) force factorization, or does an
+  *infinite* obstruction survive it? `D3` shows finite ones die under directedness;
+  the infinite case is open. This is the sharp question the whole frontier reduces
+  to, and the one genuinely-open object of the transport line.
+
+So the interface's reach is now bracketed from both sides: complete-lattice `D` ⇒
+always factors; non-directed `D` ⇒ can fail; the boundary runs through
+*directedness*, and where exactly is the open frontier.
