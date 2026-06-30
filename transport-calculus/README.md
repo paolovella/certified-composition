@@ -119,11 +119,28 @@ analog of the non-separable per-channel summary that `J_ε` exposed. Writing "DP
 here as a non-example would be the same over-collapse the `conf-typing` arc kept
 catching — recorded so it is not mistakenly added later.
 
-**What would genuinely fall outside: non-functorial / non-associative
-accumulation** — a composition theorem whose composite certificate is determined
-by *no* composable invariant, even after reparametrization. **No such witness is
-proved here.** That slot — the transport analog of `conf-typing`'s `Rbad` — is
-**empty**, and filling it (or proving it cannot be filled for some class) is the
-real correctness frontier. Until then the honest claim is the one the top-level
-README already makes: a common interface that several independent theorems
-instantiate — earned by instances, not asserted by naming.
+**The non-associativity hunt resolves negatively — with a proof, not a search.**
+A natural guess for "what falls outside" is *non-associative* accumulation. It is
+malformed: `GradedAction.act_assoc` shows that for **any** `mul`, the two
+bracketings of a triple act identically on every distance, because `act_mul`
+makes `act` a homomorphism into `(D → D, ∘)` and function composition is
+associative. A non-associative `mul` is *unobservable* through any `Bridge`, and
+`mul_assoc_of_faithful` shows a faithful action forces `mul` associative outright
+— you cannot even *construct* a witnessing instance (the `act_mul` obligation
+would be unprovable). So non-associativity is not a place a counterexample can
+live. (This corrects an earlier framing here that paired "non-associative" with
+"non-functorial" as if both were available; only the latter is.)
+
+**So the boundary is purely non-*factorization*.** The genuinely-outside class is
+a composition whose composite distance-bound is *not a function of (component
+certificates, intermediate distance)* — admitting **no** composable invariant,
+not even a sound loose one, even after reparametrization. **No such witness is
+proved here**, and the obstruction is real: anything with a genuine per-map
+contraction bound *does* compose soundly (`L_{f∘g} ≤ L_f · L_g` always holds), so
+the escapees, if any, must lack a per-map bound entirely — at which point they
+are arguably not contraction-transport at all. That slot — the transport analog
+of `conf-typing`'s `Rbad` — remains **empty**, now with one candidate class
+(non-associativity) *proved* empty rather than merely unsearched. Filling it, or
+characterizing why it cannot be filled, is the real correctness frontier. The
+honest claim stays the one the top-level README makes: a common interface that
+several independent theorems instantiate — earned by instances, not by naming.

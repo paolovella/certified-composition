@@ -69,6 +69,31 @@ theorem Bridge.comp_cert {X M D : Type} {GA : GradedAction M D} {dist : X → X 
     (g f : Bridge X M D GA dist) :
     (g.comp f).cert = GA.mul g.cert f.cert := rfl
 
+/-! ## The hunt for a non-associative accumulation witness — resolved negatively
+
+The proposed boundary "find a transport phenomenon whose accumulation is
+non-associative" is malformed: the interface **cannot host** non-associativity.
+`act_mul` makes `act` a homomorphism `(M, mul) → (D → D, ∘)`, and function
+composition is associative — so the two bracketings of any triple act *identically
+on every distance*. A non-associative `mul` is therefore **unobservable** through
+any `Bridge`, and a *faithful* action forces `mul` itself associative. So no
+`Bridge` can ever witness non-associativity; the witness does not exist, by a
+two-line proof rather than by failure to search. -/
+
+/-- The accumulation is associative *as observed* — for any `mul` whatsoever. -/
+theorem GradedAction.act_assoc {M D : Type} (GA : GradedAction M D) (a b c : M) (d : D) :
+    GA.act (GA.mul (GA.mul a b) c) d = GA.act (GA.mul a (GA.mul b c)) d := by
+  simp only [GA.act_mul]
+
+/-- And a *faithful* action forces `mul` genuinely associative: `act_mul` plus
+    injectivity ⟹ associativity. So one cannot even *construct* a `GradedAction`
+    that witnesses non-associativity with a faithful action — the `act_mul`
+    obligation would be unprovable. -/
+theorem GradedAction.mul_assoc_of_faithful {M D : Type} (GA : GradedAction M D)
+    (faithful : ∀ m m', (∀ d, GA.act m d = GA.act m' d) → m = m')
+    (a b c : M) : GA.mul (GA.mul a b) c = GA.mul a (GA.mul b c) :=
+  faithful _ _ (fun d => GA.act_assoc a b c d)
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*
