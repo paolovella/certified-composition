@@ -237,6 +237,27 @@ def factors_of_completeness {X D : Type} (le : D → D → Prop)
     intro x y
     exact le_sSup _ _ ⟨x, y, le_refl _, rfl⟩
 
+/-- **The right hypothesis — sharper than a complete lattice.** `ofModulus` does
+    not need *all* suprema; it needs only that each **image-family** — the image
+    distances over a down-set of `t` — has a *least upper bound* `sup t`. Then `f`
+    factors, and leastness alone gives the modulus its monotonicity. This is the
+    minimal directed-completeness condition the modulus requires; `factors_of_completeness`
+    (complete lattice) and `factors_of_global_bound` (one global bound) are both
+    special cases. -/
+def factors_of_image_sups {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a)
+    (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dist : X → X → D) (f : X → X)
+    (sup : D → D)
+    (le_sup : ∀ t x y, le (dist x y) t → le (dist (f x) (f y)) (sup t))
+    (sup_le : ∀ t b, (∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) → le (sup t) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist := by
+  refine Bridge.ofModulus (le := le) (dist := dist) le_trans f ⟨sup, ?_⟩ ?_
+  · intro a b hab
+    exact sup_le a (sup b) (fun x y hxy => le_sup b x y (le_trans hxy hab))
+  · intro x y
+    exact le_sup (dist x y) x y (le_refl _)
+
 /-! ## Case (b), inhabited: an escapee over an incomplete distance
 
 A map that factors through **no** `GradedAction`. The distance `D3` has a bottom

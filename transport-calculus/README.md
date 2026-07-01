@@ -237,3 +237,35 @@ transport line:
 The interface, strengthened to a directed distance, has no known escapee; the only
 gap between it and a full completeness theorem is the infinite-branching case over
 an incomplete directed `D`.
+
+**The right hypothesis is image-family sups, not completeness (c-i, proved).**
+`ofModulus` never needed *all* suprema. It needs only that each **image-family** —
+the image distances over a down-set of `t` — has a *least upper bound*.
+`factors_of_image_sups` (**axiom-free**) proves factorization from exactly that,
+with leastness alone supplying the modulus's monotonicity. It **subsumes** both
+earlier theorems: a complete lattice gives every image-family a sup, and a global
+bound is the constant image-sup. So the sharpest factorization theorem is now
+"the distance is directed-complete *on image-families*," and complete-lattice /
+bounded-output are its corollaries — the same way Cayley made the two associativity
+results corollaries.
+
+**But the escapee needs missing *joins*, not missing *sups* (c-ii, refuted).** The
+tempting witness — the rationals bounded by an irrational cut (directed, non-dcpo)
+— is **not** an escapee: in a total order you *overshoot* the missing sup, e.g.
+`φ(t) = ⌈h(t)⌉` is a monotone rational dominator. Non-dcpo is *not sufficient*. What
+made `D3` escape was a missing **join** — `dP`, `dQ` incomparable, *no common upper
+bound to overshoot to* — a partial-order phenomenon, and directedness is exactly
+what kills the finite version. So the escapee needs an image-family whose cub-closure
+is directed and bounded yet has **no sup and no monotone overshoot**, sustained
+*infinitely under directedness*. That is strictly stronger than "non-dcpo," and the
+rationals cannot carry it.
+
+**So the residual is sharper — and more open — than a four-row table.** I have no
+escapee witness even as a *preorder* under directedness (the rationals candidate is
+refuted, not "almost certainly works"), let alone as a `+`-monoid. The line's last
+question is exact: **can a directed order — still more, a genuine positively-ordered
+`+`-distance monoid — carry an infinite image-family with no monotone upper-bound
+selection, or does the algebra of `+` force the completeness the modulus needs?**
+Directedness was the finite shadow; the real hypothesis is image-family sups; and
+whether `+` entails them over its own order is the one place on this line where I
+have neither a proof nor a witness.
