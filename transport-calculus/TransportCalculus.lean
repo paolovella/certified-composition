@@ -366,6 +366,57 @@ def factors_of_global_bound {X D : Type} (le : D → D → Prop)
   · intro _ _ _; exact le_refl T
   · intro x y; exact hT x y
 
+/-! ## Trying to build the monoid escapee — the finite obstruction always dies
+
+The frontier: can a directed distance (still more, a `+`-monoid) carry an *infinite*
+image-family with no monotone selection? The attempt below shows the **finite**
+half is closed by directedness *alone* (no completeness): fold the common upper
+bound `cub` over any finite output list to get a global bound, then
+`factors_of_global_bound`. So no finite obstruction escapes a directed distance —
+the monoid's `cub` (its `+`) defeats every one. An escapee would have to be
+genuinely infinite; every finite avenue resolves. (I could not build an infinite
+one either — single chains are tracked by iterated `cub`, bounded families always
+have upper bounds — so whether the `+`-monoid escapee exists is left open, with
+this theorem closing the finite case it would have to avoid.) -/
+
+/-- Fold a chosen common upper bound over a list. -/
+def foldCub {D : Type} {le : D → D → Prop} (dir : Directed D le) : D → List D → D
+  | acc, []      => acc
+  | acc, d :: ds => foldCub dir (dir.cub acc d) ds
+
+theorem le_acc_foldCub {D : Type} {le : D → D → Prop} (dir : Directed D le)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c) :
+    ∀ (acc : D) (L : List D), le acc (foldCub dir acc L)
+  | acc, []      => le_refl acc
+  | acc, d :: ds => le_trans (dir.le_cub_left acc d)
+                      (le_acc_foldCub dir le_refl le_trans (dir.cub acc d) ds)
+
+theorem le_mem_foldCub {D : Type} {le : D → D → Prop} (dir : Directed D le)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c) (d : D) :
+    ∀ (L : List D) (acc : D), d ∈ L → le d (foldCub dir acc L)
+  | [], _, h => nomatch h
+  | e :: es, acc, h => by
+      rcases List.mem_cons.mp h with rfl | h'
+      · exact le_trans (dir.le_cub_right acc d)
+          (le_acc_foldCub dir le_refl le_trans (dir.cub acc d) es)
+      · exact le_mem_foldCub dir le_refl le_trans d es (dir.cub acc e) h'
+
+/-- **No finite escapee in a directed distance.** If every output distance lies in
+    `seed :: L` (finitely many), the fold of `cub` over them is a global bound, so
+    the map factors — directedness *alone*, no completeness. Every finite
+    obstruction resolves; the monoid's `cub` defeats it. -/
+def directed_finite_factors {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dir : Directed D le) (dist : X → X → D) (f : X → X)
+    (seed : D) (L : List D)
+    (hcover : ∀ x y, dist (f x) (f y) = seed ∨ dist (f x) (f y) ∈ L) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist :=
+  factors_of_global_bound le le_refl le_trans dist f (foldCub dir seed L)
+    (fun x y => by
+      rcases hcover x y with h | h
+      · rw [h]; exact le_acc_foldCub dir le_refl le_trans seed L
+      · exact le_mem_foldCub dir le_refl le_trans _ L seed h)
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

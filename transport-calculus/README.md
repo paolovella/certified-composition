@@ -269,3 +269,32 @@ selection, or does the algebra of `+` force the completeness the modulus needs?*
 Directedness was the finite shadow; the real hypothesis is image-family sups; and
 whether `+` entails them over its own order is the one place on this line where I
 have neither a proof nor a witness.
+
+**Tried to build the monoid escapee — the finite half is closed, the infinite half
+resisted.** `directed_finite_factors` (`propext` only) proves that if the output
+distances are *finite* (all in `seed :: L`), a directed distance factors — fold
+`cub` over the list into a global bound, no completeness needed. So **no finite
+obstruction escapes a directed distance**: the monoid's `cub` (its `+`) defeats
+every one. That kills the whole finite half of the frontier, and it kills it with
+directedness *alone*.
+
+The infinite half I could **not** build, and could not close either — every
+avenue collapsed:
+
+- a single ascending chain of inputs → iterated `cub` tracks it (increasing `φ`);
+- finite branching → one `cub` per branch resolves it;
+- a bounded infinite image-family → it has an upper bound (contraction), so the
+  *constant* modulus at that bound dominates (`factors_of_global_bound`);
+- unbounded output over an ascending chain → not contraction, excluded.
+
+An escapee would need infinite *branching* whose limit join is missing **and**
+unovershootable — the `D3` mechanism (missing join, not missing sup) sustained
+infinitely under directedness. I have no such witness, and no proof it is
+impossible. So the honest state of the transport line is: **factorization ⟺
+image-family sups (proved); complete-lattice, bounded-output, directed-finite all
+factor (proved); the finite escapee needs non-directedness (proved, `D3`); and the
+sole open question is whether a positively-ordered `+`-monoid can carry an
+infinite missing-join image-family — the point where the algebra of distances
+might, or might not, force the order-completeness the modulus needs.** First
+question in the whole arc with neither proof nor counterexample, now with its
+finite neighbourhood entirely closed off around it.
