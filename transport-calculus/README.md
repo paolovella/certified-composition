@@ -298,3 +298,30 @@ infinite missing-join image-family — the point where the algebra of distances
 might, or might not, force the order-completeness the modulus needs.** First
 question in the whole arc with neither proof nor counterexample, now with its
 finite neighbourhood entirely closed off around it.
+
+**Tried to prove "positive monoid forces factorization" — cannot, and here is the
+honest reason (not a hedge).** In attempting it, the frontier's framing corrected
+itself: the `D3` escapee is **unbounded** (`escapee_unbounded`) — `dP`, `dQ` are
+output distances with no common upper bound, so its image-family has *no* upper
+bound and `fP` is not bounded-distortion at all. It is the trivial *non-contraction*
+case. So what excluded it from a directed distance was never directedness; it was
+**boundedness**. The operative hypothesis is that image-families are bounded — and
+the clean sufficient condition for factoring is **dcpo** (directed *and*
+directed-complete): then an image-family's `cub`-closure is directed, has a sup,
+and that sup is the monotone modulus — precisely `factors_of_image_sups` with the
+sups supplied.
+
+A positive monoid gives **directed** (via `+`) but **not** directed-*complete*:
+`+` builds finite joins, not the suprema of infinite directed sets. So
+directedness / `+` **does not** force factorization; the hypothesis that does is
+dcpo, which a monoid need not satisfy. I could neither close the gap (prove that
+the specific structure of image-families rescues a non-dcpo monoid) nor inhabit it
+(build a *bounded* escapee — every avenue resolves via a constant bound or iterated
+`cub`, yet no general proof follows). So the claim "positive monoid forces
+factorization" is one I **cannot prove**, and will not assert. The proved
+characterization stands: **factorization ⟸ image-family sups** (`factors_of_image_sups`),
+with dcpo the clean order-theoretic hypothesis supplying them — and whether a
+positive monoid, lacking dcpo, nonetheless always factors on *image-families
+specifically* is the genuine open problem, with neither proof nor witness. The
+honest ceiling of the transport line is: dcpo forces it; `+` alone does not; the
+gap between them is open.

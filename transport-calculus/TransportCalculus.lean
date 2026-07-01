@@ -318,6 +318,17 @@ theorem escapee_no_monotone_dominator :
   have hmono : le3 (φ.toFun .dB) (φ.toFun .dP) := φ.mono (show le3 .dB .dP from trivial)
   exact no_common_ub ⟨φ.toFun .dP, le3_trans h1 hmono, h2⟩
 
+/-- **The escapee is *unbounded* — it is not a contraction at all.** `fP` has no
+    global output bound: `dP` and `dQ` are both output distances with no common
+    upper bound. So its image-family has no upper bound, i.e. `fP` is *not*
+    bounded-distortion. The only escapee we can build is the non-contraction case;
+    what excludes it from a directed distance is **boundedness**, not directedness.
+    That reframes the frontier: the operative hypothesis is that image-families are
+    bounded (better, have sups — `factors_of_image_sups`), not the algebra of `+`. -/
+theorem escapee_unbounded : ¬ ∃ T, ∀ x y, le3 (distP (fP x) (fP y)) T := by
+  rintro ⟨T, hT⟩
+  exact no_common_ub ⟨T, hT .a .b, hT .c .e⟩
+
 /-- The same, in interface terms: no `Bridge` in `universalGA` has map `fP`. -/
 theorem escapee_not_in_universalGA :
     ¬ ∃ B : Bridge P4 (Mono D3 le3) D3 (universalGA le3 @le3_trans) distP, B.map = fP := by
