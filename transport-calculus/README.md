@@ -325,3 +325,36 @@ positive monoid, lacking dcpo, nonetheless always factors on *image-families
 specifically* is the genuine open problem, with neither proof nor witness. The
 honest ceiling of the transport line is: dcpo forces it; `+` alone does not; the
 gap between them is open.
+
+**Directed ⇏ dcpo, mechanized — and not-dcpo is still not an escapee.** `Dm` is a
+mathlib-free directed order (`⊤` bounds everything, so `cub ≡ ⊤` gives `Directed`,
+`dirM`) whose chain `fin 0 ≤ fin 1 ≤ ⋯` is directed and bounded yet has **no least
+upper bound** (`Dm_chain_no_sup`: `L`, `R` are incomparable minimal ubs). So
+directedness — what a `+`-monoid supplies — is *strictly weaker* than the dcpo
+that factorization's clean hypothesis needs. `ℚ≥0` under `+` is the standard
+monoid witness of the same fact. **But `Dm` still factors** (`Dm_factors`): `⊤`
+overshoots every family. So *not-dcpo is necessary but not sufficient for an
+escapee* — the missing sup here is overshootable, exactly as the totally-ordered
+`ℚ≥0` gap is.
+
+**And the natural way to close the gap does not close.** The reduction "directed +
+bounded ⇒ a monotone *overshooting* selection" (weaker than dcpo — no least ub
+required) would, if provable from directedness alone, close the line with `+ ⇒
+factorization` and demote dcpo to sufficient-not-necessary. It does not go through:
+a greedy / linear-extension selection assigns `φ(t)` an ub of `S(t)` dominating
+`{φ(s) : s ≤ t}`, and that accumulation need not be **bounded** — each `φ(s)` is
+*some* ub of `S(s)`, possibly far above the later bound of `S(t)`, and controlling
+it requires choosing `φ(s)` = *least* ub = sup, i.e. dcpo. Without sups the
+accumulation can blow up, and the future bound is unknowable when the earlier
+choice is made. So the overshoot-selection reduction **relocates the difficulty to
+the same non-dcpo gap** rather than removing it — it is the original problem, not a
+weakening of it.
+
+So the transport line's final state, honestly: **factorization ⟸ image-family sups
+(proved); dcpo ⇒ image-family sups ⇒ factors; directed / `+` ⇏ dcpo (`Dm`, proved);
+not-dcpo ⇏ escapee (`Dm` still factors, proved); and whether a directed non-dcpo
+monoid can host a *bounded, un-overshootable* escapee — the one thing that would
+force the line either shut or open — has no proof and no witness.** dcpo is the
+ceiling reached; `+` alone provably does not reach it; the remaining gap is a
+genuine open problem in order theory, correctly located and mechanically fenced on
+every side.

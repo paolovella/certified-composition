@@ -428,6 +428,70 @@ def directed_finite_factors {X D : Type} (le : D → D → Prop)
       · rw [h]; exact le_acc_foldCub dir le_refl le_trans seed L
       · exact le_mem_foldCub dir le_refl le_trans _ L seed h)
 
+/-! ## Directed ⇏ dcpo, concretely — and not-dcpo is still not an escapee
+
+The natural sufficient hypothesis for factoring is **dcpo** (directed *and*
+directed-complete). A positive monoid gives directed (`+`) but need not give dcpo:
+`ℚ≥0` under `+` is the standard witness. `Dm` below is a mathlib-free one: a
+directed order (`⊤` bounds everything, so `cub ≡ ⊤` witnesses `Directed`) whose
+chain `fin 0 ≤ fin 1 ≤ ⋯` is directed and bounded yet has **no least upper bound**
+— `L`, `R` are incomparable minimal upper bounds (`Dm_chain_no_sup`). So
+`Directed ⇏ dcpo`, and `factors_of_image_sups`' hypothesis is strictly stronger
+than `Directed`. *But `Dm` still factors* — `⊤` overshoots every family
+(`Dm_factors`). So not-dcpo is necessary but **not sufficient** for an escapee:
+here the missing sup is overshootable. -/
+
+inductive Dm where
+  | fin : Nat → Dm
+  | L | R | top
+
+def leM : Dm → Dm → Prop
+  | .fin m, .fin n => m ≤ n
+  | .fin _, .L => True
+  | .fin _, .R => True
+  | .fin _, .top => True
+  | .L, .L => True
+  | .L, .top => True
+  | .R, .R => True
+  | .R, .top => True
+  | .top, .top => True
+  | _, _ => False
+
+theorem leM_refl : ∀ a, leM a a
+  | .fin n => Nat.le_refl n
+  | .L => trivial | .R => trivial | .top => trivial
+
+theorem leM_trans : ∀ {a b c}, leM a b → leM b c → leM a c := by
+  intro a b c hab hbc
+  cases a <;> cases b <;> cases c <;> simp_all [leM] <;> omega
+
+theorem leM_top : ∀ a, leM a .top
+  | .fin _ => trivial | .L => trivial | .R => trivial | .top => trivial
+
+/-- `Dm` is directed: `⊤` is a common upper bound of everything. -/
+def dirM : Directed Dm leM where
+  cub := fun _ _ => .top
+  le_cub_left := fun a _ => leM_top a
+  le_cub_right := fun _ b => leM_top b
+
+/-- **`Dm` is not a dcpo:** the chain `fin n` is directed and bounded (by `L`, `R`)
+    yet has no least upper bound — `L`, `R` are incomparable minimal ubs. -/
+theorem Dm_chain_no_sup :
+    ¬ ∃ s : Dm, (∀ n, leM (.fin n) s) ∧ (∀ u, (∀ n, leM (.fin n) u) → leM s u) := by
+  rintro ⟨s, hub, hleast⟩
+  cases s with
+  | fin k => have h := hub (k + 1); simp only [leM] at h; omega
+  | L => have h := hleast .R (fun _ => trivial); simp [leM] at h
+  | R => have h := hleast .L (fun _ => trivial); simp [leM] at h
+  | top => have h := hleast .L (fun _ => trivial); simp [leM] at h
+
+/-- **Yet `Dm` still factors:** `⊤` overshoots, so every map into `Dm` has the
+    constant modulus `⊤`. Not-dcpo is *not* an escapee — the missing sup is
+    overshootable. -/
+def Dm_factors {X : Type} (dist : X → X → Dm) (f : X → X) :
+    Bridge X (Mono Dm leM) Dm (universalGA leM @leM_trans) dist :=
+  factors_of_global_bound leM leM_refl @leM_trans dist f .top (fun x y => leM_top _)
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*
