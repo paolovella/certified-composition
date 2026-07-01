@@ -490,7 +490,159 @@ theorem Dm_chain_no_sup :
     overshootable. -/
 def Dm_factors {X : Type} (dist : X → X → Dm) (f : X → X) :
     Bridge X (Mono Dm leM) Dm (universalGA leM @leM_trans) dist :=
-  factors_of_global_bound leM leM_refl @leM_trans dist f .top (fun x y => leM_top _)
+  factors_of_global_bound leM leM_refl @leM_trans dist f .top (fun _ _ => leM_top _)
+
+/-! ## `factors_of_image_sups` is strictly non-minimal — image-suprema are not necessary
+
+`Dm_factors` established that a *not-dcpo* distance can still factor. This sharpens
+that into a refutation of the converse: the `factors_of_image_sups` hypothesis is
+*sufficient but not necessary*, witnessed, not conjectured. Take the identity map on
+`ℕ` with the distance `distMax a b = fin (max a b)`. At threshold `L` its output
+family is the entire chain `{fin n : n}` — which by the `L`/`R` obstruction has **no**
+least upper bound. So no `sup : Dm → Dm` can satisfy the theorem's hypotheses, yet the
+map factors anyway (`Dm_factors`, through the overshoot `⊤`). The canonical
+(least-upper-bound) dominator that `factors_of_image_sups` demands does not exist here;
+a non-least one does the whole job. Requiring image-family suprema therefore discards
+genuine instances — the operative condition is "*some* monotone dominator," of which
+least-sups are one non-forced source. -/
+
+/-- Distance whose image-family at threshold `L` is the whole supless chain `{fin n}`. -/
+def distMax (a b : Nat) : Dm := .fin (max a b)
+
+/-- **Image-family suprema are not necessary.** The identity on `ℕ` under `distMax`
+    factors, but the `factors_of_image_sups` hypothesis is unsatisfiable: `sup L` would
+    have to bound every `fin n` while sitting below both incomparable bounds `L` and
+    `R`, which nothing does. Factorization runs entirely through a non-least dominator. -/
+theorem image_sups_not_necessary :
+    Nonempty (Bridge Nat (Mono Dm leM) Dm (universalGA leM @leM_trans) distMax) ∧
+    ¬ ∃ sup : Dm → Dm,
+        (∀ t x y, leM (distMax x y) t → leM (distMax x y) (sup t)) ∧
+        (∀ t b, (∀ x y, leM (distMax x y) t → leM (distMax x y) b) → leM (sup t) b) := by
+  refine ⟨⟨Dm_factors distMax id⟩, ?_⟩
+  rintro ⟨sup, hle, hleast⟩
+  -- `sup L` bounds the whole chain: each `fin n` occurs as `distMax n n`, all `≤ L`.
+  have hub : ∀ n, leM (.fin n) (sup .L) := by
+    intro n
+    simpa [distMax] using hle .L n n (by simp [distMax, leM])
+  -- both `L` and `R` bound the family (every `distMax x y` is a `fin _`), so `sup L`
+  -- is below each — but nothing is below both `L` and `R` yet above every `fin n`.
+  have hL : leM (sup .L) .L := hleast .L .L (fun x y _ => by simp [distMax, leM])
+  have hR : leM (sup .L) .R := hleast .L .R (fun x y _ => by simp [distMax, leM])
+  cases hs : sup .L with
+  | fin k => have h := hub (k + 1); rw [hs] at h; simp only [leM] at h; omega
+  | L => rw [hs] at hR; simp [leM] at hR
+  | R => rw [hs] at hL; simp [leM] at hL
+  | top => rw [hs] at hL; simp [leM] at hL
+
+/-! ## The ℚ≥0 impossibility: a cofinal ℕ-ruler defeats every bounded escapee (no dcpo)
+
+The residual frontier was: does a *directed, top-less, non-dcpo* distance admit a
+bounded-image escapee? For `ℚ≥0` — the canonical such distance — the answer is **no**, and
+the reason is not directed-completeness but a *coarse* substitute. `ℚ≥0` is Archimedean, so
+the naturals `0 ≤ 1 ≤ 2 ≤ ⋯` form a monotone **cofinal ruler**: every element sits below
+some `k n`. That ruler alone — no sups, no dcpo — rounds any bounded image-family up to a
+*monotone* modulus. Send each threshold `t` to `k (least n whose ruler value bounds the
+family at t)`: leastness makes the index monotone in `t` (a larger down-set is a superset,
+so its least bounding index is not smaller), and cofinality makes `k` of it dominate. So over
+any distance carrying such a ruler, every map whose image-families are bounded factors — and
+`ℚ≥0` carries one while failing to be a dcpo.
+
+This is a sufficient hypothesis **incomparable** to directed-completeness: `ℚ≥0` has the
+ruler but is not a dcpo; an uncountable dcpo has completeness but no `ω`-ruler. Directed-
+completeness was therefore never *necessary* for factorization — it was one sufficient route,
+and the ruler is another, cheaper one that the motivating `ℚ≥0` case actually travels. It
+also closes the boundedness gap left by `escapee_unbounded`: once the image-families are
+bounded (excluding the unbounded `D3` escapee), the ruler — not completeness — factors them.
+
+(`ℚ≥0` itself is not built here — a mathlib-free rationals-with-order is disproportionate and
+orthogonal to the mechanism. The `Ruler` hypothesis is exactly the Archimedean-ruler property
+`ℚ≥0` provably has; `natRuler` witnesses that the hypothesis is inhabited by a genuine
+distance codomain. The one piece asserted in prose and not formalized is that `ℚ≥0` is not a
+dcpo — the standard `√2` gap.) -/
+
+/-- Bounded upward linear search: least `n ∈ [start, start+fuel)` with `p n`, mathlib-free
+    (Lean core lacks `Nat.find`, and this file imports nothing). -/
+def sfind (p : Nat → Prop) [DecidablePred p] (start : Nat) : Nat → Nat
+  | 0        => start
+  | fuel + 1 => if p start then start else sfind p (start + 1) fuel
+
+/-- The search result is `≤` any in-range witness — the minimality half. -/
+theorem sfind_le (p : Nat → Prop) [DecidablePred p] :
+    ∀ (fuel start m : Nat), p m → start ≤ m → m < start + fuel → sfind p start fuel ≤ m
+  | 0,        _,     _, _,  hs, _ => hs
+  | fuel + 1, start, m, hm, hs, _ => by
+      show (if p start then start else sfind p (start + 1) fuel) ≤ m
+      by_cases hp : p start
+      · rw [if_pos hp]; exact hs
+      · rw [if_neg hp]
+        have hne : start ≠ m := fun h => hp (h ▸ hm)
+        exact sfind_le p fuel (start + 1) m hm (by omega) (by omega)
+
+/-- The search finds a witness whenever one lies in range — the existence half. -/
+theorem sfind_p (p : Nat → Prop) [DecidablePred p] :
+    ∀ (fuel start : Nat), (∃ m, start ≤ m ∧ m < start + fuel ∧ p m) → p (sfind p start fuel)
+  | 0,        _,     ⟨_, hs, hlt, _⟩   => by exact absurd hs (by omega)
+  | fuel + 1, start, ⟨m, hs, hlt, hpm⟩ => by
+      show p (if p start then start else sfind p (start + 1) fuel)
+      by_cases hp : p start
+      · rw [if_pos hp]; exact hp
+      · rw [if_neg hp]
+        have hne : start ≠ m := fun h => hp (h ▸ hpm)
+        exact sfind_p p fuel (start + 1) ⟨m, by omega, by omega, hpm⟩
+
+/-- **Least witness, mathlib-free.** From a bare existence proof, a least element — the
+    monotone-selection primitive the ruler argument needs, standing in for `Nat.find`. -/
+theorem exists_least (p : Nat → Prop) [DecidablePred p] (H : ∃ n, p n) :
+    ∃ μ, p μ ∧ ∀ m, p m → μ ≤ m := by
+  obtain ⟨w, hw⟩ := H
+  refine ⟨sfind p 0 (w + 1), sfind_p p (w + 1) 0 ⟨w, Nat.zero_le _, by omega, hw⟩, ?_⟩
+  intro m hm
+  rcases Nat.lt_or_ge m (w + 1) with h | h
+  · exact sfind_le p (w + 1) 0 m hm (Nat.zero_le _) (by omega)
+  · have : sfind p 0 (w + 1) ≤ w := sfind_le p (w + 1) 0 w hw (Nat.zero_le _) (by omega)
+    omega
+
+/-- A **cofinal monotone ℕ-ruler** on `(D, le)`: a coarse, countable, unbounded skeleton.
+    `ℚ≥0` has one (`k n = n`, cofinal by the Archimedean property) yet is not a dcpo. -/
+structure Ruler (D : Type) (le : D → D → Prop) where
+  k       : Nat → D
+  mono    : ∀ {i j}, i ≤ j → le (k i) (k j)
+  cofinal : ∀ b, ∃ n, le b (k n)
+
+/-- **The impossibility theorem.** A cofinal ℕ-ruler defeats every bounded-image escapee:
+    if each image-family is bounded, the map factors — through `k (least bounding index)`,
+    monotone by leastness, dominating by cofinality. No suprema, no directed-completeness.
+    So an escapee over `ℚ≥0` (which has such a ruler) cannot exist; dcpo was never needed. -/
+noncomputable def ruler_defeats_bounded_escapee {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (R : Ruler D le) (dist : X → X → D) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist := by
+  classical
+  -- each threshold's image-family is bounded by *some* ruler value (bounded + cofinal)
+  have hExists : ∀ t, ∃ n, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) (R.k n) := by
+    intro t
+    obtain ⟨b, hb⟩ := bounded t
+    obtain ⟨n, hbn⟩ := R.cofinal b
+    exact ⟨n, fun x y hxy => le_trans (hb x y hxy) hbn⟩
+  -- `N t` = least ruler index bounding the family at `t`
+  let N : D → Nat := fun t => Classical.choose (exists_least _ (hExists t))
+  have hN : ∀ t, (∀ x y, le (dist x y) t → le (dist (f x) (f y)) (R.k (N t))) ∧
+      (∀ m, (∀ x y, le (dist x y) t → le (dist (f x) (f y)) (R.k m)) → N t ≤ m) :=
+    fun t => Classical.choose_spec (exists_least _ (hExists t))
+  refine Bridge.ofModulus (le := le) (dist := dist) le_trans f ⟨fun t => R.k (N t), ?_⟩ ?_
+  · -- monotone: a larger down-set is a superset, so its least bounding index is not smaller
+    intro a b hab
+    exact R.mono ((hN a).2 (N b) (fun x y hxy => (hN b).1 x y (le_trans hxy hab)))
+  · -- dominates: the least bounding index bounds the family, at `t = dist x y`
+    intro x y
+    exact (hN (dist x y)).1 x y (le_refl _)
+
+/-- `ℕ` carries a ruler (`k = id`) — the hypothesis is inhabited by a real distance codomain. -/
+def natRuler : Ruler Nat Nat.le where
+  k       := id
+  mono    := fun h => h
+  cofinal := fun b => ⟨b, Nat.le_refl b⟩
 
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
