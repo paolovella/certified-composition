@@ -337,24 +337,85 @@ overshoots every family. So *not-dcpo is necessary but not sufficient for an
 escapee* — the missing sup here is overshootable, exactly as the totally-ordered
 `ℚ≥0` gap is.
 
-**And the natural way to close the gap does not close.** The reduction "directed +
-bounded ⇒ a monotone *overshooting* selection" (weaker than dcpo — no least ub
-required) would, if provable from directedness alone, close the line with `+ ⇒
-factorization` and demote dcpo to sufficient-not-necessary. It does not go through:
-a greedy / linear-extension selection assigns `φ(t)` an ub of `S(t)` dominating
-`{φ(s) : s ≤ t}`, and that accumulation need not be **bounded** — each `φ(s)` is
-*some* ub of `S(s)`, possibly far above the later bound of `S(t)`, and controlling
-it requires choosing `φ(s)` = *least* ub = sup, i.e. dcpo. Without sups the
-accumulation can blow up, and the future bound is unknowable when the earlier
-choice is made. So the overshoot-selection reduction **relocates the difficulty to
-the same non-dcpo gap** rather than removing it — it is the original problem, not a
-weakening of it.
+**The *greedy* overshoot does not close — but it mislocated why.** The reduction
+"directed + bounded ⇒ a monotone *overshooting* selection" fails as a **greedy**
+construction: assigning `φ(t)` an ub of `S(t)` dominating `{φ(s) : s ≤ t}`
+accumulates, and each `φ(s)` — *some* ub of `S(s)`, possibly far above the later
+bound of `S(t)` — can blow the accumulation up, with the future bound unknowable
+when the earlier choice is made. Controlling it that way requires `φ(s)` = *least*
+ub = sup, i.e. dcpo. But this is an obstruction to *greedy accumulation*, not to
+overshooting as such. Replace the running accumulation with a **fixed external
+scale** and it dissolves — which is exactly what closes the `ℚ≥0` case below.
 
-So the transport line's final state, honestly: **factorization ⟸ image-family sups
-(proved); dcpo ⇒ image-family sups ⇒ factors; directed / `+` ⇏ dcpo (`Dm`, proved);
-not-dcpo ⇏ escapee (`Dm` still factors, proved); and whether a directed non-dcpo
-monoid can host a *bounded, un-overshootable* escapee — the one thing that would
-force the line either shut or open — has no proof and no witness.** dcpo is the
-ceiling reached; `+` alone provably does not reach it; the remaining gap is a
-genuine open problem in order theory, correctly located and mechanically fenced on
-every side.
+**Image-family sups are not even necessary (`image_sups_not_necessary`, proved).**
+Over `Dm` — directed, not-dcpo — the identity map under `distMax a b = fin (max a b)`
+factors (through the `⊤` overshoot), yet the `factors_of_image_sups` hypothesis is
+*unsatisfiable*: at threshold `L` its image-family is the whole sup-less chain
+`{fin n}`, whose least upper bound does not exist. The least-ub modulus the theorem
+demands provably does not exist here, and the map factors anyway. So image-family
+sups are the *canonical* sufficient condition, now witnessed **non-minimal** — a
+non-least dominator does the entire job.
+
+**The fixed-scale overshoot that closes `ℚ≥0` — a cofinal ℕ-ruler
+(`ruler_defeats_bounded_escapee`, proved).** The scale greedy accumulation lacked is
+a monotone **cofinal ℕ-ruler** `k : ℕ → D` (`Ruler`): a coarse countable skeleton
+with every element below some `k n`. Given one, send each threshold `t` to
+`k (least n whose ruler value bounds the family at t)` — leastness makes the index
+monotone (larger down-set ⟹ superset ⟹ least bounding index not smaller), cofinality
+makes it dominate. Nothing accumulates (the scale is fixed, not running), no sups, no
+dcpo. So **every bounded-image map over a ruler-carrying distance factors** — and
+`ℚ≥0` carries such a ruler (`k n = n`, cofinal by Archimedean-ness) while having a
+*bounded family with no sup* (the `√2` gap). The `ℚ≥0` escapee the frontier feared
+**cannot exist**. (The least-witness search is mathlib-free — Lean core has no
+`Nat.find` — and `exists_least` is *choice-free* (`propext`/`Quot.sound`): the search
+*is* the monotone selection dcpo was standing in for. The full theorem uses
+`Classical.choice` only to select the per-threshold least index.)
+
+**The honest framing is *incomparable*, not "dcpo dethroned."** A cofinal ω-ruler and
+directed-completeness are **two incomparable sufficient conditions**: `ℚ≥0` has the
+ruler and not dcpo; an uncountable dcpo has completeness and no ω-ruler. dcpo is *not*
+necessary for ruler-carrying distances. And the ruler hypothesis is milder than it
+first appears — which shrinks the residual sharply.
+
+**The residual is not "rulerless" — it is *singular cofinality*
+(`countable_cofinal_factors`, `Ruler.ofCofinalSeq`).** Directedness makes the ruler's
+monotonicity *free*: any cofinal ℕ-**sequence** `c` — no order on it assumed — becomes a
+monotone ruler by running the directed `cub` through it (`cofChain`, `Ruler.ofCofinalSeq`,
+**axiom-free**). So the operative hypothesis is not "monotone cofinal chain" but plain
+**countable cofinality**, and `countable_cofinal_factors` factors every bounded-image map
+from a bare cofinal sequence — `ℚ≥0` qualifies via `ℕ ↪ ℚ≥0`, no Archimedean rounding done
+by hand. The *same* selection argument then runs transfinitely for **any regular cardinal
+cofinality** `κ`: build a monotone cofinal `κ`-chain (at each limit `ξ < κ` the earlier `<κ`
+terms are non-cofinal, hence bounded, *because `κ` is regular*), select `g` along it (at
+limits the `<κ` chosen values are again bounded, and directedness gives the common upper
+bound), then push down by `g(t) = g(d_{least ξ : t ≤ d_ξ})` — monotone and dominating. So
+**every directed distance of regular cofinality factors**; countable is the `κ = ω` case.
+Only **singular** cofinality escapes — there a `<κ` prefix can already be cofinal and the
+limit accumulation blows up, the exact greedy failure the ruler avoided. The open frontier is
+therefore not "directed, non-dcpo, rulerless" but the strictly smaller **"directed, non-dcpo,
+of singular cofinality"** — first realized at `ℵ_ω`-cofinality, an object far past anything
+the transport instances reach. (The `ω` case is formalized; the regular-`κ` argument is prose
+— transfinite recursion and regular cardinals are not mathlib-free, and `ω` already covers
+every countably-generated distance, `ℚ≥0` included.)
+
+**And `ℕ` is not the shortcut it looks like.** `natRuler` (ℕ, `k = id`) proves `Ruler`
+is inhabited by a genuine distance codomain — but *only* that. It is tempting to read
+ℕ as the coveted "ruler-carrying, not-dcpo, factors anyway" witness, since ℕ fails
+strict directed-completeness (its unbounded chain `0 ≤ 1 ≤ ⋯` has no sup). It is not:
+**every *bounded* image-family in ℕ is finite, hence has a sup**, so
+`factors_of_image_sups` already covers ℕ and the ruler adds nothing there. ℕ's
+incompleteness lives in *unbounded* families — exactly the ones the `bounded`
+hypothesis excludes. The interesting instance needs a *bounded* family with **no**
+least upper bound (an order-gap), which ℕ lacks and `ℚ≥0` has — so `ℚ≥0`'s
+not-dcpo-ness stays load-bearing, and stays prose (a mathlib-free `ℚ≥0` is
+disproportionate). `natRuler` is non-vacuity, not the witness.
+
+So the transport line's state, corrected once more: **factorization ⟸ image-family
+sups (proved), but those sups are *not necessary* (`image_sups_not_necessary`); a
+cofinal ℕ-*sequence* is enough (`countable_cofinal_factors`), so every directed
+distance of *regular* cofinality factors — `ℚ≥0` included — and the sole residual is
+the *directed, non-dcpo, singular-cofinality* order, first seen at `ℵ_ω`, with neither
+witness nor impossibility proof.** Four times the stated hypothesis — completeness, then
+directedness, then boundedness-not-directedness, then dcpo — turned out not to be the
+operative one, and the fifth (cofinality-regularity) is now the residual; each correction
+came from trying to *prove* the thing rather than from staring at it.

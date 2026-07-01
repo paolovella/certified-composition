@@ -548,17 +548,23 @@ any distance carrying such a ruler, every map whose image-families are bounded f
 `ℚ≥0` carries one while failing to be a dcpo.
 
 This is a sufficient hypothesis **incomparable** to directed-completeness: `ℚ≥0` has the
-ruler but is not a dcpo; an uncountable dcpo has completeness but no `ω`-ruler. Directed-
-completeness was therefore never *necessary* for factorization — it was one sufficient route,
-and the ruler is another, cheaper one that the motivating `ℚ≥0` case actually travels. It
-also closes the boundedness gap left by `escapee_unbounded`: once the image-families are
-bounded (excluding the unbounded `D3` escapee), the ruler — not completeness — factors them.
+ruler but is not a dcpo; an uncountable dcpo has completeness but no `ω`-ruler. So dcpo is not
+*dethroned* — it and the ruler are two **incomparable** sufficient routes, and `ℚ≥0` travels
+the ruler. dcpo remains the only known route for the **rulerless** case, so the residual does
+not vanish, it **relocates**: to a distance that is *directed, non-dcpo, and carries no cofinal
+`ω`-chain* — a far more exotic object than `ℚ≥0`, now the entire open frontier. This also
+closes the boundedness gap left by `escapee_unbounded`: once the image-families are bounded
+(excluding the unbounded `D3` escapee), the ruler — not completeness — factors them.
 
 (`ℚ≥0` itself is not built here — a mathlib-free rationals-with-order is disproportionate and
 orthogonal to the mechanism. The `Ruler` hypothesis is exactly the Archimedean-ruler property
-`ℚ≥0` provably has; `natRuler` witnesses that the hypothesis is inhabited by a genuine
-distance codomain. The one piece asserted in prose and not formalized is that `ℚ≥0` is not a
-dcpo — the standard `√2` gap.) -/
+`ℚ≥0` provably has; the one piece asserted in prose and not formalized is that `ℚ≥0` is not a
+dcpo — the standard `√2` gap. `natRuler` witnesses only that `Ruler` is *inhabited* by a
+genuine distance codomain: it is **not** the interesting not-dcpo instance. Although `ℕ` fails
+strict directed-completeness, every *bounded* image-family in `ℕ` is finite, hence has a sup,
+so `factors_of_image_sups` already covers `ℕ` and the ruler adds nothing there — `ℕ`'s
+incompleteness lives only in *unbounded* chains, exactly what `bounded` excludes. The
+interesting instance needs a bounded family with *no* sup, which `ℕ` lacks and `ℚ≥0` has.) -/
 
 /-- Bounded upward linear search: least `n ∈ [start, start+fuel)` with `p n`, mathlib-free
     (Lean core lacks `Nat.find`, and this file imports nothing). -/
@@ -612,7 +618,8 @@ structure Ruler (D : Type) (le : D → D → Prop) where
 /-- **The impossibility theorem.** A cofinal ℕ-ruler defeats every bounded-image escapee:
     if each image-family is bounded, the map factors — through `k (least bounding index)`,
     monotone by leastness, dominating by cofinality. No suprema, no directed-completeness.
-    So an escapee over `ℚ≥0` (which has such a ruler) cannot exist; dcpo was never needed. -/
+    So an escapee over `ℚ≥0` (which has such a ruler) cannot exist — dcpo is one sufficient
+    route, this is an incomparable second, and only the *rulerless* case still needs dcpo. -/
 noncomputable def ruler_defeats_bounded_escapee {X D : Type} (le : D → D → Prop)
     (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
     (R : Ruler D le) (dist : X → X → D) (f : X → X)
@@ -643,6 +650,79 @@ def natRuler : Ruler Nat Nat.le where
   k       := id
   mono    := fun h => h
   cofinal := fun b => ⟨b, Nat.le_refl b⟩
+
+/-! ## The residual is not "rulerless" — it is *singular cofinality* (and most of it closes)
+
+The `Ruler` hypothesis asked for a *monotone* cofinal ℕ-chain. But directedness makes the
+monotonicity free: any cofinal ℕ-**sequence** `c` — no order on it assumed — becomes a genuine
+ruler by running the directed `cub` through it (`cofChain`, `Ruler.ofCofinalSeq`). So the real
+hypothesis is just **countable cofinality**, and `countable_cofinal_factors` needs only a
+cofinal sequence — which `ℚ≥0` has (`ℕ ↪ ℚ≥0`), no Archimedean rounding invoked by hand.
+
+That reframes the whole residual, and shrinks it. The *same* selection argument runs
+transfinitely for **any regular cardinal cofinality** `κ`: build a monotone cofinal `κ`-chain
+`(d_ξ)_{ξ<κ}` — at each limit `ξ < κ` the earlier `<κ` terms are non-cofinal, hence bounded,
+*because `κ` is regular* — then choose `g` along it (at a limit the `<κ` already-chosen values
+are again bounded, and directedness gives a common upper bound of them and of the family), then
+push down to all of `D` by `g(t) = g(d_{least ξ : t ≤ d_ξ})`, which is monotone and dominating.
+So **every directed distance of regular cofinality factors every bounded-image map** — countable
+is merely the `κ = ω` case. Only **singular** cofinality escapes the argument: there a `<κ`
+prefix can already be cofinal, so the limit accumulation can blow up unboundedly, exactly the
+greedy failure the ruler avoided. The open frontier is therefore not "directed, non-dcpo,
+rulerless" but the strictly smaller **"directed, non-dcpo, of singular cofinality"** — the first
+distance with such a cofinality being `ℵ_ω`-cofinal, an object far past anything the transport
+instances reach.
+
+Formalized below: the `κ = ω` case (`cofChain` folds `cub` along ℕ — no ordinals, mathlib-free).
+The regular-`κ` argument is prose: transfinite recursion and regular cardinals are not
+mathlib-free, and the ω case already covers every countably-generated distance, `ℚ≥0` included. -/
+
+/-- Run the directed `cub` through a sequence: the monotone envelope of `c 0, …, c n`. -/
+def cofChain {D : Type} {le : D → D → Prop} (dir : Directed D le) (c : Nat → D) : Nat → D
+  | 0     => c 0
+  | n + 1 => dir.cub (cofChain dir c n) (c (n + 1))
+
+theorem cofChain_le_succ {D : Type} {le : D → D → Prop} (dir : Directed D le) (c : Nat → D) :
+    ∀ n, le (cofChain dir c n) (cofChain dir c (n + 1)) :=
+  fun _ => dir.le_cub_left _ _
+
+theorem le_cofChain {D : Type} {le : D → D → Prop} (dir : Directed D le)
+    (le_refl : ∀ a, le a a) (c : Nat → D) : ∀ n, le (c n) (cofChain dir c n)
+  | 0     => le_refl (c 0)
+  | _ + 1 => dir.le_cub_right _ _
+
+theorem cofChain_mono {D : Type} {le : D → D → Prop} (dir : Directed D le)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c) (c : Nat → D) :
+    ∀ {i j}, i ≤ j → le (cofChain dir c i) (cofChain dir c j) := by
+  intro i j h
+  induction h with
+  | refl => exact le_refl _
+  | step _ ih => exact le_trans ih (cofChain_le_succ dir c _)
+
+/-- **Directedness monotonizes a cofinal sequence into a ruler.** No order on the sequence is
+    assumed — the running `cub` supplies both monotonicity and cofinality. -/
+def Ruler.ofCofinalSeq {D : Type} {le : D → D → Prop}
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dir : Directed D le) (c : Nat → D) (hc : ∀ b, ∃ n, le b (c n)) : Ruler D le where
+  k       := cofChain dir c
+  mono    := cofChain_mono dir le_refl le_trans c
+  cofinal := fun b => by
+    obtain ⟨n, hn⟩ := hc b
+    exact ⟨n, le_trans hn (le_cofChain dir le_refl c n)⟩
+
+/-- **Countable cofinality suffices — no ruler-monotonicity assumed (the `κ = ω` case).** A
+    directed distance with a merely cofinal ℕ-*sequence* factors every bounded-image map. So the
+    ruler hypothesis is exactly countable cofinality; `ℚ≥0` (cofinal `ℕ`) is covered, and the
+    residual shrinks to *singular* cofinality (the regular case closes by the same argument
+    transfinitely — see the section note). -/
+noncomputable def countable_cofinal_factors {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dir : Directed D le) (c : Nat → D) (hc : ∀ b, ∃ n, le b (c n))
+    (dist : X → X → D) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist :=
+  ruler_defeats_bounded_escapee le le_refl le_trans
+    (Ruler.ofCofinalSeq le_refl le_trans dir c hc) dist f bounded
 
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
