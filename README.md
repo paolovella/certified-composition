@@ -13,7 +13,7 @@ mathlib-free ones build instantly, the third needs the mathlib olean cache.
 |---|---|---|---|
 | [`conf-typing/`](conf-typing) | confidentiality-typing framework (the IMP timing instance + meta-theory) | none (mathlib-free) | closed |
 | [`transport-calculus/`](transport-calculus) | a common interface for transport theorems (certified morphisms) | none (mathlib-free) | core proved |
-| [`transport-kernel/`](transport-kernel) | mathlib instances of that interface | mathlib | 2 instances received |
+| [`transport-kernel/`](transport-kernel) | mathlib instances of that interface | mathlib | 2 received + Dobrushin DPI built (finite) |
 
 ## The through-line
 
@@ -55,6 +55,10 @@ The same accountancy appears at three levels of abstraction:
 **`transport-kernel`** (mathlib):
 - `comp_reconstructs_lipschitz`, `comp_reconstructs_holder` — the generic
   `Bridge.comp` reconstructs `LipschitzWith.comp` and `HolderWith.comp`.
+- `dpi` — the Dobrushin data-processing inequality for finite Markov kernels
+  (TV contraction), proved *from scratch* (mathlib has no DPI), plus
+  `comp_reconstructs_dobrushin` / `coeff_submul` — advanced composition as
+  certificate accumulation. The quantitative instance the interface was built for.
 
 ## Scope — what is *not* claimed
 
@@ -67,10 +71,11 @@ The same accountancy appears at three levels of abstraction:
   produced, not a claim being made. Two case studies by one author is a working
   style demonstrated twice, not a validated methodology. It travels only if a
   second hand runs it.
-- **Deferred:** the Markov-kernel / Dobrushin (total-variation) instance needs
-  the data-processing inequality, which mathlib lacks — a genuine from-scratch
-  formalization, and the quantitative frontier. The interface only has to
-  *receive* it; accumulation is already proved generically.
+- **Built, finite case:** the Markov-kernel / Dobrushin (total-variation) instance
+  needed the data-processing inequality, which mathlib lacks; it is now proved from
+  scratch over *finite* state spaces (`transport-kernel/DobrushinReceive.lean`). The
+  remaining brick is the *measure-theoretic* generalization to continuous state
+  spaces — the same coupling argument in integral form.
 
 ## Building
 

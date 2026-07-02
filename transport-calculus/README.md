@@ -85,10 +85,12 @@ coincidence that hid the conflation). Two compose to Lipschitz-4:
   certificate `(C, r)` with a semidirect-product law `(Cg·Cf^rg, rg·rf)`;
   `comp_reconstructs_holder` reconstructs `HolderWith.comp`. Two different
   accumulation *algebras*, one `Bridge.comp`.
-- **Markov-kernel / Dobrushin (`M = ℝ≥0`, `D = ℝ≥0∞` = TV) — deferred.** Needs the
-  data-processing inequality / Dobrushin coefficient, which mathlib lacks — a
-  genuine from-scratch formalization (century-old probability, *not* the novel
-  part). The interface only has to *receive* it; accumulation is already proved.
+- **Markov-kernel / Dobrushin (`M = ℝ≥0`, `D = ℝ`= TV) — built (finite state spaces).**
+  mathlib has no data-processing inequality, so it is proved from scratch in
+  `transport-kernel/`: `dpi` (the DPI, via the coupling/overlap argument), `Bridge.ofKernel`
+  (a kernel is a certified bridge), `comp_reconstructs_dobrushin` (advanced composition =
+  certificate accumulation), `coeff_submul` (`η(K∘L) ≤ η(K)·η(L)`). Axiom-clean, no `sorry`.
+  The measure-theoretic generalization (continuous state spaces) is the remaining extension.
 
 ## Scope — the boundary, and what it is *not*
 
@@ -384,19 +386,22 @@ monotone ruler by running the directed `cub` through it (`cofChain`, `Ruler.ofCo
 **axiom-free**). So the operative hypothesis is not "monotone cofinal chain" but plain
 **countable cofinality**, and `countable_cofinal_factors` factors every bounded-image map
 from a bare cofinal sequence — `ℚ≥0` qualifies via `ℕ ↪ ℚ≥0`, no Archimedean rounding done
-by hand. The *same* selection argument then runs transfinitely for **any regular cardinal
-cofinality** `κ`: build a monotone cofinal `κ`-chain (at each limit `ξ < κ` the earlier `<κ`
-terms are non-cofinal, hence bounded, *because `κ` is regular*), select `g` along it (at
-limits the `<κ` chosen values are again bounded, and directedness gives the common upper
-bound), then push down by `g(t) = g(d_{least ξ : t ≤ d_ξ})` — monotone and dominating. So
-**every directed distance of regular cofinality factors**; countable is the `κ = ω` case.
-Only **singular** cofinality escapes — there a `<κ` prefix can already be cofinal and the
-limit accumulation blows up, the exact greedy failure the ruler avoided. The open frontier is
-therefore not "directed, non-dcpo, rulerless" but the strictly smaller **"directed, non-dcpo,
-of singular cofinality"** — first realized at `ℵ_ω`-cofinality, an object far past anything
-the transport instances reach. (The `ω` case is formalized; the regular-`κ` argument is prose
-— transfinite recursion and regular cardinals are not mathlib-free, and `ω` already covers
-every countably-generated distance, `ℚ≥0` included.)
+by hand. **But this is specific to `ω`, and does not generalize for free** — the
+transfinite analogue is an *open proof with a real hypothesis gap*, not a formalization
+deferral. Monotonizing a cofinal ℕ-sequence uses only **finite** joins, exactly what
+directedness supplies (`cofChain` is a finite `cub`-fold). To run the same selection along a
+cofinal `κ`-chain for uncountable `κ`, the limit step needs *upper bounds of `<κ`-sized
+prefixes* — i.e. **`κ`-directedness** (every subset of size `<κ` is bounded). Regular
+cofinality does **not** give this: a `<κ`-sized subset is non-cofinal, but *non-cofinal ≠
+bounded* in a merely directed order (`ℕ` is directed yet unbounded). So "regular cofinality ⇒
+factors" has a hole at exactly that step; the hypothesis the argument really needs is
+`κ`-directedness, strictly stronger, and under it the transfinite selection is only
+*plausible* — unchecked, and unformalizable here.
+
+So the honest residual is the **whole uncountable-cofinality** directed non-dcpo realm — not
+the smaller "singular cofinality" (an earlier overstatement of mine), since even the
+regular-uncountable case is open absent `κ`-directedness. It has **neither a witness nor an
+impossibility proof**. The one solid new fact is the `ω` case; the rest is a frontier.
 
 **And `ℕ` is not the shortcut it looks like.** `natRuler` (ℕ, `k = id`) proves `Ruler`
 is inhabited by a genuine distance codomain — but *only* that. It is tempting to read
@@ -410,12 +415,26 @@ least upper bound (an order-gap), which ℕ lacks and `ℚ≥0` has — so `ℚ�
 not-dcpo-ness stays load-bearing, and stays prose (a mathlib-free `ℚ≥0` is
 disproportionate). `natRuler` is non-vacuity, not the witness.
 
-So the transport line's state, corrected once more: **factorization ⟸ image-family
-sups (proved), but those sups are *not necessary* (`image_sups_not_necessary`); a
-cofinal ℕ-*sequence* is enough (`countable_cofinal_factors`), so every directed
-distance of *regular* cofinality factors — `ℚ≥0` included — and the sole residual is
-the *directed, non-dcpo, singular-cofinality* order, first seen at `ℵ_ω`, with neither
-witness nor impossibility proof.** Four times the stated hypothesis — completeness, then
-directedness, then boundedness-not-directedness, then dcpo — turned out not to be the
-operative one, and the fifth (cofinality-regularity) is now the residual; each correction
-came from trying to *prove* the thing rather than from staring at it.
+So the transport line's state, honestly: **factorization ⟸ image-family sups (proved),
+but those sups are *not necessary* (`image_sups_not_necessary`); a cofinal ℕ-*sequence*
+is enough (`countable_cofinal_factors`), so every directed distance of *countable*
+cofinality factors — `ℚ≥0` included — and the residual is the whole *uncountable-
+cofinality* directed non-dcpo realm, which has neither witness nor impossibility proof
+(and where even the regular-cardinal sub-case is an open proof needing `κ`-directedness,
+not the closed result I first claimed).** Four times the stated hypothesis — completeness,
+directedness, boundedness-not-directedness, dcpo — turned out not to be operative; and
+what stands *proved* is only the countable-cofinality slice, with the uncountable frontier
+wide open.
+
+**The quantitative centre — now built (finite case).** This whole line is *qualitative* — it
+asks only whether a monotone dominator *exists*, never what it *is*. The interface was built
+to host **quantitative** transport: the Dobrushin / strong-data-processing contraction of
+total variation, the reason any of this connects to real contraction estimates. That instance
+was the unbuilt centre, and it is now built — over finite state spaces — in `transport-kernel/`
+(`dpi`, proved from scratch since mathlib has no DPI; `comp_reconstructs_dobrushin` making
+advanced composition a case of certificate accumulation; `coeff_submul`). So the centre is no
+longer prose: the interface demonstrably hosts a contraction theorem mathlib does not contain,
+and reproduces its composition law generically. What remains prose is the *measure-theoretic*
+generalization to continuous state spaces — the same coupling argument in integral form — and
+the qualitative order-theory frontier above. The centre is machine-checked; its continuous
+generalization is the next brick.

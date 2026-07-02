@@ -651,31 +651,33 @@ def natRuler : Ruler Nat Nat.le where
   mono    := fun h => h
   cofinal := fun b => ⟨b, Nat.le_refl b⟩
 
-/-! ## The residual is not "rulerless" — it is *singular cofinality* (and most of it closes)
+/-! ## Countable cofinality closes — and the uncountable residual is genuinely open
 
-The `Ruler` hypothesis asked for a *monotone* cofinal ℕ-chain. But directedness makes the
-monotonicity free: any cofinal ℕ-**sequence** `c` — no order on it assumed — becomes a genuine
-ruler by running the directed `cub` through it (`cofChain`, `Ruler.ofCofinalSeq`). So the real
+The `Ruler` hypothesis asked for a *monotone* cofinal ℕ-chain. Directedness makes the
+monotonicity free: any cofinal ℕ-**sequence** `c` — no order on it assumed — becomes a ruler by
+running the directed `cub` through it (`cofChain`, `Ruler.ofCofinalSeq`). So the operative
 hypothesis is just **countable cofinality**, and `countable_cofinal_factors` needs only a
-cofinal sequence — which `ℚ≥0` has (`ℕ ↪ ℚ≥0`), no Archimedean rounding invoked by hand.
+cofinal sequence — `ℚ≥0` has one (`ℕ ↪ ℚ≥0`), no Archimedean rounding by hand.
 
-That reframes the whole residual, and shrinks it. The *same* selection argument runs
-transfinitely for **any regular cardinal cofinality** `κ`: build a monotone cofinal `κ`-chain
-`(d_ξ)_{ξ<κ}` — at each limit `ξ < κ` the earlier `<κ` terms are non-cofinal, hence bounded,
-*because `κ` is regular* — then choose `g` along it (at a limit the `<κ` already-chosen values
-are again bounded, and directedness gives a common upper bound of them and of the family), then
-push down to all of `D` by `g(t) = g(d_{least ξ : t ≤ d_ξ})`, which is monotone and dominating.
-So **every directed distance of regular cofinality factors every bounded-image map** — countable
-is merely the `κ = ω` case. Only **singular** cofinality escapes the argument: there a `<κ`
-prefix can already be cofinal, so the limit accumulation can blow up unboundedly, exactly the
-greedy failure the ruler avoided. The open frontier is therefore not "directed, non-dcpo,
-rulerless" but the strictly smaller **"directed, non-dcpo, of singular cofinality"** — the first
-distance with such a cofinality being `ℵ_ω`-cofinal, an object far past anything the transport
-instances reach.
+**Why this is specific to `ω`, and does not generalize for free.** Monotonizing a cofinal
+ℕ-sequence uses only **finite** joins — exactly what directedness supplies (each `cofChain n`
+is a finite `cub`-fold). The transfinite analogue is an **open proof, not a formalization
+deferral**. To run the same selection along a cofinal `κ`-chain for uncountable `κ`, the limit
+step needs *upper bounds of `<κ`-sized prefixes* — i.e. **`κ`-directedness** (every subset of
+size `<κ` is bounded). Regular cofinality does **not** give this: a `<κ`-sized subset is
+non-cofinal, but *non-cofinal ≠ bounded* in a merely directed order (`ℕ` is directed yet
+unbounded). So "regular cofinality ⇒ factors" has a real hole at exactly that step; the
+hypothesis the argument actually needs is `κ`-directedness, strictly stronger, and under it the
+transfinite selection is only *plausible* — unchecked, and unformalizable here (transfinite
+recursion, cardinals).
 
-Formalized below: the `κ = ω` case (`cofChain` folds `cub` along ℕ — no ordinals, mathlib-free).
-The regular-`κ` argument is prose: transfinite recursion and regular cardinals are not
-mathlib-free, and the ω case already covers every countably-generated distance, `ℚ≥0` included. -/
+**So the honest residual is the whole uncountable-cofinality realm**, not the smaller "singular
+cofinality" — even the regular-uncountable case is open absent `κ`-directedness. It has
+**neither a witness nor an impossibility proof**. The one solid new fact is the `ω` case below;
+the rest is a frontier, not a theorem.
+
+Formalized below: `κ = ω` (`cofChain` folds `cub` along ℕ — no ordinals, mathlib-free), which
+covers every countably-generated distance, `ℚ≥0` included. -/
 
 /-- Run the directed `cub` through a sequence: the monotone envelope of `c 0, …, c n`. -/
 def cofChain {D : Type} {le : D → D → Prop} (dir : Directed D le) (c : Nat → D) : Nat → D
@@ -711,10 +713,10 @@ def Ruler.ofCofinalSeq {D : Type} {le : D → D → Prop}
     exact ⟨n, le_trans hn (le_cofChain dir le_refl c n)⟩
 
 /-- **Countable cofinality suffices — no ruler-monotonicity assumed (the `κ = ω` case).** A
-    directed distance with a merely cofinal ℕ-*sequence* factors every bounded-image map. So the
-    ruler hypothesis is exactly countable cofinality; `ℚ≥0` (cofinal `ℕ`) is covered, and the
-    residual shrinks to *singular* cofinality (the regular case closes by the same argument
-    transfinitely — see the section note). -/
+    directed distance with a merely cofinal ℕ-*sequence* factors every bounded-image map (the
+    monotonization uses only finite `cub`-folds). So the ruler hypothesis is exactly countable
+    cofinality; `ℚ≥0` (cofinal `ℕ`) is covered. The uncountable case does **not** follow — see
+    the section note: the transfinite step needs `κ`-directedness, an open hypothesis gap. -/
 noncomputable def countable_cofinal_factors {X D : Type} (le : D → D → Prop)
     (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
     (dir : Directed D le) (c : Nat → D) (hc : ∀ b, ∃ n, le b (c n))

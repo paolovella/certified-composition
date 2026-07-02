@@ -14,7 +14,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 1 | olean cache | multi-GB infra; gates *importing anything* | **done** (5.8G, 8542 oleans) |
 | 2a | `LipschitzWith` receive | cache only — no new math | **done**, this repo |
 | 2b | `HolderWith` receive | cache only — non-scalar certificate | **done**, this repo |
-| 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | deferred (Paper-2 brick) |
+| 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | **done** (finite state spaces), this repo |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 
@@ -72,17 +72,47 @@ Two takeaways:
   composition of two bridges requires only the action-compatibility `act_mul`.
   Leaner than a monoid action.
 
+## Tier 3 — the quantitative centre, built from scratch (`TransportKernel/DobrushinReceive.lean`)
+
+Lipschitz and Hölder were *received*: mathlib already proves the contraction, and the
+interface plugs it in with no new math. The Dobrushin instance is the opposite, and it is
+the reason the whole interface exists — mathlib has **no** data-processing inequality, so
+the contraction is proved here, over **finite state spaces**, and only then handed to the
+interface. `M = ℝ≥0` (Dobrushin coefficients) acts on `D = ℝ` (TV distances) by
+multiplication (`dobrushinGA`).
+
+- `Dist S`, `Kernel S`, `Kernel.push` — finite probability distributions on a `Fintype`,
+  stochastic matrices, and pushforward `(push μ)(t) = ∑ₛ μ(s) K(s,t)`.
+- `tvd μ ν = ½∑|μ−ν|` — total-variation distance.
+- **`dpi`** — the data-processing inequality: if every pair of rows is within TV `η`, then
+  `tvd (push μ) (push ν) ≤ η · tvd μ ν`. Proved from scratch by the coupling / overlap
+  argument (Jordan-split `μ − ν` into parts of equal mass `m`, couple by the outer product
+  `dp ⊗ dm`, bound the pushed overlap below by `(1 − η)·m` via superadditivity of `min`).
+  This is the genuine formalization — century-old, non-novel probability, but *absent from
+  mathlib*, so built here. Axioms: `propext, Classical.choice, Quot.sound` — no `sorry`.
+- `Bridge.ofKernel` — a kernel with coefficient `η` **is** a certified bridge: pushforward
+  in the map slot, `η` in the certificate slot, `dpi` in `contracts`.
+- **`comp_reconstructs_dobrushin`** — the reception as a theorem: the generic `Bridge.comp`
+  applied to two kernel bridges yields the *submultiplicative* bound `η(K)·η(L)` on the
+  composed pushforward. **Advanced composition is certificate accumulation.**
+- `coeff_submul` — the same law at certificate level: `η(K∘L) ≤ η(K)·η(L)`, via `dpi`
+  applied to the composed kernel's rows.
+
+So the interface does not merely re-file objects mathlib already contracts; it **hosts a
+contraction theorem mathlib does not have**, and reproduces its composition law generically.
+This is the quantitative payload the qualitative order-theory line (in `transport-calculus`)
+was scaffolding for.
+
 ## What this is *not* (kept honest)
 
-- Not "the genus is correct" — one external instance is one data point, not a
-  characterization. The right next move (per review) is *more* mathlib
-  composition theorems of the same morphism/certificate/accumulated-certificate
-  shape, before any heavy formalization.
-- Not the Dobrushin instance. mathlib has kernels and TV pieces but **not** the
-  data-processing inequality or the Dobrushin coefficient (confirmed by grep), so
-  that contraction lemma is a genuine from-scratch formalization — century-old,
-  non-novel probability, multi-session. Deferred. The interface only has to
-  *receive* it; accumulation is already proved generically.
+- Not "the genus is correct" — three external/built instances are data points, not a
+  characterization.
+- **The Dobrushin instance is finite-state.** `Dist`/`Kernel` are over a `Fintype`; the DPI
+  is proved for discrete distributions and stochastic matrices. The general
+  measure-theoretic Dobrushin contraction (continuous state spaces, `MeasureTheory.Kernel`,
+  TV of measures) is *not* built — it needs mathlib's measure/kernel infrastructure and the
+  same argument in integral form. The finite case is the combinatorial heart; the
+  measure-theoretic generalization is the remaining extension, not a new idea.
 
 ## Naming note
 
