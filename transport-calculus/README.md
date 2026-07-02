@@ -514,6 +514,27 @@ open core, now a pure ZFC question: **does "every legal system over `D_coh(ρ₁
 imply triviality?** If yes, the transport escapee exists in ZFC. The legal pressure system
 `Σ_succ` and the decisive follow-ups are in the note.
 
+**The dip-side attempt (note §6) — a correction, a chain-freeness theorem, and a flipped
+verdict.** Attempting the dip-side argument corrected the record twice and settled the
+direction of evidence. First, `Σ_succ` *factors* — the uniform one-level shift
+`φ((α,s)) := (α+1, (s∨1)⌢⟨1⟩)` is a dominator, so the "pressure system" exerted none; real
+pressure needs limit-level raising, and there the limit-push system is legal exactly over
+*block-tame* sequences, whose tameness hands the block-diagonal dominator its
+monotonicity — the absorption pattern, for the fourth time: **whatever coherence makes a
+system legal builds its dominator.** Second, a new ZFC theorem: **`D_coh(e)` contains an
+ω₁-chain with cofinal levels iff `e` is trivial** — a chain is a club-indexed rep system
+and the reps proof runs verbatim. So over nontrivial sequences the fiber order is provably
+chain-free (Aronszajn-type as an order), which retroactively explains every failed
+chain-mediated kill and extraction at once. Third, the kill-side analysis closes into a
+circle at every entry point: dominator correction budgets are per-*element* (not
+per-level), each level has infinitely many elements, greedy assembly accumulates only at
+countable unions, and stage-wise floor sabotage makes the pressuring slices illegal at the
+same stroke. **Verdict flipped: the evidence now favors ZFC-factoring** — plausibly every
+legal system over every coherent sequence has a dominator, and the escapee, if it exists,
+needs a different species of directed order. The one missing lemma for a proof: global
+coordination of per-element finite gap-fill corrections — a transfinite amalgamation
+question with no surviving obstruction, chain-freeness having removed the known one.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),

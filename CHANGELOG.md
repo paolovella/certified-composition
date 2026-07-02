@@ -99,6 +99,20 @@ landed.
   retreats to non-canonical dominators only; and the Bridge is restated as
   a pure ZFC question over the walks' `ρ₁`. If it holds, the transport
   escapee exists in ZFC.
+- **the dip-side attempt — correction, chain-freeness, flipped verdict.**
+  `Σ_succ` factors after all (uniform one-level shift dominator) — the
+  prior "pressure" claim is retracted; limit-raising systems are legal
+  exactly over block-tame sequences, whose tameness builds the dominator
+  (absorption pattern, fourth instance). New ZFC theorem: `D_coh(e)` has
+  an ω₁-chain with cofinal levels iff `e` is trivial (a chain is a
+  club-indexed rep system) — over nontrivial sequences the fiber order is
+  provably chain-free, explaining every failed chain-mediated argument.
+  Kill schemes close into the legality circle at every entry (per-element
+  budgets, countable-union accumulation, slice-illegality under floor
+  sabotage). Verdict flipped: evidence now favors ZFC-factoring of all
+  fiber orders; the escapee, if anywhere, needs a different species of
+  directed order. Missing lemma named: global coordination of per-element
+  finite gap-fill corrections.
 
 ## transport-kernel — mathlib instances
 

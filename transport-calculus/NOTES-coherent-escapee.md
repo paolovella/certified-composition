@@ -150,7 +150,7 @@ fiber-membership of limit values — precisely where §2's kill operates, but no
 controls, which a dip-happy `φ` may deny. That last sentence is the exact face of the
 wall.
 
-## 5. Verdict (revised after §2′)
+## 5. Verdict (revised after §2′ — see §6 for the current verdict)
 
 The session's arc, kept honest: the ◊-side attempt first produced a ◊ theorem (§2), and
 checking whether walks already satisfy it in ZFC (§2′) showed the ◊ machinery was
@@ -162,3 +162,59 @@ exist iff trivial), one legal pressure system (`Σ_succ`), and one sharply-locat
 bridge, now itself a ZFC question: whether rep-death over walks propagates to *all*
 dominators of some legal system. One genuinely new idea — dip-side pressure — is still
 what the bridge needs, in either direction.
+
+## 6. The dip-side attempt — a correction, a chain-freeness theorem, and a flipped verdict
+
+**Correction: `Σ_succ` factors — it was never a pressure system.** The uniform one-level
+shift `φ((α,s)) := (α+1, (s ∨ 1)⌢⟨1⟩)` is a dominator: for `(β, e_β) ⊑ (α, s)` the
+requirement `(β+1, e_β⌢⟨1⟩)` is covered (`e_β ≤ s↾β` is the threshold condition; the
+appended coordinate is constant `1 ≤` everything, values normalized `≥ 1`); monotonicity
+and fiber-membership are immediate. §3's claim that `Σ_succ` "forces every dominator to
+raise levels cofinally" was technically true and useless: a one-level raise needs no
+coherence choices. Real pressure requires raising to *limit* levels.
+
+**Limit-raising: legality and satisfiability arrive together (the absorption pattern).**
+The limit-push system `Σ_lim` (`r((α,s)) := (λ(α), canonical extension)`, `λ(α)` the least
+limit above `α`) is legal iff the sequence is *block-tame* — each floor's own last block
+sits pointwise below all later floors there — because the requirement floors partition
+into blocks and their sup is the block-diagonal `D(ξ) := e_{λ(ξ)}(ξ)`. And over a
+block-tame sequence the dominator `φ((α,s)) := (λ(α), max(s ∨ D↾α, e_{λ(α)} on the gap))`
+is monotone *by block-tameness itself*: within a block the diagonal supplies the missing
+inequality; across blocks tameness does. Fourth instance of the pattern: **whatever
+coherence makes a system legal is enough coherence to build its dominator.**
+
+**Theorem (ZFC): `D_coh(e)` contains an ω₁-chain with cofinal levels iff `e` is trivial.**
+A chain `⟨(α_θ, s_θ)⟩` with `s_θ ≤ s_{θ'}↾α_θ` pointwise is a club-indexed level-monotone
+representative system, and the §2′ proof runs verbatim: coherence pins pairwise
+differences finite; the chain concentrates countably many movement-witnesses at
+`θ* := sup θ'_n`; the escape set has finite initial segments (levels cofinal), hence is
+bounded; bounded escape stabilizes and trivializes. Conversely a trivializing `E` builds
+the chain. **So over nontrivial `e` every ⊑-chain has bounded levels — the fiber order is
+chain-free, an Aronszajn-type order, provably.** This retroactively explains every failed
+chain-mediated kill and extraction at once: the tool those arguments reached for does not
+exist in the structure.
+
+**Why no kill assembles: budgets are per-element.** A dominator's deviation set from the
+floor (dips and raises) is finite *per element*, and each level carries infinitely many
+elements. The per-level covering reduction is therefore wrong for the actual problem (◊
+kills per-level coverings by the block-diagonal lowering trick, but dominators never
+needed them); greedy assembly of a dominator accumulates corrections only at countable
+unions — in *both* processing orders — without ever meeting a finite-budget
+contradiction; and the ◊-kill at a limit stage closes into a circle: choosing `e_β` low
+enough to defeat the guessed committed values makes the slices that would exert the
+pressure illegal at exactly the same elements. Legality and killability quantify over the
+same sups. Every kill scheme tried — covering extraction, sup-coherence extraction along
+bounded families, chain summoning, stage-wise floor sabotage — fails at this wall, and
+the chain-freeness theorem shows the one accumulation mechanism that genuinely binds
+(§2′) is structurally unreachable.
+
+**Flipped verdict on the Bridge.** The weight of evidence now favors **ZFC-factoring**:
+plausibly every legal system over every coherent sequence has a dominator, and the
+residual of the transport line is *empty over fiber orders* — the escapee, if it exists
+anywhere, needs a different species of directed order. What is still missing for a proof
+is one lemma: the global coordination of per-element finite corrections (the gap-fill
+choices on `[α_t, μ_t)`) — a transfinite compactness/amalgamation problem that smells
+MA-adjacent but may well be outright ZFC. The sharpest formulation: *can the canonical
+overshoot's pairwise-finite monotonicity defects always be repaired by per-element finite
+dips, coordinated across the whole order?* Chain-freeness removes the known obstruction;
+no new obstruction has survived inspection.
