@@ -75,6 +75,18 @@ landed.
   choice-free), yet factors via an explicit ladder ruler (`fb_factors`). So
   the dip pathology alone is also non-lethal at countable cofinality; the
   hunt's remaining question lives at ω₁, outside a mathlib-free repo.
+- **the ◊-side attempt (`NOTES-coherent-escapee.md`) — canonical dominators
+  die; one bridge remains.** Prose rigor: two ZFC lemmas (level-preserving
+  systems always factor; representative systems ⇒ everything factors, with
+  "trivial ⇒ factors" as corollary) and one ◊ theorem (a coherent sequence
+  with *no* representative system — block-diagonal lowering against
+  ◊-guessed partial systems). The bridge from rep-death to an escapee did
+  not close: pressure needs boundable infinite families, legality makes
+  their requirements mod-finite-satisfiable, fibers absorb finite defects,
+  and every coherence-extraction from a dominator needs the reps whose
+  absence powers the kill. Open core, one sentence: does factors-everything
+  imply reps? The note records the legal pressure system `Σ_succ`, the "+1
+  trap", the self-obstruction phenomenon, and the two decisive follow-ups.
 
 ## transport-kernel — mathlib instances
 

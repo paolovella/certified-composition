@@ -490,6 +490,25 @@ tension**: mod-finite fibers make the requirement chain self-dominate by coheren
 pointwise fibers make raw `e`-requirements slice-unbounded; every viable design lives in
 the finite-modification freedom between the two.
 
+**The ◊-side attempt (see `NOTES-coherent-escapee.md`) — canonical dominators die; one
+bridge remains.** Working the diamond construction produced, at prose rigor: two ZFC
+lemmas — *level-preserving systems always factor* (`φ(t) := t ∨ sup S(t)`), and
+*representative systems (level-monotone fiber representatives) make every legal system
+factor*, recovering "trivial ⇒ factors" as a corollary — and one ◊ theorem: **under ◊ there
+is a coherent sequence with no representative system at all** (at limit stages, lower the
+glued floor to `0` at one point per ladder block, chosen against the ◊-guessed partial rep
+system; coherence survives, the guessed system cannot pass the stage, and a total system is
+caught stationarily). So under ◊ every rep-mediated dominator repair is dead. What did
+*not* close is the bridge from rep-death to an actual escapee: pressure needs infinite
+boundable threshold families, legality makes their requirements mod-finite-satisfiable,
+fibers absorb finite defects, and every extraction of coherent data from a dominator
+(threshold chains through fibers) needs exactly a representative system — the kill needs
+reps to aim itself, and no-reps is the ammunition. The open core is now one sentence:
+**does "every legal system over `D_coh(e)` factors" imply reps exist?** If yes, ◊ inhabits
+the residual; if no, dip-freedom dodges every rep-shaped obstruction and the suspicion
+flips toward ZFC-factoring. The legal successor-push system `Σ_succ` and the two decisive
+follow-ups are laid out in the note.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),
