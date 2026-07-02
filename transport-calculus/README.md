@@ -535,6 +535,22 @@ needs a different species of directed order. The one missing lemma for a proof: 
 coordination of per-element finite gap-fill corrections — a transfinite amalgamation
 question with no surviving obstruction, chain-freeness having removed the known one.
 
+**The coordination lemma attempted (note §7) — the residue isolated; the verdict
+oscillates back.** The direct attempt yields: a recursion along an ω₁-enumeration
+refining `⊑` with a finite-ledger invariant; a ZFC lemma that *requirement*-excess
+inherits uniformly (all past `M`-contributions land in the single finite set `F_u`) — the
+wall was never the requirements; and the exact residue: past floor values baked into gap
+regions, `∪_{t ∈ ↓u} (D⁺(μ_t, γ_u) \ X_t)`, with level-overshoot provably useless (high
+floors are pairwise =*-equivalent) and dips committed once against moving targets. The
+sufficient condition is named — a **uniformizing dip system** `{X_μ}` with
+`∪_{μ<γ}(D⁺(μ,γ) \ X_μ)` finite for all `γ` — which trivial sequences have, and which
+almost-extracts a representative system (`H_γ := sup(e_μ off X_μ)`; one fiber-control gap
+remains). The Bridge is now squeezed between "per-`u` finite absorption" (necessary for a
+dominator) and "uniform dips" (sufficient), one **Fodor step** and one extraction repair
+apart: if both close, dominator ⇒ trivial and **the escapee exists in ZFC**, reversing
+the previous lean; if either fails, the failure should exhibit the dip-assembly that
+factors everything. Narrowest state the question has reached.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),

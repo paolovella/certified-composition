@@ -113,6 +113,17 @@ landed.
   fiber orders; the escapee, if anywhere, needs a different species of
   directed order. Missing lemma named: global coordination of per-element
   finite gap-fill corrections.
+- **the coordination lemma attempted — residue isolated, verdict
+  oscillates.** A ⊑-refining ω₁-recursion with a finite-ledger invariant
+  works except at one point; requirement-excess inherits uniformly (ZFC
+  lemma — all past `M`-contributions land in one finite set `F_u`); the
+  residue is exactly past-floor inversions on gap regions against moving
+  targets, with level-overshoot provably useless. Sufficient condition
+  named (uniformizing dip system; trivial sequences have one), which
+  almost-extracts a rep system (one fiber-control gap). The Bridge is
+  squeezed between per-`u` absorption (necessary) and uniform dips
+  (sufficient) — one Fodor step and one extraction repair apart. If both
+  close: dominator ⇒ trivial, and the escapee exists in ZFC.
 
 ## transport-kernel — mathlib instances
 

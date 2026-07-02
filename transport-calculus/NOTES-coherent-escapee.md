@@ -218,3 +218,52 @@ MA-adjacent but may well be outright ZFC. The sharpest formulation: *can the can
 overshoot's pairwise-finite monotonicity defects always be repaired by per-element finite
 dips, coordinated across the whole order?* Chain-freeness removes the known obstruction;
 no new obstruction has survived inspection.
+
+## 7. The coordination lemma, attempted — the residue isolated, and the verdict oscillates
+
+Attempting the coordination lemma directly produced a recursion that works except at one
+named point, a positive absorption lemma, and a squeeze that points back toward the
+escapee.
+
+**The recursion framework.** Down-sets in `D_coh(e)` are countable, so `D` has an
+ω₁-enumeration refining `⊑`. Process elements in that order:
+`W_t := max(M_t, e_{μ_t} dipped at a finite X_t, sup of processed past W's)`, maintaining
+a **ledger invariant**: for every unprocessed `u`, the excess of processed values over
+`e_{γ_u}` (the floor at `u`'s eventual level) stays finite.
+
+**Lemma (requirement-excess inherits uniformly, ZFC).** All `M`-contributions of all
+pasts of `u` land inside the single finite set `F_u := {ξ : M_u(ξ) > e_{μ_u}(ξ)}`, by
+monotonicity of `M` along `⊑`. The requirement side of the ledger is absorbed for free —
+the wall was never the requirements.
+
+**The residue, exactly.** The ledger of `u` reduces to
+`∪_{t ∈ ↓u} (D⁺(μ_t, γ_u) \ X_t)` — past floor values baked into gap regions, in
+upward-defect against `u`'s target floor, minus the pasts' committed dips. Two structural
+facts pin every solution: **level-overshoot buys nothing** (high floors are pairwise
+=*-equivalent, so no choice of `γ_u` dominates an accumulated sup), and the `X_t` are
+committed once while the targets `γ_u` vary — the *moving-target problem*, the true face
+of the coordination lemma.
+
+**The sufficient condition, named.** Call `{X_μ}` (finite sets) a **uniformizing dip
+system** for `e` if `∀γ: ∪_{μ<γ} (D⁺(μ,γ) \ X_μ)` is finite. Trivial `e` has one
+(`X_μ := dev(e_μ, E)`; leftovers land in `dev(e_γ, E)`). A uniformizing dip system makes
+the ledger close and the recursion deliver a dominator for every legal system (modulo
+routine value-coordination, believed but not fully checked).
+
+**The near-extraction.** Given `{X_μ}`, the running sup `H_γ := sup_{μ<γ}(e_μ off X_μ)`
+is monotone in `γ` with `H_γ ≤* e_γ` — an *almost*-representative system. If its lower
+fiber-control could be repaired (`{ξ : H_γ(ξ) < e_γ(ξ)}` finite — the one open gap: the
+reps theorem's mover-finiteness needs =*-control from below), the reps theorem fires and
+**uniformizing dip systems exist iff `e` is trivial**.
+
+**The squeeze, and the oscillating verdict.** Necessity: a dominator forces per-`u`
+finite absorption (`∪_{t ∈ ↓u}(D⁺(μ_t, γ_u) \ X_t)` finite for each `u`, with
+`u`-dependent element sets). Sufficiency wants the uniform version. The gap between
+per-`u` and uniform has the exact shape of a pressing-down argument — targets `γ_u`
+along a club, finite leftover sets, Fodor to stabilize — call it **the Fodor step**. If
+the Fodor step and the H-extraction repair both go through, the chain closes:
+dominator ⇒ per-`u` absorption ⇒ uniform dips ⇒ trivial — i.e. **the escapee exists in
+ZFC** over every nontrivial coherent sequence, reversing §6's lean. If either fails,
+the failure mode itself should exhibit the dip-assembly that factors everything. The
+Bridge is now squeezed between two finiteness conditions one Fodor argument and one
+fiber-control repair apart — the narrowest it has been.
