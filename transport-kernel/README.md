@@ -15,6 +15,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 2a | `LipschitzWith` receive | cache only — no new math | **done**, this repo |
 | 2b | `HolderWith` receive | cache only — non-scalar certificate | **done**, this repo |
 | 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | **done** (finite state spaces), this repo |
+| 3b | measure-theoretic Dobrushin | from-scratch TV distance + DPI over mathlib's `Measure`/`Kernel` | **done** (arbitrary measurable spaces), this repo |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 
@@ -103,16 +104,47 @@ contraction theorem mathlib does not have**, and reproduces its composition law 
 This is the quantitative payload the qualitative order-theory line (in `transport-calculus`)
 was scaffolding for.
 
+## Tier 3b — the measure-theoretic generalization (`TransportKernel/DobrushinMeasureReceive.lean`)
+
+The finite-state caveat, discharged. Mathlib has no total-variation distance between
+measures and no data-processing inequality, so both are built here over **arbitrary
+measurable state spaces**, stated against mathlib's own objects
+(`MeasureTheory.Measure`, `ProbabilityTheory.Kernel`, the pushforward `κ ∘ₘ μ`):
+
+- **`tvDist μ ν = ⨆ (A measurable), μ A − ν A`** — TV distance in `ℝ≥0∞` (truncated
+  excess; for probability measures symmetric — `tvDist_comm` — and equal to the
+  classical TV distance).
+- **`tvDist_comp_le`** — the measure-theoretic DPI: if every pair of kernel measures is
+  within TV `η`, then `tvDist (κ ∘ₘ μ) (κ ∘ₘ ν) ≤ η · tvDist μ ν`. Same coupling
+  argument as the finite case, in *additive* integral form: Hahn-decompose `(μ, ν)`,
+  build the Jordan parts as genuine measures with `μ + ξ⁻ = ν + ξ⁺` (pure measure
+  algebra, no truncated subtraction), then the averaging bound
+  `m·(κ∘ₘξ⁺)A ≤ m·((κ∘ₘξ⁻)A + η·m)` — constant integrals and monotonicity only, no
+  Fubini. Axioms: `propext, Classical.choice, Quot.sound` — no `sorry`.
+- **`Bridge.ofMarkovKernel`** — the instance lands in the **same graded action as
+  Lipschitz** (`lipGA`, ℝ≥0 acting on ℝ≥0∞), with `X = ProbabilityMeasure α`: one
+  accumulation algebra now hosts mathlib's contractive maps *and* the from-scratch
+  Dobrushin contraction.
+- **`comp_reconstructs_dobrushin_measure`** — the generic `Bridge.comp` yields the
+  submultiplicative bound `η(K)·η(L)` on the iterated pushforward; and
+  `tvDist_kernel_comp_le` states the same law through mathlib's own kernel composition
+  `∘ₖ` — advanced composition as certificate accumulation, on continuous state spaces.
+
+The finite case (`DobrushinReceive.lean`) remains the combinatorial heart and is kept:
+its `½∑|·|` form and explicit outer-product coupling are the readable proof; the
+measure version is the same idea against mathlib's kernel infrastructure.
+
 ## What this is *not* (kept honest)
 
-- Not "the genus is correct" — three external/built instances are data points, not a
+- Not "the genus is correct" — four external/built instances are data points, not a
   characterization.
-- **The Dobrushin instance is finite-state.** `Dist`/`Kernel` are over a `Fintype`; the DPI
-  is proved for discrete distributions and stochastic matrices. The general
-  measure-theoretic Dobrushin contraction (continuous state spaces, `MeasureTheory.Kernel`,
-  TV of measures) is *not* built — it needs mathlib's measure/kernel infrastructure and the
-  same argument in integral form. The finite case is the combinatorial heart; the
-  measure-theoretic generalization is the remaining extension, not a new idea.
+- **The two Dobrushin developments are not yet formally linked.** The finite `tvd`
+  (real-valued, `½∑|·|`) and the measure-theoretic `tvDist` (`ℝ≥0∞`-valued sup) are
+  proved equal in no theorem; a consistency lemma through `Measure.count`-style
+  discretization would close that loop but is not built.
+- `tvDist` is defined as the one-sided sup; symmetry and the classical-TV reading are
+  proved *for probability measures* (`tvDist_comm`), which is the regime every theorem
+  here uses. It is not developed as a metric on general finite measures.
 
 ## Naming note
 

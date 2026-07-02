@@ -45,8 +45,20 @@ landed.
 - **Tier 2b** — `comp_reconstructs_holder`: a *non-scalar* pair certificate
   `(C, r)` with a semidirect-product law; the same `Bridge.comp` reconstructs
   `HolderWith.comp`. Two accumulation algebras, one composition law.
-- **Tier 3** — Markov-kernel / Dobrushin (total variation): deferred; needs a
-  from-scratch data-processing inequality mathlib does not have.
+- **Tier 3** — Markov-kernel / Dobrushin (total variation), finite state spaces:
+  the data-processing inequality `dpi` proved from scratch (coupling/overlap
+  argument — mathlib has no DPI), `Bridge.ofKernel`, and
+  `comp_reconstructs_dobrushin`: advanced composition as generic certificate
+  accumulation. The quantitative centre, no longer prose.
+- **Tier 3b** — the measure-theoretic Dobrushin contraction, arbitrary
+  measurable state spaces: `tvDist` (TV distance for measures — absent from
+  mathlib) and `tvDist_comp_le`, the DPI for `ProbabilityTheory.Kernel`
+  pushforward `κ ∘ₘ μ`, via Hahn decomposition + the coupling argument in
+  additive integral form (subtraction-free; no Fubini). Lands in the *same*
+  graded action as Lipschitz (`lipGA`), and `Bridge.comp` reproduces
+  submultiplicativity (`comp_reconstructs_dobrushin_measure`), also at kernel
+  level through mathlib's own `∘ₖ` (`tvDist_kernel_comp_le`). The "finite-state
+  only" caveat is discharged.
 
 ## Consolidation
 
