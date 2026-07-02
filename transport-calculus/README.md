@@ -433,6 +433,36 @@ monotone selection, or does some further structure always close the gap? Neither
 impossibility proof — but the frontier is no longer "the whole uncountable realm"; it is
 exactly the strip between `Directed` and `PrefixBounded`.
 
+**The hunt — candidates die informatively, and the strip narrows from both walls.** The
+natural first candidates all factor: `ω₁ × ℕ` (directed, not σ-directed, uncountable
+cofinality, *no* cofinal chain) has coordinatewise bounded-family sups, so
+`factors_of_image_sups` kills it; ideal-of-sets orders die by unions; chain-shaped designs
+die by automatic prefix-boundedness and self-domination; gap encodings pointed at the
+shrinking side die because dominator constraints are *lower* constraints only — nothing can
+force `φ` under the top side of a Hausdorff gap. Two of the deaths are theorems now:
+
+- **Wall one moved up (`sigma_directed_cofinal_factors`).** σ-directedness (`SigmaDirected`
+  — every ℕ-family bounded) supplies `PrefixBounded` along any cofinal well-ordered family
+  with countable segments (`CountableSegments` — the cardinal-free "ω₁-like").
+  Contrapositive: an escapee carrying an ω₁-like cofinal family must contain a *countable
+  unbounded family* while staying pairwise-directed.
+- **Wall two holds (`lists_not_sigma_directed`, `lists_bounded_factors`).** Failing
+  σ-directedness is not sufficient: `List Nat` under membership-inclusion is directed
+  (append), provably not σ-directed (singletons `[n]` have no common bound — lists are
+  finite), yet every bounded-image map factors: filter the bounding list down to the
+  family's members and you have a *least* upper bound. Conditional completeness, not
+  σ-directedness, is what an escapee must break.
+
+**The quarry's profile.** It must (1) fail σ-directedness, (2) fail conditional completeness
+on bounded image-families *unovershootably* (total-order gaps overshoot — the `ℚ≥0` lesson),
+and (3) fail only globally: every finite subsystem is satisfiable
+(`directed_finite_factors`) and every principal down-set is satisfied by a constant (that is
+the `bounded` hypothesis itself) — an Aronszajn-style "all levels nonempty, no branch"
+shape. Coherent sequences and gaps are the known ZFC engines of that shape, and their
+selection problems are notoriously axiom-sensitive — so the escapee's existence may be
+**independent of ZFC**, not merely open. No capture; two walls proved; the profile now
+points at genuine set-theoretic combinatorics.
+
 **And `ℕ` is not the shortcut it looks like.** `natRuler` (ℕ, `k = id`) proves `Ruler`
 is inhabited by a genuine distance codomain — but *only* that. It is tempting to read
 ℕ as the coveted "ruler-carrying, not-dcpo, factors anyway" witness, since ℕ fails

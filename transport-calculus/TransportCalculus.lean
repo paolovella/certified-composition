@@ -956,6 +956,156 @@ noncomputable def countable_cofinal_factors' {X D : Type} (le : D → D → Prop
   prefix_bounded_cofinal_factors natWellIndex le le_refl le_trans
     (prefixBounded_of_directed le_refl le_trans dir) c hc dist f bounded
 
+/-! ## Hunting the escapee — the strip narrows from both walls
+
+With the frontier reduced to "does `Directed` without `PrefixBounded` admit an escapee at
+uncountable cofinality", the hunt begins with the natural candidates, and each death is
+informative:
+
+- **`ω₁ × ℕ`** (directed, *not* σ-directed, uncountable cofinality, no cofinal chain — the
+  minimal inhabitant of the gap) **dies**: a bounded family has a coordinatewise least upper
+  bound (countable sups in `ω₁`, max in `ℕ`), so `factors_of_image_sups` applies. Failing
+  σ-directedness did not matter; the order was conditionally complete.
+- **Ideal-of-sets orders** (finite or countable subsets, finitely-generated downsets) die the
+  same way: bounded = inside one member, and unions supply lubs.
+- **Chain-shaped designs** die twice over: requirements accumulated along a threshold chain
+  lie inside one bounded slice (prefix-boundedness is automatic), and chain-shaped
+  requirements self-dominate (`φ(tₐ) := a₍ₐ₊₁₎`).
+- **Gap encodings pointed the wrong way** die structurally: a dominator's constraints are
+  *lower* constraints only (`φ t` ranges over an up-set), so nothing can force `φ` under the
+  shrinking side of a Hausdorff gap; top-side elements satisfy every constraint.
+
+Two of the deaths generalize into theorems, formalized below.
+
+**Wall one moves up (`sigma_directed_cofinal_factors`).** σ-directedness — every ℕ-family
+bounded, the countable strengthening of `Directed` — supplies `PrefixBounded` along any
+cofinal well-ordered family with *countable segments* (an "ω₁-like" index; the segment
+enumeration replaces cardinals, as `PrefixBounded` replaced `κ`-directedness). So at
+cofinality ω₁, σ-directedness already forces factorization: **an escapee carrying an ω₁-like
+cofinal family must fail σ-directedness** — it must contain a countable family with no upper
+bound, while every pair still has one.
+
+**Wall two holds (`lists_not_sigma_directed` + `lists_bounded_factors`).** Failing
+σ-directedness is *not sufficient*: `List Nat` under membership-inclusion is directed
+(append), fails σ-directedness (the singletons `[n]` have no common bound — a list is
+finite), yet **every bounded-image map over it factors**: a bounded image-family lives inside
+one list, and filtering that list down to the family's actual members is a *least* upper
+bound (taken classically), so `factors_of_image_sups` applies. This is the `ω₁ × ℕ` death,
+made mathlib-free: the first wall of the strip is not where escapees live.
+
+**The quarry's profile, after this hunt.** An escapee must: (1) fail σ-directedness (else
+wall one, given an ω₁-like cofinal family); (2) fail conditional completeness on bounded
+image-families *unovershootably* (else `factors_of_image_sups`; and total-order gaps
+overshoot — the `ℚ≥0` lesson); (3) exhibit its failure only globally: every finite
+subsystem is satisfiable (`directed_finite_factors`), and every principal down-set is
+satisfied by a constant (that is the `bounded` hypothesis itself) — so no finite and no
+localized witness exists, an Aronszajn-style "all levels nonempty, no branch" phenomenon.
+Coherent-sequence and gap machinery are the known ZFC engines for exactly that shape —
+and their selection problems are notoriously sensitive to axioms beyond ZFC, so the
+escapee's existence may yet be *independent*, not merely open. That is the sharpened state
+of the hunt: no capture, two walls proved, and a profile that points at genuine
+set-theoretic combinatorics. -/
+
+/-- σ-directedness: every *countable* family is bounded — the ℕ-strengthening of
+    `Directed` (which bounds pairs), and exactly what `PrefixBounded` needs when
+    segments are countable. -/
+def SigmaDirected (D : Type) (le : D → D → Prop) : Prop :=
+  ∀ c : Nat → D, ∃ b, ∀ n, le (c n) b
+
+/-- An "ω₁-like" index: every segment `{v // v ≤ w}` is countable (admits an
+    ℕ-enumeration). The cardinal-free form of "cofinality at most ω₁". -/
+def CountableSegments {W : Type} (WI : WellIndex W) : Prop :=
+  ∀ w, ∃ e : Nat → W, ∀ v, WI.le v w → ∃ n, e n = v
+
+open Classical in
+/-- σ-directedness supplies `PrefixBounded` over any index with countable segments:
+    enumerate the segment, bound the induced ℕ-family. The `ω`-case pattern
+    (`prefixBounded_of_directed`: finite segments, finite `cub`-folds) lifted one rung. -/
+theorem prefixBounded_of_sigmaDirected {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (hσ : SigmaDirected D le) (hcs : CountableSegments WI) : PrefixBounded WI le := by
+  intro w g
+  obtain ⟨e, he⟩ := hcs w
+  obtain ⟨b, hb⟩ := hσ (fun n =>
+    if h : WI.le (e n) w then g (e n) h else g w (WI.le_refl w))
+  refine ⟨b, fun v hv => ?_⟩
+  obtain ⟨n, hn⟩ := he v hv
+  subst hn
+  have h := hb n
+  rw [dif_pos hv] at h
+  exact h
+
+/-- **Wall one: σ-directedness closes the ω₁-like case.** A σ-directed distance with a
+    cofinal well-ordered family of countable segments factors every bounded-image map.
+    Contrapositive, for the hunt: an escapee carrying such a family must contain a
+    *countable* unbounded family — directedness intact, σ-directedness broken. -/
+noncomputable def sigma_directed_cofinal_factors {X W D : Type} (WI : WellIndex W)
+    (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (hσ : SigmaDirected D le) (hcs : CountableSegments WI)
+    (c : W → D) (hc : ∀ b, ∃ w, le b (c w))
+    (dist : X → X → D) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist :=
+  prefix_bounded_cofinal_factors WI le le_refl le_trans
+    (prefixBounded_of_sigmaDirected WI hσ hcs) c hc dist f bounded
+
+/-! ### Wall two: a mathlib-free directed order that fails σ-directedness and factors anyway -/
+
+/-- Membership-inclusion on finite lists: the mathlib-free stand-in for finite sets of
+    naturals. A preorder (not antisymmetric — the interface never asked for that). -/
+def leL (l₁ l₂ : List Nat) : Prop := ∀ x, x ∈ l₁ → x ∈ l₂
+
+theorem leL_refl : ∀ l, leL l l := fun _ _ h => h
+
+theorem leL_trans : ∀ {a b c}, leL a b → leL b c → leL a c :=
+  fun hab hbc x hx => hbc x (hab x hx)
+
+/-- Directed: append is a common upper bound. -/
+def dirL : Directed (List Nat) leL where
+  cub          := (· ++ ·)
+  le_cub_left  := fun _ _ _x hx => List.mem_append.mpr (Or.inl hx)
+  le_cub_right := fun _ _ _x hx => List.mem_append.mpr (Or.inr hx)
+
+/-- Every member of a list is at most its running maximum. -/
+theorem mem_le_foldMax : ∀ (l : List Nat) (x : Nat), x ∈ l → x ≤ l.foldr Nat.max 0
+  | a :: l, x, hx => by
+    cases hx with
+    | head => exact Nat.le_max_left _ _
+    | tail _ h => exact Nat.le_trans (mem_le_foldMax l x h) (Nat.le_max_right _ _)
+
+/-- **`List Nat` is not σ-directed**: the singletons `[n]` have no common upper bound —
+    such a bound would contain every natural, and lists are finite. Directedness holds
+    (`dirL`), so this order lives strictly inside the strip the hunt is searching. -/
+theorem lists_not_sigma_directed : ¬ SigmaDirected (List Nat) leL := by
+  intro hσ
+  obtain ⟨b, hb⟩ := hσ (fun n => [n])
+  have hmem : ∀ n, n ∈ b := fun n => hb n n (List.mem_cons_self ..)
+  have := mem_le_foldMax b (b.foldr Nat.max 0 + 1) (hmem _)
+  omega
+
+open Classical in
+/-- **Wall two: failing σ-directedness is not sufficient for an escapee.** Every
+    bounded-image map over `(List Nat, leL)` factors: a bounded image-family lies inside
+    one list `b t`, and filtering `b t` to the family's actual members is a *least* upper
+    bound of the family — so `factors_of_image_sups` applies. The same death as `ω₁ × ℕ`
+    (coordinatewise sups) and every ideal-of-sets order (unions): natural set-shaped
+    directed orders are conditionally complete on bounded families, and conditional
+    completeness, not σ-directedness, is what an escapee has to break. -/
+noncomputable def lists_bounded_factors {X : Type}
+    (dist : X → X → List Nat) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, leL (dist x y) t → leL (dist (f x) (f y)) b) :
+    Bridge X (Mono (List Nat) leL) (List Nat) (universalGA leL leL_trans) dist := by
+  refine factors_of_image_sups leL leL_refl leL_trans dist f
+    (fun t => (Classical.choose (bounded t)).filter
+      (fun v => decide (∃ x y, leL (dist x y) t ∧ v ∈ dist (f x) (f y))))
+    (fun t x y hxy v hv => ?_) (fun t u hu v hv => ?_)
+  · -- the filter keeps every actual image member: it is an upper bound
+    refine List.mem_filter.mpr ⟨Classical.choose_spec (bounded t) x y hxy v hv, ?_⟩
+    exact decide_eq_true ⟨x, y, hxy, hv⟩
+  · -- and keeps only image members: it is below any other bound — leastness
+    obtain ⟨x, y, hxy, hvmem⟩ := of_decide_eq_true (List.mem_filter.mp hv).2
+    exact hu x y hxy v hvmem
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

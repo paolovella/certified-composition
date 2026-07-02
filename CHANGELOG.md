@@ -51,6 +51,17 @@ landed.
   proves directedness supplies it at `ω` (re-deriving the countable case);
   uncountably it is not a theorem. The residual is now exactly one hypothesis
   wide: whether `Directed` without `PrefixBounded` admits an escapee.
+- **the hunt — two walls proved, no capture.** Candidates die informatively
+  (`ω₁ × ℕ` and ideal-of-sets orders are conditionally complete; chain designs
+  self-dominate; gap encodings can't force a dominator *under* anything). Wall
+  one: `sigma_directed_cofinal_factors` — σ-directedness + an ω₁-like cofinal
+  family (`CountableSegments`) forces factorization, so an escapee there must
+  contain a countable unbounded family. Wall two: `lists_not_sigma_directed` +
+  `lists_bounded_factors` — `List Nat` under membership-inclusion fails
+  σ-directedness yet factors everything (filtered bounding list = least upper
+  bound), so failing σ-directedness is not sufficient. Residual profile: break
+  conditional completeness unovershootably, with only-global failure
+  (Aronszajn/gap shape); existence may be independent of ZFC.
 
 ## transport-kernel — mathlib instances
 
