@@ -16,6 +16,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 2b | `HolderWith` receive | cache only — non-scalar certificate | **done**, this repo |
 | 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | **done** (finite state spaces), this repo |
 | 3b | measure-theoretic Dobrushin | from-scratch TV distance + DPI over mathlib's `Measure`/`Kernel` | **done** (arbitrary measurable spaces), this repo |
+| 3c | discretization consistency | Dirac embedding; `tvd`/`tvDist` proved equal; finite DPI re-derived from the measure one | **done**, this repo |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 
@@ -134,14 +135,30 @@ The finite case (`DobrushinReceive.lean`) remains the combinatorial heart and is
 its `½∑|·|` form and explicit outer-product coupling are the readable proof; the
 measure version is the same idea against mathlib's kernel infrastructure.
 
+## Tier 3c — the discretization consistency lemma (`TransportKernel/DobrushinConsistency.lean`)
+
+The loop between the two Dobrushin developments, closed. `Dist.toMeasure` embeds a
+finite distribution as a sum of weighted Diracs (over any `DiscreteMeasurableSpace`),
+and then:
+
+- **`tvDist_toMeasure`** — the consistency lemma:
+  `tvDist μ° ν° = ENNReal.ofReal (tvd μ ν)`. The `ℝ≥0∞`-valued sup and the real
+  `½∑|·|` are the *same number* under the embedding; the sup is attained on
+  `{s | ν s ≤ μ s}`, and the real side goes through the exposed overlap identity
+  `tvd_eq_one_sub_sum_min` (so the two files share actual proof structure, not just
+  a name).
+- **`Kernel.toMKernel`, `toMeasure_push`** — a stochastic matrix is a mathlib Markov
+  kernel, and the finite pushforward `K.push` commutes with the embedding into
+  `κ ∘ₘ ·`.
+- **`dpi_via_measure`** — the payoff: the finite DPI re-derived as a *corollary* of
+  the measure-theoretic `tvDist_comp_le`, by transporting hypothesis and conclusion
+  through the consistency lemma. The two developments provably agree where they
+  overlap. Axioms: `propext, Classical.choice, Quot.sound` — no `sorry`.
+
 ## What this is *not* (kept honest)
 
 - Not "the genus is correct" — four external/built instances are data points, not a
   characterization.
-- **The two Dobrushin developments are not yet formally linked.** The finite `tvd`
-  (real-valued, `½∑|·|`) and the measure-theoretic `tvDist` (`ℝ≥0∞`-valued sup) are
-  proved equal in no theorem; a consistency lemma through `Measure.count`-style
-  discretization would close that loop but is not built.
 - `tvDist` is defined as the one-sided sup; symmetry and the classical-TV reading are
   proved *for probability measures* (`tvDist_comm`), which is the regime every theorem
   here uses. It is not developed as a metric on general finite measures.

@@ -59,6 +59,13 @@ landed.
   submultiplicativity (`comp_reconstructs_dobrushin_measure`), also at kernel
   level through mathlib's own `∘ₖ` (`tvDist_kernel_comp_le`). The "finite-state
   only" caveat is discharged.
+- **Tier 3c** — the discretization consistency lemma: `Dist.toMeasure` (Dirac
+  embedding) with `tvDist_toMeasure` proving the finite `tvd` and the
+  measure-theoretic `tvDist` are the same number, `toMeasure_push` matching the
+  finite pushforward with `κ ∘ₘ ·`, and `dpi_via_measure` re-deriving the finite
+  DPI as a corollary of the measure-theoretic one. The "not yet formally
+  linked" caveat is discharged; the two Dobrushin developments provably agree
+  where they overlap.
 
 ## Consolidation
 
