@@ -124,6 +124,21 @@ landed.
   squeezed between per-`u` absorption (necessary) and uniform dips
   (sufficient) — one Fodor step and one extraction repair apart. If both
   close: dominator ⇒ trivial, and the escapee exists in ZFC.
+- **the Fodor step attempted — the circle proves itself; the core goes
+  Aronszajn.** Pressing down is sound; its input is unobtainable: probe
+  systems exerting cofinal floor-pressure are legal iff sup-coherence
+  already holds (the circle is an equivalence now). New ZFC lemmas:
+  single-target dips free; bounded families never obstruct; the
+  chain-continuation lemma (dips against a chain's own sup serve every
+  continuation — the moving target is fake for chains). But the reduction
+  is self-similar under per-element targets; club targets die over the
+  ◊-sequence; and §7's "overshoot useless" is corrected — overshooting
+  parks values on post-kill floors, making a dominator a `D`-indexed
+  rep-like selection whose kill needs chains that chain-freeness forbids.
+  Both directions lose their weapon at the last step. Hard core isolated:
+  monotone fiber-valued selection with pairwise-finite deviations on the
+  chain-free order — Aronszajn-type uniformization. Third flip: lean is
+  now independence, one named gap per side.
 
 ## transport-kernel — mathlib instances
 

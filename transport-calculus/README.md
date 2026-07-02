@@ -551,6 +551,25 @@ apart: if both close, dominator ⇒ trivial and **the escapee exists in ZFC**, r
 the previous lean; if either fails, the failure should exhibit the dip-assembly that
 factors everything. Narrowest state the question has reached.
 
+**The Fodor step attempted (note §8) — the circle proves itself; the core goes
+Aronszajn; third flip, toward independence.** Pressing down is sound but its input is
+unobtainable: probe systems forcing cofinal floor-pressure are legal *iff* sup-coherence
+already holds — the circle is now an equivalence. Three ZFC lemmas fell out: single-target
+dips are free; bounded families are never obstructions (their dips uniformize against all
+targets); and the **chain-continuation lemma** — dips against a chain's own sup serve
+every continuation (`D⁺(μ_n,γ) \ D⁺(μ_n,δ*) ⊆ D⁺(δ*,γ)`, one finite set) — the moving
+target is fake for single chains. But the reduction is self-similar (per-element targets
+reproduce sup-coherence at the target level; club-valued targets die over the ◊-sequence,
+whose kill-set is stationary), and §7's "level-overshoot is useless" is corrected:
+overshooting past kill-points parks values on the post-kill low floor, so a dominator is
+in total a `D`-indexed rep-like selection — and the reps kill needs ω₁-chains in the
+index, which chain-freeness forbids. Both directions thus lose their closing weapon at
+the last step. The hard core, isolated: *a monotone fiber-valued selection with
+pairwise-finite deviations on the chain-free order itself* — an Aronszajn-type
+uniformization, the exact family where ◊ kills and MA/PFA saves. Current lean, third
+revision: **independent of ZFC**, with one named gap per side (◊: make the dominator need
+the killed coordinates despite overshoot; MA: tame the self-similar ledger).
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),

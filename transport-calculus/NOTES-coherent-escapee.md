@@ -267,3 +267,59 @@ ZFC** over every nontrivial coherent sequence, reversing §6's lean. If either f
 the failure mode itself should exhibit the dip-assembly that factors everything. The
 Bridge is now squeezed between two finiteness conditions one Fodor argument and one
 fiber-control repair apart — the narrowest it has been.
+
+## 8. The Fodor step, attempted — the circle proves itself, and the core goes Aronszajn
+
+**Pressing down works; its input is unobtainable.** The plan was: probe systems force
+`W_{c_δ} ≥ e_λ` pointwise for cofinally many `λ < δ`; fiber-hood confines the excess
+`X_δ := dev⁺(W_{c_δ})` to a finite set; `δ ↦ max X_δ` is regressive; Fodor stabilizes;
+sup-coherence falls out on a stationary set and (via §7's extraction) trivializes. The
+pressing-down half is sound. The input half self-destructs, exactly: probes
+`m^δ_λ := (λ, min(e_λ, e_δ↾λ))` exist below every canonical `c_δ` (the min is a fiber
+element — defects are finite), but then the slice at `c_δ` contains `{e_λ : λ < δ}` and
+its *legality is sup-coherence at `δ`* — the conclusion. Dipping the images restores
+legality and deletes the pressure at precisely the inversion points. **The probe circle
+is now an equivalence, not a suspicion: cofinal floor-pressure is legal iff the
+trivialization-surrogate already exists.**
+
+**Two ZFC lemmas.** (i) *Single-target dips are free*: against one `δ`, dip each `e_λ` at
+`D⁺(λ,δ)` — finite per `λ`, leftover empty. (ii) *Bounded families are never
+obstructions*: if `sup v_λ ≤ w =* e_γ`, then for every `γ'` the leftover is
+`⊆ dev⁺(w) ∪ D⁺(γ,γ')`, uniformly in `λ`. (Bounded families of thresholds have bounded
+level-sets anyway — levels live below the bound's level — so cofinal-level families are
+never jointly bounded; the difficulty was always per-`δ` families glued across `δ`.)
+
+**The chain-continuation lemma (new).** For levels `μ_n ↑ δ*`: dips against `δ*` serve
+every continuation, since `D⁺(μ_n, γ) \ D⁺(μ_n, δ*) ⊆ D⁺(δ*, γ)` — one finite set,
+independent of `n`. *The moving target is fake for any single chain*: dip against the
+chain's own sup.
+
+**But the reduction is self-similar.** With per-element targets `δ*(t)`, the ledger
+becomes `∪_{t ∈ ↓u} D⁺(δ*(t), γ_u)` — the sup-coherence problem reproduced at the target
+level. Regularity of ω₁ defeats every selection scheme tried: global constants do not
+exist; per-down-set constants conflict across overlapping down-sets; club-valued targets
+fail over the ◊-sequence, whose kill-set is stationary and defeats sup-coherence along
+*every* club. The dip-coordination problem is a fixed point of its own reduction.
+
+**Correction to §7: level-overshoot is not useless.** Over the ◊-sequence, overshooting
+the value's level past a kill-point lets the value sit at the post-kill *low* floor — the
+killed coordinates need no dips at all; high fibers carry the low values natively. §7's
+"overshoot buys nothing" applied to sup-absorption, not to kill-avoidance. Consequence:
+a dominator is, in total, a **`D`-indexed rep-like coherent selection** (values in
+fibers, pairwise-finite deviations, monotone along `⊑`) — and the §2′ reps kill needs an
+ω₁-chain in the *index*, which `D` provably lacks (§6 chain-freeness). The escapee
+direction loses its main weapon at exactly the final step, just as the factoring
+direction loses its selection schemes to self-similarity.
+
+**Where this leaves the Bridge (third flip).** Both directions now lack a closing
+mechanism, and the hard core is isolated: *does a monotone fiber-valued selection with
+pairwise-finite deviations exist on the chain-free directed order `D_coh(e)` itself,
+over the ◊-built (or walk) sequence?* — a uniformization problem on an Aronszajn-type
+index. That is exactly the family of statements where ◊ builds counterexamples and
+MA/PFA builds uniformizations. Honest current lean, third revision: **independent of
+ZFC**, with the candidate independence statement now concrete: "every legal system over
+every coherent fiber order factors" — ◊ plausibly refutes it via a system realizing the
+kill-traces (the remaining gap: making the dominator *need* the killed coordinates
+despite level-overshoot), MA_{ω₁} plausibly proves it via amalgamation along the
+countable-down-set enumeration (the remaining gap: the self-similar ledger). Neither gap
+closed this session; both are now single, named, and disjoint.
