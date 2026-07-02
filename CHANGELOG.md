@@ -62,6 +62,19 @@ landed.
   bound), so failing σ-directedness is not sufficient. Residual profile: break
   conditional completeness unovershootably, with only-global failure
   (Aronszajn/gap shape); existence may be independent of ZFC.
+- **the coherent-sequence encoding — the profile is realizable, up to set
+  theory.** On paper: the fiber order `D_coh(e)` over a nontrivial coherent
+  sequence (ZFC, via walks) is directed with finite joins, not σ-directed,
+  and join-incomplete (bounded families with *no minimal* upper bound) — the
+  first structure passing every wall. The escapee question on it reduces to a
+  coherent-sequence uniformization principle (level-monotone bounded coherent
+  sequences are provably trivial, so the canonical dominator is obstructed;
+  MA/◊-sensitive, plausibly independent of ZFC). Formalized shadow: `Fb`
+  (levels ℕ∪{∞}, finite patches over a constant floor) — directed, not
+  σ-directed, bounded family with no minimal ub (`fb_no_minimal_ub`,
+  choice-free), yet factors via an explicit ladder ruler (`fb_factors`). So
+  the dip pathology alone is also non-lethal at countable cofinality; the
+  hunt's remaining question lives at ω₁, outside a mathlib-free repo.
 
 ## transport-kernel — mathlib instances
 

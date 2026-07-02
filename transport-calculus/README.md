@@ -463,6 +463,43 @@ selection problems are notoriously axiom-sensitive — so the escapee's existenc
 **independent of ZFC**, not merely open. No capture; two walls proved; the profile now
 points at genuine set-theoretic combinatorics.
 
+**The coherent-sequence encoding — the profile is realizable, up to a set-theory question.**
+For a coherent sequence `⟨e_α : α < ω₁⟩` (`e_α : α → ω`, `e_α =* e_β↾α`; nontrivial ones
+exist in ZFC by Todorcevic's walks), the **fiber order**
+`D_coh(e) := Σ_α {s : α → ω ∣ s =* e_α}`, ordered *pointwise* on the smaller domain, is —
+on paper, since ω₁ is not formalizable mathlib-free —
+
+- **directed with finite joins**: pointwise max stays in the fiber, because coherence keeps
+  deviations finite;
+- **not σ-directed**: spikes to `e_{α*}(ξ_n) + n` at points `ξ_n → α*` defeat every bound,
+  since coherence forces any bound to agree with `e_{α*}` cofinitely;
+- **incomplete in the join sense**: a bounded family whose pointwise sup dips below the
+  floor infinitely has upper bounds but **no minimal upper bound** — every bound can dip at
+  one more coordinate. The `D3` missing-join mechanism, sustained infinitely under
+  directedness — the first structure found that passes every wall.
+
+Whether an escapee actually lives on it reduces to a **uniformization question**: the
+canonical overshoot dominator is monotone except at coherence defects, and repairing them
+globally means choosing fiber representatives pointwise-monotonically in the level — but
+*level-monotone bounded coherent sequences are trivial* (per-coordinate values stabilize;
+coherence turns the stable function into a trivialization — provable on paper). Over a
+nontrivial sequence the canonical dominator is genuinely obstructed; whether some
+non-canonical one always exists is a coherent-sequence uniformization principle, exactly
+the class of statement that MA and ◊ split. The design space is pinned by a **two-order
+tension**: mod-finite fibers make the requirement chain self-dominate by coherence;
+pointwise fibers make raw `e`-requirements slice-unbounded; every viable design lives in
+the finite-modification freedom between the two.
+
+**The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
+pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
+with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),
+and carries a bounded family with **no minimal upper bound** (`fb_no_minimal_ub`, choice-free
+— strictly worse than `Dm`'s two-incomparable-minimal-ubs gap), yet still factors
+(`fb_factors`): an explicit ladder is a bare cofinal ℕ-sequence and the ruler machinery
+overshoots every dip. So the dips alone don't kill factorization either — the quarry must
+carry them at *uncountable* cofinality, where no ruler exists. That is `D_coh(e)` over a
+nontrivial coherent sequence, and the question leaves this repo for set theory.
+
 **And `ℕ` is not the shortcut it looks like.** `natRuler` (ℕ, `k = id`) proves `Ruler`
 is inhabited by a genuine distance codomain — but *only* that. It is tempting to read
 ℕ as the coveted "ruler-carrying, not-dcpo, factors anyway" witness, since ℕ fails

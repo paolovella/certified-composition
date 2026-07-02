@@ -1106,6 +1106,353 @@ noncomputable def lists_bounded_factors {X : Type}
     obtain ⟨x, y, hxy, hvmem⟩ := of_decide_eq_true (List.mem_filter.mp hv).2
     exact hu x y hxy v hvmem
 
+/-! ## The coherent-sequence encoding — the hunt reaches set theory
+
+The profile said: fail σ-directedness, break conditional completeness unovershootably, fail
+only globally. Coherent sequences are the ZFC engine with exactly that shape, and the
+encoding goes through — up to a question this repo cannot decide. For a coherent sequence
+`⟨e_α : α < ω₁⟩` (`e_α : α → ω`, `e_α =* e_β↾α` — nontrivial ones exist in ZFC, by
+Todorcevic's walks), the **fiber order** `D_coh(e) := Σ_α {s : α → ω ∣ s =* e_α}`, ordered
+*pointwise* on the smaller domain, is (on paper — ω₁ is not formalizable here):
+
+- **directed with finite joins** — the pointwise max of two fiber elements stays in the
+  fiber, because coherence keeps the deviation finite;
+- **not σ-directed** — members spiking to `e_{α*}(ξ_n) + n` at points `ξ_n → α*` defeat
+  every bound `(γ, w)`: coherence forces `w(ξ_n) = e_{α*}(ξ_n)` cofinitely;
+- **conditionally incomplete in the join sense** — a bounded family whose pointwise sup
+  dips below the floor `e_β` infinitely has upper bounds but **no minimal upper bound**:
+  every bound can dip at one more coordinate. Not the overshootable total-order gap; the
+  `D3`-flavoured missing-join kind, sustained infinitely under directedness.
+
+**The first structure passing every wall.** Whether an escapee lives on it reduces to a
+uniformization question: the canonical overshoot `φ(t) := (β_t, max(u_{S(t)}, e_{β_t}))` is
+monotone *except at coherence defects* — finite per comparable pair, but fixing them
+globally means choosing fiber representatives pointwise-monotonically in the level, and
+**level-monotone bounded coherent sequences are trivial** (per-coordinate values stabilize;
+coherence turns the stable function into a trivialization — provable, on paper). So over a
+*nontrivial* sequence the canonical dominator is genuinely obstructed; whether *some*
+non-canonical dominator always exists is exactly a coherent-sequence uniformization
+principle — the class of statement that is axiom-sensitive (MA vs ◊), i.e. plausibly
+**independent of ZFC**. The design space is pinned by a two-order tension: mod-finite
+fibers make the requirement chain self-dominate by coherence; pointwise fibers make raw
+`e`-requirements slice-unbounded (`sup_{β≤α} e_β(ξ)` can be infinite); every viable design
+lives in the finite-modification freedom between the two.
+
+**What is formalizable is the dip pathology itself** — profile item (2), witnessed below at
+countable cofinality: `Fb`, levels `ℕ ∪ {∞}` over a constant-`1` floor with finite patches
+(the trivial-coherent-sequence shadow of `D_coh`). It is directed (`dirF`), not σ-directed
+(`fb_not_sigma_directed`), and carries a bounded family with **no minimal upper bound**
+(`fb_no_minimal_ub`) — strictly worse than `Dm`'s two-incomparable-minimal-ubs — yet still
+factors (`fb_factors`): an explicit ladder is a cofinal ℕ-sequence, and
+`countable_cofinal_factors` overshoots every dip. So *each* profile item is individually
+non-lethal at countable cofinality; the quarry must carry the dip pathology at uncountable
+cofinality, where the ruler is gone — and that is `D_coh(e)`, waiting on set theory. -/
+
+/-- Evaluate a finite patch list against the constant-`1` floor (first match wins). -/
+def evalP : List (Nat × Nat) → Nat → Nat
+  | [],             _ => 1
+  | (k, v) :: rest, ξ => if ξ = k then v else evalP rest ξ
+
+theorem evalP_not_key : ∀ (p : List (Nat × Nat)) (ξ : Nat),
+    (∀ v, (ξ, v) ∉ p) → evalP p ξ = 1
+  | [],             _, _ => rfl
+  | (k, v) :: rest, ξ, h => by
+    have hne : ξ ≠ k := fun he => h v (he ▸ List.mem_cons_self ..)
+    show (if ξ = k then v else evalP rest ξ) = 1
+    rw [if_neg hne]
+    exact evalP_not_key rest ξ (fun u hu => h u (List.mem_cons_of_mem _ hu))
+
+/-- Every key of a patch list is at most its running key-maximum. -/
+def maxKeyP (p : List (Nat × Nat)) : Nat := p.foldr (fun kv acc => Nat.max kv.1 acc) 0
+
+theorem key_le_maxKeyP : ∀ (p : List (Nat × Nat)) (ξ v : Nat), (ξ, v) ∈ p → ξ ≤ maxKeyP p
+  | kv :: rest, ξ, v, h => by
+    cases h with
+    | head => exact Nat.le_max_left _ _
+    | tail _ h => exact Nat.le_trans (key_le_maxKeyP rest ξ v h) (Nat.le_max_right _ _)
+
+/-- Every patch value is at most the running value-maximum-with-1. -/
+def maxValP (p : List (Nat × Nat)) : Nat := p.foldr (fun kv acc => Nat.max kv.2 acc) 1
+
+theorem evalP_le_maxValP : ∀ (p : List (Nat × Nat)) (ξ : Nat), evalP p ξ ≤ maxValP p
+  | [],             _ => Nat.le_refl 1
+  | (k, v) :: rest, ξ => by
+    show (if ξ = k then v else evalP rest ξ) ≤ Nat.max v (maxValP rest)
+    by_cases h : ξ = k
+    · rw [if_pos h]; exact Nat.le_max_left _ _
+    · rw [if_neg h]; exact Nat.le_trans (evalP_le_maxValP rest ξ) (Nat.le_max_right _ _)
+
+/-- Levels: `ℕ ∪ {∞}` (`none` = the limit level with full domain). -/
+def leLvl : Option Nat → Option Nat → Prop
+  | _,      none   => True
+  | none,   some _ => False
+  | some n, some m => n ≤ m
+
+theorem leLvl_refl : ∀ l, leLvl l l
+  | none   => trivial
+  | some _ => Nat.le_refl _
+
+theorem leLvl_trans : ∀ {a b c}, leLvl a b → leLvl b c → leLvl a c :=
+  fun {a b c} => match a, b, c with
+  | _,      _,      none   => fun _ _ => trivial
+  | none,   none,   some _ => fun _ h₂ => nomatch h₂
+  | none,   some _, some _ => fun h₁ _ => nomatch h₁
+  | some _, none,   some _ => fun _ h₂ => nomatch h₂
+  | some _, some _, some _ => fun h₁ h₂ => Nat.le_trans h₁ h₂
+
+/-- Domain of a level. -/
+def inLvl (ξ : Nat) : Option Nat → Prop
+  | none   => True
+  | some n => ξ < n
+
+theorem inLvl_mono : ∀ {l l'}, leLvl l l' → ∀ {ξ}, inLvl ξ l → inLvl ξ l' :=
+  fun {l l'} h {_ξ} hξ => match l, l', h, hξ with
+  | _,      none,   _, _  => trivial
+  | none,   some _, h, _  => nomatch h
+  | some _, some _, h, hξ => Nat.lt_of_lt_of_le hξ h
+
+/-- The fiber order, mathlib-free: a level and a finite patch of the constant-`1` floor,
+    ordered pointwise on the smaller domain — the trivial-coherent-sequence shadow of
+    `D_coh(e)`. -/
+def Fb := Option Nat × List (Nat × Nat)
+
+def leF (a b : Fb) : Prop :=
+  leLvl a.1 b.1 ∧ ∀ ξ, inLvl ξ a.1 → evalP a.2 ξ ≤ evalP b.2 ξ
+
+theorem leF_refl : ∀ a, leF a a := fun a => ⟨leLvl_refl a.1, fun _ _ => Nat.le_refl _⟩
+
+theorem leF_trans : ∀ {a b c}, leF a b → leF b c → leF a c :=
+  fun hab hbc => ⟨leLvl_trans hab.1 hbc.1,
+    fun ξ hξ => Nat.le_trans (hab.2 ξ hξ) (hbc.2 ξ (inLvl_mono hab.1 hξ))⟩
+
+/-! ### Directed: level-max plus pointwise-max patch merge -/
+
+def cubLvl : Option Nat → Option Nat → Option Nat
+  | some n, some m => some (Nat.max n m)
+  | _,      _      => none
+
+theorem leLvl_cubLvl_left : ∀ l l', leLvl l (cubLvl l l')
+  | none,   none   => trivial
+  | none,   some _ => trivial
+  | some _, none   => trivial
+  | some _, some _ => Nat.le_max_left _ _
+
+theorem leLvl_cubLvl_right : ∀ l l', leLvl l' (cubLvl l l')
+  | none,   none   => trivial
+  | none,   some _ => trivial
+  | some _, none   => trivial
+  | some _, some _ => Nat.le_max_right _ _
+
+/-- Merge two patches: at every mentioned key, take the pointwise max of both sides. -/
+def mergeP (p q : List (Nat × Nat)) : List (Nat × Nat) :=
+  (p ++ q).map (fun kv => (kv.1, Nat.max (evalP p kv.1) (evalP q kv.1)))
+
+theorem evalP_mergeP_of_mem : ∀ (l p q : List (Nat × Nat)) (ξ v : Nat), (ξ, v) ∈ l →
+    evalP (l.map (fun kv => (kv.1, Nat.max (evalP p kv.1) (evalP q kv.1)))) ξ
+      = Nat.max (evalP p ξ) (evalP q ξ)
+  | (k, w) :: rest, p, q, ξ, v, h => by
+    show (if ξ = k then Nat.max (evalP p k) (evalP q k) else _) = _
+    by_cases hk : ξ = k
+    · rw [if_pos hk, hk]
+    · rw [if_neg hk]
+      cases h with
+      | head => exact absurd rfl hk
+      | tail _ h => exact evalP_mergeP_of_mem rest p q ξ v h
+
+open Classical in
+theorem le_evalP_mergeP_left (p q : List (Nat × Nat)) (ξ : Nat) :
+    evalP p ξ ≤ evalP (mergeP p q) ξ := by
+  by_cases h : ∃ v, (ξ, v) ∈ p ++ q
+  · obtain ⟨v, hv⟩ := h
+    rw [mergeP, evalP_mergeP_of_mem (p ++ q) p q ξ v hv]
+    exact Nat.le_max_left _ _
+  · have hp : ∀ v, (ξ, v) ∉ p := fun v hv => h ⟨v, List.mem_append.mpr (Or.inl hv)⟩
+    have hm : ∀ v, (ξ, v) ∉ mergeP p q := by
+      intro v hv
+      obtain ⟨⟨k, w⟩, hk, he⟩ := List.mem_map.mp hv
+      cases he
+      exact h ⟨w, hk⟩
+    rw [evalP_not_key p ξ hp, evalP_not_key _ ξ hm]
+    exact Nat.le_refl 1
+
+open Classical in
+theorem le_evalP_mergeP_right (p q : List (Nat × Nat)) (ξ : Nat) :
+    evalP q ξ ≤ evalP (mergeP p q) ξ := by
+  by_cases h : ∃ v, (ξ, v) ∈ p ++ q
+  · obtain ⟨v, hv⟩ := h
+    rw [mergeP, evalP_mergeP_of_mem (p ++ q) p q ξ v hv]
+    exact Nat.le_max_right _ _
+  · have hq : ∀ v, (ξ, v) ∉ q := fun v hv => h ⟨v, List.mem_append.mpr (Or.inr hv)⟩
+    have hm : ∀ v, (ξ, v) ∉ mergeP p q := by
+      intro v hv
+      obtain ⟨⟨k, w⟩, hk, he⟩ := List.mem_map.mp hv
+      cases he
+      exact h ⟨w, hk⟩
+    rw [evalP_not_key q ξ hq, evalP_not_key _ ξ hm]
+    exact Nat.le_refl 1
+
+def dirF : Directed Fb leF where
+  cub          := fun a b => (cubLvl a.1 b.1, mergeP a.2 b.2)
+  le_cub_left  := fun a b =>
+    ⟨leLvl_cubLvl_left a.1 b.1, fun ξ _ => le_evalP_mergeP_left a.2 b.2 ξ⟩
+  le_cub_right := fun a b =>
+    ⟨leLvl_cubLvl_right a.1 b.1, fun ξ _ => le_evalP_mergeP_right a.2 b.2 ξ⟩
+
+/-! ### Not σ-directed: unbounded spikes at coordinate 0 -/
+
+theorem fb_not_sigma_directed : ¬ SigmaDirected Fb leF := by
+  intro hσ
+  obtain ⟨⟨l, v⟩, hb⟩ := hσ (fun n => (none, [(0, n)]))
+  have he : evalP [(0, evalP v 0 + 1)] 0 = evalP v 0 + 1 := by
+    show (if 0 = 0 then evalP v 0 + 1 else evalP [] 0) = evalP v 0 + 1
+    rw [if_pos rfl]
+  have h : evalP [(0, evalP v 0 + 1)] 0 ≤ evalP v 0 :=
+    (hb (evalP v 0 + 1)).2 0 trivial
+  rw [he] at h
+  omega
+
+/-! ### The dip pathology: a bounded family with NO minimal upper bound -/
+
+/-- The patch zeroing the even coordinates below `n`. -/
+def zeroEvens : Nat → List (Nat × Nat)
+  | 0     => []
+  | n + 1 => if n % 2 = 0 then (n, 0) :: zeroEvens n else zeroEvens n
+
+theorem evalP_zeroEvens_le_one : ∀ (n ξ : Nat), evalP (zeroEvens n) ξ ≤ 1
+  | 0,     _ => Nat.le_refl 1
+  | n + 1, ξ => by
+    show evalP (if n % 2 = 0 then (n, 0) :: zeroEvens n else zeroEvens n) ξ ≤ 1
+    by_cases h : n % 2 = 0
+    · rw [if_pos h]
+      show (if ξ = n then 0 else evalP (zeroEvens n) ξ) ≤ 1
+      by_cases hξ : ξ = n
+      · rw [if_pos hξ]; exact Nat.zero_le 1
+      · rw [if_neg hξ]; exact evalP_zeroEvens_le_one n ξ
+    · rw [if_neg h]; exact evalP_zeroEvens_le_one n ξ
+
+theorem evalP_zeroEvens_even : ∀ (n ξ : Nat), ξ < n → ξ % 2 = 0 → evalP (zeroEvens n) ξ = 0
+  | 0,     _, hlt, _   => by omega
+  | n + 1, ξ, hlt, hev => by
+    show evalP (if n % 2 = 0 then (n, 0) :: zeroEvens n else zeroEvens n) ξ = 0
+    by_cases hξ : ξ = n
+    · subst hξ
+      rw [if_pos hev]
+      show (if ξ = ξ then 0 else evalP (zeroEvens ξ) ξ) = 0
+      rw [if_pos rfl]
+    · by_cases h : n % 2 = 0
+      · rw [if_pos h]
+        show (if ξ = n then 0 else evalP (zeroEvens n) ξ) = 0
+        rw [if_neg hξ]
+        exact evalP_zeroEvens_even n ξ (by omega) hev
+      · rw [if_neg h]
+        exact evalP_zeroEvens_even n ξ (by omega) hev
+
+/-- The dip family: level `n`, floor `1` zeroed on the evens below `n`. Its pointwise sup
+    drops to `0` at every even coordinate — infinitely far below the limit-level floor. -/
+def sEv (n : Nat) : Fb := (some n, zeroEvens n)
+
+/-- **The dip pathology, witnessed.** The family `sEv` is bounded, and every upper bound
+    strictly exceeds another upper bound — dip at one more even coordinate beyond its
+    patches. No minimal upper bound exists, a fortiori no least: strictly worse than the
+    `Dm` gap (two incomparable minimal ubs), and the exact conditional-incompleteness the
+    quarry's profile item (2) demands. -/
+theorem fb_no_minimal_ub :
+    (∃ b, ∀ n, leF (sEv n) b) ∧
+    (∀ u, (∀ n, leF (sEv n) u) →
+      ∃ u', (∀ n, leF (sEv n) u') ∧ leF u' u ∧ ¬ leF u u') := by
+  constructor
+  · exact ⟨(none, []), fun n => ⟨trivial, fun ξ _ => evalP_zeroEvens_le_one n ξ⟩⟩
+  · intro u hu
+    obtain ⟨l, v⟩ := u
+    -- a fresh even coordinate beyond every patch key
+    obtain ⟨ξ₀, hev, hgt⟩ : ∃ w, w % 2 = 0 ∧ maxKeyP v < w :=
+      ⟨2 * (maxKeyP v + 1), by omega, by omega⟩
+    have hfresh : ∀ w, (ξ₀, w) ∉ v := fun w hw =>
+      absurd (key_le_maxKeyP v ξ₀ w hw) (by omega)
+    have hv₀ : evalP v ξ₀ = 1 := evalP_not_key v ξ₀ hfresh
+    refine ⟨(l, (ξ₀, 0) :: v), ⟨?_, ?_, ?_⟩⟩
+    · -- still an upper bound: the family itself is 0 at ξ₀
+      intro n
+      refine ⟨(hu n).1, fun ξ hξ => ?_⟩
+      show evalP (zeroEvens n) ξ ≤ (if ξ = ξ₀ then 0 else evalP v ξ)
+      by_cases hξeq : ξ = ξ₀
+      · rw [if_pos hξeq]
+        have h0 : evalP (zeroEvens n) ξ = 0 :=
+          evalP_zeroEvens_even n ξ hξ (by rw [hξeq]; exact hev)
+        omega
+      · rw [if_neg hξeq]
+        exact (hu n).2 ξ hξ
+    · -- below the given bound
+      refine ⟨leLvl_refl l, fun ξ _ => ?_⟩
+      show (if ξ = ξ₀ then 0 else evalP v ξ) ≤ evalP v ξ
+      by_cases hξeq : ξ = ξ₀
+      · rw [if_pos hξeq]; exact Nat.zero_le _
+      · rw [if_neg hξeq]; exact Nat.le_refl _
+    · -- strictly: the given bound is 1 at ξ₀, the new one is 0
+      intro hle
+      have hl : l = none := by
+        cases l with
+        | none => rfl
+        | some m => exact absurd ((hu (m + 1)).1) (Nat.not_succ_le_self m)
+      have h := hle.2 ξ₀ (by rw [hl]; exact trivial)
+      have h0 : evalP ((ξ₀, 0) :: v) ξ₀ = 0 := by
+        show (if ξ₀ = ξ₀ then 0 else evalP v ξ₀) = 0
+        rw [if_pos rfl]
+      rw [hv₀, h0] at h
+      omega
+
+/-! ### And it still factors: the ladder is a cofinal ℕ-sequence -/
+
+/-- The ladder patch: value `k` on `[0, j)`. -/
+def ladder (k : Nat) : Nat → List (Nat × Nat)
+  | 0     => []
+  | j + 1 => (j, k) :: ladder k j
+
+theorem evalP_ladder_lt : ∀ (k j ξ : Nat), ξ < j → evalP (ladder k j) ξ = k
+  | _, 0,     _, h => by omega
+  | k, j + 1, ξ, h => by
+    show (if ξ = j then k else evalP (ladder k j) ξ) = k
+    by_cases hξ : ξ = j
+    · rw [if_pos hξ]
+    · rw [if_neg hξ]
+      exact evalP_ladder_lt k j ξ (by omega)
+
+theorem evalP_ladder_ge : ∀ (k j ξ : Nat), j ≤ ξ → evalP (ladder k j) ξ = 1
+  | _, 0,     _, _ => rfl
+  | k, j + 1, ξ, h => by
+    show (if ξ = j then k else evalP (ladder k j) ξ) = 1
+    rw [if_neg (by omega)]
+    exact evalP_ladder_ge k j ξ (by omega)
+
+/-- The ladders are cofinal: every element is dominated once the rung exceeds its patch
+    keys and values. A bare cofinal ℕ-sequence — the countable escape hatch. -/
+theorem fb_ladder_cofinal : ∀ a : Fb, ∃ n, leF a (none, ladder n n) := by
+  intro a
+  obtain ⟨l, p⟩ := a
+  refine ⟨Nat.max (maxValP p) (maxKeyP p + 1), ⟨trivial, fun ξ _ => ?_⟩⟩
+  by_cases hξ : ξ < Nat.max (maxValP p) (maxKeyP p + 1)
+  · rw [evalP_ladder_lt _ _ ξ hξ]
+    exact Nat.le_trans (evalP_le_maxValP p ξ) (Nat.le_max_left _ _)
+  · rw [evalP_ladder_ge _ _ ξ (by omega)]
+    have hkey : ∀ v, (ξ, v) ∉ p := by
+      intro v hv
+      have h1 := key_le_maxKeyP p ξ v hv
+      have h2 : maxKeyP p + 1 ≤ Nat.max (maxValP p) (maxKeyP p + 1) := Nat.le_max_right _ _
+      omega
+    rw [evalP_not_key p ξ hkey]
+    exact Nat.le_refl 1
+
+/-- **Profile item (2) is individually non-lethal.** `Fb` carries the dip pathology (no
+    minimal upper bound) and fails σ-directedness, yet every bounded-image map factors —
+    the ladder ruler overshoots every dip. The quarry must therefore carry the dips at
+    *uncountable* cofinality, where no ruler exists: exactly `D_coh(e)` over a nontrivial
+    coherent sequence, and that question leaves this repo for set theory. -/
+noncomputable def fb_factors {X : Type} (dist : X → X → Fb) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, leF (dist x y) t → leF (dist (f x) (f y)) b) :
+    Bridge X (Mono Fb leF) Fb (universalGA leF leF_trans) dist :=
+  countable_cofinal_factors leF leF_refl leF_trans dirF
+    (fun n => (none, ladder n n)) fb_ladder_cofinal dist f bounded
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*
