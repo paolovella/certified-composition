@@ -570,6 +570,22 @@ uniformization, the exact family where ◊ kills and MA/PFA saves. Current lean,
 revision: **independent of ZFC**, with one named gap per side (◊: make the dominator need
 the killed coordinates despite overshoot; MA: tame the self-similar ledger).
 
+**The ◊-side gap attempted (note §9) — a no-go theorem; fourth flip.** The attempt closed
+the ◊ route instead of the gap. Single-level kills are structurally *thin* (coherence
+forces it: finite below every lower level, inherited by every higher floor), so they never
+accumulate; staggered kills would make two fixed levels differ infinitely — impossible;
+committed-value forcing needs img-families cofinal in the kill stage, which legality
+forbids (unbounded slices), marker-isolation blocks (infinitely many markers is not a
+fiber element), and delayed-level construction cannot reach (coherence caps late
+deviations at finite). The template no-go in three lines: **legal forcing is
+bounded-family forcing; bounded families are absorbable; kills need unabsorbable
+forcing** — covering all five kill designs attempted across the notes. First genuinely
+one-sided evidence in the arc. Current lean, fourth revision: **ZFC-factoring**, with the
+MA-side amalgamation now read as a candidate ZFC proof and its missing piece named
+(*forcing-locality*: every cross-element floor-inversion accumulation traces back to some
+slice's forcing — if true, "legality ⇒ absorbability ⇒ dominator" becomes a theorem and
+the fiber-order residual is empty in ZFC).
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),

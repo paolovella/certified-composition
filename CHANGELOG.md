@@ -139,6 +139,18 @@ landed.
   monotone fiber-valued selection with pairwise-finite deviations on the
   chain-free order — Aronszajn-type uniformization. Third flip: lean is
   now independence, one named gap per side.
+- **the ◊-side gap attempted — a no-go theorem for the kill template
+  (fourth flip).** Kills are structurally thin (coherence: finite below
+  every lower level, inherited above), so they never accumulate;
+  staggered kills contradict pairwise coherence; committed-value forcing
+  needs img-levels cofinal in the kill stage, which legality forbids,
+  markers block (infinite markers ∉ fiber), and delayed levels cannot
+  reach (coherence caps late deviation at finite). Template no-go: legal
+  forcing is bounded-family forcing; bounded families are absorbable;
+  kills need unabsorbable forcing — covers all five kill designs tried.
+  First one-sided evidence in the arc. Lean, fourth revision:
+  ZFC-factoring; the MA-side route re-read as a candidate ZFC proof with
+  its missing piece named (forcing-locality).
 
 ## transport-kernel — mathlib instances
 

@@ -323,3 +323,49 @@ kill-traces (the remaining gap: making the dominator *need* the killed coordinat
 despite level-overshoot), MA_{ω₁} plausibly proves it via amalgamation along the
 countable-down-set enumeration (the remaining gap: the self-similar ledger). Neither gap
 closed this session; both are now single, named, and disjoint.
+
+## 9. The ◊-side gap, attempted — a no-go theorem for the kill template (fourth flip)
+
+The gap was: make the dominator need the killed coordinates despite level-overshoot.
+Working it produced a no-go, not a closure.
+
+**Thinness (ZFC).** Coherence forces any single level's kill-set to be finite below every
+`α < δ` — an ω-sequence cofinal in `δ`. So every element of level `< δ` sees finitely
+many of `δ`'s kill points (dippable per-element), and every floor above `δ` inherits the
+kill (coherence pins it ≈ 0 there): inversions live only across the single kill boundary,
+thinly. The existing ◊-kill can never accumulate. Staggered multi-level kills die the
+same way: one element seeing infinitely many pre-drop coordinates with drops above its
+level would make two fixed levels differ infinitely — impossible.
+
+**The forcing dilemma.** Accumulation therefore needs committed *values* (not floors):
+img-families with levels cofinal in the kill stage, undipped at the candidate points.
+Legality forbids exactly that: such families have unbounded slices (any bound exceeds its
+own floor at all kill points). Marker-isolation legalizes mixed-stage systems but the
+accumulating element must then carry infinitely many markers — not a fiber element;
+unmarked mixing is illegal outright (kill-stage bounds are jointly sup-incoherent).
+Delayed-level construction (build a low level late, kill against committed values) fails
+too: coherence caps a late level's deviation from already-built higher levels at finite.
+
+**No-go (template-level, proof-shaped).** For any ♦-recursion of the shape used since
+§2: (i) commitments available at stage `β` have levels bounded by earlier stages; (ii)
+legality confines every slice to sup-coherent stage-mixtures; (iii) sup-coherent mixtures
+have absorbable forcing (the §8 bounded-family lemma); (iv) a kill needs cofinal
+unabsorbable forcing below its stage. (i)–(iv) are jointly unsatisfiable. In three lines:
+**legal forcing is bounded-family forcing; bounded families are absorbable; kills need
+unabsorbable forcing.** This covers all five kill designs attempted across these notes —
+the "+1 trap", the trace systems, the probe systems, the marker systems, and the delayed
+levels are all instances.
+
+**Fourth flip, and what remains live.** The ◊ route is closed for this entire template
+family — the first genuinely one-sided evidence in the arc. Remaining routes: (a) the
+MA-side amalgamation, which given the no-go pattern now reads as a candidate *ZFC*
+factoring proof rather than a consistency result; its missing piece is unchanged (the
+self-similar ledger), but the no-go suggests a strategy: show every cross-element
+floor-inversion accumulation traces back to some slice's forcing ("**forcing-locality**",
+named conjecture) — then absorbability of slices closes the ledger and the metatheorem
+"legality ⇒ absorbability ⇒ dominator" becomes a theorem, emptying the fiber-order
+residual in ZFC. (b) A kill attacking *monotonicity structure* rather than
+fiber-membership — no design exists; the no-go does not formally exclude it, but every
+mechanism tried routes through fiber-membership eventually. Current lean, fourth
+revision: **ZFC-factoring**, now supported by a no-go rather than by failed attempts
+alone.
