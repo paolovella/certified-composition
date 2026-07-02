@@ -87,6 +87,18 @@ landed.
   absence powers the kill. Open core, one sentence: does factors-everything
   imply reps? The note records the legal pressure system `Σ_succ`, the "+1
   trap", the self-obstruction phenomenon, and the two decisive follow-ups.
+- **the ◊ theorem collapses to ZFC: reps ⟺ trivial.** Checking whether the
+  walk sequences already lack reps answered far more strongly — *every*
+  nontrivial coherent sequence lacks representative systems, in ZFC
+  (coherence pins pairwise rep-differences finite; level-monotonicity
+  concentrates countably many witnesses at one countable level, so movement
+  below any α is finite; the escape set has finite initial segments, hence
+  bounded; bounded escape trivializes). The ◊ construction is retired as
+  unnecessary (kept in the note for the record); "canonical dominators
+  exist iff trivial" is a ZFC dichotomy; the independence suspicion
+  retreats to non-canonical dominators only; and the Bridge is restated as
+  a pure ZFC question over the walks' `ρ₁`. If it holds, the transport
+  escapee exists in ZFC.
 
 ## transport-kernel — mathlib instances
 

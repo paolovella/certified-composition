@@ -28,7 +28,11 @@ slice bound keeps everything in the fiber. Corollary: trivial `e` has reps
 (`ρ_α := max(e_α, E↾α)`), so **triviality ⇒ factors-everything**; the escapee, if any,
 lives strictly on nontrivial sequences.
 
-## 2. The ◊ theorem (sketch-complete)
+## 2. The ◊ theorem (sketch-complete) — **superseded by §2′: this is a ZFC theorem**
+
+*(Kept for the record. The construction below is correct but unnecessary: §2′ proves in ZFC
+that reps exist iff the sequence is trivial, so every nontrivial coherent sequence — the
+walk sequences included — already lacks reps. The ◊-guessing machinery bought nothing.)*
 
 **Theorem (◊).** There is a coherent sequence `e` with values `≥ 1` admitting **no
 representative system** — hence (Lemma 2's route) no canonical dominator repairs exist.
@@ -45,8 +49,49 @@ finitely many `ξ_n` below any `α < β`. Any candidate `ρ_β` must satisfy
 partial system cannot pass `β`. A total rep system is guessed correctly at stationarily
 many `β` (standard coding + club argument), and dies there. ∎
 
-Open side-question: the walk sequences (`ρ₁`) may *already* lack reps in ZFC — worth
-checking against Todorcevic's unboundedness properties before assuming ◊ is needed here.
+Open side-question *(resolved in §2′)*: the walk sequences (`ρ₁`) may *already* lack reps
+in ZFC — worth checking against Todorcevic's unboundedness properties before assuming ◊ is
+needed here.
+
+## 2′. ◊ was unnecessary: reps ⟺ trivial (ZFC)
+
+Checking the side-question dissolved the ◊ theorem. No property of walks is needed —
+nontriviality alone forbids reps.
+
+**Theorem (ZFC).** A coherent sequence `e` admits a level-monotone representative system
+iff `e` is trivial.
+
+*Proof.* (⟸) `ρ_α := max(e_α, E↾α)` for a trivializing `E`. (⟹) Let `ρ` be reps.
+
+1. **Pairwise differences are finite.** For `α < β`:
+   `ρ_β↾α =* e_β↾α =* e_α =* ρ_α`, so `M(α,β) := {ξ < α : ρ_β(ξ) > ρ_α(ξ)}` is finite —
+   coherence of `e` transfers to `ρ`.
+2. **Only finitely many coordinates below `α` ever move after `α`.** Let
+   `U_α := {ξ < α : ∃β > α, ρ_β(ξ) > ρ_α(ξ)}`. If `ξ_n ∈ U_α` are distinct with witnesses
+   `β_n`, then `β* := sup_n β_n < ω₁` (regularity), and level-monotonicity gives
+   `ρ_{β*}(ξ_n) ≥ ρ_{β_n}(ξ_n) > ρ_α(ξ_n)` — so `M(α, β*)` is infinite, contradicting 1.
+   This is the decisive step: *monotonicity concentrates countably many witnesses at a
+   single countable level.*
+3. **The escape set is bounded.** `T := {ξ : sup_β ρ_β(ξ) = ∞}`: each `ξ ∈ T` moves
+   cofinally, so `T ∩ α ⊆ U_α` is finite for every `α`; an unbounded set with finite
+   initial segments has order type `ω` and hence countable sup — so `T` is bounded, say
+   `T ⊆ α₀`.
+4. **Bounded escape trivializes.** Off `α₀` every coordinate's value `ρ_β(ξ)` is
+   nondecreasing and bounded, hence stable at some `E(ξ)` from a stage `γ_ξ` on. For any
+   `α`, `γ(α) := sup{γ_ξ : ξ ∈ [α₀, α)} < ω₁`, and `ρ_{γ(α)}` agrees with `E` on
+   `[α₀, α)`; since `ρ_{γ(α)}↾α =* e_α` (step 1's chain), `E =* e_α` on `[α₀, α)`. Set
+   `E := e_{α₀}` below `α₀` (coherence handles that block). Then `E↾α =* e_α` for all `α`:
+   `e` is trivial. ∎
+
+Corollaries: the earlier "level-monotone + pointwise bounded ⇒ trivial" drops its
+boundedness hypothesis (step 3 manufactures it); **every nontrivial coherent sequence — in
+particular `ρ₁` of the walks, in ZFC — lacks reps**; and with Lemma 2:
+
+> **Canonical dominators exist iff `e` is trivial — a ZFC dichotomy.**
+
+The independence suspicion thus retreats: the rep-half of the question was never
+axiom-sensitive. Whatever independence remains, if any, lives entirely in the
+*non-canonical* dominators.
 
 ## 3. The obstruction: pressure vs. legality, and the "+1 trap"
 
@@ -75,22 +120,23 @@ Everything below is where the construction stops being a proof and becomes a red
   club-restricted reps) circles back to this: **the kill needs reps to aim itself, and
   no-reps is the ammunition.**
 
-## 4. The reduced open core
+## 4. The reduced open core (restated after §2′ — now a pure ZFC question)
 
-The ◊-side attempt therefore closes iff the following bridge closes:
+With reps ⟺ trivial in ZFC, the bridge is no longer conditioned on ◊:
 
-> **Bridge (open).** Over the ◊-sequence of §2 (or any no-reps coherent sequence), does
-> some legal system have no dominator at all? Equivalently: does "every legal system
-> factors" imply the existence of a representative system?
+> **Bridge (open, ZFC-stated).** Over any *nontrivial* coherent sequence — e.g. `ρ₁` of
+> the walks, a concrete ZFC object — does some legal system have no dominator at all?
+> Equivalently: does "every legal system over `D_coh(e)` factors" imply `e` is trivial?
 
-Lemma 2 is the converse (reps ⇒ factors-everything). If the bridge holds, ◊ produces the
-escapee and the transport line's residual is **consistently inhabited**. If the bridge
-fails — if non-canonical dominators can always be assembled without reps — then the
-dip-coherence freedom (upper bounds may dip below the floor at finite sets, chosen
-per-point) is strong enough to dodge every rep-shaped obstruction, and the suspicion flips
-toward ZFC-factoring of `D_coh(e)`. The repeated satisfiability wall of §3 is weak evidence
-for the second reading; the Aronszajn shape of the order is evidence for the first. Both
-readings are consistent with everything proved here.
+Lemma 2 + §2′ give the converse: trivial ⟺ reps ⟹ factors-everything. If the bridge
+holds, **the transport escapee exists in ZFC** — no independence anywhere in this line. If
+it fails — if non-canonical dominators can be assembled over a nontrivial sequence — then
+the dip-coherence freedom (upper bounds may dip below the floor at finite sets, chosen
+per-point) dodges every rep-shaped obstruction, and `D_coh(e)` factors everything in ZFC
+despite the rep dichotomy. Independence, if it enters at all, now has exactly one place
+left to live: the behaviour of dip-assembled dominators for specific systems like
+`Σ_succ`. The repeated satisfiability wall of §3 is weak evidence for factoring; the
+Aronszajn shape of the order and the ZFC rep dichotomy are evidence for the escapee.
 
 What would decide it: (a) a direct construction of a dominator for `Σ_succ` over the ◊
 sequence — this must route monotone values through the fibers *without* a rep chain, i.e.
@@ -104,12 +150,15 @@ fiber-membership of limit values — precisely where §2's kill operates, but no
 controls, which a dip-happy `φ` may deny. That last sentence is the exact face of the
 wall.
 
-## 5. Verdict
+## 5. Verdict (revised after §2′)
 
-◊ demonstrably destroys every *canonical* (rep-mediated) dominator; whether it destroys
-some system's *every* dominator is exactly the Bridge. The attempt stands as: two ZFC
-lemmas, one ◊ theorem, one legal pressure system (`Σ_succ`), and one sharply-located open
-bridge — rather than a claimed independence result. The honest suspicion is unchanged in
-direction but sharpened in location: the escapee question over `D_coh(e)` is equivalent to
-a rep-existence/uniformization principle whose ◊-side needs one more genuinely new idea —
-dip-side pressure — that no encoding so far supplies.
+The session's arc, kept honest: the ◊-side attempt first produced a ◊ theorem (§2), and
+checking whether walks already satisfy it in ZFC (§2′) showed the ◊ machinery was
+unnecessary — **canonical dominators die over every nontrivial coherent sequence, in
+ZFC**, by a four-step argument whose engine is that level-monotonicity concentrates
+countably many witnesses at one countable level. The attempt now stands as: three ZFC
+theorems (level-preserving systems factor; reps ⟺ trivial; hence canonical dominators
+exist iff trivial), one legal pressure system (`Σ_succ`), and one sharply-located open
+bridge, now itself a ZFC question: whether rep-death over walks propagates to *all*
+dominators of some legal system. One genuinely new idea — dip-side pressure — is still
+what the bridge needs, in either direction.

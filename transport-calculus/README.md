@@ -490,24 +490,29 @@ tension**: mod-finite fibers make the requirement chain self-dominate by coheren
 pointwise fibers make raw `e`-requirements slice-unbounded; every viable design lives in
 the finite-modification freedom between the two.
 
-**The ◊-side attempt (see `NOTES-coherent-escapee.md`) — canonical dominators die; one
-bridge remains.** Working the diamond construction produced, at prose rigor: two ZFC
-lemmas — *level-preserving systems always factor* (`φ(t) := t ∨ sup S(t)`), and
+**The ◊-side attempt (see `NOTES-coherent-escapee.md`) — and its ZFC collapse: canonical
+dominators die over every nontrivial sequence.** Working the diamond construction produced
+two ZFC lemmas — *level-preserving systems always factor* (`φ(t) := t ∨ sup S(t)`), and
 *representative systems (level-monotone fiber representatives) make every legal system
-factor*, recovering "trivial ⇒ factors" as a corollary — and one ◊ theorem: **under ◊ there
-is a coherent sequence with no representative system at all** (at limit stages, lower the
-glued floor to `0` at one point per ladder block, chosen against the ◊-guessed partial rep
-system; coherence survives, the guessed system cannot pass the stage, and a total system is
-caught stationarily). So under ◊ every rep-mediated dominator repair is dead. What did
-*not* close is the bridge from rep-death to an actual escapee: pressure needs infinite
-boundable threshold families, legality makes their requirements mod-finite-satisfiable,
-fibers absorb finite defects, and every extraction of coherent data from a dominator
-(threshold chains through fibers) needs exactly a representative system — the kill needs
-reps to aim itself, and no-reps is the ammunition. The open core is now one sentence:
-**does "every legal system over `D_coh(e)` factors" imply reps exist?** If yes, ◊ inhabits
-the residual; if no, dip-freedom dodges every rep-shaped obstruction and the suspicion
-flips toward ZFC-factoring. The legal successor-push system `Σ_succ` and the two decisive
-follow-ups are laid out in the note.
+factor* — plus a ◊ theorem building a coherent sequence with no reps. Then checking
+whether the walk sequences already lack reps in ZFC **retired the ◊ machinery entirely**:
+
+> **Theorem (ZFC): a coherent sequence admits a representative system iff it is trivial.**
+
+The proof's engine: coherence transfers to any rep system and pins pairwise differences
+finite; level-monotonicity then concentrates countably many movement-witnesses at a single
+countable level, so only finitely many coordinates below any `α` ever move after `α`; the
+escape set therefore has finite initial segments, hence is bounded; and bounded escape
+stabilizes into a trivializing function. Corollary: **canonical dominators exist iff the
+sequence is trivial — a ZFC dichotomy**, with the walks' `ρ₁` a concrete rep-less witness.
+The independence suspicion retreats accordingly: whatever axiom-sensitivity remains lives
+only in *non-canonical* (dip-assembled) dominators. What still did not close is the bridge
+from rep-death to an actual escapee — pressure needs infinite boundable threshold
+families, legality makes their requirements mod-finite-satisfiable, fibers absorb finite
+defects, and every coherence-extraction from a dominator needs exactly a rep chain. The
+open core, now a pure ZFC question: **does "every legal system over `D_coh(ρ₁)` factors"
+imply triviality?** If yes, the transport escapee exists in ZFC. The legal pressure system
+`Σ_succ` and the decisive follow-ups are in the note.
 
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
