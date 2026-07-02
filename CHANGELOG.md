@@ -35,6 +35,22 @@ landed.
 - field `coeff` → `cert`, and the over-claiming "genus / existence proof"
   framing dropped to "a common interface," once the Hölder instance showed the
   certificate need not be numeric.
+- **the qualitative frontier, bracketed** — the non-monotone escapee question
+  resolved into: complete lattice ⇒ factors; image-family sups ⇒ factors (and
+  are not necessary); non-directed `D` ⇒ escapee (`D3`); directed + finite /
+  bounded ⇒ factors; countable cofinality ⇒ factors (cofinal ℕ-ruler,
+  cub-monotonized). Residual: uncountable cofinality.
+- **the transfinite theorem, proved — "unformalizable" was wrong.** The
+  uncountable-cofinality selection, previously called "plausible — unchecked,
+  and unformalizable here (transfinite recursion, cardinals)", is now a
+  mathlib-free theorem (`prefix_bounded_cofinal_factors`): selection over any
+  well-ordered index needs **no limit steps** (`wruler_defeats_bounded_escapee`,
+  `Classical.choice` only), and monotonization runs on Lean-core
+  `WellFounded.fix` under `PrefixBounded` — `κ`-directedness stated without
+  cardinals, weakened to segment-indexed families. `prefixBounded_of_directed`
+  proves directedness supplies it at `ω` (re-deriving the countable case);
+  uncountably it is not a theorem. The residual is now exactly one hypothesis
+  wide: whether `Directed` without `PrefixBounded` admits an escapee.
 
 ## transport-kernel — mathlib instances
 

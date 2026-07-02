@@ -395,13 +395,43 @@ prefixes* — i.e. **`κ`-directedness** (every subset of size `<κ` is bounded)
 cofinality does **not** give this: a `<κ`-sized subset is non-cofinal, but *non-cofinal ≠
 bounded* in a merely directed order (`ℕ` is directed yet unbounded). So "regular cofinality ⇒
 factors" has a hole at exactly that step; the hypothesis the argument really needs is
-`κ`-directedness, strictly stronger, and under it the transfinite selection is only
-*plausible* — unchecked, and unformalizable here.
+`κ`-directedness, strictly stronger — and under it the transfinite selection was first called
+"only plausible — unchecked, and unformalizable here", which the next paragraph corrects:
+it is now *proved*, in this file.
 
 So the honest residual is the **whole uncountable-cofinality** directed non-dcpo realm — not
 the smaller "singular cofinality" (an earlier overstatement of mine), since even the
 regular-uncountable case is open absent `κ`-directedness. It has **neither a witness nor an
-impossibility proof**. The one solid new fact is the `ω` case; the rest is a frontier.
+impossibility proof**.
+
+**The transfinite theorem, formalized — "unformalizable" was wrong
+(`prefix_bounded_cofinal_factors`, proved).** Neither cardinals nor — for half the argument —
+transfinite recursion was actually needed, and the mistake was load-bearing for how open the
+residual looked. Split the ω-argument in two and each half generalizes, mathlib-free:
+
+- **Selection is not transfinite** (`wruler_defeats_bounded_escapee`, `Classical.choice`
+  only). Over *any* well-ordered index — `WellIndex`, an order with a least witness for every
+  inhabited predicate, `ℕ`'s `exists_least` abstracted — a monotone cofinal chain defeats
+  every bounded-image escapee by the same per-threshold least-index selection as at `ω`.
+  **No limit steps exist in this argument at all**; what looked transfinite never was.
+- **Monotonization is where recursion lives** (`WRuler.ofCofinalFamily`): turning a bare
+  cofinal `W`-family into a monotone chain runs `WellFounded.fix` (Lean core;
+  well-foundedness derived from least witnesses, `WellIndex.wf`) under the real hypothesis:
+  **`PrefixBounded`** — every family indexed by an initial segment `{v // v ≤ w}` is bounded.
+  That is `κ`-directedness stated *without cardinals*, and weakened to segment-indexed
+  families — sharper than what the prose version asked for.
+- `prefixBounded_of_directed` proves plain directedness supplies `PrefixBounded` at `W = ℕ`
+  (segments are finite; `cub`-folds bound them) — "κ-directedness is free at ω" as a theorem
+  — and `countable_cofinal_factors'` re-derives the whole countable case from the general
+  machinery, confirming the subsumption end-to-end.
+
+**The residual, restated at its true width: one hypothesis.** `PrefixBounded ⇒ factors` is
+proved at every cofinality; `Directed ⇒ PrefixBounded` is proved at `ω` and is *not* a theorem
+uncountably (finite `cub`-folds cannot bound infinite segments). The open question is whether
+that gap is **inhabited**: can a directed-only distance of uncountable cofinality defeat every
+monotone selection, or does some further structure always close the gap? Neither witness nor
+impossibility proof — but the frontier is no longer "the whole uncountable realm"; it is
+exactly the strip between `Directed` and `PrefixBounded`.
 
 **And `ℕ` is not the shortcut it looks like.** `natRuler` (ℕ, `k = id`) proves `Ruler`
 is inhabited by a genuine distance codomain — but *only* that. It is tempting to read
@@ -418,13 +448,15 @@ disproportionate). `natRuler` is non-vacuity, not the witness.
 So the transport line's state, honestly: **factorization ⟸ image-family sups (proved),
 but those sups are *not necessary* (`image_sups_not_necessary`); a cofinal ℕ-*sequence*
 is enough (`countable_cofinal_factors`), so every directed distance of *countable*
-cofinality factors — `ℚ≥0` included — and the residual is the whole *uncountable-
-cofinality* directed non-dcpo realm, which has neither witness nor impossibility proof
-(and where even the regular-cardinal sub-case is an open proof needing `κ`-directedness,
-not the closed result I first claimed).** Four times the stated hypothesis — completeness,
-directedness, boundedness-not-directedness, dcpo — turned out not to be operative; and
-what stands *proved* is only the countable-cofinality slice, with the uncountable frontier
-wide open.
+cofinality factors — `ℚ≥0` included; and the transfinite theorem is now proved at every
+cofinality (`prefix_bounded_cofinal_factors`): a cofinal well-ordered family on a
+*prefix-bounded* distance factors every bounded-image map, with selection needing no limit
+steps at all.** Five times the stated hypothesis — completeness, directedness,
+boundedness-not-directedness, dcpo, "unformalizable transfinitely" — turned out not to be
+operative or not to be true; what stands open is exactly one strip: whether `Directed`
+without `PrefixBounded`, at uncountable cofinality, admits an escapee. Neither witness nor
+impossibility proof — but the frontier is one hypothesis wide, with machine-checked
+theorems on both of its shores.
 
 **The quantitative centre — now built (finite case).** This whole line is *qualitative* — it
 asks only whether a monotone dominator *exists*, never what it *is*. The interface was built

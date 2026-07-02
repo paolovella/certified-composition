@@ -667,14 +667,15 @@ step needs *upper bounds of `<κ`-sized prefixes* — i.e. **`κ`-directedness**
 size `<κ` is bounded). Regular cofinality does **not** give this: a `<κ`-sized subset is
 non-cofinal, but *non-cofinal ≠ bounded* in a merely directed order (`ℕ` is directed yet
 unbounded). So "regular cofinality ⇒ factors" has a real hole at exactly that step; the
-hypothesis the argument actually needs is `κ`-directedness, strictly stronger, and under it the
-transfinite selection is only *plausible* — unchecked, and unformalizable here (transfinite
-recursion, cardinals).
+hypothesis the argument actually needs is `κ`-directedness, strictly stronger. (This note
+originally went on to call the transfinite selection under `κ`-directedness "plausible —
+unchecked, and unformalizable here (transfinite recursion, cardinals)". That was wrong on
+both counts, and the next section is the correction: the theorem is *proved* there,
+mathlib-free — `prefix_bounded_cofinal_factors`.)
 
 **So the honest residual is the whole uncountable-cofinality realm**, not the smaller "singular
 cofinality" — even the regular-uncountable case is open absent `κ`-directedness. It has
-**neither a witness nor an impossibility proof**. The one solid new fact is the `ω` case below;
-the rest is a frontier, not a theorem.
+**neither a witness nor an impossibility proof**.
 
 Formalized below: `κ = ω` (`cofChain` folds `cub` along ℕ — no ordinals, mathlib-free), which
 covers every countably-generated distance, `ℚ≥0` included. -/
@@ -725,6 +726,235 @@ noncomputable def countable_cofinal_factors {X D : Type} (le : D → D → Prop)
     Bridge X (Mono D le) D (universalGA le le_trans) dist :=
   ruler_defeats_bounded_escapee le le_refl le_trans
     (Ruler.ofCofinalSeq le_refl le_trans dir c hc) dist f bounded
+
+/-! ## The transfinite selection, formalized — the residual shrinks to one hypothesis
+
+The section note above claimed the transfinite analogue was "unformalizable here (transfinite
+recursion, cardinals)". Both halves of that claim were wrong, and the error was load-bearing
+for how open the residual looked. Split the ω-argument into its two halves and each
+generalizes, mathlib-free:
+
+- **Selection** (`wruler_defeats_bounded_escapee`): given a *monotone* cofinal chain over any
+  well-ordered index (`WellIndex` — an order with a least witness for every inhabited
+  predicate), the modulus is `k (least bounding index)`, exactly as at `ω`. The argument is
+  per-threshold: it has **no limit steps at all**. What looked transfinite was never
+  transfinite; nothing here is specific to `ℕ` except `exists_least`, and `WellIndex.least`
+  is that property abstracted.
+- **Monotonization** (`WRuler.ofCofinalFamily`): turning a *bare* cofinal `W`-family into a
+  monotone chain is where recursion lives — `WellFounded.fix` (Lean core; well-foundedness is
+  derived from least witnesses, `WellIndex.wf`) — and where the real hypothesis enters:
+  `PrefixBounded`, every family indexed by an initial segment `{v // v ≤ w}` is bounded.
+  That is `κ`-directedness stated without cardinals, and *weakened* to segment-indexed
+  families — sharper than the classical hypothesis the prose version asked for.
+
+`prefix_bounded_cofinal_factors` composes the halves: **a cofinal family over a well-ordered
+index, on a prefix-bounded distance, factors every bounded-image map** — at every cofinality,
+the theorem the note above called "only plausible". At `W = ℕ`, `prefixBounded_of_directed`
+proves plain directedness already supplies `PrefixBounded` (segments are finite; `cub`-folds
+bound them) — the formal content of "κ-directedness is free at ω" — and
+`countable_cofinal_factors'` re-derives the countable case end-to-end from the general
+theorem.
+
+**What this does and does not close.** The residual is now exactly one hypothesis wide, with
+proofs machine-checked on both sides of it: `PrefixBounded` ⇒ factors (any cofinality,
+proved); directedness ⇒ `PrefixBounded` at `ω` (proved); at uncountable cofinality
+directedness supplies only finite `cub`-folds, which do not bound infinite segments — no
+theorem forces `PrefixBounded` there. Whether a directed-only distance of uncountable
+cofinality can genuinely defeat every monotone selection — i.e. whether the gap between
+`Directed` and `PrefixBounded` is inhabited by an escapee — remains open, with neither
+witness nor impossibility proof. But the frontier is no longer "the whole uncountable realm":
+it is that single gap. -/
+
+/-- A well-ordered index, mathlib-free: reflexive, transitive, antisymmetric, with a **least
+    witness for every inhabited predicate**. (Classically a well-order: least witnesses on
+    pair-predicates give totality, and `WellIndex.wf` below derives well-foundedness.) -/
+structure WellIndex (W : Type) where
+  le          : W → W → Prop
+  le_refl     : ∀ a, le a a
+  le_trans    : ∀ {a b c}, le a b → le b c → le a c
+  le_antisymm : ∀ {a b}, le a b → le b a → a = b
+  least       : ∀ (p : W → Prop), (∃ w, p w) → ∃ μ, p μ ∧ ∀ m, p m → le μ m
+
+/-- The strict order of a `WellIndex`. -/
+def WellIndex.lt {W : Type} (WI : WellIndex W) (a b : W) : Prop :=
+  WI.le a b ∧ ¬ WI.le b a
+
+/-- Least witnesses make the strict order well-founded — the recursion
+    `WRuler.ofCofinalFamily` runs on. (Classical: the least non-accessible element is
+    accessible, since leastness puts it below any non-accessible strict predecessor.) -/
+theorem WellIndex.wf {W : Type} (WI : WellIndex W) : WellFounded WI.lt := by
+  constructor
+  intro a
+  refine Classical.byContradiction (fun ha => ?_)
+  obtain ⟨μ, hμ, hleast⟩ := WI.least (fun w => ¬ Acc WI.lt w) ⟨a, ha⟩
+  exact hμ (Acc.intro μ (fun v hv =>
+    Classical.byContradiction (fun hv' => hv.2 (hleast v hv'))))
+
+/-- `ℕ` is a `WellIndex` — `exists_least` is exactly the least-witness field. -/
+def natWellIndex : WellIndex Nat where
+  le          := Nat.le
+  le_refl     := Nat.le_refl
+  le_trans    := Nat.le_trans
+  le_antisymm := Nat.le_antisymm
+  least       := fun p hp => @exists_least p (fun n => Classical.propDecidable (p n)) hp
+
+/-- A cofinal monotone chain over a well-ordered index — the transfinite ruler. -/
+structure WRuler (W D : Type) (WI : WellIndex W) (le : D → D → Prop) where
+  k       : W → D
+  mono    : ∀ {i j}, WI.le i j → le (k i) (k j)
+  cofinal : ∀ b, ∃ w, le b (k w)
+
+/-- **The selection half is not transfinite.** A monotone cofinal chain over *any* well-ordered
+    index defeats every bounded-image escapee, by exactly the `ω`-argument: send `t` to
+    `k (least index bounding the image-family at t)` — leastness gives monotonicity, cofinality
+    gives domination. Per-threshold; no limit steps, no recursion along the chain. -/
+noncomputable def wruler_defeats_bounded_escapee {X W D : Type} (WI : WellIndex W)
+    (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (R : WRuler W D WI le) (dist : X → X → D) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist := by
+  classical
+  -- each threshold's image-family is bounded by *some* chain value (bounded + cofinal)
+  have hExists : ∀ t, ∃ w, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) (R.k w) := by
+    intro t
+    obtain ⟨b, hb⟩ := bounded t
+    obtain ⟨w, hbw⟩ := R.cofinal b
+    exact ⟨w, fun x y hxy => le_trans (hb x y hxy) hbw⟩
+  -- `N t` = least chain index bounding the family at `t`
+  let N : D → W := fun t => Classical.choose (WI.least _ (hExists t))
+  have hN : ∀ t, (∀ x y, le (dist x y) t → le (dist (f x) (f y)) (R.k (N t))) ∧
+      (∀ m, (∀ x y, le (dist x y) t → le (dist (f x) (f y)) (R.k m)) → WI.le (N t) m) :=
+    fun t => Classical.choose_spec (WI.least _ (hExists t))
+  refine Bridge.ofModulus (le := le) (dist := dist) le_trans f ⟨fun t => R.k (N t), ?_⟩ ?_
+  · -- monotone: a larger down-set is a superset, so its least bounding index is not smaller
+    intro a b hab
+    exact R.mono ((hN a).2 (N b) (fun x y hxy => (hN b).1 x y (le_trans hxy hab)))
+  · -- dominates: the least bounding index bounds the family, at `t = dist x y`
+    intro x y
+    exact (hN (dist x y)).1 x y (le_refl _)
+
+/-- **`κ`-directedness, stated without cardinals** — and weakened to what the argument needs:
+    every family indexed by an initial segment `{v // v ≤ w}` of the index is bounded.
+    Segments are inclusive, hence inhabited; no separate seed element is needed. -/
+def PrefixBounded {W D : Type} (WI : WellIndex W) (le : D → D → Prop) : Prop :=
+  ∀ (w : W) (g : ∀ v, WI.le v w → D), ∃ b, ∀ v (h : WI.le v w), le (g v h) b
+
+section
+open Classical
+
+/-- Monotonize a bare `W`-family: at each `w`, choose (via `PrefixBounded`) a bound of the
+    already-monotonized strict predecessors together with `c` on the segment itself.
+    `WellFounded.fix` (Lean core) is the transfinite recursion — no ordinals, no cardinals. -/
+noncomputable def monotonize {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (hpb : PrefixBounded WI le) (c : W → D) : W → D :=
+  WI.wf.fix (fun w rec =>
+    Classical.choose (hpb w (fun v _ => if h : WI.lt v w then rec v h else c v)))
+
+theorem monotonize_eq {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (hpb : PrefixBounded WI le) (c : W → D) (w : W) :
+    monotonize WI hpb c w = Classical.choose
+      (hpb w (fun v _ => if _h : WI.lt v w then monotonize WI hpb c v else c v)) :=
+  WI.wf.fix_eq _ w
+
+/-- The monotonized chain dominates the family it came from (the `v = w` slot of the choice). -/
+theorem le_monotonize {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (hpb : PrefixBounded WI le) (c : W → D) (w : W) :
+    le (c w) (monotonize WI hpb c w) := by
+  rw [monotonize_eq]
+  have h := Classical.choose_spec
+    (hpb w (fun v _ => if _h : WI.lt v w then monotonize WI hpb c v else c v)) w (WI.le_refl w)
+  rw [dif_neg (fun hlt : WI.lt w w => hlt.2 (WI.le_refl w))] at h
+  exact h
+
+/-- The monotonized chain is monotone across a strict step (the `v < w` slots of the choice). -/
+theorem monotonize_lt_mono {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (hpb : PrefixBounded WI le) (c : W → D) {v w : W} (hvw : WI.lt v w) :
+    le (monotonize WI hpb c v) (monotonize WI hpb c w) := by
+  rw [monotonize_eq WI hpb c w]
+  have h := Classical.choose_spec
+    (hpb w (fun v _ => if _h : WI.lt v w then monotonize WI hpb c v else c v)) v hvw.1
+  rw [dif_pos hvw] at h
+  exact h
+
+theorem monotonize_mono {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (le_refl : ∀ a : D, le a a) (hpb : PrefixBounded WI le) (c : W → D)
+    {i j : W} (hij : WI.le i j) :
+    le (monotonize WI hpb c i) (monotonize WI hpb c j) := by
+  by_cases h : WI.le j i
+  · rw [WI.le_antisymm hij h]
+    exact le_refl _
+  · exact monotonize_lt_mono WI hpb c ⟨hij, h⟩
+
+end
+
+/-- **The monotonization half.** Under `PrefixBounded` — the cardinal-free `κ`-directedness —
+    any cofinal family over a well-ordered index monotonizes into a `WRuler`: each value
+    bounds all earlier values and its own `c`, so monotonicity and cofinality both hold.
+    This is the limit step the `ω`-case did with finite `cub`-folds, now at any cofinality. -/
+noncomputable def WRuler.ofCofinalFamily {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (hpb : PrefixBounded WI le) (c : W → D) (hc : ∀ b, ∃ w, le b (c w)) :
+    WRuler W D WI le where
+  k       := monotonize WI hpb c
+  mono    := fun hij => monotonize_mono WI le_refl hpb c hij
+  cofinal := fun b => by
+    obtain ⟨w, hw⟩ := hc b
+    exact ⟨w, le_trans hw (le_monotonize WI hpb c w)⟩
+
+/-- **The transfinite theorem the residual called "plausible — unchecked".** A cofinal family
+    over any well-ordered index, on a prefix-bounded distance, factors every bounded-image
+    map: selection (`wruler_defeats_bounded_escapee`) composed with monotonization
+    (`WRuler.ofCofinalFamily`). The open residual is now exactly the hypothesis gap:
+    directedness supplies `PrefixBounded` at `ω` (`prefixBounded_of_directed`) and is not
+    known to at any uncountable cofinality. -/
+noncomputable def prefix_bounded_cofinal_factors {X W D : Type} (WI : WellIndex W)
+    (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (hpb : PrefixBounded WI le) (c : W → D) (hc : ∀ b, ∃ w, le b (c w))
+    (dist : X → X → D) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist :=
+  wruler_defeats_bounded_escapee WI le le_refl le_trans
+    (WRuler.ofCofinalFamily WI le_refl le_trans hpb c hc) dist f bounded
+
+/-- **Directedness supplies `PrefixBounded` at `ω`** — `ℕ`-segments are finite, and iterated
+    `cub` bounds any finite family. This is the formal content of "monotonizing an ℕ-sequence
+    needs only finite joins", and it is exactly what does not generalize: at uncountable
+    cofinality, segments are infinite and finite `cub`-folds cannot reach them. -/
+theorem prefixBounded_of_directed {D : Type} {le : D → D → Prop}
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dir : Directed D le) : PrefixBounded natWellIndex le := by
+  intro w
+  induction w with
+  | zero =>
+      intro g
+      refine ⟨g 0 (Nat.le_refl 0), fun v hv => ?_⟩
+      have hv0 : v = 0 := Nat.le_zero.mp hv
+      subst hv0
+      exact le_refl _
+  | succ n ih =>
+      intro g
+      obtain ⟨b, hb⟩ := ih (fun v hv => g v (Nat.le_succ_of_le hv))
+      refine ⟨dir.cub b (g (n + 1) (Nat.le_refl _)), fun v hv => ?_⟩
+      by_cases h : v = n + 1
+      · subst h
+        exact dir.le_cub_right _ _
+      · have hvle : v ≤ n + 1 := hv
+        have hv' : v ≤ n := by omega
+        exact le_trans (hb v hv') (dir.le_cub_left _ _)
+
+/-- The countable case, re-derived end-to-end through the transfinite machinery: `ω` is the
+    instance `W = ℕ` with `PrefixBounded` supplied by plain directedness. Same statement as
+    `countable_cofinal_factors`; the general theorem subsumes it. -/
+noncomputable def countable_cofinal_factors' {X D : Type} (le : D → D → Prop)
+    (le_refl : ∀ a, le a a) (le_trans : ∀ {a b c}, le a b → le b c → le a c)
+    (dir : Directed D le) (c : Nat → D) (hc : ∀ b, ∃ n, le b (c n))
+    (dist : X → X → D) (f : X → X)
+    (bounded : ∀ t, ∃ b, ∀ x y, le (dist x y) t → le (dist (f x) (f y)) b) :
+    Bridge X (Mono D le) D (universalGA le le_trans) dist :=
+  prefix_bounded_cofinal_factors natWellIndex le le_refl le_trans
+    (prefixBounded_of_directed le_refl le_trans dir) c hc dist f bounded
 
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
