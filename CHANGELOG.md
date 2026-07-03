@@ -162,6 +162,14 @@ landed.
   sequence alone. The seven-session hunt ends at one line: is every
   dip-schedulable coherent sequence trivial? Handed to set theory in
   final form.
+- **`PROBLEM-dip-schedulability.md`** — the standalone problem statement
+  for set theorists: definitions from scratch, the strong/weak game, the
+  implication diagram with rigor-graded arrows (the strong/weak split and
+  the realizability gap presented honestly rather than papered over),
+  four numbered questions, four proved ZFC lemmas with proofs, the
+  thinness remark (why naive ◊-attacks fail), and the
+  independence-boundary discussion. Pure ω₁ combinatorics; no knowledge
+  of the program required.
 
 ## transport-kernel — mathlib instances
 

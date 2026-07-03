@@ -602,6 +602,16 @@ dip-schedulable(`e`)** (both directions argued), and the entire seven-session hu
 at one line: **is every dip-schedulable coherent sequence trivial?** — a self-contained
 uniformization invariant of coherent sequences, handed to set theory in final form.
 
+**The problem statement for set theorists: `PROBLEM-dip-schedulability.md`.** Fully
+self-contained (no transport calculus needed): definitions, the game, the implication
+diagram `trivial ⟹ strong-schedulable ⟹ Φ ⟹ weak-schedulable` with rigor grading on
+every arrow, four numbered questions (the main one; the realizability/fractal gap; the
+◊-sequence and walks instances; the MA/PFA consistency route with the schedule-forcing's
+ccc-ness as the crux), a toolbox of four proved ZFC lemmas with proofs
+(chain-continuation, single-target, representative systems ⟺ trivial, chain-freeness of
+the fiber order), the thinness remark explaining why naive ◊-attacks fail, and the
+independence-boundary discussion. Questions 1–4 are pure ω₁ combinatorics.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),
