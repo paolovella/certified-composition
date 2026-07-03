@@ -369,3 +369,49 @@ fiber-membership — no design exists; the no-go does not formally exclude it, b
 mechanism tried routes through fiber-membership eventually. Current lean, fourth
 revision: **ZFC-factoring**, now supported by a no-go rather than by failed attempts
 alone.
+
+## 10. Forcing-locality proved; the Bridge becomes a game on `e` alone
+
+**Forcing-locality (proved).** The one forcing pattern the §9 no-go missed is the
+*anti-kill*: raise `e_ν` above all its ladder floors at points cofinal in `ν` (coherent —
+finitely many such points below each ladder level). It forces the dominator's values high
+by *fiberhood*, not by requirements, evading the no-go. But it breaks nothing: for forced
+highs to hurt, some higher floor must be low on the same infinite set, and "raised at
+`ν`, killed at `ν′`" on one infinite set contradicts pairwise coherence of `(ν, ν′)`.
+Together with the no-go: **nothing legal ever forces values above the eventual floors.**
+Every cross-element accumulation traces to floor-baking, not forcing — forcing-locality,
+as conjectured in §9.
+
+**The collapse.** With forcing-locality the ledger analysis closes around three ZFC
+facts: every down-set has a ⊑-cofinal ω-chain (countable and join-closed); the
+requirement-sup over a down-set is bounded by legality at its top; and the only surviving
+ledger term is **floor-baking along chains** — pre-kill floor values baked by fiberhood
+below future kill-levels. Per pair everything is finite (thinness, coherence caps,
+chain-continuation dips); across overlapping chains the dips leave per-pair-finite
+leftovers whose union regenerates the problem one level up. The regress is *fractal*:
+that self-similarity is the phenomenon, not a failure of technique.
+
+**The game.** Level-pressure is free for the adversary — fully-dipped images are always
+legal and force nothing but level-raising — so systems reduce to monotone
+level-assignments `μ : D → ω₁`, and dominators reduce to schedules: `γ : D → ω₁` with
+`γ ≥ μ` plus finite dip-sets `X : D → [ω₁]^{<ω}`. The dominator wins `G(e)` iff for every
+`u`: `∪_{x ∈ ↓u} (D⁺(γ_x, γ_u) \ X_x)` is finite. Call `e` **dip-schedulable** iff the
+dominator wins.
+
+> **Theorem-shaped equivalence (both directions argued at prose rigor):**
+> every legal system over `D_coh(e)` factors ⟺ `e` is dip-schedulable.
+> (⟸ the §7 recursion armed with forcing-locality, chain-cofinality of down-sets, and
+> chain-continuation dips; ⟹ trace-realization by fully-dipped systems.)
+
+**The final open core.** Trivial `e` is dip-schedulable (reps schedule everything).
+The question standing at the end of the whole reduction:
+
+> **Is every dip-schedulable coherent sequence trivial?**
+
+Equivalently: does the ◊-sequence (or `ρ₁`) defeat every schedule? The per-pair coherence
+caps argue for the dominator; the fractal regress and the stationary kill-set argue for
+the adversary. Everything else — systems, dominators, legality, forcing, fiberhood — has
+been proved away. What remains is a self-contained uniformization invariant of coherent
+sequences, stated in one line, sitting exactly at the boundary where such invariants
+historically go independent. This is where the transport line hands the question to set
+theory in its final form.

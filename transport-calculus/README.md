@@ -586,6 +586,22 @@ MA-side amalgamation now read as a candidate ZFC proof and its missing piece nam
 slice's forcing — if true, "legality ⇒ absorbability ⇒ dominator" becomes a theorem and
 the fiber-order residual is empty in ZFC).
 
+**Forcing-locality proved; the Bridge becomes a game on `e` alone (note §10).**
+Forcing-locality holds: the one pattern the no-go missed (the *anti-kill* — floors raised
+above their ladders at cofinally many points, forcing values high by fiberhood rather
+than requirements) breaks nothing, since forced highs hurt only where higher floors are
+low, and raised-then-killed on one infinite set contradicts pairwise coherence. So
+nothing legal ever forces values above the eventual floors. With that, systems and
+dominators are eliminable: down-sets have ⊑-cofinal ω-chains, requirement-sups are
+legality-bounded, and the only surviving obstruction is *floor-baking along chains* —
+finite per pair, fractally self-similar across overlapping chains. The whole Bridge
+reduces to a two-quantifier combinatorial game `G(e)`: adversary plays a monotone
+level-assignment `μ`; dominator plays a schedule `γ ≥ μ` with finite dip-sets; dominator
+wins iff every down-set's leftover union is finite. **Factors-everything(`e`) ⟺
+dip-schedulable(`e`)** (both directions argued), and the entire seven-session hunt ends
+at one line: **is every dip-schedulable coherent sequence trivial?** — a self-contained
+uniformization invariant of coherent sequences, handed to set theory in final form.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),

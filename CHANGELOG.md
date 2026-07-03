@@ -151,6 +151,17 @@ landed.
   First one-sided evidence in the arc. Lean, fourth revision:
   ZFC-factoring; the MA-side route re-read as a candidate ZFC proof with
   its missing piece named (forcing-locality).
+- **forcing-locality proved; the Bridge becomes a game on `e` alone.**
+  The anti-kill (fiberhood-forcing, the one pattern the no-go missed)
+  breaks nothing by pairwise coherence — so nothing legal forces values
+  above eventual floors. Systems and dominators eliminate: down-sets have
+  ⊑-cofinal ω-chains; requirement-sups are legality-bounded; the sole
+  residue is floor-baking along chains, finite per pair and fractally
+  self-similar across chains. Result: factors-everything(e) ⟺
+  dip-schedulable(e), a two-quantifier combinatorial game on the coherent
+  sequence alone. The seven-session hunt ends at one line: is every
+  dip-schedulable coherent sequence trivial? Handed to set theory in
+  final form.
 
 ## transport-kernel — mathlib instances
 
