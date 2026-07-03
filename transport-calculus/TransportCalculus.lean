@@ -1453,6 +1453,387 @@ noncomputable def fb_factors {X : Type} (dist : X → X → Fb) (f : X → X)
   countable_cofinal_factors leF leF_refl leF_trans dirF
     (fun n => (none, ladder n n)) fb_ladder_cofinal dist f bounded
 
+/-! ## The reps theorem, machine-checked in shadow
+
+The set-theoretic hunt (`NOTES-coherent-escapee.md`) runs on one four-step engine: a
+level-monotone system of representatives for a coherent sequence forces triviality. Its
+proof uses exactly three properties of the index ω₁, all already abstracted in this file:
+least witnesses (`WellIndex`), σ-directedness of the index (`SigmaDirected` — where
+regularity enters), and countable segments (`CountableSegments`). So the engine itself is
+formalizable *in shadow*: over an abstract index carrying those three hypotheses, with
+"finite" rendered mathlib-free as "covered by a list".
+
+Honesty about instances, per house style: the intended model (ω₁) is not constructible
+here, and `ℕ` — the only concrete `WellIndex` in this file — *fails* `SigmaDirected`
+(`nat_not_sigma_directed`). The shadow is therefore paired with its boundary witness:
+at index `ℕ` the concentration step provably fails (`omega_concentration_fails`) — the
+level-monotone, pairwise-finitely-differing family `χ_{<n}` moves at *every* coordinate.
+σ-directedness of the index is load-bearing, not decorative: the theorem below is the
+exact reason the set-theoretic argument works at ω₁ and not below it. -/
+
+/-- Mathlib-free finiteness of a predicate: some list covers it. -/
+def FiniteP {A : Type} (P : A → Prop) : Prop := ∃ L : List A, ∀ a, P a → a ∈ L
+
+theorem FiniteP.union {A : Type} {P Q : A → Prop} (hP : FiniteP P) (hQ : FiniteP Q) :
+    FiniteP (fun a => P a ∨ Q a) := by
+  obtain ⟨L, hL⟩ := hP
+  obtain ⟨M, hM⟩ := hQ
+  refine ⟨L ++ M, fun a h => List.mem_append.mpr ?_⟩
+  cases h with
+  | inl h => exact Or.inl (hL a h)
+  | inr h => exact Or.inr (hM a h)
+
+theorem FiniteP.mono {A : Type} {P Q : A → Prop} (h : ∀ a, P a → Q a) (hQ : FiniteP Q) :
+    FiniteP P := by
+  obtain ⟨L, hL⟩ := hQ
+  exact ⟨L, fun a ha => hL a (h a ha)⟩
+
+/-- From non-finiteness, a fresh witness outside any list (classical). -/
+theorem exists_fresh {A : Type} {P : A → Prop} (h : ¬ FiniteP P) (L : List A) :
+    ∃ a, P a ∧ ¬ a ∈ L :=
+  Classical.byContradiction (fun hno =>
+    h ⟨L, fun a ha => Classical.byContradiction (fun hmem => hno ⟨a, ha, hmem⟩)⟩)
+
+/-- Mathlib-free pigeonhole: an injective ℕ-sequence cannot land inside one list. -/
+theorem no_injection_into_list {A : Type} :
+    ∀ (L : List A) (f : Nat → A), (∀ m n, f m = f n → m = n) → ¬ ∀ n, f n ∈ L
+  | [], f, _, hall => absurd (hall 0) (fun h => nomatch h)
+  | a :: L, f, hinj, hall => by
+    by_cases h : ∃ k, f k = a
+    · obtain ⟨k, hk⟩ := h
+      refine no_injection_into_list L (fun n => f (if n < k then n else n + 1)) ?_ ?_
+      · intro m n hmn
+        have h1 := hinj _ _ hmn
+        by_cases hm : m < k <;> by_cases hn : n < k
+        · rw [if_pos hm, if_pos hn] at h1; exact h1
+        · rw [if_pos hm, if_neg hn] at h1; omega
+        · rw [if_neg hm, if_pos hn] at h1; omega
+        · rw [if_neg hm, if_neg hn] at h1; omega
+      · intro n
+        have hne : f (if n < k then n else n + 1) ≠ a := by
+          intro he
+          have := hinj _ k (he.trans hk.symm)
+          by_cases hn : n < k
+          · rw [if_pos hn] at this; omega
+          · rw [if_neg hn] at this; omega
+        cases hall (if n < k then n else n + 1) with
+        | head => exact absurd rfl hne
+        | tail _ hmem => exact hmem
+    · refine no_injection_into_list L f hinj (fun n => ?_)
+      cases hall n with
+      | head => exact absurd ⟨n, rfl⟩ h
+      | tail _ hmem => exact hmem
+
+/-- Least witnesses give totality: apply `least` to the pair predicate. -/
+theorem WellIndex.total {W : Type} (WI : WellIndex W) (a b : W) :
+    WI.le a b ∨ WI.le b a := by
+  obtain ⟨μ, hμ, hleast⟩ := WI.least (fun w => w = a ∨ w = b) ⟨a, Or.inl rfl⟩
+  cases hμ with
+  | inl h => subst h; exact Or.inl (hleast b (Or.inr rfl))
+  | inr h => subst h; exact Or.inr (hleast a (Or.inl rfl))
+
+theorem WellIndex.lt_of_lt_of_le {W : Type} (WI : WellIndex W) {u v w : W}
+    (h : WI.lt u v) (hle : WI.le v w) : WI.lt u w :=
+  ⟨WI.le_trans h.1 hle, fun hwu => h.2 (WI.le_trans hle hwu)⟩
+
+theorem WellIndex.lt_of_le_of_lt {W : Type} (WI : WellIndex W) {u v w : W}
+    (hle : WI.le u v) (h : WI.lt v w) : WI.lt u w :=
+  ⟨WI.le_trans hle h.1, fun hwu => h.2 (WI.le_trans hwu hle)⟩
+
+/-- A coherent sequence over an abstract index: a `ℕ`-valued row per level, any two
+    rows differing at only finitely many common-domain positions. (Rows are total
+    functions; only values at `u < w` are meaningful.) -/
+structure CoherentSeq (W : Type) (WI : WellIndex W) where
+  e   : W → W → Nat
+  coh : ∀ v w, FiniteP (fun u => WI.lt u v ∧ WI.lt u w ∧ e v u ≠ e w u)
+
+/-- Triviality: one global row matches every level's row off a finite set. -/
+def CoherentSeq.Trivial {W : Type} {WI : WellIndex W} (C : CoherentSeq W WI) : Prop :=
+  ∃ E : W → Nat, ∀ w, FiniteP (fun u => WI.lt u w ∧ E u ≠ C.e w u)
+
+/-- A representative system: per-level rows in the fiber (finite deviation from `e`),
+    pointwise monotone in the level. -/
+structure Reps {W : Type} {WI : WellIndex W} (C : CoherentSeq W WI) where
+  ρ     : W → W → Nat
+  fiber : ∀ w, FiniteP (fun u => WI.lt u w ∧ ρ w u ≠ C.e w u)
+  mono  : ∀ {v w}, WI.le v w → ∀ u, WI.lt u v → ρ v u ≤ ρ w u
+
+section RepsTheorem
+open Classical
+
+variable {W : Type} (WI : WellIndex W)
+
+/-- σ-directedness bounds pairs. -/
+theorem pair_bound (hσ : SigmaDirected W WI.le) (a b : W) :
+    ∃ c, WI.le a c ∧ WI.le b c := by
+  obtain ⟨c, hc⟩ := hσ (fun n => if n = 0 then a else b)
+  refine ⟨c, ?_, ?_⟩
+  · have := hc 0; rw [if_pos rfl] at this; exact this
+  · have := hc 1; rw [if_neg (by omega)] at this; exact this
+
+/-- Strictly-above elements exist (unboundedness + totality). -/
+theorem exists_gt (hub : ∀ w, ∃ w', ¬ WI.le w' w) (w : W) : ∃ s, WI.lt w s := by
+  obtain ⟨s, hs⟩ := hub w
+  cases WI.total w s with
+  | inl h => exact ⟨s, h, hs⟩
+  | inr h => exact absurd h hs
+
+/-- **The reps theorem, in shadow.** Over any index with least witnesses, σ-directedness,
+    countable segments, and no top, a coherent sequence admitting a level-monotone
+    representative system is trivial. This is the four-step ω₁ engine of the
+    set-theoretic notes, machine-checked: (1) coherence transfers to the reps and pins
+    pairwise movers finite; (2) σ-directedness concentrates countably many movement
+    witnesses at one bound — the step that fails at index ℕ; (3) hence the escape set is
+    bounded; (4) bounded escape stabilizes into a trivializing row. -/
+theorem reps_implies_trivial
+    (hσ : SigmaDirected W WI.le) (hcs : CountableSegments WI)
+    (hub : ∀ w, ∃ w', ¬ WI.le w' w) (w₀ : W)
+    (C : CoherentSeq W WI) (R : Reps C) : C.Trivial := by
+  -- (1) pairwise movers are finite: chain through the two fibers and coherence
+  have hmov : ∀ v w, FiniteP (fun u => WI.lt u v ∧ WI.lt u w ∧ R.ρ w u > R.ρ v u) := by
+    intro v w
+    refine FiniteP.mono (fun u hu => ?_)
+      (((R.fiber v).union (C.coh v w)).union (R.fiber w))
+    obtain ⟨huv, huw, hgt⟩ := hu
+    by_cases h1 : R.ρ v u = C.e v u
+    · by_cases h2 : C.e v u = C.e w u
+      · by_cases h3 : C.e w u = R.ρ w u
+        · omega
+        · exact Or.inr ⟨huw, fun he => h3 he.symm⟩
+      · exact Or.inl (Or.inr ⟨huv, huw, h2⟩)
+    · exact Or.inl (Or.inl ⟨huv, h1⟩)
+  -- (2) concentration: the set of coordinates below `v` that ever move is finite
+  have hU : ∀ v, FiniteP (fun u => WI.lt u v ∧ ∃ w, WI.le v w ∧ R.ρ w u > R.ρ v u) := by
+    intro v
+    refine Classical.byContradiction (fun hinf => ?_)
+    -- an injective sequence of movers, each with a witness level
+    have hfresh : ∀ L : List W, ∃ u,
+        (WI.lt u v ∧ ∃ w, WI.le v w ∧ R.ρ w u > R.ρ v u) ∧ ¬ u ∈ L :=
+      fun L => exists_fresh hinf L
+    let picks : Nat → List W := fun n =>
+      Nat.rec [] (fun _ ih => Classical.choose (hfresh ih) :: ih) n
+    let u : Nat → W := fun n => Classical.choose (hfresh (picks n))
+    have hspec : ∀ n, (WI.lt (u n) v ∧ ∃ w, WI.le v w ∧ R.ρ w (u n) > R.ρ v (u n))
+        ∧ ¬ u n ∈ picks n := fun n => Classical.choose_spec (hfresh (picks n))
+    have hpicks_succ : ∀ n, picks (n + 1) = u n :: picks n := fun _ => rfl
+    have hmem_picks : ∀ m n, m < n → u m ∈ picks n := by
+      intro m n h
+      induction n with
+      | zero => omega
+      | succ k ih =>
+        rw [hpicks_succ k]
+        by_cases hmk : m = k
+        · subst hmk; exact List.mem_cons_self ..
+        · exact List.mem_cons_of_mem _ (ih (by omega))
+    have hinj : ∀ m n, u m = u n → m = n := by
+      intro m n he
+      by_cases h : m = n
+      · exact h
+      · exfalso
+        cases Nat.lt_or_ge m n with
+        | inl hlt =>
+          have hx := hmem_picks m n hlt
+          rw [he] at hx
+          exact (hspec n).2 hx
+        | inr hge =>
+          have hlt : n < m := by omega
+          have hx := hmem_picks n m hlt
+          rw [← he] at hx
+          exact (hspec m).2 hx
+    -- witness levels, concentrated at a σ-bound
+    let wit : Nat → W := fun n => Classical.choose (hspec n).1.2
+    have hwit : ∀ n, WI.le v (wit n) ∧ R.ρ (wit n) (u n) > R.ρ v (u n) :=
+      fun n => Classical.choose_spec (hspec n).1.2
+    obtain ⟨b, hb⟩ := hσ wit
+    have hvb : WI.le v b := WI.le_trans (hwit 0).1 (hb 0)
+    -- every `u n` is a mover of the single pair (v, b)
+    obtain ⟨L, hL⟩ := hmov v b
+    refine no_injection_into_list L u hinj (fun n => hL (u n) ?_)
+    have hub' : WI.lt (u n) b := WellIndex.lt_of_lt_of_le WI (hspec n).1.1 hvb
+    have hmono : R.ρ (wit n) (u n) ≤ R.ρ b (u n) :=
+      R.mono (hb n) (u n) (WellIndex.lt_of_lt_of_le WI (hspec n).1.1 (hwit n).1)
+    exact ⟨(hspec n).1.1, hub', by have := (hwit n).2; omega⟩
+  -- (3) the escape set is bounded: otherwise a strictly increasing chain of escapees
+  -- gets σ-bounded, and each member moves above the bound — an infinite mover set
+  have hT : ∃ wstar, ∀ u, (¬ ∃ B, ∀ w, WI.lt u w → R.ρ w u ≤ B) → WI.le u wstar := by
+    refine Classical.byContradiction (fun hno => ?_)
+    have hstep : ∀ w : W, ∃ u, (¬ ∃ B, ∀ w', WI.lt u w' → R.ρ w' u ≤ B) ∧ ¬ WI.le u w :=
+      fun w => Classical.byContradiction (fun hn =>
+        hno ⟨w, fun u hu => Classical.byContradiction (fun hle => hn ⟨u, hu, hle⟩)⟩)
+    let t : Nat → W := fun n =>
+      Nat.rec (motive := fun _ => W) (Classical.choose (hstep w₀))
+        (fun _ prev => Classical.choose (hstep prev)) n
+    have hts : ∀ n, (¬ ∃ B, ∀ w', WI.lt (t (n+1)) w' → R.ρ w' (t (n+1)) ≤ B)
+        ∧ ¬ WI.le (t (n+1)) (t n) := fun n => Classical.choose_spec (hstep (t n))
+    have hesc : ∀ n, ¬ ∃ B, ∀ w', WI.lt (t n) w' → R.ρ w' (t n) ≤ B := by
+      intro n
+      cases n with
+      | zero => exact (Classical.choose_spec (hstep w₀)).1
+      | succ k => exact (hts k).1
+    have hstep_le : ∀ n, WI.le (t n) (t (n+1)) := by
+      intro n
+      cases WI.total (t n) (t (n+1)) with
+      | inl h => exact h
+      | inr h => exact absurd h (hts n).2
+    have hchain : ∀ m n, m ≤ n → WI.le (t m) (t n) := by
+      intro m n h
+      induction n with
+      | zero =>
+        have hm0 : m = 0 := by omega
+        subst hm0
+        exact WI.le_refl _
+      | succ k ih =>
+        by_cases hmk : m = k + 1
+        · subst hmk; exact WI.le_refl _
+        · exact WI.le_trans (ih (by omega)) (hstep_le k)
+    have htinj : ∀ m n, t m = t n → m = n := by
+      intro m n he
+      by_cases h : m = n
+      · exact h
+      · exfalso
+        cases Nat.lt_or_ge m n with
+        | inl hlt =>
+          have h1 := hchain (m+1) n (by omega)
+          rw [← he] at h1
+          exact (hts m).2 h1
+        | inr hge =>
+          have hlt : n < m := by omega
+          have h1 := hchain (n+1) m (by omega)
+          rw [he] at h1
+          exact (hts n).2 h1
+    obtain ⟨b, hb⟩ := hσ t
+    obtain ⟨s, hbs⟩ := exists_gt WI hub b
+    obtain ⟨L, hL⟩ := hU s
+    refine no_injection_into_list L t htinj (fun n => hL (t n) ?_)
+    have hlts : WI.lt (t n) s := WellIndex.lt_of_le_of_lt WI (hb n) hbs
+    have hmove : ∃ w', WI.lt (t n) w' ∧ R.ρ s (t n) < R.ρ w' (t n) :=
+      Classical.byContradiction (fun hn =>
+        hesc n ⟨R.ρ s (t n), fun w' hw' => Classical.byContradiction
+          (fun hgt => hn ⟨w', hw', by omega⟩)⟩)
+    obtain ⟨w', hw'lt, hw'gt⟩ := hmove
+    obtain ⟨w'', hw'w'', hsw''⟩ := pair_bound WI hσ w' s
+    refine ⟨hlts, w'', hsw'', ?_⟩
+    have := R.mono hw'w'' (t n) hw'lt
+    omega
+  -- (4) bounded escape stabilizes into a trivializing row
+  obtain ⟨wstar, hwstar⟩ := hT
+  obtain ⟨sstar, hsstar⟩ := exists_gt WI hub wstar
+  have hstable : ∀ u, ¬ WI.le u wstar →
+      ∃ M, (∃ w, WI.lt u w ∧ R.ρ w u = M) ∧ (∀ w, WI.lt u w → R.ρ w u ≤ M) := by
+    intro u hu
+    have hbdd : ∃ B, ∀ w, WI.lt u w → R.ρ w u ≤ B :=
+      Classical.byContradiction (fun hn => hu (hwstar u hn))
+    obtain ⟨M, hM, hMleast⟩ := @exists_least (fun B => ∀ w, WI.lt u w → R.ρ w u ≤ B)
+      (fun _ => Classical.propDecidable _) hbdd
+    refine ⟨M, ?_, hM⟩
+    refine Classical.byContradiction (fun hnot => ?_)
+    have hlt' : ∀ w, WI.lt u w → R.ρ w u ≠ M := fun w hw he => hnot ⟨w, hw, he⟩
+    obtain ⟨s, hs⟩ := exists_gt WI hub u
+    cases Nat.eq_zero_or_pos M with
+    | inl h0 =>
+      have h1 := hM s hs
+      have h2 := hlt' s hs
+      omega
+    | inr hpos =>
+      have hM' : ∀ w, WI.lt u w → R.ρ w u ≤ M - 1 := by
+        intro w hw
+        have h1 := hM w hw
+        have h2 := hlt' w hw
+        omega
+      have := hMleast (M - 1) hM'
+      omega
+  -- the trivializing row: the floor at `sstar` below the escape bound, stable values above
+  let E : W → Nat := fun u =>
+    if h : WI.le u wstar then C.e sstar u else Classical.choose (hstable u h)
+  refine ⟨E, fun v => ?_⟩
+  -- σ-bound the stabilization stages over the (countable) segment of `v`
+  obtain ⟨f, hf⟩ := hcs v
+  let g : Nat → W := fun n =>
+    if h : ¬ WI.le (f n) wstar then
+      Classical.choose (Classical.choose_spec (hstable (f n) h)).1
+    else v
+  obtain ⟨γ₀, hγ₀⟩ := hσ g
+  obtain ⟨γ, hvγ, hγ₀γ⟩ := pair_bound WI hσ v γ₀
+  refine FiniteP.mono (fun u hu => ?_)
+    (((C.coh sstar v).union (R.fiber γ)).union (C.coh γ v))
+  obtain ⟨huv, hne⟩ := hu
+  by_cases h : WI.le u wstar
+  · -- below the escape bound: `E` is the `sstar` floor; coherence covers the difference
+    have hus : WI.lt u sstar := WellIndex.lt_of_le_of_lt WI h hsstar
+    have hEu : E u = C.e sstar u := dif_pos h
+    exact Or.inl (Or.inl ⟨hus, huv, fun he => hne (hEu ▸ he)⟩)
+  · -- above: `E` is the stable value, attained at `γ`; fiber + coherence cover it
+    obtain ⟨n, hfn⟩ := hf u huv.1
+    subst hfn
+    have hEu : E (f n) = Classical.choose (hstable (f n) h) := dif_neg h
+    have hgn : g n = Classical.choose (Classical.choose_spec (hstable (f n) h)).1 :=
+      dif_pos h
+    have hwu := Classical.choose_spec (Classical.choose_spec (hstable (f n) h)).1
+    rw [← hgn] at hwu
+    have hγlt : WI.lt (f n) γ := WellIndex.lt_of_lt_of_le WI huv hvγ
+    have hge : R.ρ (g n) (f n) ≤ R.ρ γ (f n) :=
+      R.mono (WI.le_trans (hγ₀ n) hγ₀γ) (f n) hwu.1
+    have hbd := (Classical.choose_spec (hstable (f n) h)).2 γ hγlt
+    have hργ : R.ρ γ (f n) = Classical.choose (hstable (f n) h) := by
+      have h2 := hwu.2
+      omega
+    by_cases h2 : R.ρ γ (f n) = C.e γ (f n)
+    · refine Or.inr ⟨hγlt, huv, fun he => hne ?_⟩
+      rw [hEu, ← hργ, h2, he]
+    · exact Or.inl (Or.inr ⟨hγlt, h2⟩)
+
+end RepsTheorem
+
+/-! ### The boundary witness: the concentration step fails at index ℕ -/
+
+/-- ℕ is not σ-directed as an index: the identity family is unbounded. -/
+theorem nat_not_sigma_directed : ¬ SigmaDirected Nat Nat.le := by
+  intro hσ
+  obtain ⟨b, hb⟩ := hσ (fun n => n)
+  have h : b + 1 ≤ b := hb (b + 1)
+  omega
+
+/-- The ω-indexed family `χ_{<n}`: level `n` is the indicator of `[0, n)`. -/
+def chiLt (n ξ : Nat) : Nat := if ξ < n then 1 else 0
+
+/-- The family is level-monotone. -/
+theorem chiLt_mono {n m : Nat} (h : n ≤ m) (ξ : Nat) : chiLt n ξ ≤ chiLt m ξ := by
+  show (if ξ < n then 1 else 0) ≤ (if ξ < m then 1 else 0)
+  by_cases hξ : ξ < n
+  · rw [if_pos hξ, if_pos (by omega)]
+    exact Nat.le_refl 1
+  · rw [if_neg hξ]
+    exact Nat.zero_le _
+
+/-- The family is pairwise finitely-differing ("coherent" at index ℕ). -/
+theorem chiLt_coherent (n m : Nat) : FiniteP (fun ξ => chiLt n ξ ≠ chiLt m ξ) := by
+  refine ⟨List.range n ++ List.range m, fun ξ hξ => List.mem_append.mpr ?_⟩
+  by_cases h1 : ξ < n
+  · exact Or.inl (List.mem_range.mpr h1)
+  · by_cases h2 : ξ < m
+    · exact Or.inr (List.mem_range.mpr h2)
+    · refine absurd ?_ hξ
+      show (if ξ < n then 1 else 0) = (if ξ < m then 1 else 0)
+      rw [if_neg h1, if_neg h2]
+
+/-- **The concentration step fails at index ℕ.** Every coordinate of the coherent,
+    level-monotone family `χ_{<n}` moves: the mover set of level `0` is all of ℕ — not
+    finite. At ω₁ this set is finite (`reps_implies_trivial`, step 2) *because* the index
+    is σ-directed; ℕ is not (`nat_not_sigma_directed`), and this is the exact boundary.
+    The shadow theorem's hypotheses are load-bearing. -/
+theorem omega_concentration_fails :
+    ¬ FiniteP (fun ξ : Nat => ∃ m, chiLt m ξ > chiLt 0 ξ) := by
+  intro hfin
+  obtain ⟨L, hL⟩ := hfin
+  have hall : ∀ ξ : Nat, ξ ∈ L := by
+    intro ξ
+    refine hL ξ ⟨ξ + 1, ?_⟩
+    show (if ξ < ξ + 1 then 1 else 0) > (if ξ < 0 then 1 else 0)
+    rw [if_pos (by omega), if_neg (by omega)]
+    omega
+  have := mem_le_foldMax L (L.foldr Nat.max 0 + 1) (hall _)
+  omega
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

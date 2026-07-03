@@ -612,6 +612,21 @@ ccc-ness as the crux), a toolbox of four proved ZFC lemmas with proofs
 the fiber order), the thinness remark explaining why naive ◊-attacks fail, and the
 independence-boundary discussion. Questions 1–4 are pure ω₁ combinatorics.
 
+**The reps theorem, machine-checked in shadow (`reps_implies_trivial`).** The
+set-theoretic hunt's four-step engine is now formalized: over an abstract index carrying
+exactly the three properties of ω₁ the proof uses — least witnesses (`WellIndex`),
+σ-directedness (`SigmaDirected`, where regularity enters), countable segments
+(`CountableSegments`) — a coherent sequence (`CoherentSeq`, finiteness as
+list-coverage) admitting a level-monotone representative system (`Reps`) is trivial.
+Axioms: `propext, Classical.choice, Quot.sound`; no `sorry`; supporting lemmas include a
+mathlib-free pigeonhole (`no_injection_into_list`) and totality-from-least-witnesses
+(`WellIndex.total`, axiom-free). Honesty about instances, per house style: the intended
+model (ω₁) is not constructible here, and the pairing makes the hypotheses demonstrably
+load-bearing — `nat_not_sigma_directed` shows ℕ fails σ-directedness, and
+`omega_concentration_fails` shows the concentration step (the proof's heart) genuinely
+fails at index ℕ: the coherent, level-monotone family `χ_{<n}` moves at every
+coordinate. The shadow theorem is exactly why the argument works at ω₁ and not below.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),

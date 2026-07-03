@@ -170,6 +170,16 @@ landed.
   thinness remark (why naive ◊-attacks fail), and the
   independence-boundary discussion. Pure ω₁ combinatorics; no knowledge
   of the program required.
+- **the reps theorem machine-checked in shadow.** `reps_implies_trivial`:
+  over an abstract index with least witnesses, σ-directedness, and
+  countable segments (the three ω₁ properties the proof uses), a coherent
+  sequence with a level-monotone representative system is trivial —
+  axiom-clean, no sorry, with a mathlib-free pigeonhole and
+  totality-from-least-witnesses (axiom-free) as supporting lemmas. Paired
+  with the boundary: ℕ fails σ-directedness and the concentration step
+  provably fails there (`omega_concentration_fails` — the χ family moves
+  at every coordinate). The hunt's engine is now machine-checked, and its
+  regularity hypothesis demonstrably load-bearing.
 
 ## transport-kernel — mathlib instances
 

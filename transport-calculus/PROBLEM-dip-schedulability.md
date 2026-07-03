@@ -112,6 +112,13 @@ contradicting (1). (3) `T := {ξ : sup_β ρ_β(ξ) = ∞}` satisfies `T ∩ α 
 `γ(α) := sup` of countably many stabilization stages, `ρ_{γ(α)}` agrees with `E` on
 `[α₀, α)` and `ρ_{γ(α)}↾α =* e_α`, so `E =* e_α` there; set `E := e_{α₀}` below `α₀`.
 Then `E` trivializes `e`. ∎
+*Machine-checked:* the four-step engine is formalized in shadow in
+`TransportCalculus.lean` (`reps_implies_trivial`, axioms: `propext, Classical.choice,
+Quot.sound`, no `sorry`) — over an abstract index carrying exactly the three properties
+of ω₁ the proof uses (least witnesses, σ-directedness, countable segments), with "finite"
+rendered as "covered by a list". The boundary is also machine-checked:
+`omega_concentration_fails` shows step (2) fails at index ℕ, which lacks σ-directedness
+(`nat_not_sigma_directed`) — the regularity hypothesis is load-bearing.
 
 **Lemma D (chain-freeness of the fiber order).** `D(e)` contains a `⊑`-chain of order
 type ω₁ with levels cofinal in ω₁ iff `e` is trivial.
