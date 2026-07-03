@@ -191,6 +191,19 @@ landed.
   of the problem statement is rescoped to element-dependent schedules.
   Phase-0 hygiene: stale Dobrushin claims fixed in transport-calculus
   README; `tools/check-claims.sh` drift guard added.
+- **Phase 1 closed; literature first sweep clean.** Lemma E (cofinal
+  restriction: schedules push into any cofinal level set via min-above +
+  dip absorption; adversaries may attack `ρ₁` on any club). The
+  set-based schedule condition has a genuine multiplicity hole (bounds
+  leaking coordinates, not values — the recursion can blow up pointwise);
+  fixed by the value-form definition, under which strongly-schedulable ⟹
+  Φ is written at careful-prose rigor (notes §12) and the diagram arrow
+  upgrades. First literature sweep (BLH 1902.02736 §2, Bannister
+  2302.07222, derived-limits searches): Definition 2.10 dictionary
+  confirmed; BLH's engine is pressing-down, not concentration; Bannister
+  is ω^κ/Δ-systems; no uniformization-implies-triviality statement of
+  Theorem B's shape found — preliminary no-subsumption verdict, with the
+  three named residual reads as the remaining Phase-4 gate.
 
 ## transport-kernel — mathlib instances
 

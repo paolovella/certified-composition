@@ -464,3 +464,87 @@ finishes. **The open content of Question 1 is now exactly element-dependent sche
 whether the fiber order's per-element freedom (infinitely many elements per level) can
 absorb what no level-uniform assignment can. The §8 self-similarity analysis says that
 freedom is the whole game; Theorem B says it is now the *only* game.
+
+## 12. Phase 1 closes: cofinal restriction, and a multiplicity hole in the schedule
+
+**(a) Lemma E (cofinal restriction).** If `e` is strongly dip-schedulable, then for every
+cofinal `C ⊆ ω₁` the `C`-level-restricted game (elements of level in `C`, pressure and
+schedule values in `C`) is winnable. *Proof.* Extend a `C`-pressure map `μ` to `D(e)` by
+`μ̂(y) := min{c ∈ C : c ≥ ℓ(y) and c ≥ μ(x) for all x ∈ ↓y ∩ D_C}` (countable down-set,
+`C` cofinal — well-defined and monotone). Take a full schedule `(γ, X)` for `μ̂`; push:
+`γ_C(x) := min(C ∩ [γ(x), ω₁))`, `X_C(x) := X(x) ∪ dev(e_{γ(x)}, e_{γ_C(x)})` — finite by
+coherence. For `u ∈ D_C` and `ξ ∈ D⁺(γ_C(x), γ_C(u)) \ X_C(x)`: the triangle inclusion
+`D⁺(a,c) ⊆ D⁺(a,b) ∪ D⁺(b,c)` applied twice routes `ξ` into
+`D⁺(γ(x), γ(u)) \ X(x)` (the full game's finite set at `u`) or into
+`dev(e_{γ(u)}, e_{γ_C(u)})` (finite, `u`-only): the `C`-union is finite. ∎
+Contrapositive, for Question 3(b): to refute schedulability of `ρ₁` it suffices to
+refute it on any single club — and nontriviality of `ρ₁` is club-robust, so the adversary
+may standardize the walk structure first.
+
+**(b) The multiplicity hole, and the value-form schedule.** Writing the
+strongly-schedulable ⟹ Φ arrow at careful rigor exposed a gap in the *set-based* schedule
+condition: it bounds which coordinates leak, not the values there. Coherence permits
+`e_{λ_k}(ξ) → ∞` along levels at a fixed defect coordinate; infinitely many `t ∈ ↓u` may
+then hit the same leftover `ξ` with unbounded floor values, and the recursion's
+`W_u(ξ) = sup_t W_t(ξ) = ∞` — no function value exists, while the set-condition holds.
+**Fixed definition (value-form schedule):** require additionally that
+`S_u(ξ) := sup{e_{γ(x)}(ξ) : x ⊑ u, ξ ∉ X(x), ξ < γ(x)}` is finite for every `ξ` and
+`≤ e_{γ(u)}(ξ)` off a finite set (per `u`). Theorem A's `E`-schedule satisfies the
+value-form (off `X(x)` the dipped floor *equals* `E`, so `S_u = E ≤ e_{γ(u)}` off
+`dev(e_{γ(u)}, E)`); Theorem B uses only the set-form, so the equivalence chain survives
+with the weaker hypothesis on the harder side.
+
+**(c) Strongly-schedulable (value-form) ⟹ Φ, at careful rigor.** Given legal Σ, set
+`μ_t := max(ℓ(t), sup of img-levels over the slice)` — a pressure map. Take a value-form
+schedule `(γ, X)`. Enumerate `D(e)` refining `⊑`; define
+`W_t := max(ext(t), M_t, sup_{s ⊑ t} W_s, e_{γ(t)} off X(t))` pointwise on `γ(t)`.
+(i) *Pointwise finiteness*: unfolding, every ingredient at `ξ` is bounded by
+`max(M_u(ξ), S_u(ξ))` — `M_u` finite via any legality bound, `S_u` finite by the
+value-form. (ii) *Fiber-hood*: the excess of `W_u` over `e_{γ(u)}` is contained in
+`F_u ∪ E_u` where `F_u` (requirement excess) is finite via a legality bound `b_u` —
+`M_u ≤ b_u =* e_{ℓ(b_u)} =* e_{γ(u)}` on the common domain, three finite deviations —
+and `E_u` (floor excess) is the value-form's exceptional set; downward deviation is at
+most `X(u)`. (iii) *Monotonicity and domination* are by construction (the max includes
+past values and the slice-sup). So `φ(t) := (γ(t), W_t)` is a dominator. ∎
+The problem statement's diagram arrow "strongly schedulable ⟹ Φ" upgrades from [argued]
+to [proved at prose rigor, §12(c)] *for the value-form definition*; the set-form retains
+only the [argued] grade via this section's counterexample-shaped hole.
+
+## 13. Literature pass, first sweep (gating for shipping) — no subsumption found
+
+Comparison object: Theorem B (level-indexed finite dips + almost-monotonicity-with-
+per-target-finite-leftover ⟺ trivial). Sources actually inspected (ar5iv full-text
+fetches, excerpt-limited; final gate still requires the PDFs):
+
+- **Bergfalk–Lambie-Hanson, *The Cohomology of the Ordinals I* (arXiv 1902.02736), §2.**
+  Definition 2.10 confirmed verbatim as our coherence/triviality with values in an
+  arbitrary abelian group `A` (our ω-valued case embeds; the ℤ-remark stands). Their §2
+  proves *non*triviality (Theorem 2.4) by contradiction, via pressing-down and regressive
+  functions on stationary sets (Claim 2.6) — a different engine from Theorem B's
+  witness-concentration; no "uniformization ⟹ triviality" statement appears, no
+  per-level finite-correction mechanism, no games or schedules. One nuance worth
+  tracking for Question 3(b): `ρ₂` satisfies coherence mod *locally constant* functions
+  (`=ᶜ`, their Corollary 2.7), strictly richer than mod-finite — the game as posed is
+  mod-finite, and `ρ₂`'s extra rigidity might matter on either side.
+- **Bannister, *Additivity of derived limits in the Cohen model* (arXiv 2302.07222).**
+  Indexing is `ω^κ`-systems, not ω₁-level-indexed families; the "propagating
+  trivializations" reframing (their §4, generalizing BHL Lemma 4.7) concerns injective
+  systems and Cohen forcing; the partition principle (§5, not fully visible in the
+  fetch) drives vanishing via higher-dimensional Δ-systems. Their "Type I triviality"
+  (Definition 8) *is* a per-index finite-exceptional-set condition — but against a single
+  global witness, i.e. it is the *definition* of triviality in their setting, not a
+  sufficient condition of dip shape. No statement found of the form "per-level finite
+  corrections making the family almost-monotone imply triviality".
+- **Searches** across the derived-limits circle (partition hypotheses PHₙ, universally
+  Baire n-coherent families on `ω^ω`, ladder-system uniformization on trees) surface
+  adjacent shapes — Δ-system-driven uniformization, mod-finite agreement off finite
+  sets — but nothing with Theorem B's mechanism or Lemma C's statement
+  ("pointwise-monotone representatives ⟺ trivial").
+
+**Preliminary verdict (first sweep): no subsumption.** The monotone/dip mechanism —
+Lemma C, Theorem B, the schedule game — appears to be ours; the neighborhood is
+Δ-systems and partition principles on function-space indices, while ours is
+order-monotonicity on the level index. Residual risk before Phase 4: Bannister §5's full
+partition principle, the BHL "simultaneously vanishing" paper, and Todorcevic's walks
+book ch. 1–2 (for whether ρ₁-specific structure trivially decides Question 3(b)). Those
+three reads remain the gate.

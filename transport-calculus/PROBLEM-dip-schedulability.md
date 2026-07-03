@@ -11,6 +11,12 @@ in this repository; none of it is needed below). Rigor grading is explicit throu
 Work in ZFC. Fix throughout a *coherent sequence*
 `e = ⟨e_α : α < ω₁⟩`, `e_α : α → ω`, meaning: for all `α < β`,
 `{ξ < α : e_α(ξ) ≠ e_β(ξ)}` is finite. Write `s =* t` for "equal off a finite set".
+This is Bergfalk–Lambie-Hanson's Definition 2.10 (*The Cohomology of the Ordinals I*,
+arXiv 1902.02736) with values in `ω` in place of an abelian group `A`; a ℤ-valued
+trivialization of an ω-valued family is negative only on a set with finite initial
+segments, hence bounded, hence patchable, so the two notions of triviality coincide
+here. In their vocabulary: *trivial* is `[Φ] = 0` in `H¹(ω₁)`, and nontrivial families
+exist in ZFC via the walk functions `ρ₁, ρ₂` (Todorcevic).
 
 - `e` is **trivial** if there is `E : ω₁ → ω` with `E↾α =* e_α` for every `α`.
   Nontrivial coherent sequences exist in ZFC (Todorcevic; e.g. `e_α := ρ₁(·, α)` from
@@ -28,7 +34,15 @@ Work in ZFC. Fix throughout a *coherent sequence*
 (monotone: `x ⊑ y ⟹ μ(x) ≤ μ(y)`). A **schedule** for `μ` is a pair `(γ, X)` where
 `γ : D(e) → ω₁` is monotone with `γ ≥ μ`, and `X : D(e) → [ω₁]^{<ω}`, such that
 
-> for every `u ∈ D(e)`:  `⋃_{x ⊑ u} ( D⁺(γ(x), γ(u)) \ X(x) )`  is finite.
+> for every `u ∈ D(e)`: (i) `⋃_{x ⊑ u} ( D⁺(γ(x), γ(u)) \ X(x) )` is finite, and
+> (ii) `S_u(ξ) := sup{e_{γ(x)}(ξ) : x ⊑ u, ξ < γ(x), ξ ∉ X(x)}` is finite for every `ξ`
+> and `≤ e_{γ(u)}(ξ)` off a finite set.
+
+(Condition (ii) — the *value-form* — is needed for the intended application: (i) alone
+bounds which coordinates leak but not the values there, and coherence permits unbounded
+growth along levels at a fixed defect coordinate; see the notes, §12(b). All positive
+results below prove the stronger (i)+(ii) form or need only (i); the questions are
+equivalent-shaped under either reading, but (i)+(ii) is the official definition.)
 
 - `e` is **strongly dip-schedulable** if every pressure map admits a schedule.
 - `e` is **weakly dip-schedulable** if every pressure map of the form
@@ -45,11 +59,12 @@ the union is over genuinely branching, overlapping countable directed families.
 ## 2. The implication diagram
 
 ```
-trivial  ⟹[proved]  strongly schedulable  ⟹[argued]  Φ(e)  ⟹[argued]  weakly schedulable
+trivial  ⟹[proved]  strongly schedulable  ⟹[proved†]  Φ(e)  ⟹[argued]  weakly schedulable
    ↑                                                    |
    └────────────────── ??? (Question 1) ────────────────┘
 ```
 
+(† at careful-prose rigor, notes §12(c), for the value-form definition above.)
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are
@@ -152,6 +167,18 @@ type ω₁ with levels cofinal in ω₁ iff `e` is trivial.
 increasing fiber representatives); the same four steps run verbatim, and coherence spreads
 the conclusion from the club of levels to all levels. Conversely a trivializing `E` gives
 the chain `(α, max(e_α, E↾α))`. ∎
+
+**Lemma E (cofinal restriction).** If `e` is strongly dip-schedulable, so is its
+restriction to any cofinal set of levels `C ⊆ ω₁` (elements, pressure, and schedule
+values confined to `C`).
+*Proof.* Extend a `C`-pressure map by least-`C`-element-above (down-sets are countable);
+take a full schedule `(γ, X)`; push `γ_C(x) := min(C ∩ [γ(x), ω₁))` and absorb the push
+into the dips, `X_C(x) := X(x) ∪ dev(e_{γ(x)}, e_{γ_C(x)})`. The triangle inclusion
+`D⁺(a,c) ⊆ D⁺(a,b) ∪ D⁺(b,c)` routes every leftover point into the full game's finite
+set at `u` or into the single finite set `dev(e_{γ(u)}, e_{γ_C(u)})`. ∎
+*Use:* refuting schedulability of a specific sequence (Question 3) may be done on any
+club, where e.g. the walk structure of `ρ₁` can be standardized first; nontriviality is
+club-robust.
 
 **Remark (thinness).** Coherence forces any single level's deviation from its
 predecessors to be finite below every smaller ordinal — so "kills" (as in Question 3(a))
