@@ -85,12 +85,15 @@ coincidence that hid the conflation). Two compose to Lipschitz-4:
   certificate `(C, r)` with a semidirect-product law `(Cg·Cf^rg, rg·rf)`;
   `comp_reconstructs_holder` reconstructs `HolderWith.comp`. Two different
   accumulation *algebras*, one `Bridge.comp`.
-- **Markov-kernel / Dobrushin (`M = ℝ≥0`, `D = ℝ`= TV) — built (finite state spaces).**
+- **Markov-kernel / Dobrushin (`M = ℝ≥0`, `D` = TV) — built, finite AND measure-theoretic.**
   mathlib has no data-processing inequality, so it is proved from scratch in
-  `transport-kernel/`: `dpi` (the DPI, via the coupling/overlap argument), `Bridge.ofKernel`
-  (a kernel is a certified bridge), `comp_reconstructs_dobrushin` (advanced composition =
-  certificate accumulation), `coeff_submul` (`η(K∘L) ≤ η(K)·η(L)`). Axiom-clean, no `sorry`.
-  The measure-theoretic generalization (continuous state spaces) is the remaining extension.
+  `transport-kernel/`: `dpi` (finite state spaces, coupling/overlap argument),
+  `tvDist_comp_le` (arbitrary measurable spaces, Hahn decomposition + additive coupling),
+  `Bridge.ofKernel` / `Bridge.ofMarkovKernel` (kernels are certified bridges),
+  `comp_reconstructs_dobrushin` / `comp_reconstructs_dobrushin_measure` (advanced
+  composition = certificate accumulation), and the discretization consistency lemma
+  (`tvDist_toMeasure`, `dpi_via_measure`: the two developments provably agree, the finite
+  DPI a corollary of the measure one). Axiom-clean, no `sorry`.
 
 ## Scope — the boundary, and what it is *not*
 
@@ -627,6 +630,17 @@ load-bearing — `nat_not_sigma_directed` shows ℕ fails σ-directedness, and
 fails at index ℕ: the coherent, level-monotone family `χ_{<n}` moves at every
 coordinate. The shadow theorem is exactly why the argument works at ω₁ and not below.
 
+**The fiber-control gap closes — Theorem B, and Question 1′ proved (note §11).** The §7
+`H`-route is refuted by a counterexample (wasteful dips hide whole columns below an
+ω-cofinality level), and the theorem is proved by the *honest-column* extraction instead:
+values are monotone along honest levels, never-honest points are finite per level
+automatically, unbounded columns die by witness-concentration, and the max honest value
+trivializes. **A coherent sequence admits a uniformizing dip system iff it is trivial**
+(ZFC, relativizes to cofinal level sets), and hence **level-factored strong
+schedulability implies triviality** — a proved partial answer to the problem statement's
+Question 1, whose open content is now exactly element-dependent schedules. Also landed:
+`tools/check-claims.sh`, a drift guard for README/status claims.
+
 **The formalizable shadow (`Fb`): profile item (2) is individually non-lethal.** The dip
 pathology has a countable, mathlib-free witness: levels `ℕ ∪ {∞}` over a constant-`1` floor
 with finite patches. `Fb` is directed (`dirF`), not σ-directed (`fb_not_sigma_directed`),
@@ -666,11 +680,12 @@ theorems on both of its shores.
 asks only whether a monotone dominator *exists*, never what it *is*. The interface was built
 to host **quantitative** transport: the Dobrushin / strong-data-processing contraction of
 total variation, the reason any of this connects to real contraction estimates. That instance
-was the unbuilt centre, and it is now built — over finite state spaces — in `transport-kernel/`
-(`dpi`, proved from scratch since mathlib has no DPI; `comp_reconstructs_dobrushin` making
-advanced composition a case of certificate accumulation; `coeff_submul`). So the centre is no
-longer prose: the interface demonstrably hosts a contraction theorem mathlib does not contain,
-and reproduces its composition law generically. What remains prose is the *measure-theoretic*
-generalization to continuous state spaces — the same coupling argument in integral form — and
-the qualitative order-theory frontier above. The centre is machine-checked; its continuous
-generalization is the next brick.
+was the unbuilt centre, and it is now fully built in `transport-kernel/` — finite state
+spaces (`dpi`, `comp_reconstructs_dobrushin`, `coeff_submul`), arbitrary measurable state
+spaces (`tvDist`, `tvDist_comp_le`, `comp_reconstructs_dobrushin_measure`,
+`tvDist_kernel_comp_le`), and the discretization consistency lemma joining them
+(`tvDist_toMeasure`, `dpi_via_measure`). So the centre is no longer prose at any level of
+generality: the interface demonstrably hosts a contraction theorem mathlib does not
+contain, reproduces its composition law generically, and the finite and measure-theoretic
+developments provably agree where they overlap. What remains open is only the qualitative
+order-theory frontier above.

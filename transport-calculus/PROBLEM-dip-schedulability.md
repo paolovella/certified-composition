@@ -55,6 +55,30 @@ Here `Φ(e)` is the statement the program cares about ("every legal constraint s
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are
 sketch-rigor reductions from the notes; the combinatorial questions stand on their own.
 
+**Theorem B (uniformizing dip systems) [proved].** Call `{X_μ : μ < ω₁}` (finite
+`X_μ ⊆ μ`) a *uniformizing dip system* for `e` if `U_γ := ⋃_{μ<γ}(D⁺(μ,γ) \ X_μ)` is
+finite for every `γ`. Then **`e` admits a uniformizing dip system iff `e` is trivial**.
+(⟸) `X_μ := {ξ : e_μ(ξ) ≠ E(ξ)}`. (⟹) Call `γ` *ξ-honest* if `γ > ξ` and
+`ξ ∉ X_γ ∪ U_γ`. Values are nondecreasing along honest levels (else the offending point
+lands in `U_γ`); never-honest points below `γ` lie in `X_γ ∪ U_γ`, hence are finite per
+level automatically; columns with unbounded honest values are finite below every `α`
+(concentrate distinct witnesses at one level `β*` above their sup — all but finitely many
+survive `X_{β*} ∪ U_{β*}`, and the registered excess makes `e_{β*}` differ from `e_α`
+infinitely, against coherence). Let `E(ξ)` be the maximum honest value; for any `γ`,
+choosing `δ*` above `γ` and above countably many attainment stages sandwiches
+`E(ξ) = e_{δ*}(ξ) = e_γ(ξ)` off four finite sets. ∎ The proof relativizes to dip systems
+on any cofinal set of levels. *Warning:* the running sup `H_γ` of the dipped family does
+**not** satisfy `H_γ =* e_γ` in general (dips can hide whole columns below an
+ω-cofinality level); the honest-column extraction is the correct route.
+
+**Corollary (Question 1′, the level-factored case) [proved].** A *level-factored*
+schedule (`γ(x) = g(ℓ(x))`, `X(x) = Y_{ℓ(x)}`) for the identity pressure map, evaluated
+on the probe elements `(α, min(e_α, s_u↾α)) ⊑ u`, induces a uniformizing dip system on
+the cofinal level set `g[ω₁]`; hence **level-factored strong schedulability implies
+triviality**. Question 1 is thereby rescoped: its open content is exactly
+*element-dependent* schedules — whether the per-element freedom of the fiber order
+(infinitely many elements per level) can absorb what no level-uniform assignment can.
+
 **Theorem A (trivial ⟹ strongly schedulable) [proved].** Let `E` trivialize `e`. Given
 any pressure map `μ`, set `γ := μ` and `X(x) := {ξ < γ(x) : e_{γ(x)}(ξ) ≠ E(ξ)}` (finite,
 by triviality). If `ξ ∈ D⁺(γ(x), γ(u)) \ X(x)` then `e_{γ(x)}(ξ) = E(ξ)` and
@@ -64,6 +88,8 @@ by triviality). If `ξ ∈ D⁺(γ(x), γ(u)) \ X(x)` then `e_{γ(x)}(ξ) = E(ξ
 ## 3. The questions
 
 **Question 1 (main).** Is every strongly dip-schedulable coherent sequence trivial?
+*(The level-factored case is proved — Corollary to Theorem B above. What is open is
+whether a genuinely element-dependent schedule can exist over a nontrivial sequence.)*
 
 **Question 2 (realizability / the fractal gap).** Does weak dip-schedulability imply
 strong dip-schedulability? (The subtlety: realizing a given pressure map by a legal

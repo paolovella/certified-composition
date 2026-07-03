@@ -180,6 +180,17 @@ landed.
   provably fails there (`omega_concentration_fails` — the χ family moves
   at every coordinate). The hunt's engine is now machine-checked, and its
   regularity hypothesis demonstrably load-bearing.
+- **Theorem B: uniformizing dip systems ⟺ trivial (ZFC); Question 1′
+  proved.** The §7 H-extraction is refuted (wasteful dips hide columns
+  below ω-cofinality levels) and replaced by the honest-column argument:
+  monotone along honest levels; never-honest points finite per level
+  automatically (they sit in `X_γ ∪ U_γ`); unbounded columns killed by
+  witness-concentration at one level; the max honest value trivializes,
+  sandwiched at a late honest level. Relativizes to cofinal level sets;
+  corollary: level-factored strong schedulability ⟹ trivial. Question 1
+  of the problem statement is rescoped to element-dependent schedules.
+  Phase-0 hygiene: stale Dobrushin claims fixed in transport-calculus
+  README; `tools/check-claims.sh` drift guard added.
 
 ## transport-kernel — mathlib instances
 

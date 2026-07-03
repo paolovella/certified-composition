@@ -415,3 +415,52 @@ been proved away. What remains is a self-contained uniformization invariant of c
 sequences, stated in one line, sitting exactly at the boundary where such invariants
 historically go independent. This is where the transport line hands the question to set
 theory in its final form.
+
+## 11. The fiber-control gap: `H` refuted, the theorem proved by honest columns
+
+The §7 extraction gap — lower fiber-control of `H_γ` — resolves, but not by repair:
+`H` was the wrong object, and abandoning it proves the theorem.
+
+**The `H`-route is refutable.** Take trivial `e` with canonical dips `X_μ := ∅`, then
+waste: `X'_μ := μ ∩ ω` for `μ ≤ ω`, unchanged above. Still uniformizing (larger dips only
+shrink leftovers), but `H_ω` is undefined on all of ω: `{ξ : H_ω(ξ) < e_ω(ξ)}` is
+infinite. A dip system may hide entire columns below any fixed ω-cofinality level, so
+`H_γ =* e_γ` is simply false in general.
+
+**Honest columns.** Given a uniformizing dip system `{X_μ}` (finite, with
+`U_γ := ⋃_{μ<γ}(D⁺(μ,γ) \ X_μ)` finite for all `γ`), call `γ` *ξ-honest* if `γ > ξ` and
+`ξ ∉ X_γ ∪ U_γ`. Then:
+
+0. *Monotone along honest levels*: for ξ-honest `δ < γ`, `e_δ(ξ) ≤ e_γ(ξ)` — else
+   `ξ ∈ D⁺(δ,γ) \ X_δ ⊆ U_γ`, against γ-honesty. (Only `ξ ∉ X_δ` and `ξ ∉ U_γ` are used.)
+1. *Never-honest points are finite per level, automatically*:
+   `NH ∩ γ ⊆ X_γ ∪ U_γ`, since a never-honest `ξ < γ` fails honesty at `γ` itself.
+   (The wasteful example above has `NH = ∅`: levels above ω are honest for every `ξ < ω`.)
+2. *Unbounded-value columns are finite below every `α`* — the §2′ concentration step,
+   with the twist that witnesses live in the approximating levels: given distinct
+   `ξ_n < α` whose honest values exceed `e_α(ξ_n)` at witnesses `γ_n`, take a level
+   `β* > sup_n γ_n`; all but finitely many `ξ_n` avoid the finite `X_{β*} ∪ U_{β*}`, and
+   for those, step 0 registers the excess at `β*`: `e_{β*}` then differs from `e_α`
+   at infinitely many points — coherence violated. (No order-type-ω step is needed,
+   unlike Lemma C: finiteness below each level is used directly.)
+
+**Theorem B (ZFC): `e` admits a uniformizing dip system iff `e` is trivial.**
+(⟸) is Theorem A's dips. (⟹): let `E(ξ)` be the maximum honest value at `ξ`
+(attained — values are bounded naturals off the step-2 set; arbitrary on `NH ∪ T`).
+Fix `γ`. Choose attainment stages for the countably many `ξ < γ` off `NH ∪ T`, and any
+`δ*` above `γ` and above their sup. Off four finite sets — `NH ∩ γ` (step 1), `T ∩ γ`
+(step 2), `X_{δ*} ∪ U_{δ*}`, and `dev(e_γ, e_{δ*})` — the value `e_{δ*}(ξ)` is sandwiched:
+`≥ E(ξ)` by step 0 from the attainment stage, `≤ E(ξ)` since `δ*` is itself ξ-honest and
+participates in the max; and `e_{δ*}(ξ) = e_γ(ξ)` off the deviation set. So `E =* e_γ`. ∎
+
+The proof relativizes verbatim to a dip system defined on any *cofinal* set of levels
+(choose `β*`, `δ*` inside it; the conclusion trivializes the full sequence by coherence).
+
+**Corollary (Question 1′): level-factored strong schedulability implies triviality.**
+A schedule with `γ(x) = g(ℓ(x))` and `X(x) = Y_{ℓ(x)}`, applied to the identity pressure
+map and evaluated on the probe elements `m^u_α = (α, min(e_α, s_u↾α)) ⊑ u`, yields a
+uniformizing dip system on the cofinal level set `g[ω₁]`; the relativized Theorem B
+finishes. **The open content of Question 1 is now exactly element-dependent schedules** —
+whether the fiber order's per-element freedom (infinitely many elements per level) can
+absorb what no level-uniform assignment can. The §8 self-similarity analysis says that
+freedom is the whole game; Theorem B says it is now the *only* game.
