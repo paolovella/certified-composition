@@ -548,3 +548,34 @@ order-monotonicity on the level index. Residual risk before Phase 4: Bannister �
 partition principle, the BHL "simultaneously vanishing" paper, and Todorcevic's walks
 book ch. 1–2 (for whether ρ₁-specific structure trivially decides Question 3(b)). Those
 three reads remain the gate.
+
+### §13 addendum: second sweep — gate CLEARED
+
+Second-sweep fetches (BHL-circle *Simultaneously nonvanishing higher derived limits*,
+arXiv 2411.15856; Bergfalk's higher-walks introduction, arXiv 2410.00607; Bannister full
+HTML): (i) the BHL-circle's triviality criterion is a *cofinality bound* — their
+Prop 2.7: `cf(ℐ, ⊆*) < ω_n` makes every coherent n-family trivial — degenerate for
+ω₁-level-indexed 1-families, and of a different shape from dips; (ii) the walks
+introduction confirms ρ₁ coherent mod finitely-supported, ρ₂ mod locally constant,
+nontriviality as `H¹(ω₁; ℤ) ≠ 0`, and contains **no** monotonicity-after-finite-deletions
+characterization ("appears to be an open direction" per the fetch), no level-index
+correction machinery, no games; (iii) Bannister's PHₙ is Ramsey-theoretic on Cohen reals
+over `ω^κ` via higher-dimensional Δ-systems, his Type I/II trivialities are structural
+definitions, and neither involves level-indexed finite corrections or monotonicity off
+finite sets. **Verdict: the gate clears — no subsumption of Theorem B, Lemma C, or the
+schedule game found across four independent probes.** One footnote of residual risk: the
+literal PHₙ statement is deferred inside Bannister §5 and the fetch could not extract it
+verbatim; a PDF read of that one section is the last nice-to-have before the arXiv note,
+not a blocker for drafting.
+
+### Phase 4 prep: the three-sentence pitch (draft)
+
+> We study a uniformization game on 1-coherent families on ω₁ (your Definition 2.10,
+> ω-valued): finite "dip" sets per element of the fiber order, absorbing the pairwise
+> upward-defects of a level assignment against every down-set at once. Trivial families
+> are schedulable (and level-indexed schedulability is *equivalent* to triviality — a
+> short ZFC theorem whose engine, a monotone-representatives ⟺ triviality lemma, is
+> machine-checked in Lean); whether a *nontrivial* family — ρ₁, say — can be schedulable
+> through genuinely element-dependent corrections is open, and sits at the
+> ladder-uniformization/◊-vs-MA boundary. Problem statement with proofs, rigor grading,
+> and the Lean artifacts: [link].

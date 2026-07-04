@@ -204,6 +204,18 @@ landed.
   is ω^κ/Δ-systems; no uniformization-implies-triviality statement of
   Theorem B's shape found — preliminary no-subsumption verdict, with the
   three named residual reads as the remaining Phase-4 gate.
+- **gate cleared; Phase 2 translation layer done.** Second sweep
+  (BHL-circle 2411.15856: triviality via cofinality bounds, degenerate at
+  ω₁; higher-walks intro 2410.00607: no monotonicity-after-deletions
+  machinery, no games; Bannister full HTML: PHₙ is Ramsey/Δ-systems on
+  ω^κ, trivialities structural): no subsumption across four probes; one
+  footnote — PHₙ's literal statement needs a PDF read of Bannister §5,
+  nice-to-have not blocker. Problem statement gains: the Def 2.10
+  dictionary with the ω-vs-ℤ remark, the positioning paragraph
+  (Theorem B: level-schedules ARE trivializations; Question 1: does
+  element-freedom add power), Question 3(b) in H¹-vocabulary with the
+  ρ₂ =ᶜ nuance, coherent-tree citations at Lemma D, and a verified
+  related-work section. Phase-4 pitch drafted in the notes.
 
 ## transport-kernel — mathlib instances
 

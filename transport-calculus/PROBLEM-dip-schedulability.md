@@ -100,6 +100,12 @@ by triviality). If `ξ ∈ D⁺(γ(x), γ(u)) \ X(x)` then `e_{γ(x)}(ξ) = E(ξ
 `e_{γ(x)}(ξ) > e_{γ(u)}(ξ)`, so `E(ξ) > e_{γ(u)}(ξ)`, i.e.
 `ξ ∈ {ζ : E(ζ) ≠ e_{γ(u)}(ζ)}` — a finite set depending only on `u`. ∎
 
+*Positioning:* Theorem A says a trivialization is (canonically) a schedule; Theorem B
+says level-indexed schedules are *nothing but* trivializations. Question 1 asks whether
+the implication "trivialization ⟹ schedule" is secretly an equivalence — i.e. whether
+the fiber order's per-element freedom (infinitely many elements per level) adds any
+uniformization power at all over the level-indexed case.
+
 ## 3. The questions
 
 **Question 1 (main).** Is every strongly dip-schedulable coherent sequence trivial?
@@ -116,7 +122,12 @@ is itself a schedulability-type problem. The reduction reproduces itself one lev
 (a) Let `e` be built by the block-diagonal ◊-recursion (at stationarily many limits `δ`,
 `e_δ` is the ladder-glue of its predecessors lowered to `0` at one point per ladder
 block, the points chosen cofinally in `δ`). Is `e` strongly (weakly) dip-schedulable?
-(b) Is `e_α := ρ₁(·, α)` (from walks) dip-schedulable?
+(b) Is `e_α := ρ₁(·, α)` (from walks) dip-schedulable? In the vocabulary of the
+derived-limits literature: `[Φ_{ρ₁}] ≠ 0` in `H¹(ω₁)` witnesses nontriviality in ZFC;
+the question is whether its class being nonzero already obstructs every element-dependent
+schedule, or whether ρ₁'s finer structure (coherence mod finitely-supported functions;
+for ρ₂, mod locally constant — Bergfalk–Lambie-Hanson, Cor 2.7) decides the game some
+other way. By Lemma E the question may be attacked on any club.
 
 **Question 4 (consistency).** Is "some nontrivial coherent sequence is strongly
 dip-schedulable" consistent with ZFC? Natural candidate axioms: MA_{ω₁} or PFA, via a
@@ -161,7 +172,11 @@ rendered as "covered by a list". The boundary is also machine-checked:
 `omega_concentration_fails` shows step (2) fails at index ℕ, which lacks σ-directedness
 (`nat_not_sigma_directed`) — the regularity hypothesis is load-bearing.
 
-**Lemma D (chain-freeness of the fiber order).** `D(e)` contains a `⊑`-chain of order
+**Lemma D (chain-freeness of the fiber order).** *(This is the pointwise-≤ sibling of
+a classical fact: for the coherent tree `T(e)` — Todorcevic, "Lipschitz maps on trees";
+Moore's survey — a cofinal branch is exactly a trivialization, and nontrivial `e` gives
+an Aronszajn tree. `D(e)` is `T(e)` closed under finite modifications, re-equipped with
+the pointwise order; Lemma D is the branch fact for that order, by a different proof.)* `D(e)` contains a `⊑`-chain of order
 type ω₁ with levels cofinal in ω₁ iff `e` is trivial.
 *Proof.* Such a chain is a club-indexed system as in Lemma C (its functions are pointwise
 increasing fiber representatives); the same four steps run verbatim, and coherence spreads
@@ -189,6 +204,22 @@ entries at levels below a kill see only finitely many killed points (absorbable 
 correction at all. A successful adversary must exploit *overlap* of down-sets, not any
 single level's structure. A template no-go covering five diagonalization designs is in
 the notes, §9.
+
+## 4½. Related work (adversarial pass, verified against the sources)
+
+Bergfalk–Lambie-Hanson (arXiv 1902.02736) give the coherence/triviality definitions
+(Def 2.10) and prove nontriviality of the walk families (their Thm 2.4) by pressing-down
+on stationary sets (Claim 2.6) — a different engine from this note's
+witness-concentration; no uniformization-implies-triviality statement appears there. The
+derived-limits circle (Bergfalk–Hrušák–Lambie-Hanson; Bannister, arXiv 2302.07222;
+arXiv 2411.15856) works over `ω^κ`-indexed systems with higher-dimensional Δ-systems and
+partition hypotheses PHₙ; its triviality criteria are cofinality bounds
+(`cf(ℐ,⊆*) < ω_n`) or structural Type I/II trivialities — none of dip shape. The
+higher-walks introduction (arXiv 2410.00607) reviews ρ₁/ρ₂ coherence (mod
+finitely-supported, mod locally-constant respectively) and contains no
+monotonicity-after-finite-deletions machinery on the level index. To our knowledge the
+schedule game, Theorem B's dip mechanism, and Lemma C's monotone-representatives
+equivalence do not appear in this literature.
 
 ## 5. Why this may sit at the independence boundary
 
