@@ -257,6 +257,19 @@ landed.
   trace-distance DPI) is a confirmed open slot with all ingredients
   present. Plan Q0–Q5 recorded in `NOTES-quantum-tier4.md`; drift guard
   extended to transport-kernel notes.
+- **Tier 4 (Q1+Q2) — the quantum DPI, done and received.**
+  `QuantumDobrushinReceive.lean` against Physlib (pinned; mathlib revs
+  identical, cache shared): the Jordan form of the trace norm
+  (`‖A‖₁ = tr A⁺ + tr A⁻`), the quantum DPI at positive-trace-preserving
+  generality (`traceNorm_map_le` — complete positivity not assumed;
+  Ruskai), trace-distance contraction for `PTPMap`s on states, the
+  quantum Dobrushin bound with the DPI as its η = 1 instance, and the
+  reception `Bridge.ofPTPChannel` + `comp_reconstructs_quantum_dobrushin`
+  in `dobrushinGA` — the same graded action as the finite classical tier.
+  Finite kernels, measure kernels, quantum channels: one composition law.
+  Axiom-clean (standard three) against the full Physlib cone — none of
+  Physlib's 48 sorries are in it. Q3 (diagonal consistency) and Q4
+  (quantum-DP two-row check) remain.
 
 ## Consolidation
 
