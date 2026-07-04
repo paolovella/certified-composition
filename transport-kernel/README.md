@@ -17,7 +17,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | **done** (finite state spaces), this repo |
 | 3b | measure-theoretic Dobrushin | from-scratch TV distance + DPI over mathlib's `Measure`/`Kernel` | **done** (arbitrary measurable spaces), this repo |
 | 3c | discretization consistency | Dirac embedding; `tvd`/`tvDist` proved equal; finite DPI re-derived from the measure one | **done**, this repo |
-| 4 | quantum trace-distance DPI + Dobrushin | Physlib (`MState`, `PTPMap`/`CPTPMap`, `traceNorm`, Jordan via cfc) + from-scratch contraction | **recon done** (`NOTES-quantum-tier4.md`): gap confirmed, same toolchain, slot open |
+| 4 | quantum trace-distance DPI + Dobrushin | Physlib (`MState`, `PTPMap`/`CPTPMap`, `traceNorm`, Jordan via cfc) + from-scratch contraction | **done** (Q1+Q2), this repo; Q3 (diagonal consistency) open |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 
@@ -163,6 +163,35 @@ and then:
 - `tvDist` is defined as the one-sided sup; symmetry and the classical-TV reading are
   proved *for probability measures* (`tvDist_comm`), which is the regime every theorem
   here uses. It is not developed as a metric on general finite measures.
+
+## Tier 4 — the quantum tier (`TransportKernel/QuantumDobrushinReceive.lean`)
+
+Physlib (leanprover-community; the March-2026 Lean-QuantumInfo + PhysLean merge) has
+`TrDistance` with basic properties but **no channel contractivity and no Dobrushin
+coefficient** (recon: `NOTES-quantum-tier4.md`) — the mathlib-had-no-DPI situation, one
+level up. So the contraction is proved here, from scratch, and received:
+
+- **`traceNorm_eq_trace_posPart_add_trace_negPart`** — the Jordan form of the trace
+  norm, `‖A‖₁ = tr A⁺ + tr A⁻`, glued from Physlib's eigenvalue characterization and
+  cfc trace formula.
+- **`traceNorm_map_le`** — the quantum DPI at **positive trace-preserving generality**:
+  complete positivity is *not* assumed (Ruskai) — positivity and trace preservation
+  suffice. The honest minimal hypothesis, sharper than the CPTP textbook statement;
+  CPTP follows via `CPTPMap.toPTPMap`.
+- **`trDistance_apply_le`** — `T(Λρ, Λσ) ≤ T(ρ, σ)` for every `PTPMap` on states.
+- **`QDobrushinBound`, `qDobrushinBound_one`** — the quantum Dobrushin coefficient as a
+  bound hypothesis; the DPI is the universal `η = 1` instance.
+- **`Bridge.ofPTPChannel`, `comp_reconstructs_quantum_dobrushin`** — the reception, in
+  **`dobrushinGA`, the same graded action as the finite classical tier**: finite
+  kernels (Tier 3), measure-theoretic kernels (Tier 3b), and quantum channels (Tier 4)
+  now compose under the *same* generic `Bridge.comp`. Three physical regimes, one
+  composition law — the strongest reuse evidence the interface has produced.
+
+Axioms: `propext, Classical.choice, Quot.sound` — no `sorry`, checked against the full
+Physlib import cone (the library carries `sorry`s elsewhere; none in this cone).
+Remaining: Q3 (diagonal embedding — classical `Dist` ↪ diagonal density matrices,
+`TrDistance` on diagonals = finite `tvd`, classical DPI as a corollary of the quantum
+one) and Q4 (the quantum-DP two-row check).
 
 ## Naming note
 

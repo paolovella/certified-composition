@@ -48,6 +48,11 @@ ingredients all present:
 ## Plan status
 
 - **Q0 (this file)**: done — gap confirmed.
+- **Q1+Q2: DONE** (same session as Q0+1 day — far under the week estimate; the Physlib
+  API was exactly right-shaped). `QuantumDobrushinReceive.lean`, axiom-clean against the
+  full import cone. Note for the estimate ledger: the recon's signature-pinning made the
+  file compile with only three error classes (a notation `open`, a name ambiguity, a
+  universe restriction on `Bridge`).
 - **Q1** (trace-distance DPI at PTP generality): open slot confirmed; ingredients listed
   above; estimate unchanged (~a week).
 - **Q2** (`Bridge.ofChannel`, `comp_reconstructs_quantum_dobrushin`): lands in `lipGA`;
