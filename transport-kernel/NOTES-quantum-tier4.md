@@ -62,5 +62,9 @@ ingredients all present:
   after Q1 whether the DPI lives as a Physlib PR with a thin bridge in transport-kernel,
   or in-repo first.
 
+Build note for Q1 session-planning: `lake exe cache get` covers the *mathlib*
+dependency only; Physlib's own ~84 QuantumInfo modules compile locally (budget the
+first-build time, or check Reservoir for a package cache before starting).
+
 Scoping note, kept honest: quantum enters the transport line here and only here —
 channel contraction fits the interface as-is; it does not touch dip-schedulability.
