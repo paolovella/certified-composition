@@ -17,6 +17,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | **done** (finite state spaces), this repo |
 | 3b | measure-theoretic Dobrushin | from-scratch TV distance + DPI over mathlib's `Measure`/`Kernel` | **done** (arbitrary measurable spaces), this repo |
 | 3c | discretization consistency | Dirac embedding; `tvd`/`tvDist` proved equal; finite DPI re-derived from the measure one | **done**, this repo |
+| 4 | quantum trace-distance DPI + Dobrushin | Physlib (`MState`, `PTPMap`/`CPTPMap`, `traceNorm`, Jordan via cfc) + from-scratch contraction | **recon done** (`NOTES-quantum-tier4.md`): gap confirmed, same toolchain, slot open |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 

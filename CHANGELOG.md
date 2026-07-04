@@ -247,6 +247,16 @@ landed.
   DPI as a corollary of the measure-theoretic one. The "not yet formally
   linked" caveat is discharged; the two Dobrushin developments provably agree
   where they overlap.
+- **Tier 4 recon (Q0) — the quantum slot, gap confirmed.** Physlib
+  (leanprover-community, ex Lean-QuantumInfo + PhysLean) inventoried:
+  `MState`, `TrDistance` (basic properties only), strong `traceNorm` API,
+  first-class PTP-vs-CPTP distinction, Jordan pos/neg parts via cfc, and
+  a sandwiched-Rényi DPI — but **no trace-distance contractivity and no
+  Dobrushin coefficient**. Same toolchain as this repo (v4.31.0). The
+  mathlib-had-no-DPI situation replays one level up; Q1 (PTP-generality
+  trace-distance DPI) is a confirmed open slot with all ingredients
+  present. Plan Q0–Q5 recorded in `NOTES-quantum-tier4.md`; drift guard
+  extended to transport-kernel notes.
 
 ## Consolidation
 

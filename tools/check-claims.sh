@@ -28,5 +28,14 @@ for f in transport-calculus/NOTES-*.md transport-calculus/PROBLEM-*.md; do
   fi
 done
 
+# 4. Same for transport-kernel notes.
+for f in transport-kernel/NOTES-*.md; do
+  [ -e "$f" ] || continue
+  base=$(basename "$f")
+  if ! grep -q "$base" transport-kernel/README.md; then
+    echo "DRIFT: $base not mentioned in transport-kernel/README.md"; fail=1
+  fi
+done
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail
