@@ -17,7 +17,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 3 | Dobrushin / TV instance | cache **+** from-scratch data-processing inequality | **done** (finite state spaces), this repo |
 | 3b | measure-theoretic Dobrushin | from-scratch TV distance + DPI over mathlib's `Measure`/`Kernel` | **done** (arbitrary measurable spaces), this repo |
 | 3c | discretization consistency | Dirac embedding; `tvd`/`tvDist` proved equal; finite DPI re-derived from the measure one | **done**, this repo |
-| 4 | quantum trace-distance DPI + Dobrushin | Physlib (`MState`, `PTPMap`/`CPTPMap`, `traceNorm`, Jordan via cfc) + from-scratch contraction | **done** (Q1+Q2), this repo; Q3 (diagonal consistency) open |
+| 4 | quantum trace-distance DPI + Dobrushin | Physlib (`MState`, `PTPMap`/`CPTPMap`, `traceNorm`, Jordan via cfc) + from-scratch contraction | **done** (Q1–Q3), this repo; Q4 verdict recorded, Q5 PR-ready |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 
@@ -189,9 +189,24 @@ level up. So the contraction is proved here, from scratch, and received:
 
 Axioms: `propext, Classical.choice, Quot.sound` — no `sorry`, checked against the full
 Physlib import cone (the library carries `sorry`s elsewhere; none in this cone).
-Remaining: Q3 (diagonal embedding — classical `Dist` ↪ diagonal density matrices,
-`TrDistance` on diagonals = finite `tvd`, classical DPI as a corollary of the quantum
-one) and Q4 (the quantum-DP two-row check).
+**Q3 (`TransportKernel/QuantumDobrushinConsistency.lean`) — the tower closes.**
+`Dist.toMState` embeds distributions as diagonal states; `trDistance_toMState` proves
+the quantum trace distance restricted to diagonals IS the classical `tvd` (Jordan
+trace-norm lemma + `cfc_diagonal`); `Kernel.toQChannel` embeds stochastic matrices as
+diagonal-output PTP channels; `toMState_push` intertwines; and
+`classical_contraction_via_quantum` re-derives `tvd (K.push μ) (K.push ν) ≤ tvd μ ν`
+from the quantum DPI. With Tier 3c: the finite development embeds consistently into
+both the measure-theoretic and the quantum generalizations, all machine-checked to
+agree. (Scope note: the quantum corollary transports the η = 1 contraction; the
+pairwise-row-η refinement stays classical.) Axiom-clean.
+
+**Q4 (research pass, recorded in `NOTES-quantum-tier4.md`)**: quantum (ε,δ)-DP is the
+hockey-stick condition (Hirche–Rouzé–Stilck França); their sequential composition is a
+product of channel contraction coefficients — exactly this tier's certificate
+accumulation — but no general adaptive composition theorem exists and no tensorizing
+f-DP analogue appears: either a literature gap or a genuine interface boundary;
+deliberately left open. **Q5**: the five DPI-core declarations have zero TransportKernel
+dependencies and are PR-shaped for Physlib upstreaming.
 
 ## Naming note
 

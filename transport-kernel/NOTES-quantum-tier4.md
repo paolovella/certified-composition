@@ -55,17 +55,43 @@ ingredients all present:
   universe restriction on `Bridge`).
 - **Q1** (trace-distance DPI at PTP generality): open slot confirmed; ingredients listed
   above; estimate unchanged (~a week).
-- **Q2** (`Bridge.ofChannel`, `comp_reconstructs_quantum_dobrushin`): lands in `lipGA`;
-  headline — finite kernels, measure-theoretic kernels, and quantum channels in the
-  *same* graded action under the *same* `Bridge.comp`.
-- **Q3** (diagonal embedding; classical DPI as corollary of quantum): fifth
-  agree-where-they-overlap instance; completes the tower finite ↪ measure ∧ finite ↪
-  quantum, all machine-checked to agree.
-- **Q4** (quantum DP two-row check, Hirche–Rouzé–Stilck França): research pass;
-  outcome deliberately not pre-committed.
-- **Q5** (upstream to Physlib): viable — community umbrella, same toolchain; decide
-  after Q1 whether the DPI lives as a Physlib PR with a thin bridge in transport-kernel,
-  or in-repo first.
+- **Q2: DONE** (with Q1; landed in `dobrushinGA`, the finite classical tier's action —
+  even better than the planned `lipGA` for the story).
+- **Q3: DONE** (`QuantumDobrushinConsistency.lean`, axiom-clean): `Dist.toMState`
+  (diagonal embedding), `trDistance_toMState` (trace distance on diagonals = classical
+  `tvd`, via the Jordan trace-norm lemma + `cfc_diagonal`), `Kernel.toQChannel`
+  (classical channel as diagonal-output PTP map), `toMState_push` (intertwining), and
+  `classical_contraction_via_quantum` (`tvd (K.push μ) (K.push ν) ≤ tvd μ ν` as a
+  corollary of the quantum DPI). Honest scope note: the quantum corollary transports the
+  η = 1 *contraction*; the pairwise-row-η coefficient refinement stays with its
+  classical proof (Tier 3) — quantifying `QDobrushinBound` over all states, including
+  non-diagonal ones, would need measurement-contraction machinery the corollary doesn't
+  buy. The tower is complete: finite ↪ measure (Tier 3c) and finite ↪ quantum (this),
+  all machine-checked to agree.
+- **Q4: research pass DONE (verdict at research-pass rigor, not formalized).** Against
+  Hirche–Rouzé–Stilck França (arXiv 2202.10717, IEEE TIT 2023): quantum (ε,δ)-DP *is*
+  the hockey-stick condition `sup_{ρ∼σ} E_{e^ε}(𝒜ρ‖𝒜σ) ≤ δ` — same shape as classical.
+  But the classical two-row dichotomy does **not** simply replay: their parallel
+  composition needs *product-input structure*, their sequential bound (Prop III.4) is a
+  **product of channel contraction coefficients** — literally the Tier-4 Dobrushin
+  certificate accumulation — and **no general adaptive/advanced composition theorem is
+  proven**; no cleanly-tensorizing quantum PLD/f-DP analogue appears. Two readings, both
+  recorded per the plan's no-pre-commitment: (a) the composable invariant exists but
+  hasn't been found — a literature gap, classical-pattern intact; (b) quantum adaptive
+  composition with adversarial entanglement is a **genuine boundary phenomenon** for the
+  interface — a composite whose certificate is not a function of component certificates
+  alone. Deciding between them requires reading their §V (Rényi) composition properties
+  and the 2512.16778 non-linear SDPI line; deliberately left open. Either way the
+  connection is real: their layered composition mechanism IS `comp_reconstructs_quantum_dobrushin`.
+- **Q5: decision — upstream the DPI core to Physlib.** The five declarations
+  `abs_eq_sup_add_sup`, `traceNorm_eq_trace_posPart_add_trace_negPart`,
+  `traceNorm_eq_re_trace_of_posSemidef`, `traceNorm_map_le`, `trDistance_apply_le` have
+  **zero TransportKernel dependencies** — pure Physlib+mathlib — and fill Physlib's
+  stated trace-distance gap. Plan: PR them (likely as
+  `QuantumInfo/States/Mixed/TraceDistance` additions or a new
+  `Channels/TraceDistanceContraction.lean`, module-system headers, PTP-generality
+  statement), keeping the Bridge reception in-repo. Opening the PR is a user-account
+  action; the declarations are PR-shaped as they stand.
 
 Build note for Q1 session-planning: `lake exe cache get` covers the *mathlib*
 dependency only; Physlib's own ~84 QuantumInfo modules compile locally (budget the

@@ -4,3 +4,4 @@ import TransportKernel.DobrushinReceive
 import TransportKernel.DobrushinMeasureReceive
 import TransportKernel.DobrushinConsistency
 import TransportKernel.QuantumDobrushinReceive
+import TransportKernel.QuantumDobrushinConsistency

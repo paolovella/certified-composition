@@ -32,7 +32,7 @@ open scoped ComplexOrder
 variable {d : Type*} [Fintype d] [DecidableEq d]
 
 /-- `|x| = (x ⊔ 0) + (-x ⊔ 0)` — the scalar shadow of the Jordan decomposition. -/
-private lemma abs_eq_sup_add_sup (x : ℝ) : |x| = (x ⊔ 0) + (-x ⊔ 0) := by
+lemma abs_eq_sup_add_sup (x : ℝ) : |x| = (x ⊔ 0) + (-x ⊔ 0) := by
   rcases le_total x 0 with h | h
   · rw [abs_of_nonpos h, sup_eq_right.mpr h, sup_eq_left.mpr (by linarith), zero_add]
   · rw [abs_of_nonneg h, sup_eq_left.mpr h, sup_eq_right.mpr (by linarith), add_zero]
