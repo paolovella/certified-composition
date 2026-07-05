@@ -6,76 +6,118 @@ discipline:
 > **Evidence carries its hypotheses, and composition *accumulates* them —
 > never discharges or coerces silently.**
 
-Each sub-project is a self-contained Lean package. All are `no sorry`; the two
-mathlib-free ones build instantly, the third needs the mathlib olean cache.
+Each sub-project is a self-contained Lean package. All are `no sorry` and
+axiom-audited; the two mathlib-free ones build instantly, the third needs the
+mathlib olean cache (and compiles its Physlib dependency locally).
 
 | dir | what | deps | status |
 |---|---|---|---|
 | [`conf-typing/`](conf-typing) | confidentiality-typing framework (the IMP timing instance + meta-theory) | none (mathlib-free) | closed |
-| [`transport-calculus/`](transport-calculus) | a common interface for transport theorems (certified morphisms) | none (mathlib-free) | core proved |
-| [`transport-kernel/`](transport-kernel) | mathlib instances of that interface | mathlib | 2 received + Dobrushin DPI built (finite) |
+| [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question, shipped to its community |
+| [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` (path) | tiers 1–5 done |
 
 ## The through-line
 
-The same accountancy appears at three levels of abstraction:
+The same accountancy appears at every level:
 
 - **`conf-typing`** — a discharge of a confidentiality obligation carries its
-  evidence: `Discharge.pol` bundles `(φ, proof that the channel releases at most
-  φ)`, *not* bare membership; `confidential_transport` carries **both** strata's
-  guarantees across the conformance gate; the assumption ledger tracks which
-  theorem consumes which admissibility condition. Nothing composes that silently
-  drops a side-condition.
+  evidence: `Discharge.pol` bundles `(φ, proof)`, not bare membership;
+  `confidential_transport` carries both strata across the conformance gate;
+  the assumption ledger tracks which theorem consumes which condition.
 - **`transport-calculus`** — that accountancy made the primitive object. A
   `Bridge` is a map bundled with a certificate; `Bridge.comp` accumulates
-  certificates (a monoid action), and dropping the accumulation makes the
-  composite's proof fail to type-check. Zero axioms, mathlib-free.
-- **`transport-kernel`** — the interface receives objects *someone else built*:
-  mathlib's `LipschitzWith` (scalar certificate) and `HolderWith` (a non-scalar
-  pair certificate with a semidirect-product law). The generic `Bridge.comp`
-  reconstructs each library's own composition lemma.
+  certificates (a monoid action on a distance order), and dropping the
+  accumulation makes the composite's proof fail to type-check. Zero axioms.
+- **`transport-kernel`** — the interface receives objects *someone else
+  built*, and the receptions compose under **one generic law**: mathlib's
+  `LipschitzWith` and `HolderWith`, finite Markov kernels, measure-theoretic
+  kernels, and quantum channels all land in graded actions served by the same
+  `Bridge.comp`. Advanced composition — classical, measure-theoretic, and
+  quantum — is certificate accumulation, as theorems.
 
 ## What each sub-project actually proves
 
 **`conf-typing`** (mathlib-free; core meta-theorems axiom-free):
 - the parametric framework — admissibility (A1–A3), joint generation, bounded
   delimited-release policy, the conformance gate, Boolean soundness;
-- the typed rejection of cross-stratum evidence, proved *J-invariant*
-  (`reject_Jinvariant`, `∀ J`);
-- a corrected §10: among admissible properties, the only nondegenerate
-  **2-safety** one is noninterference (`qualitative_admissible_is_JNI`);
-  separability is the *congruence-refinement* of 2-safety, not equal to it
-  (`Rbad_nonseparable`); the k-safety hierarchy above 2-safety is
-  kernel-determined (`A3_factors_kernel`, `simA3_iff_respectsCoarsening`).
+- the typed rejection of cross-stratum evidence, proved *J-invariant*;
+- the corrected §10: among admissible properties the only nondegenerate
+  2-safety one is noninterference; separability is the congruence-refinement
+  of 2-safety; the k-safety hierarchy above 2 is kernel-determined.
 
 **`transport-calculus`** (mathlib-free; `Bridge.comp` axiom-free):
-- `GradedAction M D` — a grade monoid `M` acting monotonically on a distance
-  order `D`;
-- `Bridge.comp` — the composition law, accumulating certificates by the action.
+- `GradedAction M D` and `Bridge.comp` — the interface and its composition law;
+- the **qualitative frontier**, bracketed by theorems: complete-lattice /
+  image-sup / bounded / directed-finite factorization; the `D3` escapee; the
+  cofinal-ruler and countable-cofinality theorems; the transfinite selection
+  theorem (`prefix_bounded_cofinal_factors`) with `PrefixBounded` as the
+  cardinal-free κ-directedness; the hunt's walls
+  (`sigma_directed_cofinal_factors`, `lists_bounded_factors`, `Fb`);
+- the **reps engine, machine-checked**: over an abstract index with least
+  witnesses, σ-directedness, and countable segments, a coherent sequence with
+  a level-monotone representative system is trivial
+  (`reps_implies_trivial`), paired with the ω-boundary witness showing the
+  regularity hypothesis is load-bearing (`omega_concentration_fails`);
+- the **research line** the frontier opened, in prose at graded rigor:
+  [`NOTES-coherent-escapee.md`](transport-calculus/NOTES-coherent-escapee.md)
+  (thirteen sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
+  order, the no-go for kill templates, forcing-locality, Theorem B —
+  uniformizing dip systems ⟺ trivial — and the reduction of the whole
+  question to one game invariant), and the standalone problem statement for
+  set theorists,
+  [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):
+  **is every strongly dip-schedulable coherent sequence on ω₁ trivial?** —
+  with the level-factored case proved and the toolbox machine-checked.
 
-**`transport-kernel`** (mathlib):
-- `comp_reconstructs_lipschitz`, `comp_reconstructs_holder` — the generic
-  `Bridge.comp` reconstructs `LipschitzWith.comp` and `HolderWith.comp`.
-- `dpi` — the Dobrushin data-processing inequality for finite Markov kernels
-  (TV contraction), proved *from scratch* (mathlib has no DPI), plus
-  `comp_reconstructs_dobrushin` / `coeff_submul` — advanced composition as
-  certificate accumulation. The quantitative instance the interface was built for.
+**`transport-kernel`** (mathlib + Physlib + `transport-calculus`):
+- **Tier 2** — `comp_reconstructs_lipschitz`, `comp_reconstructs_holder`: the
+  generic `Bridge.comp` reconstructs mathlib's own composition lemmas, for a
+  scalar and a non-scalar (semidirect-product) certificate algebra.
+- **Tier 3** — the Dobrushin data-processing inequality for finite Markov
+  kernels, proved from scratch (mathlib has no DPI), with
+  `comp_reconstructs_dobrushin` and `coeff_submul`.
+- **Tier 3b** — the measure-theoretic DPI over arbitrary measurable state
+  spaces (`DobrushinMeasureReceive.lean`: `tvDist`, `tvDist_comp_le`,
+  `comp_reconstructs_dobrushin_measure`), built on mathlib's
+  `Measure`/`Kernel`.
+- **Tier 3c** — discretization consistency: the finite and measure-theoretic
+  developments provably agree (`tvDist_toMeasure`, `dpi_via_measure`).
+- **Tier 4** — the **quantum** DPI against Physlib
+  (`QuantumDobrushinReceive.lean`): trace-distance contraction at
+  positive-trace-preserving generality (`traceNorm_map_le` — complete
+  positivity not assumed), the quantum Dobrushin bound, the reception in the
+  *same* graded action as the finite classical tier
+  (`comp_reconstructs_quantum_dobrushin`), and diagonal consistency
+  (`classical_contraction_via_quantum`): the finite development embeds into
+  both generalizations, all machine-checked to agree. The DPI core is
+  PR-shaped for Physlib upstreaming.
+- **Tier 5** — the reps theorem at **actual ω₁** (`OmegaOneCoherent.lean`):
+  mathlib's `ω₁.ToType` models the abstract index (σ-directedness *is* the
+  regularity of ℵ₁), giving `omega1_reps_implies_trivial` — every coherent
+  sequence on ω₁ with a pointwise level-monotone representative system is
+  trivial — and its contrapositive for nontrivial sequences. To our knowledge
+  the first machine-checked theorem about coherent sequences on ω₁. The
+  mathlib-free engine and its mathlib model are verified separately and
+  compose.
 
 ## Scope — what is *not* claimed
 
-- The transport interface is **not** asserted to be the "correct general notion"
-  of certified transport. It is a small interface that, so far, two independent
-  mathlib theorems instantiate. Whether it deserves a grander status is earned by
-  more instances, not by naming.
-- The **method** behind this — adversarially attacking one's own *statements*
-  (not proofs) and narrowing to a machine-checked theorem — is how the work was
-  produced, not a claim being made. Two case studies by one author is a working
-  style demonstrated twice, not a validated methodology. It travels only if a
-  second hand runs it.
-- **Built, finite case:** the Markov-kernel / Dobrushin (total-variation) instance
-  needed the data-processing inequality, which mathlib lacks; it is now proved from
-  scratch over *finite* state spaces (`transport-kernel/DobrushinReceive.lean`). The
-  remaining brick is the *measure-theoretic* generalization to continuous state
-  spaces — the same coupling argument in integral form.
+- The transport interface is **not** asserted to be the "correct general
+  notion" of certified transport. It is a small interface that five
+  independent instance families now inhabit under one composition law —
+  status earned by instances, revisable by counterexamples.
+- The qualitative frontier's last question — dip-schedulability — is **open**,
+  not settled: the notes record four verdict flips, each forced by a proof or
+  a refutation, and the problem statement grades every arrow ([proved] /
+  [argued] / [open]). The independence suspicion is a suspicion.
+- The quantum-DP row (Q4) is a research-pass verdict with two live readings
+  (literature gap vs. genuine interface boundary), deliberately unresolved.
+- "First machine-checked theorem about coherent sequences on ω₁" is a
+  to-our-knowledge claim after an adversarial literature pass (notes §13),
+  not a certainty.
+- The **method** — adversarially attacking one's own statements and narrowing
+  to machine-checked theorems — is how the work was produced, not a validated
+  methodology. It travels only if a second hand runs it.
 
 ## Building
 
@@ -84,11 +126,15 @@ The same accountancy appears at three levels of abstraction:
 cd conf-typing        && lake build
 cd transport-calculus && lake build
 
-# mathlib — needs the olean cache first (multi-GB)
+# mathlib + Physlib — needs the olean cache; Physlib's modules compile locally
 cd transport-kernel   && lake exe cache get && lake build
 ```
 
-All pinned to Lean `v4.31.0` (see each `lean-toolchain`).
+All pinned to Lean `v4.31.0` (see each `lean-toolchain`); transport-kernel
+pins Physlib to a fixed commit sharing this repo's mathlib revision, so the
+cache is shared.
 
-Per-subdir `README.md` and `CHANGELOG.md` carry the detail; the top-level
-[`CHANGELOG.md`](CHANGELOG.md) traces the arc across all three.
+`tools/check-claims.sh` guards the READMEs against status drift (retired
+claims resurfacing, modules or notes going unmentioned); run it after landing
+anything. Per-subdir `README.md` and `CHANGELOG.md` carry the detail; the
+top-level [`CHANGELOG.md`](CHANGELOG.md) traces the arc across all three.

@@ -4,11 +4,23 @@
 set -u
 fail=0
 
-# 1. Claims retired by transport-kernel tiers 3b/3c must not resurface.
+# 1. Retired claims must not resurface — in ANY readme, including the top-level one
+#    (the top-level README carried "remaining brick" for nine sessions because this
+#    check originally skipped it).
 for phrase in "is the remaining extension" "generalization is the next brick" \
-              "not yet formally linked"; do
-  if grep -qF "$phrase" transport-calculus/README.md transport-kernel/README.md 2>/dev/null; then
+              "remaining brick" "not yet formally linked" \
+              "Dobrushin DPI built (finite)"; do
+  if grep -qF "$phrase" README.md transport-calculus/README.md transport-kernel/README.md 2>/dev/null; then
     echo "DRIFT: retired phrase present: '$phrase'"; fail=1
+  fi
+done
+
+# 1b. The top-level README must mention every tier-bearing module family and note file.
+for name in DobrushinMeasureReceive tvDist_toMeasure QuantumDobrushinReceive \
+            OmegaOneCoherent NOTES-coherent-escapee.md PROBLEM-dip-schedulability.md \
+            reps_implies_trivial; do
+  if ! grep -q "$name" README.md; then
+    echo "DRIFT: top-level README does not mention $name"; fail=1
   fi
 done
 
