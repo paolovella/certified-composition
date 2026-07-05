@@ -270,6 +270,19 @@ landed.
   Axiom-clean (standard three) against the full Physlib cone — none of
   Physlib's 48 sorries are in it. Q3 (diagonal consistency) and Q4
   (quantum-DP two-row check) remain.
+- **Tier 4 complete (Q3–Q5).** Q3: `QuantumDobrushinConsistency.lean` —
+  diagonal embedding `Dist.toMState`, `trDistance_toMState` (quantum
+  trace distance on diagonals = classical `tvd`), `Kernel.toQChannel`,
+  intertwining, and `classical_contraction_via_quantum`; the tower
+  closes — finite ↪ measure and finite ↪ quantum, all machine-checked to
+  agree; axiom-clean. Q4 (research pass): quantum (ε,δ)-DP is the
+  hockey-stick condition; HRSF's sequential composition is a product of
+  contraction coefficients — exactly this tier's certificate
+  accumulation — but no general adaptive composition theorem and no
+  tensorizing f-DP analogue exist: literature gap or genuine interface
+  boundary, deliberately left open. Q5 decision: the five DPI-core
+  declarations (zero TransportKernel dependencies) are PR-shaped for
+  Physlib upstreaming; the Bridge reception stays in-repo.
 
 ## Consolidation
 
