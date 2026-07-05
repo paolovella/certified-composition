@@ -18,6 +18,7 @@ Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
 | 3b | measure-theoretic Dobrushin | from-scratch TV distance + DPI over mathlib's `Measure`/`Kernel` | **done** (arbitrary measurable spaces), this repo |
 | 3c | discretization consistency | Dirac embedding; `tvd`/`tvDist` proved equal; finite DPI re-derived from the measure one | **done**, this repo |
 | 4 | quantum trace-distance DPI + Dobrushin | Physlib (`MState`, `PTPMap`/`CPTPMap`, `traceNorm`, Jordan via cfc) + from-scratch contraction | **done** (Q1–Q3), this repo; Q4 verdict recorded, Q5 PR-ready |
+| 5 | the reps theorem at actual ω₁ | mathlib ordinals (`ToType`, regularity of ℵ₁) + `TransportCalculus` as a path dependency | **done** (`OmegaOneCoherent.lean`) |
 
 ## Tier 2 — the result (`TransportKernel/LipschitzReceive.lean`)
 
@@ -207,6 +208,34 @@ accumulation — but no general adaptive composition theorem exists and no tenso
 f-DP analogue appears: either a literature gap or a genuine interface boundary;
 deliberately left open. **Q5**: the five DPI-core declarations have zero TransportKernel
 dependencies and are PR-shaped for Physlib upstreaming.
+
+## Tier 5 — the reps theorem at actual ω₁ (`TransportKernel/OmegaOneCoherent.lean`)
+
+The mathlib-free `transport-calculus` proves the set-theoretic hunt's four-step engine
+over an abstract index (`reps_implies_trivial`); its intended model, ω₁, is not
+constructible there. This file builds the model from mathlib and instantiates:
+
+- **`OmegaOne := ω₁.ToType`** — the countable ordinals as a `Type 0` well order, with
+  the `ToType.mk : Iio ω₁ ≃o ω₁.ToType` transfer API.
+- **`wellIndexOmegaOne`** — least witnesses from well-foundedness;
+  **`sigmaDirected_omegaOne`** — σ-directedness IS the regularity of ℵ₁
+  (`Ordinal.iSup_lt_of_lt_cof` + `isRegular_aleph_one`); **`countableSegments_omegaOne`**
+  — segments are countable via `#o.ToType = o.card` below ℵ₁;
+  **`unbounded_omegaOne`** — countability is closed under successors.
+- **`finiteP_iff_finite`** — the abstract list-coverage finiteness is `Set.Finite`, so
+  the abstract coherence is the standard mod-finite notion.
+- **`omega1_reps_implies_trivial`** — *every coherent sequence on ω₁ admitting a
+  pointwise level-monotone system of representatives is trivial* — and its
+  contrapositive **`nontrivial_coherent_no_reps`**: a nontrivial coherent sequence
+  (e.g. Todorcevic's walk families, witnessing `H¹(ω₁; ℤ) ≠ 0`) admits no monotone
+  representative system. To our knowledge the first machine-checked theorem about
+  coherent sequences on ω₁. Axioms: `propext, Classical.choice, Quot.sound`; no `sorry`.
+
+The dependency structure is the point: the four-step *combinatorial engine* is verified
+in a mathlib-free package (`TransportCalculus`, required by path), and mathlib
+contributes exactly the three index facts the abstract hypotheses isolate — regularity,
+countable segments, no top. The proof of the engine and the construction of its model
+are machine-checked *separately* and compose.
 
 ## Naming note
 

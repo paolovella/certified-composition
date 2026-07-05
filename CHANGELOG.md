@@ -283,6 +283,20 @@ landed.
   boundary, deliberately left open. Q5 decision: the five DPI-core
   declarations (zero TransportKernel dependencies) are PR-shaped for
   Physlib upstreaming; the Bridge reception stays in-repo.
+- **Tier 5 — the reps theorem at actual ω₁ (`OmegaOneCoherent.lean`).**
+  `TransportCalculus` added as a lake path dependency; `OmegaOne :=
+  ω₁.ToType` (Type 0) models the abstract index: least witnesses from
+  well-foundedness, σ-directedness from the regularity of ℵ₁
+  (`Ordinal.iSup_lt_of_lt_cof`), countable segments from `#o.ToType =
+  o.card` below ℵ₁, no top from countability under successors.
+  `finiteP_iff_finite` bridges list-coverage finiteness to `Set.Finite`,
+  so the statement reads in standard vocabulary:
+  `omega1_reps_implies_trivial` — every coherent sequence on ω₁ with a
+  pointwise level-monotone representative system is trivial;
+  contrapositive `nontrivial_coherent_no_reps`. To our knowledge the
+  first machine-checked theorem about coherent sequences on ω₁. The
+  mathlib-free engine and its mathlib model are verified separately and
+  compose. Axiom-clean.
 
 ## Consolidation
 

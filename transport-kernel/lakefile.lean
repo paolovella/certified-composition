@@ -7,5 +7,7 @@ require mathlib from git "https://github.com/leanprover-community/mathlib4.git" 
 
 require Physlib from git "https://github.com/leanprover-community/physlib.git" @ "2e21835a8fd5304fbf62f4d68ae4385272292e00"
 
+require TransportCalculus from "../transport-calculus"
+
 @[default_target]
 lean_lib «TransportKernel»
