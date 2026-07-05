@@ -171,6 +171,10 @@ of ω₁ the proof uses (least witnesses, σ-directedness, countable segments), 
 rendered as "covered by a list". The boundary is also machine-checked:
 `omega_concentration_fails` shows step (2) fails at index ℕ, which lacks σ-directedness
 (`nat_not_sigma_directed`) — the regularity hypothesis is load-bearing.
+*Update:* the theorem is now also instantiated at **actual ω₁** — mathlib's `ω₁.ToType`
+models the abstract index (regularity of ℵ₁ supplies σ-directedness), giving
+`omega1_reps_implies_trivial` in `transport-kernel/TransportKernel/OmegaOneCoherent.lean`:
+to our knowledge the first machine-checked theorem about coherent sequences on ω₁.
 
 **Lemma D (chain-freeness of the fiber order).** *(This is the pointwise-≤ sibling of
 a classical fact: for the coherent tree `T(e)` — Todorcevic, "Lipschitz maps on trees";
