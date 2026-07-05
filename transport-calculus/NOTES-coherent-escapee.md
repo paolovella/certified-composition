@@ -579,3 +579,52 @@ not a blocker for drafting.
 > through genuinely element-dependent corrections is open, and sits at the
 > ladder-uniformization/◊-vs-MA boundary. Problem statement with proofs, rigor grading,
 > and the Lean artifacts: [link].
+
+## 14. Attacking Question 1: the deviation-transfer lemma, and the gap-core reduction
+
+Question 1's open content after Q1′ was element-dependent schedules. The elements of the
+fiber order are exactly pairs (level, finite patch), so an element-dependent schedule is
+a *patch-dependent* level assignment — and the patch turns out to carry real power.
+
+**Lemma F (deviation-transfer / below-region absorption) [proved].** For any monotone
+pressure `μ ≥ ℓ`, take `γ := μ` and
+`X(x) := devSet(x) ∪ dev(e_{ℓ(x)}, e_{γ(x)})` — the element's own deviation set
+`{ξ < ℓx : s_x(ξ) ≠ e_{ℓx}(ξ)}` plus one pair-defect, both finite. Then for every `u`
+and every `x ⊑ u`:
+`(D⁺(γ(x), γ(u)) ∩ [0, ℓ(x))) \ X(x) ⊆ devSet(u) ∪ dev(e_{ℓ(u)}, e_{γ(u)})` —
+one finite set depending only on `u`.
+*Proof.* At `ξ < ℓ(x)` off `X(x)`: `e_{γ(x)}(ξ) = e_{ℓ(x)}(ξ) = s_x(ξ) ≤ s_u(ξ)` — the
+equalities by the dips, the inequality by `x ⊑ u`. Off `u`'s finite set,
+`s_u(ξ) = e_{ℓ(u)}(ξ) = e_{γ(u)}(ξ)`, contradicting the inversion. ∎
+The order relation transfers *function* inequalities that floors alone do not carry:
+this is the first place the fiber order's per-element structure does work that no
+level-indexed object can.
+
+**Corollaries [proved].** (i) The identity pressure `μ = ℓ` is schedulable over *every*
+coherent sequence (gap regions empty; the value-form holds since the surviving values
+are `s_x(ξ) ≤ s_u(ξ)`). (ii) Every *finite-raising* pressure (`μ(x) < ℓ(x) + ω`) is
+schedulable over every coherent sequence: the gap `[ℓ(x), γ(x))` is finite and the dips
+absorb it outright.
+
+**The gap-core reduction [proved].** Combining Lemma F's dips with any putative
+gap-dips, Question 1 is equivalent to its restriction to **gap regions under
+limit-raising pressure**: does some (equivalently every) nontrivial `e` defeat all
+schedules on the leftovers
+`⋃_{x ⊑ u} (D⁺(γ(x), γ(u)) ∩ [ℓ(x), γ(x)) \ X(x))` — coordinates *above* the element's
+own level, where no function protects and only the floors speak? Everything below the
+element's level is now provably absorbable; the §7/§8 residue was always exactly this.
+
+**A negative finding, recorded as evidence.** The natural ladder-based schedule for the
+◊-sequence (dip each ladder point against its successor along the gluing ladder)
+collapses into Theorem B: a ladder point sits on the ladders of many limits, its finite
+dip set must serve every continuation, and serving all continuations uniformly is a
+uniformizing dip system — triviality. So gap-region schedules, if they exist over
+nontrivial sequences, cannot be ladder-factored, just as they cannot be level-factored:
+each successive factorization structure collapses to Theorem B. The open question now
+lives entirely in whether *patch-dependence* (the one resource with a proved win, Lemma
+F) can reach into gap regions — where, by definition, the element's patch is silent.
+The two live readings sharpen accordingly: (a) patches are silent on gaps, so gap-cores
+behave like level-indexed objects, Theorem B's engine eventually applies, and Q1 is
+TRUE; (b) the schedule can *choose* γ to park gap floors past kills (§8 overshoot) with
+patch-guided targeting, and some nontrivial sequence is schedulable, making Q1 FALSE.
+Neither is closed; but the battlefield has shrunk to the gaps.

@@ -106,11 +106,26 @@ the implication "trivialization ⟹ schedule" is secretly an equivalence — i.e
 the fiber order's per-element freedom (infinitely many elements per level) adds any
 uniformization power at all over the level-indexed case.
 
+**Lemma F (deviation-transfer) [proved].** For any pressure map, the schedule
+`γ := μ`, `X(x) := {ξ : s_x(ξ) ≠ e_{ℓ(x)}(ξ)} ∪ dev(e_{ℓ(x)}, e_{γ(x)})` absorbs every
+leftover coordinate *below the element's own level* into one finite `u`-set: at such
+`ξ` off the dips, `e_{γ(x)}(ξ) = s_x(ξ) ≤ s_u(ξ) = e_{γ(u)}(ξ)` — the order relation
+transfers function inequalities that floors do not carry. Consequently **the identity
+pressure and every finite-raising pressure (`μ(x) < ℓ(x) + ω`) are schedulable over
+every coherent sequence** [proved], and Question 1 reduces to the **gap-core**: only
+leftovers at coordinates in `[ℓ(x), γ(x))` — above the element's level, under
+limit-raising pressure — remain contested. Per-element freedom provably wins below the
+element's level and is, by definition, patch-silent above it.
+
 ## 3. The questions
 
 **Question 1 (main).** Is every strongly dip-schedulable coherent sequence trivial?
-*(The level-factored case is proved — Corollary to Theorem B above. What is open is
-whether a genuinely element-dependent schedule can exist over a nontrivial sequence.)*
+*(The level-factored case is proved — Corollary to Theorem B above — and by Lemma F the
+question is equivalent to its gap-core: schedules win below each element's own level and
+on all finite-raising pressures, over every coherent sequence; what is open is exactly
+whether the gap regions `[ℓ(x), γ(x))` under limit-raising pressure can be scheduled
+over a nontrivial sequence. Ladder-factored gap schedules collapse to Theorem B, like
+level-factored ones.)*
 
 **Question 2 (realizability / the fractal gap).** Does weak dip-schedulability imply
 strong dip-schedulability? (The subtlety: realizing a given pressure map by a legal
