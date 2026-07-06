@@ -154,14 +154,17 @@ interval to receive infinitely many marks; the glue makes each floor see only fi
 many; perfect cross-floor coherence of visibility trivializes. If the ◊-recursion can
 thread between, the `Φ ⟹ schedule` arrow — now proved with leftover inside the single
 set `X(u)` — delivers a legal system with no monotone dominator under ◊.)*
-*(§17's claimed resolution ("Theorem D") had a flawed step — see notes §18 for the
-correction. What stands: **Lemma G** — Fodor forces a heavy interval, used by
-stationarily many killers; **Lemma H** — capping interval-usage forces the killing set
-non-stationary; and the correct reduction: mark-visibility, hence weak realizability of
-the lethal pressure over a Theorem-C sequence, is equivalent to a **survivor
-selection** — each killer's witness-family meeting the heavy class finitely. Whether
-survivor selection is achievable is open; the escapee-via-Theorem-C route is reduced to
-it, not closed by it.)*
+*(Resolved — after one retraction and a restoration; notes §17–§19. **Theorem D**:
+over a Theorem-C sequence, the lethal pressure is not weakly realizable, so the
+escapee-via-Theorem-C route is closed and the schedule game is strictly stronger than
+`Φ` under ◊. The correct proof runs through the **global shown-pattern**: binary floors
+are pairwise `=*`-equal, so all floors share one mod-finite pattern of visible marks;
+coherence makes each killer's hidden marks finite (rows), legality makes each block's
+shown marks finite (columns), and a pressing diagonal — constant row-count `m` on a
+stationary set, then `m+2` iterated Fodor pressings — traps a stationary set inside a
+finite union of columns. Per-slice arguments provably cannot see this: countable
+survivor selection is always feasible via an injective rank, which is exactly what
+fails at ω₁.)*
 
 **Question 3 (specific sequences).**
 (a) Let `e` be built by the block-diagonal ◊-recursion (at stationarily many limits `δ`,

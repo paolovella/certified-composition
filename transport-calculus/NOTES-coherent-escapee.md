@@ -845,3 +845,61 @@ finitely** (concede exactly at heavy intervals; light intervals need no concessi
 
 Found by re-auditing before building on §17; the referee that caught it was the
 attempt to use it.
+
+## 19. Theorem D restored with a correct proof: the global shown-pattern (eighth and ninth flips)
+
+§18's correction was right that §17's proof was flawed — and wrong to leave feasibility
+open. Both are now settled by identifying the load-bearing object §17 and §18 each
+missed.
+
+**Why no per-slice argument could work (the countable trick).** Within one slice the
+survivor-selection demands are countable, and countable survivor selection is *always*
+feasible: take any injective rank `n : blocks → ω`; let the survivors at `b` be the
+users of rank `≤ n_b`. Each killer concedes only at the finitely many blocks ranked
+below its own index. So legality can never be refuted slice-locally — which is exactly
+why §17's attempts kept slipping between quantifiers.
+
+**The global pattern is forced.** The floors of a §15-sequence are pairwise `=*`-equal
+functions with binary values, and its only zeros are marks. Hence **any two floors'
+shown-mark-sets differ globally finitely**, and there is a single canonical mod-finite
+pattern `shown*` — a property of the sequence, not a per-slice choice. The injective
+rank needed to satisfy it cheaply would have to embed ω₁-many blocks into ω: the
+countable trick dies exactly at the global level.
+
+**Theorem D (restored) [careful-prose rigor].** Over any §15-type killed sequence, no
+legal constraint system realizes the lethal pressure. *Proof.*
+(1) *Global pattern*: fix any reference floor `Γ*` above the relevant region;
+`shown* := ` its shown marks; any other floor's pattern differs globally finitely.
+(2) *Rows finite (coherence)*: `e_{Γ*} =* e_κ` and `e_κ` is `0` at all of `marks(κ)`,
+so each killer hides only finitely many of its own marks: `g(κ) := |hidden(κ)| < ω`.
+(3) *Columns finite (legality)*: a slice covering block `b` is bounded only if every
+image at the block dips `shown* ∩ I_b`; image dips are finite and fiber elements cannot
+be `0` at infinitely many later marks — so `S_b := ` users whose `b`-mark is shown is
+finite, for every `b`.
+(4) *Pressing diagonal*: `g` is constant `= m` on a stationary `K′` (countable
+partition of a stationary set). Iterate Fodor on the first `m+2` witness-elements of
+the families over `K′`: pressed blocks `b₀, …, b_{m+1}` and a stationary core
+`K′_{m+1}` all of whose members use every `b_j`. Each core killer hides at most `m` of
+its `m+2` pressed marks, hence **shows at least one**, hence lies in
+`⋃_{j≤m+1} S_{b_j}` — a finite set. A stationary set inside a finite set is absurd. ∎
+
+**Standing consequences (now on a correct footing).**
+1. The escapee-via-Theorem-C route is **closed**: under ◊ the killed sequence defeats
+   every schedule for the lethal pressure, and no legal system can exert that pressure.
+2. **Theorem C separates the game from Φ**: the schedule game's free pressure is
+   strictly stronger than what legality permits. The §9 no-go's spirit holds at the
+   Φ-level with the incidence matrix as its mechanism; its §15 scope-correction (the
+   game was never covered) also stands.
+3. Question 2 over §15-sequences: **weak realizability of the lethal pressure fails** —
+   the fractal regress has a floor, and the necessary condition of §17(3) (incidence-
+   tameness ∧ kill-compatibility) is confirmed as the constraint on any future escapee
+   attempt: by this theorem, over binary staggered-kill sequences, nothing satisfies
+   both.
+4. Lemmas G and H (§18) remain true and are subsumed: heaviness exists (columns
+   somewhere infinite pre-selection) and cannot be capped away — but the real wall is
+   the global pattern, not heaviness per se.
+
+**Trail note.** Flip seven retracted §17's proof; flips eight and nine are its
+restoration: the countable-feasibility discovery (which showed *why* the old proof
+couldn't work) and the global-pattern observation (which made a correct one). The
+statement of Theorem D was right the first time; its proof is only now sound.
