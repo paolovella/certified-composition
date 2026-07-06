@@ -742,3 +742,61 @@ condition and a proved failure mode on either flank. Neither the §9 no-go nor t
 anti-kill governs it (both scope-corrected in §15); the historically-fatal checks are
 inline. This is the closest the transport line's original residual has come to being
 consistently inhabited.
+
+## 17. The incidence wall: mark-visibility is impossible — the escapee route closes (sixth flip)
+
+§16's hope is refuted. The mark-visibility design question resolves **negatively**, by a
+counting argument that survived every design tried against it.
+
+**Design attempts, recorded compactly (each died by Fodor).** (a) *Milestone
+confinement* (≤1 kill per gap of a dynamic club): every interval would carry ≤1 mark
+ever — but pressing-down on gap-predecessors shows the kill-set is then non-stationary
+(kills at milestone-limits have empty local zones), so some dominator escapes guessing.
+(b) *Block-disjoint in-gap reuse, clean spines, gateway routing*: either the strays are
+canonically suppressed everywhere — which erases entire mark-sets and breaks coherence
+with the killing stages (the over-cleaning death, three separate guises) — or the
+routing choices reintroduce stationary reuse. (c) *Canonical sacrifice / last-mark
+policies*: consistent per pair, but the global assignment is a row-finite reuse system,
+killed below.
+
+**Theorem D (the incidence wall) [careful-prose rigor].** Over any §15-type killed
+sequence, the lethal pressure (any `μ ≥ λ∘ℓ` on the witnesses) is **not weakly
+realizable**: no legal constraint system exerts it. *Argument.* View
+killers × intervals as an incidence matrix. (i) **Columns are Fodor-infinite**: the
+first witness-block-starts of a stationary killing family are regressive, so some
+interval `I*` is used by stationarily many killers. (ii) **Rows are coherence-finite**:
+every floor above a killer shows all but finitely many of its marks (pairwise coherence
+with an infinite mark-set), so any visibility policy hides only finitely many marks per
+killer. (iii) Img-legality requires **per-interval finite visibility**: image dips are
+finite per block, and a fiber element at level `λ(b)` cannot be `0` at infinitely many
+marks placed by later stages (they deviate infinitely from its floor). So almost all of
+`I*`'s users must permanently sacrifice their `I*`-mark — a sacrifice assignment whose
+rows (sacrifices per killer) are finite. (iv) But a **row-finite reuse system is itself
+Fodor-impossible**: the families' first elements are regressive, so some single point
+lies in uncountably many families, and its owners' rows blow up. Columns force infinite
+sacrifice; rows forbid it. ∎
+
+**Consequences.**
+1. **The Theorem-C route to the transport escapee is closed.** Under ◊ the killed
+   sequence defeats every *schedule* for the lethal pressure — but no *legal system*
+   can exert that pressure, so no dominator-free legal system arises this way. The
+   legality wall protects Φ exactly at the pressure the kill needs.
+2. **Theorem C separates the game from Φ.** The schedule game's adversary (free choice
+   of pressure) is strictly stronger than legal systems: game-unwinnable coherent
+   sequences exist under ◊, while the corresponding Φ-statement remains open — and now
+   looks harder. The §9 no-go's *spirit* is re-established at the Φ-level (its letter
+   was game-scoped; §15 corrected that), with the incidence matrix as the quantitative
+   mechanism.
+3. **A necessary condition on any future escapee construction**: its forcing pressure
+   must be *incidence-tame* (legal: bounded columns after sacrifice, finite rows) and
+   *kill-compatible* (the ◊-guess must still find undippable inversions) simultaneously.
+   The two demands pull against each other through the same matrix; whether any
+   construction threads them is the sharpened residual question.
+4. **Question 2's answer over §15-sequences is NO** for the lethal pressure: weak
+   realizability fails. Weak and strong schedulability can only differ on pressures a
+   legal system can actually exert — the fractal regress now has a floor.
+
+**Honest trail.** §16 conjectured mark-visibility might be achievable and flagged it as
+the decisive check; this section refutes it. Sixth verdict flip of the program, and like
+the others it was forced by an argument, not a mood: the columns are Fodor's, the rows
+are coherence's, and nothing fits between them.

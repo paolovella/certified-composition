@@ -154,6 +154,14 @@ interval to receive infinitely many marks; the glue makes each floor see only fi
 many; perfect cross-floor coherence of visibility trivializes. If the ◊-recursion can
 thread between, the `Φ ⟹ schedule` arrow — now proved with leftover inside the single
 set `X(u)` — delivers a legal system with no monotone dominator under ◊.)*
+*(Resolved, notes §17 — **Theorem D, the incidence wall**: mark-visibility is
+impossible. Killers × intervals form an incidence matrix whose columns Fodor makes
+infinite somewhere and whose rows coherence keeps finite; per-interval finite visibility
+would need a row-finite sacrifice assignment, which is itself Fodor-impossible. So the
+lethal pressure is not weakly realizable over any Theorem-C sequence: the game is
+strictly stronger than Φ, the escapee-via-Theorem-C route is closed, and any future
+escapee construction must thread incidence-tameness and kill-compatibility through the
+same matrix.)*
 
 **Question 3 (specific sequences).**
 (a) Let `e` be built by the block-diagonal ◊-recursion (at stationarily many limits `δ`,
