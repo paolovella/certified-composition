@@ -957,3 +957,45 @@ The incidence machinery of §19 is the natural tool: its global shown-pattern ar
 used binaryness and the kill's witness structure, and the open work is whether a
 general coherent sequence's defect structure (`D⁺`-patterns replacing marks) supports
 the same rows/columns dichotomy against wild legal systems.
+
+## 21. The wildness cap, first assault: block-wild systems never escape; the residual is floor-selection
+
+**Theorem F (block-wild cap) [proved].** Call a system *block-wild* if its imgs sit at
+levels `λ(ℓ(val))` over their vals (the minimal limit-raising shape). For such systems:
+(i) legality is equivalent to **block-diagonal domination** (BD): the function
+`Δ_Σ(ξ) := sup{img-values at ξ from ξ's own block}` satisfies: for every `B` some floor
+dominates `Δ_Σ↾B` mod finite. (ii) BD *also* schedules the induced pressure: with
+`γ := λ∘ℓ`-closure, the gap-leftover at any top `u` is contained in `Δ_Σ↾`'s finite
+excess over the bounding floor — no dips needed. Hence by Theorem E every legal
+block-wild system has a monotone dominator, over every coherent sequence, in ZFC. ∎
+
+Together with Corollary 2 of §20 (tame systems), the escapee hunt is pushed out of the
+two most natural system classes. Two structural remarks:
+
+- **Kills destroy BD** — the block-diagonal picks up pre-kill values (`λ⁺(ξ)` sits far
+  below any kill stage marking `ξ`) while post-kill floors show `0` — which is exactly
+  *why* Theorem D's wild system was illegal over the killed sequence. Theorems C, D,
+  and F are three views of one mechanism.
+- The same computation shows: over a sequence *with* BD for its own block-diagonal
+  `Δ(ξ) = e_{λ⁺(ξ)}(ξ)`, the canonical block-wild system is legal and exerts genuinely
+  limit-raising pressure — legally realizable wildness exists wherever BD holds. It
+  just never escapes.
+
+**The residual, sharpened (floor-selection).** For general wild systems, legality
+bounds the *img-value* diagonal `Δ_Σ`; schedulability of the induced pressure needs a
+*floor* diagonal dominated: some monotone level-selection `γ ≥ μ` for which
+`Δ_γ(ξ) := sup{e_{γ(x)}(ξ) : ℓ(x) ≤ ξ < γ(x)}` is locally dominated mod the dips. The
+obstruction: least-absorption floors can stick out pointwise above the img-profile on
+gap regions (`E(x) ≤* e_{Λ(x)}` pins the floor only in the level order, not pointwise).
+So:
+
+> **Question 5′ (floor-selection form).** If every `Δ_Σ`-diagonal of a legal system is
+> locally dominated, must *some* level-selection `γ ≥ μ` have locally-dominated floor
+> diagonal? A ZFC yes settles Φ(e) for all coherent sequences (no escapee in the
+> class); a consistent no — floors sticking out robustly under overshooting, against
+> every selection — is the last doorway to an escapee.
+
+The selection problem has the reps flavor one level up: choosing levels whose floors
+behave pointwise. The reps theorem itself warns that canonical selections fail over
+nontrivial sequences; but the selection here is level-valued, not element-valued, and
+overshooting is allowed — neither the reps engine nor its refutation applies as-is.
