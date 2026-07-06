@@ -691,3 +691,54 @@ the schedule condition fails at `u*`. ∎
    line's original residual is **consistently inhabited**. Realizing `λ∘ℓ` requires
    img-families whose gap-region floor-sups are slice-bounded — itself gap-core-shaped.
    This is the decisive next check.
+
+## 16. Realizability of the lethal pressure: mark-visibility, and one proved arrow
+
+Theorem C leaves the transport escapee one gap: realizing `λ∘ℓ` by a legal system over
+the killed sequence. Working it produced a proved upgrade and a sharp reduction.
+
+**Dominator ⟹ schedule [proved — the `Φ ⟹ weak-schedulable` arrow upgrades].** Given a
+dominator `φ` of a legal system, set `γ(x) := ℓ(φ(x))` and `X(x) := dev(W_x, e_{γ(x)})`
+(the value's finite deviation from its floor). Monotonicity of `φ` gives, at any
+gap-or-below leftover point `ξ ∉ X(x)`:
+`e_{γ(x)}(ξ) = W_x(ξ) ≤ W_u(ξ)`, which equals `e_{γ(u)}(ξ)` off `X(u)` — so the entire
+leftover at `u` lands inside the single finite set `X(u)`, and the value-form holds via
+`W_u`'s pointwise values. Consequently: **a legal system realizing a pressure `μ` with
+`μ ≥ λ∘ℓ` on the §15 witnesses, over the killed sequence, yields a dominator-free legal
+system under ◊** — the transport escapee — because any dominator would induce a schedule
+that the staggered kill has already defeated.
+
+**The realizability reduction.** The natural realizer (min-probes raised to `λ(ℓ(x))`,
+gaps filled by the local floor) has slice-sups equal to the **block-diagonal**
+`Δ(ξ) = e_{λ⁺(ξ)}(ξ)` — over the killed sequence `Δ = 1` at every kill-mark, while every
+sufficiently high floor shows `0` there: slices unbounded, the system illegal — *unless
+the images dip the marks in their gap-blocks*. Image dips are finite per block; so:
+
+> **Legality of the lethal pressure ⟺ canonical mark-visibility**: does the §15
+> construction admit ladders such that for every canonical interval `I`, all
+> sufficiently high floors see the *same* finite set of marks in `I`, mod a single
+> finite set per `I`? If yes, the images dip exactly those sets, the system is legal,
+> and **the transport escapee exists under ◊**.
+
+**Structural facts framing the sub-question.**
+- *Fodor forbids point-finite ladder systems*: the first ladder points of a ladder
+  system are constant on a stationary set, so some interval receives marks from
+  stationarily many stages — infinite total marks per interval are unavoidable.
+- *But the glue erases*: the interval-finiteness invariant (§15) means any *fixed* floor
+  sees only finitely many marks per interval — each floor's ancestry chain through an
+  interval is finite and forgets the rest. Visibility is finite per floor; the question
+  is only whether it is *coherent across floors*.
+- *Over-canonicalization fails instructively*: gluing by the canonical block tiling
+  (every floor copies `e_{λ(b)}` on `[b, λ(b))`) makes visibility perfectly coherent —
+  and erases every kill instantly, breaking coherence with the killing stages
+  (their own cofinal mark-sets would differ infinitely from all later floors). Perfect
+  visibility-coherence trivializes; the kill needs visibility-incoherence somewhere.
+  The triviality/nontriviality tension reproduces itself one level down, now about
+  *which marks survive*, not which values.
+
+**Status.** The escapee under ◊ now rests on exactly the mark-visibility sub-question —
+a concrete design problem about ladder routing in the §15 recursion, with a proved win
+condition and a proved failure mode on either flank. Neither the §9 no-go nor the §10
+anti-kill governs it (both scope-corrected in §15); the historically-fatal checks are
+inline. This is the closest the transport line's original residual has come to being
+consistently inhabited.

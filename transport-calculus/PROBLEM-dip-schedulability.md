@@ -59,12 +59,14 @@ the union is over genuinely branching, overlapping countable directed families.
 ## 2. The implication diagram
 
 ```
-trivial  ⟹[proved]  strongly schedulable  ⟹[proved†]  Φ(e)  ⟹[argued]  weakly schedulable
+trivial  ⟹[proved]  strongly schedulable  ⟹[proved†]  Φ(e)  ⟹[proved‡]  weakly schedulable
    ↑                                                    |
    └────────────────── ??? (Question 1) ────────────────┘
 ```
 
-(† at careful-prose rigor, notes §12(c), for the value-form definition above.)
+(† at careful-prose rigor, notes §12(c), for the value-form definition above;
+‡ notes §16 — a dominator induces a schedule whose leftover lies inside the single
+finite set `X(u)`.)
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are
@@ -145,6 +147,13 @@ strong dip-schedulability? (The subtlety: realizing a given pressure map by a le
 constraint family requires the constraint elements `w_p` — fiber elements at levels
 `λ_p` — to be *jointly bounded* on every down-set, and arranging their finite deviations
 is itself a schedulability-type problem. The reduction reproduces itself one level down.)
+*(Sharpened, notes §16: over the Theorem-C sequence, realizing the lethal pressure
+`λ∘ℓ` is equivalent to **canonical mark-visibility** — all high floors seeing the same
+finite mark-set per canonical interval, mod one fixed finite set. Fodor forces some
+interval to receive infinitely many marks; the glue makes each floor see only finitely
+many; perfect cross-floor coherence of visibility trivializes. If the ◊-recursion can
+thread between, the `Φ ⟹ schedule` arrow — now proved with leftover inside the single
+set `X(u)` — delivers a legal system with no monotone dominator under ◊.)*
 
 **Question 3 (specific sequences).**
 (a) Let `e` be built by the block-diagonal ◊-recursion (at stationarily many limits `δ`,
