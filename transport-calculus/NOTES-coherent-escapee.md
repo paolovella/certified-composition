@@ -800,3 +800,48 @@ sacrifice; rows forbid it. ∎
 the decisive check; this section refutes it. Sixth verdict flip of the program, and like
 the others it was forced by an argument, not a mood: the columns are Fodor's, the rows
 are coherence's, and nothing fits between them.
+
+## 18. CORRECTION to §17: Theorem D's step (iv) is flawed — the wall is a reduction, not a closure (seventh flip)
+
+Re-auditing §17 before building on it exposed an error. **Step (iv) conflated two row
+notions**: the *reuse rows* of a family system (how often κ's family is reused by later
+killers) and the *sacrifice rows* of a visibility policy (how many marks κ concedes).
+Fodor's pressing-down on n-th witness-elements produces a descending chain of stationary
+classes `S₀ ⊇ S₁ ⊇ ⋯`; a killer in `S_n \ S_{n+1}` concedes only ~n marks — finite
+rows, no contradiction — unless some killer lies in `⋂_n S_n`, which is not forced
+(stationarity is not σ-closed). So the claimed impossibility does not follow, and with
+it fall §17's consequences 1, 2, and 4 as stated. What survives, and what replaces the
+"theorem":
+
+**Lemma G (columns rigidity) [proved].** For any stationary killing family with thin
+cofinal witness-families, some interval is **heavy** (used by stationarily many
+killers): press down on first witness-block-starts. Heaviness cannot be designed away.
+
+**Lemma H (caps rigidity) [proved].** Enforcing any uniform per-interval usage cap
+forces the killing set to be non-stationary — the same pressing-down violates any cap
+on the constant interval. (Likewise the §17 milestone-confinement death stands.)
+
+**The correct reduction [proved].** Per-interval-finite visibility with
+per-killer-finite hiding is exactly a **survivor selection**: finitely many surviving
+marks per interval, each killer surviving in all but finitely many of its own
+intervals. Feasibility ⟺ **each killer's witness-family meets the heavy class
+finitely** (concede exactly at heavy intervals; light intervals need no concessions).
+
+**Status after the correction.**
+1. The escapee-via-Theorem-C route is **not closed** — it is *reduced* to the
+   survivor-selection design question: can the ◊-recursion choose witness-families so
+   that heaviness (which Lemma G forces to exist and Lemma H forbids capping)
+   concentrates on few-per-killer? The heaviness pattern is dynamic and
+   self-referential; freshness-availability at limits of kills is the recurring
+   unresolved mechanism.
+2. "The game is strictly stronger than Φ" is **retracted to conditional**: it holds iff
+   survivor selection is infeasible. Theorem C (game-unwinnable sequences under ◊)
+   stands — it never depended on §17.
+3. Question 2 over killed sequences **re-opens**: weak realizability of the lethal
+   pressure ⟺ survivor selection.
+4. The incidence *framework* stands and is the right ledger: columns are Fodor's, rows
+   are coherence's, and both rigidity lemmas are real constraints on any future
+   construction — but the space between them is open, not empty.
+
+Found by re-auditing before building on §17; the referee that caught it was the
+attempt to use it.
