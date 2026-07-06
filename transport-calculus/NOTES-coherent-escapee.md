@@ -903,3 +903,57 @@ its `m+2` pressed marks, hence **shows at least one**, hence lies in
 restoration: the countable-feasibility discovery (which showed *why* the old proof
 couldn't work) and the global-pattern observation (which made a correct one). The
 statement of Theorem D was right the first time; its proof is only now sound.
+
+## 20. The game is Φ-complete: schedule ⟹ dominator, and Φ(e) collapses to the game
+
+The dip-schedulability game was derived as the combinatorial residue of Φ. It is in
+fact **equivalent** to it.
+
+**Theorem E (schedule ⟹ dominator) [proved].** Let `Σ` be a legal system over `D(e)`.
+Define its induced pressure `μ(u) := max(Λ(u), sup{ℓ(img) : img ∈ S(u)}, ℓ(u))`, where
+`E(u)(ξ) := sup{img(ξ) : img ∈ S(u)}` (pointwise finite *by legality*: any slice bound
+dominates it) and `Λ(u)` is the least level whose floor absorbs `E(u)` (absorbers are
+upward-closed by pair-coherence and nonempty by legality; `E` is monotone since slices
+nest; so `Λ` and `μ` are monotone). If `(γ, X)` is a schedule for `μ` — value-form:
+`S̃_u(ξ) := sup{e_{γ(x)}(ξ) : x ⊑ u, ξ < γ(x), ξ ∉ X(x)}` finite and `≤ e_{γ(u)}` off a
+finite `F_u` — then
+`φ(u) := (γ(u), W(u))`, `W(u) := max(e_{γ(u)} dipped at X(u), E(u), S̃_u·1_{F_u ∪ X(u)})`
+is a monotone dominator of `Σ`. *Proof sketch, all cases.* Fiberhood: three finite
+corrections (dips `X(u)`; `E(u)`'s excess, finite since `Λ(u) ≤ γ(u)` and floors are
+pairwise `=*`; the finite raise on `F_u ∪ X(u)`, with finite values by the value-form).
+Domination: the `E(u)`-part, with levels covered by the img-level-sup inside `μ`.
+Monotonicity at `v ⊑ u`, coordinate `ξ < γ(v)`, by the three parts of `W(v)`:
+the `E`-part lands in the `E`-part (`E(v) ≤ E(u)`); the raise-part has
+`S̃_v(ξ) ≤ S̃_u(ξ)`, which sits under `W(u)` either via the raise (if `ξ ∈ F_u ∪ X(u)`)
+or via the undipped floor (value-form, `ξ ∉ F_u`); and the honest-floor part is the
+decisive one — `v` is itself a witness in `S̃_u`'s sup, so `e_{γ(v)}(ξ) ≤ S̃_u(ξ)`, and
+the same dichotomy closes. ∎
+
+**Corollary 1 (the collapse).** With `dominator ⟹ schedule` (§16):
+**`Φ(e)` ⟺ every legally-induced pressure over `e` is schedulable.** The game is not
+an abstraction of the transport question; it *is* the transport question.
+
+**Corollary 2 (tame systems never escape) [ZFC].** By Lemma F, every legal system whose
+induced pressure is finite-raising (`μ(u) < ℓ(u) + ω` mod the absorbed part) has a
+monotone dominator — over *every* coherent sequence, trivial or not. The first
+unconditional positive Φ-result beyond trivial sequences.
+
+**Corollary 3 (the residual, exactly).** A transport escapee among fiber orders exists
+iff **some legal system induces an unschedulable pressure over some coherent
+sequence** — necessarily limit-raising (Corollary 2), necessarily wild inside down-sets
+cofinally (else the kill-side of Lemma F absorbs it). Theorem C manufactures an
+unschedulable pressure under ◊; Theorem D shows *that* pressure is not legally induced
+over *that* sequence. The remaining question is whether legality and unschedulability
+are compatible at all:
+
+> **Question 5 (the wildness cap).** Is there — in ZFC or consistently — a coherent
+> sequence `e` and a legal system over `D(e)` whose induced pressure is unschedulable?
+> Equivalently (by Theorem E): does `Φ(e)` fail for some coherent sequence? A negative
+> answer in ZFC would settle the transport line's original residual: the fiber orders
+> of coherent sequences can never defeat every monotone modulus, and the escapee hunt
+> must leave this class entirely.
+
+The incidence machinery of §19 is the natural tool: its global shown-pattern argument
+used binaryness and the kill's witness structure, and the open work is whether a
+general coherent sequence's defect structure (`D⁺`-patterns replacing marks) supports
+the same rows/columns dichotomy against wild legal systems.

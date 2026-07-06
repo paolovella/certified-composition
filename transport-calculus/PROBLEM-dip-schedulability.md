@@ -59,14 +59,19 @@ the union is over genuinely branching, overlapping countable directed families.
 ## 2. The implication diagram
 
 ```
-trivial  ⟹[proved]  strongly schedulable  ⟹[proved†]  Φ(e)  ⟹[proved‡]  weakly schedulable
+trivial  ⟹[proved]  strongly schedulable  ⟹[proved†]  Φ(e)  ⟺[proved‡]  every legally-induced pressure schedulable
    ↑                                                    |
    └────────────────── ??? (Question 1) ────────────────┘
 ```
 
 († at careful-prose rigor, notes §12(c), for the value-form definition above;
-‡ notes §16 — a dominator induces a schedule whose leftover lies inside the single
-finite set `X(u)`.)
+‡ both directions: notes §16 — a dominator induces a schedule with leftover inside the
+single finite set `X(u)` — and notes §20, **Theorem E** — a schedule for the induced
+least-absorption pressure rebuilds a monotone dominator. **The game is Φ-complete**:
+`Φ(e)` holds iff every legally-induced pressure over `e` is schedulable. Consequently
+tame legal systems (finite-raising induced pressure) have dominators over every
+coherent sequence in ZFC, and the transport escapee question is exactly: can a legal
+system induce an unschedulable pressure? — **Question 5**, the wildness cap.)
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are
