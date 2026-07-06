@@ -999,3 +999,68 @@ The selection problem has the reps flavor one level up: choosing levels whose fl
 behave pointwise. The reps theorem itself warns that canonical selections fail over
 nontrivial sequences; but the selection here is level-valued, not element-valued, and
 overshooting is allowed — neither the reps engine nor its refutation applies as-is.
+
+## 22. Question 5, second assault: the value-form localizes to a finite gap-chain rider — and it IS the incidence problem
+
+Attacking Q5′ against the official value-form (problem statement §1(ii)) produced a clean
+demotion of the §12(b) hole and an identification: the wildness cap is the §17–§19
+incidence problem, one level richer. No flip — this is forward reduction.
+
+**Reduction Lemma (value-form localizes) [proved].** Fix schedule data `(γ, X)` meeting
+the set-form (i), with finite leftover `L_u := ⋃_{x⊑u}(D⁺(γ(x),γ(u)) \ X(x))`. Then the
+value-form (ii) holds at `u` **iff** `S_u(ξ) < ∞` for each of the finitely many `ξ ∈ L_u`.
+*Proof.* For `ξ ∉ L_u`: any counted `x` (`x ⊑ u`, `ξ<γ(x)`, `ξ∉X(x)`) has
+`ξ ∉ D⁺(γ(x),γ(u))` (else `ξ ∈ D⁺\X(x) ⊆ L_u`), so `e_{γ(x)}(ξ) ≤ e_{γ(u)}(ξ)`; hence
+`S_u(ξ) ≤ e_{γ(u)}(ξ) < ∞`, and the inequality clause holds off the finite `L_u`. So the
+value-form's *entire* surplus over the set-form is `|L_u|`-many pointwise finiteness
+conditions. §12(b)'s "`W_u(ξ)=∞`" fear is demoted to a finite, coordinate-local rider. ∎
+
+**Gap localization [proved].** Augment `X` with Lemma F's below-level dips. At `ξ ∈ L_u`,
+split `S_u(ξ)` by element level. Elements with `ℓ(x) > ξ` contribute, off the F-dips,
+`e_{γ(x)}(ξ) = s_x(ξ) ≤ s_u(ξ)` (fiber transfer), a single finite bound. So `S_u(ξ)=∞`
+forces unboundedness over the **gap elements** `G_{u,ξ} := {x ⊑ u : ℓ(x) ≤ ξ < γ(x),
+ξ∉X(x)}`. `G_{u,ξ}` is `⊑`-directed (joins of level `≤ ξ` stay below `u`) with a cofinal
+ω-chain `y_0 ⊑ y_1 ⊑ ⋯`, levels `≤ ξ`, `γ(y_n) ↑ δ ≤ γ(u)`. So the rider fails at
+`(u,ξ)` **iff** the gap-chain floor values `e_{γ(y_n)}(ξ)` are unbounded — a pure
+gap-chain-divergence event, exactly the §21 floor-diagonal blow-up, now pinned to
+finitely many `ξ` per `u`.
+
+**Why no single-`u` concentration contradiction exists.** The Theorem-B / §2′
+witness-concentration argument needs *infinitely many* bad `ξ` at one level to break
+coherence. The Reduction Lemma caps bad `ξ` at `|L_u| < ω` per `u`. So coherence does
+**not** locally forbid the divergence; the difficulty is genuinely global — spread thin
+across all `u`.
+
+**The identification: Q5 is the §19 incidence problem, gap-chain flavored.** Dipping
+`ξ` at cofinally many `y_n ⊑ u` kills the `(u,ξ)`-divergence, and dipping only ever
+*helps* both conditions (larger `X` shrinks `D⁺\X` and every sup). So the sole
+constraint is **finiteness of dips per element**. Form the incidence matrix
+rows = fiber elements, columns = coordinates, entry = "this element must dip this
+coordinate to kill some divergence it lies on." A schedule for the induced pressure
+exists **iff this matrix admits a finite-row covering** (each element dipping finitely
+many coordinates suffices). This is precisely the §17–§19 rows/columns problem:
+- *Columns* (§21's `Δ_Σ`-diagonal, legality): image-values are locally dominated — the
+  column side is exactly the set-form (i) achievability.
+- *Rows* (coherence + the value-form rider): finite dips per element.
+- The wall of §19 (global shown-pattern ⟹ stationary-in-finite) was the special case
+  where the pressure is the ◊-lethal one over the killed sequence: there the required
+  covering is finite-row-impossible, which is *why* that pressure is not legally induced.
+
+So the two open threads are one:
+
+> **Question 5 (unified).** Over which coherent sequences does *every* legally-induced
+> pressure admit a finite-row dip covering of its gap-chain-divergence incidence matrix?
+> ZFC-always ⟹ Φ(e) for all coherent `e` ⟹ the transport line's fiber orders never
+> escape (residual settled negatively). A consistent failure ⟹ an escapee. Theorem F
+> (block-wild) and §20 Cor. 2 (tame) are the two proved finite-row cases; Theorem D is
+> the one proved *infinite-row* case, but its pressure is illegal, so it is not a
+> counterexample — it is the boundary marker showing the covering can fail exactly when
+> legality already fails.
+
+**Net.** §12(b)'s hole is downgraded to a finite rider; Q5′'s floor-selection is
+exactly a finite-row incidence covering; the §19 machinery is the right tool and the
+open content is whether *legal* induced pressures (unlike the ◊-lethal one) always yield
+coverable matrices. The next concrete target: does legality (column-domination of
+`Δ_Σ`) itself imply finite-row coverability — i.e. is there a legal induced pressure
+whose gap-chain incidences have a stationary heavy row? Theorem F says no for the
+block-wild shape; the general wild shape is the frontier.

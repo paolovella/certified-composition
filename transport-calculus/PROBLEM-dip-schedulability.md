@@ -72,6 +72,17 @@ least-absorption pressure rebuilds a monotone dominator. **The game is Φ-comple
 tame legal systems (finite-raising induced pressure) have dominators over every
 coherent sequence in ZFC, and the transport escapee question is exactly: can a legal
 system induce an unschedulable pressure? — **Question 5**, the wildness cap.)
+
+*(Localized, notes §22: against the official value-form, condition (ii) exceeds the
+set-form (i) by only `|L_u|`-many pointwise-finiteness conditions — one per coordinate in
+the finite set-form leftover `L_u`. With Lemma F's below-level dips these localize to
+**gap-chain divergence**: (ii) fails at `(u,ξ)` iff the floor values `e_{γ(y_n)}(ξ)`
+diverge along a cofinal ω-chain of `{x ⊑ u : ℓ(x) ≤ ξ < γ(x)}`. Since dipping only helps
+and is free except for per-element finiteness, scheduling an induced pressure is exactly
+a **finite-row covering** of the gap-chain-divergence incidence matrix — the §17–§19
+rows/columns problem. Question 5 thereby unifies with the incidence machinery: block-wild
+(Theorem F) and tame (§20 Cor. 2) pressures are the proved coverable cases; the ◊-lethal
+pressure is the proved non-coverable case, but it is illegal, hence not an escapee.)*
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are
