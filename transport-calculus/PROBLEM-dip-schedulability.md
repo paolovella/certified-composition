@@ -117,6 +117,19 @@ leftovers at coordinates in `[ℓ(x), γ(x))` — above the element's level, und
 limit-raising pressure — remain contested. Per-element freedom provably wins below the
 element's level and is, by definition, patch-silent above it.
 
+**Theorem C (◊) [careful-prose rigor, notes §15].** There is a coherent sequence that is
+**not strongly dip-schedulable**: a ◊-recursion staggers kills across the forced gaps of
+guessed schedules — at a guessing stage, one witness element per ladder block, one kill
+point per witness chosen *after* seeing that element's finite dip set, inside its gap,
+where its committed floor is `1`; the stage's own floor is killed to `0` there, and the
+top `(β, e_β)` collects infinitely many surviving gap-inversions, one per pair. Trivial
+sequences are schedulable (Theorem A), so the sequence is automatically nontrivial.
+Consequences: "every coherent sequence is strongly schedulable" is not a ZFC theorem;
+the minimal limit-raising pressure `λ∘ℓ` is already lethal; and Question 1 remains open
+in both directions — but a Q1-FALSE witness (nontrivial *and* schedulable) must evade
+the staggered-kill mechanism, and the consistency of a full transport escapee now
+reduces to Question 2 (realizability of `λ∘ℓ`) over the killed sequence.
+
 ## 3. The questions
 
 **Question 1 (main).** Is every strongly dip-schedulable coherent sequence trivial?
@@ -148,7 +161,9 @@ other way. By Lemma E the question may be attacked on any club.
 dip-schedulable" consistent with ZFC? Natural candidate axioms: MA_{ω₁} or PFA, via a
 forcing whose conditions are countable partial schedules; the ccc/properness of that
 forcing over the ◊-sequence is precisely where the fractal regress of Question 2
-reappears, and is open.
+reappears, and is open. *(Update: the complementary consistency statement is settled —
+by Theorem C, "some coherent sequence is NOT strongly dip-schedulable" holds under ◊,
+so schedulability-for-all is not a ZFC theorem.)*
 
 A negative answer to Question 1 with a ZFC witness would (via the argued arrows) refute
 `Φ` in ZFC for that sequence; a positive answer makes `Φ(e) ⟺ e trivial` plausible; an

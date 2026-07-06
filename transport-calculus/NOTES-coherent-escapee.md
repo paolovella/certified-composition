@@ -628,3 +628,66 @@ behave like level-indexed objects, Theorem B's engine eventually applies, and Q1
 TRUE; (b) the schedule can *choose* γ to park gap floors past kills (§8 overshoot) with
 patch-guided targeting, and some nontrivial sequence is schedulable, making Q1 FALSE.
 Neither is closed; but the battlefield has shrunk to the gaps.
+
+## 15. The staggered ◊-kill: a non-schedulable coherent sequence (fifth flip, partial)
+
+**Theorem (◊) [careful-prose rigor].** There is a coherent sequence `e` (values `≥ 1`)
+that is **not strongly dip-schedulable**: the minimal limit-raising pressure
+`μ := λ∘ℓ` (each element raised to the least limit above its level) defeats every
+schedule. Since trivial sequences are schedulable (Theorem A), `e` is automatically
+nontrivial.
+
+*Construction.* ◊-recursion with baseline value `1`. At a guessing limit `β` (the guess
+decoding to a partial schedule `(γ, X)↾D_β`; a club confines `γ[D_β] ⊆ β` and closes
+under `λ`), work up the blocks `[b_n, b_{n+1})` of `β`'s ladder, recursively in `n`:
+
+1. `x_n := (b_n, min(e_{b_n}, e_β↾b_n))` — a fiber element of `D_β` (its function uses
+   only the already-fixed part of `e_β`), so the guess reveals `γ(x_n), X(x_n)`; note
+   `γ(x_n) ≥ λ(b_n)`, so the interval `(b_n, λ(b_n))` lies inside `x_n`'s **gap**.
+2. Choose `ξ*_n ∈ (b_n, λ(b_n))` avoiding the finite `X(x_n)` and the finite `0`-set of
+   `e_{γ(x_n)}` in the interval — available by the **interval-finiteness invariant**:
+   every floor's `0`-set meets every interval `(α, λ(α))` finitely (the glue copies one
+   ladder floor per block, each preserving the invariant; kills add one point per
+   block). Then `e_{γ(x_n)}(ξ*_n) = 1`.
+3. Kill: `e_β(ξ*_n) := 0` — one point per block, coherence preserved.
+
+*The catch.* For a total schedule `(γ, X)` of `λ∘ℓ`, ◊ catches `(γ, X)↾D_β` at some
+club-stage `β`. Set `u* := (β, e_β)`: every `x_n ⊑ u*` (their functions ride `e_β` by
+construction). For almost every `n`: `ξ*_n ∈ [ℓ(x_n), γ(x_n)) \ X(x_n)`,
+`e_{γ(x_n)}(ξ*_n) = 1`, and `e_{γ(u*)}(ξ*_n) = 0` — the single pair `(β, γ(u*))`
+inherits the kills off a finite set. So
+`⋃_{x ⊑ u*} (D⁺(γ(x), γ(u*)) ∩ [ℓ(x), γ(x)) \ X(x)) ⊇ {ξ*_n : n large}` is infinite:
+the schedule condition fails at `u*`. ∎
+
+**Why the prior walls don't stop this — the scope-corrections, recorded.**
+- The §9 no-go's clauses (ii)–(iii) are about *legality of forcing systems*; the
+  schedule game has no legality constraint on the pressure, so the no-go never governed
+  game-kills. Its conclusion stands for what it covered (requirement-forcing kill
+  templates in the Φ-frame).
+- §10's anti-kill coherence argument covered fiberhood-forcing concentrated at a
+  *single* level: "raised at ν, killed at ν′ on one infinite set" violates pair
+  coherence. The staggered kill forces high at infinitely many *distinct* levels
+  `γ(x_n)`, one point each: every pair carries one new inversion, coherence is
+  untouched, and the infinity materializes only in the fiberhood of the would-be value
+  at `u*` — which is exactly the refutation.
+- Without ◊ the kill fails: the kill points are `e`-definable and finite-per-element, so
+  a schedule chosen after `e` dips them (`X(x_n) := {ξ*_n}`). The guess is load-bearing:
+  it chooses `ξ*_n` *after* seeing `X(x_n)`. Whether the kill survives without ◊ (e.g.
+  from a nontrivial sequence with extra ZFC structure) is open.
+
+**Consequences.**
+1. "Every coherent sequence is strongly dip-schedulable" is **not a ZFC theorem** — one
+   of §14's two live readings dies. Under ◊, non-schedulable (hence nontrivial)
+   sequences exist.
+2. The Question 3(a) shape is answered under ◊ for the killed sequence.
+3. **Question 1 proper remains open in both directions**: this produces a nontrivial
+   *non*-schedulable sequence — consistent with Q1 TRUE — and says nothing about
+   whether some nontrivial sequence is schedulable (Q1 FALSE). But any Q1-FALSE witness
+   must now evade the staggered-kill mechanism.
+4. **The transport escapee's consistency now hinges on exactly one gap**: realizability
+   (Question 2) of `λ∘ℓ` over the killed sequence — if the minimal limit-raising
+   pressure is weakly realizable by a legal system there, then under ◊ the fiber order
+   `D_coh(e)` carries a legal system with no monotone dominator, and the transport
+   line's original residual is **consistently inhabited**. Realizing `λ∘ℓ` requires
+   img-families whose gap-region floor-sups are slice-bounded — itself gap-core-shaped.
+   This is the decisive next check.
