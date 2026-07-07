@@ -1612,3 +1612,66 @@ time. The honest terminus is *less* closed than §30 claimed: the ZFC skeleton s
 is machine-checked, checkpoint (1) is cleared, but the final question is an **open**
 order-theoretic realizability problem whose independence is not established. Better an
 open question correctly classified than a resolution wrongly cited.
+
+## 32. The order-realizability residual, re-grounded: a ZFC sufficient condition, and the triple-evasion that isolates it
+
+Attacking the correctly-classified (§31) order question directly. One clean ZFC positive
+result, and a precise location of the residual against the machine-checked §4–§8 order
+theory — the frame the transport line opened with, now closed around the exact gap.
+
+**Theorem H (bounded-complete ⟹ no escapee) [proved].** If the fiber order `D(e)` is
+**bounded-complete** (every bounded subset has a join), then `Φ(e)` holds: every legal
+system has a monotone dominator. *Proof.* Legality makes `{w_p : v_p ⊑ u}` bounded, so its
+join `φ(u) := ⊔{w_p : v_p ⊑ u}` exists. `φ` is monotone (`u ⊑ u'` enlarges the set, so
+enlarges the join) and dominating (a join is `⊒` each member). ∎ No recursion, no walk
+estimate — the whole difficulty is *whether the join exists*.
+
+**The join need not exist [machine-checked witnesses].** `D(e)` for nontrivial `e` is
+generally **not** bounded-complete: coherence defects create bounded families with no
+least upper bound, exactly the pathology the mathlib-free witnesses isolate —
+`Dm_chain_no_sup` (a bounded chain with two incomparable minimal upper bounds `L, R`, no
+join) and `Fb`'s `fb_no_minimal_ub` (a bounded family with *no* minimal upper bound at
+all). So Theorem H's hypothesis genuinely fails, and the join-route does not settle `Φ(e)`
+in general.
+
+**But non-bounded-completeness is not enough for an escapee — the three sufficient
+routes.** The same witnesses factor anyway, by *other* means:
+- `Dm_factors`: `Dm` has no join for its chain, yet **a top `⊤` overshoots** every family
+  — factorization via overshoot.
+- `fb_factors`: `Fb` has no minimal upper bound, yet **a cofinal `ω`-ruler** dominates —
+  factorization via a ruler (the `prefix_bounded_cofinal_factors` / σ-directed route).
+
+So a directed order factors (no escapee) if **any** of: (a) it is bounded-complete
+(joins, Theorem H); (b) it has a top / overshoot (`Dm`); (c) it carries a cofinal
+monotone ruler (`Fb`, σ-directed, prefix-bounded). These are the machine-checked
+sufficient conditions from §4–§8.
+
+**The triple evasion — why `D(e)` is exactly the residual [argued].** For nontrivial `e`,
+the fiber order `D(e)` evades all three at once:
+- **not bounded-complete** — coherence defects give `Dm`/`Fb`-type bounded families with
+  no join (the minimal-UB gap, locally);
+- **no top / no overshoot** — `D(e)` is unbounded (every element has a strict successor);
+- **no cofinal ω₁-ruler** — nontrivial `e` has no `⊑`-chain with cofinal levels
+  (`Lemma D`), so no global monotone ruler.
+
+`D(e)` sits precisely at the point where all three known sufficient conditions fail
+simultaneously. That is the sharp reason it is the residual — and it re-anchors the whole
+question to the order theory the transport line began with, not to cohomology.
+
+**The honest open core, order-theoretically exact.**
+
+> **`Φ(e)` open form.** Does a directed order that is simultaneously *not* bounded-complete,
+> *top*-less, and *ruler*-less nonetheless admit a monotone dominator for every legal
+> (down-set-bounded) constraint system — via *selection among incomparable minimal upper
+> bounds*, coherently across the branching? A ZFC "yes" (a fourth sufficient condition
+> covering the triple-evasion case) settles **no escapee**; a legal system realizing the
+> minimal-UB obstruction cofinally settles **escapee**.
+
+This is a genuine order/cofinality problem — a monotone-thread / ordered-inverse-limit
+existence question (the correct non-abelian analog, §31) over an ω₁-directed-with-
+countable-down-sets order lacking joins, tops, and rulers. Its ZFC status is **open and
+unknown**. The transport line has thus returned, sharpened and with a machine-checked
+skeleton, to the exact order-theoretic gap it started from: the escapee, if it exists, is
+a legal constraint system witnessing that *selection among coherence-defect minimal upper
+bounds cannot be made monotone* — the one thing the `Dm`/`Fb` overshoot and ruler routes
+cannot rescue when there is no top and no ω₁-chain.
