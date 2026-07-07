@@ -1733,3 +1733,58 @@ but it relocates the entire question to a sharp, `Dm`/`Fb`-anchored form: **can 
 constraint system force cofinal reliance on ideal (non-fiber) joins over a nontrivial
 `D(e)`?** That is the open problem, and it is now purely about coherence-defect minimal
 upper bounds — the object the machine-checked witnesses were built to probe.
+
+## 34. A legal family with a proper-ideal join, explicit over canonical ρ₁ — the ingredient Theorem D lacked
+
+Constructing the escapee's local ingredient: a legal constraint family whose only join is
+an ideal, not a fiber element — the reliance §33 identified. It exists **explicitly over
+canonical ρ₁, with no kills**, so it is legal where Theorem D's kill-driven version was
+not. One concrete construction, one anti-overclaim check, one honest remaining gap.
+
+**The construction [proved, explicit].** Canonical ρ₁, levels `ω·n → ω²`. From §29,
+`e_{ω·n}(ω·k+j) = j` (for `k < n`) while `e_{ω²}(ω·k+j) = max(k+1, j)`. So for `j < k`
+there is a value-gap `(j, k+1]` between floor and bound. Define fiber elements
+`c_n := (ω·n, s_n)` by
+`s_n(ω·k+j) := j+1` when `j < k < n`, and `s_n := e_{ω·n}` elsewhere.
+- *Each `c_n` is a fiber element*: `s_n` deviates from `e_{ω·n}` only on
+  `{ω·k+j : j < k < n}`, which is **finite**. ✓
+- *The `c_n` form a `⊑`-chain*: for `ξ = ω·k+j` shared by `c_n, c_{n+1}`, both give
+  `j+1`; elsewhere both are the floor. So `s_n ≤ s_{n+1}↾ω·n`. ✓
+- *Bounded by `e_{ω²}` (legal!)*: `s_n(ω·k+j) = j+1 ≤ k+1 = e_{ω²}(ω·k+j)` for `j<k`, and
+  `s_n = e_{ω·n} ≤* e_{ω²}` elsewhere. So `c_n ⊑ (ω², e_{ω²})` for all `n`. ✓
+- *The join is a proper ideal*: `s_ω := sup_n s_n` has `s_ω(ω·k+j) = j+1` for all `j < k`.
+  This deviates from `e_{ω²}(ω·k+j) = k+1` on the **infinite** set `{ω·k+j : j+1 < k+1}`,
+  and matches no other floor (no fiber element takes value `j+1` at cofinally many
+  `ω·k+j`). So `s_ω` is **not `=*` any floor — not a fiber element**; the join lives only
+  in `Idl(D(e))`. ✓
+
+So `M := {c_n}` is a **legal** family (bounded by `e_{ω²}`) whose join is a **proper
+ideal**. The reliance of §33 is real, concrete, and — crucially — needs **no kills**: it
+rides the intrinsic value-gaps of `ρ₁`'s floors (`§28`'s block-diagonal spikes seen from
+below), which is exactly why it stays legal where Theorem D's binary kills broke column-
+boundedness.
+
+**Anti-overclaim check [proved].** One might hope §29's floor-convergence gives bounded-
+completeness (⟹ Theorem H ⟹ no escapee). It does **not**: the obstruction is the
+**downward** defect. `⋃_n D⁻(ω·n, ω²) = ⋃_n {ξ : e_{ω²}(ξ) > e_{ω·n}(ξ)} =
+{ω·k+j : k+1 > j}` is **infinite** — that infinite set is precisely the room the chain
+climbs into, and precisely why `s_ω` deviates infinitely. Floor-*convergence* (upward,
+`§29`) and floor-*co-divergence* (downward, here) are independent; the latter breaks
+bounded-completeness even when the former holds. Theorem H does not apply to canonical
+`ρ₁`, and the shortcut to no-escapee is closed.
+
+**The remaining gap [honest].** A single legal ideal-join family is **not** an escapee:
+its fiber bound `e_{ω²}` dominates it, so `φ(u) := e_{ω²}` schedules this one `M`. The
+escapee needs **cofinally many** such families, cross-conflicting so that no *monotone*
+fiber choice of bounds threads them — the §26 cross-defective configuration. That global
+threading is the open part, and it is where osc-coherence (or a forcing) must enter.
+
+**Verdict — the escapee-live side is materially strengthened.** The local ingredient — a
+legal family forced onto an ideal join — is now **explicit, kill-free, and legal over
+canonical `ρ₁`**. This is exactly the piece Theorem D could not supply legally: the
+legality wall that stopped the kill construction does **not** stop the value-gap
+construction. What remains is not "can the obstruction be made legal" (yes, done here) but
+"can legal ideal-reliances be threaded into a cofinal cross-conflict" — the §26 poset/
+osc problem, now the sole surviving obstacle to an outright escapee. The construction has
+moved the frontier from *legality of the ingredient* (settled: legal) to *coherence of the
+global conflict* (open), which is genuine forward motion on the escapee side.
