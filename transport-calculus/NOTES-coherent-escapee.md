@@ -1675,3 +1675,61 @@ skeleton, to the exact order-theoretic gap it started from: the escapee, if it e
 a legal constraint system witnessing that *selection among coherence-defect minimal upper
 bounds cannot be made monotone* — the one thing the `Dm`/`Fb` overshoot and ruler routes
 cannot rescue when there is no top and no ω₁-chain.
+
+## 33. Trying the fourth sufficient condition: D(e) is a lattice, the selection reduces to countable joins, and the route stalls at the machine-checked gap
+
+The honest attempt to prove "legality + countable down-sets ⟹ monotone selection ⟹ no
+escapee." A new structural fact, a clean reduction, and a precise finding: the natural
+routes all stall at the countable-join / minimal-UB gap — machine-checked to be real — so
+this proof does **not** close, and the balance tips toward the escapee being live.
+
+**Structural fact [proved]: `D(e)` is a lattice.** Binary joins were known (pointwise max,
+`=* e_{max}`, by coherence). Meets too: `(α,s) ∧ (β,t) := (min(α,β), pointwise min)` is the
+greatest lower bound and `=* e_{min}` (coherence: `s`, `t↾α` are both `=* e_α`, so their
+min is). So **finite** joins and meets always exist. The bounded-completeness gap (§32) is
+therefore located *precisely* at **countable** joins: `D(e)` is a lattice that is not
+`ω`-join-complete.
+
+**The selection reduces to countable joins [argued].** Build `φ` by recursion on an
+enumeration `D(e) = {u_ξ}`, maintaining monotonicity. At stage `ξ`, `φ(u_ξ)` must be an
+upper bound of `M(u_ξ) := {w_p : v_p ⊑ u_ξ}` (bounded, by legality) that lies `⊒` every
+processed lower `φ(u_η)` (`u_η ⊑ u_ξ`) and `⊑` every processed upper `φ(u_η)`
+(`u_ξ ⊑ u_η`). The upper constraints are handled by *meets* (which exist, finitely; the
+processed uppers below a bound are fine). The lower constraints require an element `⊒`
+the set `M(u_ξ) ∪ {φ(u_η) : u_η ⊑ u_ξ}` — a **countable** set (subset of a countable
+down-set-image), **bounded** (legality + induction). Its least such element is its
+**countable join**. Zorn's-lemma and maximal-partial-selection variants reduce to the
+same point. So the recursion is feasible at `u_ξ` iff the relevant countable join exists.
+
+**The route stalls [machine-checked gap].** Countable bounded joins **do not exist** in
+general: `Dm_chain_no_sup` is a countable bounded chain with two incomparable minimal upper
+bounds and no join; `fb_no_minimal_ub` is worse. And the stall is not rare — every element
+of `D(e)` has an infinite down-set, so essentially every stage asks for a countable join of
+the processed lower values. **Legality + countable down-sets does not supply these joins**;
+that is exactly the bounded-completeness Theorem H assumed and §32 showed can fail. The
+fourth-sufficient-condition proof, by this route, **does not close.**
+
+**Clean reformulation [proved]: factoring = joins land in `D(e)`, not its completion.** The
+ideal completion `Idl(D(e))` *is* bounded-complete (all bounded joins exist as ideals), so a
+monotone dominator into `Idl(D(e))` always exists — `φ(u) := ⊔ M(u)` taken in `Idl`. Thus:
+
+> **`Φ(e)` ⟺ this ideal-valued dominator can be taken to land in `D(e)` itself** — i.e. the
+> required countable joins are *fiber elements*, not proper ideals. The escapee exists iff
+> some legal system forces the dominator to rely on a proper ideal — a
+> **coherence-defect "missing minimal upper bound"**, an ideal point of `Idl(D(e)) \ D(e)`.
+
+The missing points of the completion are exactly the `Dm`/`Fb` gaps: bounded families whose
+"join" is an ideal with no fiber realization. So the escapee is precisely a legal system
+whose induced bounds are cofinally *ideal*, never fiber.
+
+**Honest verdict.** The attempt does not prove the fourth sufficient condition; it shows
+the natural routes (recursion, Zorn, join) all reduce to countable-join existence, which
+legality + countable down-sets does **not** force — the obstruction is the machine-checked
+countable-join / minimal-UB gap, active at essentially every stage. This is genuine
+evidence that **no-escapee does not follow from these hypotheses**, tilting toward the
+escapee being live: an escapee would be a legal system driving the dominator into proper
+ideals cofinally. It is not a proof of the escapee — a route failing is not impossibility —
+but it relocates the entire question to a sharp, `Dm`/`Fb`-anchored form: **can a legal
+constraint system force cofinal reliance on ideal (non-fiber) joins over a nontrivial
+`D(e)`?** That is the open problem, and it is now purely about coherence-defect minimal
+upper bounds — the object the machine-checked witnesses were built to probe.
