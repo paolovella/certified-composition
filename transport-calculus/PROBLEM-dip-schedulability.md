@@ -88,11 +88,19 @@ pressure is the proved non-coverable case, but it is illegal, hence not an escap
 at `(u,ξ)` by dipping `dev(e_{γ(y_n)}, e_{γ(u)})`, finite at each chain level by
 coherence (**level-spike finiteness**). A monotone `γ ≥ μ` schedules `μ` as soon as it
 has the **finite-fan property** — `⋃_{u ⊒ x} dev(e_{γ(x)}, e_{γ(u)}) ∩ [ℓ(x),γ(x))`
-finite for every `x` (**Theorem G [proved]**). Block-wild and tame pressures have finite
-fan; the open content is whether *every* legal induced pressure admits a finite-fan `γ`
-— equivalently whether the ceilings can be **coherently selected**, a reps-theorem-type
-uniformization. ZFC-yes ⟹ no escapee; a consistent no ⟹ an escapee, and a witness must
-pair column-domination with an infinite fan at stationarily many elements.)*
+finite for every `x` (**Theorem G [proved]**). *Tame* pressures have finite fan (finite
+gaps); *block-wild* pressures are covered instead by block-diagonal domination
+(Theorem F), a separate sufficient route — over nontrivial `e` their infinite gap
+intervals give infinite fans (notes §24, correcting a §23 slip). So coverability is a
+union of incomparable sufficient conditions — tame, BD, finite-fan — and a
+non-schedulable induced pressure must defeat all of them. The sharpest reformulation
+(notes §24): a legal `Σ` schedules iff its **profile diagonal** `Ψ_Σ(ξ) :=
+e_{β_{B(ξ)}}(ξ)` (the splice of block legality-witness floors, `≥` every profile) admits
+a **monotone realization** by fiber ceilings with finite defect-union. `Ψ_Σ` is a
+trivialization iff `e` is trivial, so over nontrivial `e` it is a locally-trivial,
+globally-nontrivial cochain — the `H¹(ω₁) ≠ 0` / derived-limit signature — and the
+escapee exists iff such a cochain can be legally forced while resisting monotone
+realization. ZFC-yes ⟹ no escapee; consistent-no ⟹ escapee.)*
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are

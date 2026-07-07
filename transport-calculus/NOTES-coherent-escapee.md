@@ -1132,3 +1132,67 @@ Theorem D showed the ◊-lethal pressure fails to clear. The construction — a 
 system forcing limit ceilings with a non-uniformizable spike pattern — is the single
 remaining target, now fully concrete: it needs column-domination (legality) to coexist
 with an infinite fan at stationarily many elements.
+
+## 24. CORRECTION to §23, and the profile-diagonal reformulation (tenth flip)
+
+Re-auditing §23 before attempting the escapee construction exposed an error, and the
+repair reorganizes the picture toward the honest crux.
+
+**The error.** §23 claimed block-wild `γ` has the finite-fan property. **False.**
+Block-wild `γ(x) = λ(ℓ(x))` has *infinite* gap interval `[ℓ(x), λ(ℓ(x)))`, and over
+nontrivial `e` the ceilings `{γ(u) = λ(ℓ(u)) : u ⊒ x}` are cofinal in ω₁, so
+`Fan(x) = ⋃_u dev(e_{λ(ℓ(x))}, e_{λ(ℓ(u))}) ∩ [ℓ(x), λ(ℓ(x)))` collects every coordinate
+in the interval whose floor-value changes at some higher ceiling — generically infinite.
+Theorem F covers block-wild by **block-diagonal domination (BD)**, a *distinct*
+sufficient condition; it does not go through finite fan. (Tame, §20 Cor. 2, genuinely
+has finite fan: its gap interval is finite, so `Fan(x)` is finite outright.) Theorem G's
+proof is untouched — finite fan ⟹ coverable still holds; only the "block-wild satisfies
+it" remark is retracted.
+
+**The productive consequence: coverability is a union of incomparable sufficient
+routes** [proved] — tame (finite gaps), BD (Theorem F), finite-fan (Theorem G). A
+non-schedulable induced pressure must defeat **all** routes at once. The schedulable side
+is more robust than §23 implied; this is evidence *against* a cheap escapee.
+
+**The profile-diagonal reformulation [proved].** Strip to the dominator (Theorem E). A
+dominator's *values* `W(u)` need only track the profile `E(u)`, never the bare floor.
+Legality bounds every profile pointwise: `E(u)(ξ) ≤ Δ_Σ(ξ) ≤ e_{β_{B(ξ)}}(ξ)` off finite,
+where `e_{β_B}` is the block-`B` legality witness. Define the **profile diagonal**
+`Ψ_Σ(ξ) := e_{β_{B(ξ)}}(ξ)` — a splice of the legality-witness floors, pointwise `≥`
+every profile. Two facts pin it:
+
+1. `Ψ_Σ` is a *trivialization of `e`* (`Ψ_Σ ↾ α =* e_α` for all `α`) **iff** `e` is
+   trivial. (⟸ use the trivialization as witnesses. ⟹ `Ψ_Σ` is the required `E`.) So over
+   nontrivial `e`, `Ψ_Σ` dominates all profiles and is *locally floored*
+   (`Ψ_Σ ≤* e_{β_B}` on each block `B`) yet is **not** `=*` the sequence — a genuinely
+   nontrivial, locally-trivial datum.
+2. A dominator must approximate `Ψ_Σ` by *fiber* ceilings `W(u) =* e_{γ(u)}` with `W(u)
+   ⊒ E(u)`, monotonically; the defect between `Ψ_Σ` and the floors `e_{γ(u)}` is exactly
+   what the dips must absorb. `W(u) := Ψ_Σ ↾ γ(u)` is illegal precisely because
+   `Ψ_Σ ↾ γ(u) ≠* e_{γ(u)}` for nontrivial `e`.
+
+> **Question 5 (profile-diagonal form).** For a legal `Σ`, can its profile diagonal
+> `Ψ_Σ` — locally floored, `≥` all profiles — be *monotonically realized* by fiber
+> ceilings with finite defect-union? Equivalently: does local flooring plus monotonicity
+> force a coherent global ceiling? ZFC-yes ⟹ no escapee (residual negative); consistent-no
+> ⟹ escapee.
+
+**Why this is the honest crux, and where it points (observation, not proof).** `Ψ_Σ` is a
+*locally trivial, globally nontrivial* cochain — the exact signature of `H¹(ω₁) ≠ 0` /
+the nonvanishing of a derived limit. The escapee exists iff such a cochain can be forced
+by a **legal** system and simultaneously resist monotone realization. Legality supplies
+the local flooring for free; the whole question is whether local flooring + monotonicity
+forces global flooring — a coherent-sequence uniformization strongly resembling the
+`lim¹` / additivity-of-derived-limits questions of Bergfalk–Lambie-Hanson (arXiv
+1902.02736) and Bannister (2302.07222), which are classically *independent*. This does
+not prove independence, but it relocates the transport residual into a well-mapped
+independence-prone neighborhood — which explains why every ZFC attack (Theorems A–G, C, D)
+has halted at a boundary rather than closing, and it makes the sharpest concrete target a
+*legality-respecting* forcing: add a generic monotone realization of `Ψ_Σ` (MA/PFA side)
+or a generic obstruction to all realizations (the escapee side), and check ccc/properness
+— the same fractal-regress checkpoint §10 flagged, now with `Ψ_Σ` as the explicit object
+being (anti-)uniformized.
+
+**Trail note.** Tenth flip: §23's finite-fan-covers-block-wild remark retracted; found by
+auditing before building the escapee on it. Theorem G stands; the reorganization into
+three sufficient routes and the `Ψ_Σ` reformulation are the forward content.
