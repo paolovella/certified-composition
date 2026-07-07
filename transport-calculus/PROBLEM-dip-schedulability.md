@@ -101,6 +101,14 @@ trivialization iff `e` is trivial, so over nontrivial `e` it is a locally-trivia
 globally-nontrivial cochain — the `H¹(ω₁) ≠ 0` / derived-limit signature — and the
 escapee exists iff such a cochain can be legally forced while resisting monotone
 realization. ZFC-yes ⟹ no escapee; consistent-no ⟹ escapee.)*
+
+*(Poset form, notes §25: the finite-approximation poset `P(Σ)` — monotone partial `γ ≥ μ`,
+finite dips, and *frozen* per-top promise sets `F_u` — is dense-generically a full
+schedule [density proved]; so `P(Σ)` ccc for every legal `Σ` under MA_{ω₁} ⟹ Φ(e) for all
+`e` ⟹ no escapee, consistently. The sole checkpoint is the ccc/properness of `P(Σ)`, whose
+antichains are walk-oscillation Δ-systems with incompatible frozen promises — a `lim¹`-type
+dichotomy of the Bergfalk–Lambie-Hanson / Bannister family. The ZFC skeleton is fully
+proved; Question 5 in its five equivalent forms is the independence-frontier heart.)*
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are

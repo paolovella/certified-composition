@@ -1196,3 +1196,67 @@ being (anti-)uniformized.
 **Trail note.** Tenth flip: §23's finite-fan-covers-block-wild remark retracted; found by
 auditing before building the escapee on it. Theorem G stands; the reorganization into
 three sufficient routes and the `Ψ_Σ` reformulation are the forward content.
+
+## 25. The realization poset, and the ccc checkpoint: the ZFC phase closes, the residual is a lim¹-type independence
+
+The profile-diagonal form (§24) makes the residual a concrete (anti-)uniformization. Here
+is the poset that decides it, with the one checkpoint isolated. This is the natural end of
+the ZFC-analysis phase: everything above is proved; what remains is a single forcing
+dichotomy of known-independence-prone type.
+
+**The realization poset `P(Σ)` [defined; density proved].** For legal `Σ` over `e` with
+induced `μ`, conditions are quadruples `p = (d_p, γ_p, X_p, F_p)`:
+`d_p ∈ [D(e)]^{<ω}`; `γ_p : d_p → ω₁` monotone with `γ_p ≥ μ`; `X_p, F_p : d_p → [ω₁]^{<ω}`;
+subject to, for all `x ⊑ u` in `d_p`, the **promise-respecting** constraints
+`D⁺(γ_p(x), γ_p(u)) \ X_p(x) ⊆ F_p(u)` and `{ξ : e_{γ_p(x)}(ξ) > e_{γ_p(u)}(ξ),
+ξ ∉ X_p(x)} ⊆ F_p(u)` (value-form seed). Extension `q ≤ p`: `d_q ⊇ d_p`, `γ_q ⊇ γ_p`,
+`X_q(x) ⊇ X_p(x)`, and **promises are frozen**: `F_q(u) = F_p(u)` for `u ∈ d_p`.
+
+*Density [proved].* For each `w ∈ D(e)`, `{p : w ∈ d_p}` is dense: given `p`, pick
+`γ(w) ≥ max(μ(w), max γ_p[d_p ∩ ↓w], …)` monotone; for the finitely many `u ∈ d_p` with
+`w ⊑ u`, set `X(w) := ⋃_u (D⁺(γ(w), γ(u)) \ F_p(u))` — finite, and it forces the promise
+`⊆ F_p(u)` at each such `u`; for `u ⊒ w` added later, `w`'s promise `F(w)` is fresh. So a
+generic filter yields a total monotone `γ`, dips `X`, and per-top finite promise sets
+`F_u` — and because promises are frozen, the realized leftover `L_u ⊆ F_u` stays finite:
+**a generic realizes the schedule.** Hence, meeting the ω₁ density sets `{w ∈ d}`:
+
+> **`P(Σ)` ccc (or proper) for every legal `Σ` over every coherent `e`, under MA_{ω₁}
+> (resp. PFA), ⟹ Φ(e) for all `e` ⟹ no transport escapee** — consistently with ZFC.
+
+**The checkpoint (isolated).** The only nontrivial question is the ccc/properness of
+`P(Σ)`. Incompatibility of `p, q` sharing a top `u` arises from **frozen incompatible
+promises**: `F_p(u) ≠ F_q(u)` with `γ`-values whose amalgamated defect escapes both. An
+uncountable antichain is an uncountable family of conditions whose pairwise amalgamation
+forces a defect outside every frozen promise — a Δ-system-plus-coherence-oscillation
+configuration. Whether one exists is governed precisely by the **oscillation of `e`'s
+walks** (Todorcevic): the same `osc(ρ)` structure that makes `H¹(ω₁) ≠ 0`. So:
+
+> **Question 5 (poset form, final).** Is `P(Σ)` ccc for every legal `Σ`, or does some legal
+> `Σ` over some nontrivial `e` yield a walk-oscillation antichain? The former (consistently)
+> caps every escapee; the latter, if it forces the realization to fail *in V*, is the
+> escapee. This is a `lim¹`-type dichotomy: `P(Σ)` is the finite-approximation poset of a
+> derived-limit vanishing, `Ψ_Σ` the cochain being trivialized, and its ccc is the
+> additivity/oscillation question of Bergfalk–Lambie-Hanson and Bannister.
+
+**Status of the transport line (honest ledger).** The escapee is neither cheaply built
+nor cheaply refuted, and now we know *why*: it sits at a `lim¹` independence boundary. The
+ZFC reduction is complete and, at each step, a theorem:
+
+- **[proved]** trivial ⟹ schedulable (A); level/ladder-factored ⟹ trivial (B, Cor 1′);
+  Lemma F (below-level absorption); dominator ⟺ schedule (E, the game is Φ-complete);
+  tame and block-wild caps (§20 Cor 2, F); finite-fan ⟹ coverable (G); the value-form
+  localizes to a finite gap-chain rider = a finite-row incidence covering (§22);
+  level-spike finiteness and the profile-diagonal reformulation (§23–24).
+- **[proved under ◊]** a non-schedulable (hence nontrivial) coherent sequence exists (C);
+  its lethal pressure is not legally induced (D) — the escapee route through *that* kill
+  is closed.
+- **[open, ⟺ Question 5]** whether a *legal* system can induce an unschedulable pressure
+  = whether `Ψ_Σ` resists monotone realization = whether `P(Σ)` fails ccc — a
+  `lim¹`-type question, expected independent, matching §10's original prediction.
+- **[machine-checked, ZFC]** the anchor of the whole chain — reps ⟺ trivial — is
+  formalized in Lean at actual ω₁ (Tier 5, `OmegaOneCoherent.lean`).
+
+The transport line's original residual is thereby *located*, not eliminated: it is a
+concrete, named `lim¹`-type independence, with its ZFC skeleton fully proved and its
+combinatorial heart (Question 5, five equivalent forms) handed to set theory in final
+form. This is the honest terminus of the ZFC phase.
