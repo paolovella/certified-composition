@@ -1788,3 +1788,55 @@ construction. What remains is not "can the obstruction be made legal" (yes, done
 osc problem, now the sole surviving obstacle to an outright escapee. The construction has
 moved the frontier from *legality of the ingredient* (settled: legal) to *coherence of the
 global conflict* (open), which is genuine forward motion on the escapee side.
+
+## 35. CORRECTION to §29/§34: the canonical C-sequence gives a TRIVIAL ρ₁ — the escapee needs a nontrivial (oscillating) C-sequence (fourteenth flip)
+
+Setting up the cofinal placement forced the check I should have run at §29: is the
+canonical-C `ρ₁` even nontrivial? It is **not**. §29 and §34 were computed on a trivial
+sequence. The mechanisms are correct; the sequence was the wrong one for an escapee.
+
+**The triviality [proved].** For the canonical local-ladder C-sequence
+(`C_{ω·n} = {ω·(n-1)+m}`, ladders staying in their block), the walk from any `γ` above
+`ξ`'s block funnels down through `λ(ξ) → ξ`, so `ρ₁(ξ, γ)` **stabilizes**: for
+`ξ = ω·k+j`, `E(ξ) := sup_γ ρ₁(ξ, γ) = max(k+1, j) < ∞` (high steps have weight 0; only
+the block-entry `k+1` and final descent `j` survive). And `E` **trivializes** `e`:
+`E↾α =* e_α`, because `E(ξ) ≠ e_{ω·n}(ξ) = j` only for `ξ = ω·k+j` with `j ≤ k < n` —
+finitely many below each `ω·n`. So `E↾ω·n =* e_{ω·n}`, and by cofinality `E↾α =* e_α` for
+all `α`. **Canonical `ρ₁` is trivial.** (A very regular C-sequence yields a trivial walk;
+nontriviality of `ρ₁` requires a genuinely oscillating C-sequence — an Aronszajn/ladder
+structure — not the nested-local one.)
+
+**What this invalidates, and what stands.**
+- *Invalidated as escapee-relevant:* §29's "floor-convergence holds over canonical `ρ₁`"
+  and §34's "legal ideal-join family over canonical `ρ₁`" are computations on a **trivial**
+  sequence. A trivial sequence is schedulable (Theorem A) — no escapee — so the §34 family,
+  while a genuine legal family with an ideal join, is dominated by the trivialization and is
+  **not** an escapee ingredient. The "checkpoint (1) cleared over canonical `ρ₁`" (§29) is
+  the trivial baseline, not information about the nontrivial case.
+- *Stands (all C-independent):* Theorem H (bounded-complete ⟹ no escapee); `D(e)` is a
+  lattice (§33); the ideal-completion reformulation (`Φ(e)` ⟺ the ideal dominator lands in
+  `D(e)`, §33); the *mechanism* of the value-gap construction (§34) — a bounded chain with
+  accumulating deviations has an ideal join. These do not depend on which C-sequence, only
+  on `e`'s abstract coherence.
+
+**The escapee genuinely requires oscillation [reframing].** Over a **nontrivial** `ρ₁`
+(oscillating C-sequence), floor values `ρ₁(ξ, γ)` are **unbounded in `γ`** at cofinally
+many `ξ` — there is no stable `E(ξ)`, no trivialization; that unbounded incoherent growth
+*is* `osc(ρ₁)`. The value-gap mechanism of §34 then has genuinely wild bounds (the "next
+absorbing floor" `e_{Λ(u)}` climbs without a stable ceiling), and it is exactly there that
+cofinally many families can be placed with **conflicting** bounds — because there is no
+trivialization to thread them through. So the cofinal-placement construction is confirmed
+to live **strictly in the nontrivial/oscillating regime**, and it needs the C-sequence's
+oscillation as its engine — the Walks-ch.-2 machinery flagged since §27, not the canonical
+computation.
+
+**Honest verdict.** The placement attempt did not produce a conflict over the sequence I
+was using, for the decisive reason that that sequence is **trivial**. This is the correct,
+if humbling, outcome: §29–§34's canonical-C computations were the trivial baseline
+throughout, and the escapee — if it exists — requires a nontrivial oscillating `ρ₁` where
+the value-gap families' bounds have no common trivializing ceiling. The construction is
+back at the oscillation frontier, now with the *reason* sharp: an escapee is a cofinal
+family of value-gap ideal-reliances whose absorbing floors `e_{Λ}` cannot be monotonically
+threaded precisely because `osc` denies a stable ceiling. Whether `osc` forces that is the
+open question — genuinely at the Walks/independence boundary, and not settled by canonical
+computation. Fourteenth flip: caught by checking triviality before building on it.
