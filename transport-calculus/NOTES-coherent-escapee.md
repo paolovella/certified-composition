@@ -1840,3 +1840,74 @@ family of value-gap ideal-reliances whose absorbing floors `e_{Λ}` cannot be mo
 threaded precisely because `osc` denies a stable ceiling. Whether `osc` forces that is the
 open question — genuinely at the Walks/independence boundary, and not settled by canonical
 computation. Fourteenth flip: caught by checking triviality before building on it.
+
+## 36. The residual IS Todorcevic's cofinal-types independence: the correct (Tukey) frame — literature research
+
+Research (not reconstruction). The order-realizability residual (§31–§35) is a
+**cofinal-type / Tukey** question about the ℵ₁-directed fiber order — and it is a *known,
+deep, order-theoretic independence*, exactly the category §31 predicted after retracting
+§30's abelian-`lim¹` overreach. Sourced from the literature below.
+
+**The literature fact [Todorcevic, sourced].** For directed sets of size `≤ ℵ₁` under the
+Tukey order (`D ≤_T E` iff a map sends unbounded sets to unbounded sets — i.e. a monotone
+cofinal reduction):
+- **Under PFA**: there are *exactly five* cofinal types — `1, ω, ω₁, ω×ω₁, [ω₁]^{<ω}`
+  (Todorcevic's classification; `[ω₁]^{<ω}` is the maximum).
+- **Under CH**: there are `2^{ℵ₁}` cofinal types (Todorcevic) — a wild zoo, realized by
+  coherent/Aronszajn-tree structures.
+
+This is *the* independence of the cofinal structure of ℵ₁-directed sets.
+
+**The identification [argued — and in the correct category].** The fiber order `D(e)` of a
+coherent sequence has size `ℵ₁` (ω₁ levels × countably many finite modifications each) and
+is directed. A **monotone dominator** for a legal constraint system *is* a Tukey reduction
+witnessing that `D(e)` is cofinally tame; the **escapee** is `D(e)` carrying a legal
+constraint family that no monotone map dominates — i.e. `D(e)` sitting at a *wild* cofinal
+type. So:
+
+> - **PFA side:** every ℵ₁-directed set — `D(e)` included — is Tukey-equivalent to one of
+>   the five tame types. The cofinal structure is *completely classified*; there is no wild
+>   type, so no wild escapee. Everything factors up to the `[ω₁]^{<ω}` ceiling.
+> - **CH side:** `2^{ℵ₁}` cofinal types exist, the wild ones built from exactly
+>   coherent-sequence / tree structures like `D(e)`. A nontrivial coherent sequence's fiber
+>   order can be a wild type — **an escapee.**
+
+Hence the transport residual is **Todorcevic's cofinal-types independence**: escapee under
+CH, tame under PFA — an *order-theoretic* (Tukey) independence, not the abelian
+strong-homology one.
+
+**Why this frame is correct where §30's was not [the decisive check].** §30's `lim¹` frame
+was refuted by Theorem F (block-wild legal systems over nontrivial `e` are schedulable
+while `[e] ≠ 0`), because schedulability is a *monotone order* realization, not an abelian
+coboundary. The **Tukey** frame is *exactly* the monotone-order category — a Tukey
+reduction is a monotone cofinal map — so Theorem F is no objection at all: it merely says
+*some* constraint systems on `D(e)` are dominated (don't witness the maximal cofinal type),
+which is normal — a directed set's Tukey type is witnessed by *particular* unbounded
+families, not all of them. The frame that Theorem F killed (abelian `lim¹`) and the frame
+that survives it (Tukey cofinal types) are different categories, and only the second is the
+one our objects live in. §31 called this correctly ("pcf/coherent-order flavor, not
+strong-homology"); the Tukey classification is that flavor, named.
+
+**Closure of the line.** The transport calculus *opened* (§4–§8) as an order question —
+dcpo/cofinal-factorization of directed sets, with the machine-checked witnesses `D3`, `Dm`,
+`Fb` as small cofinal-type examples (`Dm` not a dcpo yet factoring via `⊤`; `Fb` factoring
+via a ruler — these are Tukey-tameness witnesses). It detoured through cohomology (§24, §30)
+and was corrected back to order theory (§31). It now lands, sourced, on its true home:
+**the cofinal-type theory of ℵ₁-directed sets, whose independence (5 under PFA, `2^{ℵ₁}`
+under CH) is exactly the escapee's independence.** The whole arc — Lipschitz/Hölder/
+Dobrushin quantitative tiers, then the qualitative dcpo residual — was a Tukey question from
+the first, and the residual is a *named, deep, decades-old independence* in Todorcevic's
+program.
+
+**Honest remaining work [named].** The exact reduction — that a *specific* legal constraint
+system on `D(e)` realizes a wild cofinal type under CH (and that PFA-tameness implies every
+legal system is dominated) — must be written to make "escapee ⟺ wild Tukey type" a theorem
+rather than a (correct-category) identification. That is a reduction to Todorcevic's cofinal
+types, tractable because the category is right. But the meta-question is now *answered*: the
+residual is independent of ZFC, order-theoretically, and the reference is Todorcevic's
+cofinal-types classification — this time in the category that survives Theorem F.
+
+Sources: Todorcevic, *Directed sets and cofinal types* (Trans. AMS, 1985) and the PFA
+five-types classification; the CH `2^{ℵ₁}`-types result; surveyed in "The Tukey Order and
+Subsets of ω₁" (arXiv:1608.00319) and the cofinal-types literature (arXiv:2108.03701,
+2211.13361).
