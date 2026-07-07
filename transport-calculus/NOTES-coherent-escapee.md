@@ -1372,3 +1372,65 @@ ZFC** (escapees exist, from any stationary-osc walk sequence). If legality prova
 for every osc-driver — the columns *always* break when the defect oscillates enough —
 that is a theorem pushing hard toward the no-escapee / independence side. Either resolution
 is a real result; the fork is now a computation about `ρ₁`, handed off intact.
+
+## 28. Computing Δ_Σ for the walk system: the block-diagonal is unbounded, and checkpoint (1) reframes to a floor-divergence question about ρ₁
+
+Branch-(1) checkpoint (1), done as far as honest walk facts allow. One solid computation,
+one definitional correction to §27, and a concrete reduction of the checkpoint — with the
+genuinely walk-combinatorial residue flagged, not faked.
+
+**Computation [solid, C-sequence-explicit].** Take `e_β := ρ₁(·, β)` (Todorcevic walks;
+coherent and nontrivial). Fix a limit `δ`, block `[δ, δ+ω)`, `λ(δ+m) = δ+ω`. With the
+natural `C_{δ+ω} = {δ+n : n < ω}` (cofinal, closed, order type ω), the walk from `δ+ω` to
+`δ+m` is the single step `δ+ω → δ+m` (since `δ+m ∈ C_{δ+ω}`), of weight
+`|C_{δ+ω} ∩ (δ+m)| = |{δ, δ+1, …, δ+m-1}| = m`. Hence
+**`ρ₁(δ+m, δ+ω) = m`** — the sequence's own **block-diagonal `Δ(ξ) = ρ₁(ξ, λ(ξ))` is
+unbounded on every block** (linearly, here; robustly unbounded for any cofinal ω-type
+`C_{δ+ω}`, since all but finitely many of its points lie in `[δ, δ+ω)`).
+
+*Two consequences, both checkable.* (i) **Block-wild systems are illegal over `ρ₁`** —
+their `Δ_Σ` is exactly this unbounded block-diagonal, so Theorem F never applies to the
+native walk system. (ii) The walk sequence is **natively wild**: the §21 "kills destroy
+BD" phenomenon arises here with *no kills*, intrinsically from the C-sequence — the
+oscillation is baked into `ρ₁`'s floors, not added.
+
+*Within-block fixed-coordinate profile [computed].* At a fixed `ξ = δ+m`, for successor
+levels `β = δ+m+j` in the block, the walk `β → δ+m` runs down the successors with weights
+`|{δ+m+i-1} ∩ (δ+m)| = 0`, so `ρ₁(δ+m, δ+m+j) = 0`; the value jumps to `m` only at the
+block-limit `δ+ω`. So the floor value at a fixed coordinate is flat (`0`) across the
+block and **spikes at the limit level** — wildness concentrated exactly at limits, which
+is exactly where limit-raising pressure lives.
+
+**Correction to §27's checkpoint (1) [definitional].** "The osc-driven `Σ` must keep
+`Δ_Σ` locally dominated" was misframed: `Δ_Σ` is *tautologically* locally dominated for
+any legal `Σ`, because legality **is** joint-boundedness of the image family below each
+`u`, and a joint bound `(γ, s)` gives `Δ_Σ ≤ s =* e_γ` for free. The real legality content
+is the joint-boundedness itself: an infinite image family at levels `β_n` has a fiber
+bound iff its pointwise sup `sup_n e_{β_n}` is `=*` a floor — i.e. iff `sup_n ρ₁(ξ, β_n)`
+is finite at (almost) every `ξ`. That is precisely **no floor-divergence** (§23) = the
+finite-fan condition = local realization of `Ψ_Σ` (§24). Legality and schedulability are
+the *same* floor-divergence condition, one level apart.
+
+**The checkpoint, reduced to a concrete `ρ₁` question.** A legal *limit-raising* system
+over `ρ₁` exists iff some infinite image family at levels `β_n` cofinal in a limit `δ` is
+jointly bounded — iff
+
+> **(ρ₁-floor-convergence.)** For stationarily many `δ` and some (equivalently every
+> tail-representative) cofinal `⟨β_n⟩ → δ`, is `sup_n ρ₁(ξ, β_n) < ∞` for all but
+> finitely many `ξ < δ` — i.e. does `sup_n e_{β_n} =* e_δ`?
+
+The block-diagonal spike (`ρ₁(δ+m, δ+ω) = m`) is the warning sign: floor values *do*
+jump at limits, so the sup over levels approaching `δ` can pick up the spikes. Whether it
+stays finite is the divergence question, and it is **C-sequence-dependent** walk
+combinatorics — the honest boundary of this computation.
+
+**Honest verdict.** The computation is decisive for framing, not for the fork. It shows:
+(a) the escapee's raw material — unbounded local wildness — is genuinely present in `ρ₁`,
+concentrated at limits; (b) that same wildness is the legality obstruction (spikes break
+joint-boundedness), the Theorem-D double-edge now intrinsic; (c) which wins is exactly
+`(ρ₁-floor-convergence)`, a concrete divergence computation. If floor-convergence holds
+(stationarily), legal limit-raising systems exist and the escapee is live; if it fails
+robustly, every legal system over `ρ₁` is tame (`§20 Cor. 2`) and **`ρ₁` is provably not
+an escapee** — Φ(ρ₁) in ZFC. The next real step is that single divergence computation for
+a concrete C-sequence, which needs Walks ch. 2's `ρ₁` estimates in hand — set up here,
+not fabricated.
