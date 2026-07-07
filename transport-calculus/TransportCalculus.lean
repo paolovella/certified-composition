@@ -1834,6 +1834,90 @@ theorem omega_concentration_fails :
   have := mem_le_foldMax L (L.foldr Nat.max 0 + 1) (hall _)
   omega
 
+/-! ## The dip-schedulability game, in shadow: Theorem A and Lemma F machine-checked
+
+`NOTES-coherent-escapee.md` / `PROBLEM-dip-schedulability.md` reduce the transport line's
+qualitative residual to a game on a coherent sequence. Two proved pillars of that
+development are index-agnostic (no ω₁ regularity, no fiber-order construction beyond the
+pointwise data they use) and formalize directly over the same `CoherentSeq` abstraction
+the reps theorem runs on:
+
+- **Theorem A** (trivial ⟹ strongly schedulable): a trivialization *is* a schedule — the
+  canonical dips route every surviving defect into one finite per-top set.
+- **Lemma F** (below-level absorption): below an element's own level the fiber inequality
+  `s_x ≤ s_u` transfers through the floors, so those coordinates never leak.
+
+These are the pieces the contested open heart (Question 5) rests on; machine-checking
+them makes the proved skeleton unimpeachable while the heart stays open. -/
+
+section DipSchedule
+open Classical
+variable {W : Type} {WI : WellIndex W}
+
+/-- **Upward defect** `D⁺(a,b)` (for `a ≤ b`): coordinates below `a` where row `a`
+    exceeds row `b`. -/
+def upDefect (C : CoherentSeq W WI) (a b : W) : W → Prop :=
+  fun u => WI.lt u a ∧ C.e a u > C.e b u
+
+/-- The **canonical trivialization dip** at source level `a`: where row `a` deviates from
+    the global row `E`. -/
+def trivDip (C : CoherentSeq W WI) (E : W → Nat) (a : W) : W → Prop :=
+  fun u => WI.lt u a ∧ C.e a u ≠ E u
+
+/-- The schedule leftover at a top `t`: coordinates surviving *some* source `a ≤ t`'s
+    canonical dip while still defecting against `t`. (`γ = μ`; the union over sources
+    `x ⊑ u` collapses to a quantifier over source levels `a ≤ t`.) -/
+def scheduleLeftover (C : CoherentSeq W WI) (E : W → Nat) (t : W) : W → Prop :=
+  fun u => ∃ a, WI.le a t ∧ upDefect C a t u ∧ ¬ trivDip C E a u
+
+/-- **Theorem A (leftover containment).** Every coordinate surviving the canonical dips
+    at top `t` lies in the single `t`-local set where the global row `E` disagrees with
+    row `t`. This is the whole content: the union over sources lands in one finite set. -/
+theorem thmA_leftover_subset (C : CoherentSeq W WI) (E : W → Nat) (t u : W)
+    (hu : scheduleLeftover C E t u) : WI.lt u t ∧ E u ≠ C.e t u := by
+  obtain ⟨a, hat, hdef, hndip⟩ := hu
+  obtain ⟨hua, hgt⟩ := hdef
+  have heq : C.e a u = E u :=
+    Classical.byContradiction (fun hne => hndip ⟨hua, hne⟩)
+  refine ⟨⟨WI.le_trans hua.1 hat, fun htu => hua.2 (WI.le_trans hat htu)⟩, ?_⟩
+  intro hEt; rw [heq] at hgt; omega
+
+/-- **Theorem A (trivial ⟹ strongly schedulable).** For a trivial coherent sequence, the
+    canonical trivialization dips make the schedule leftover finite at every top — the
+    schedule condition. -/
+theorem thmA_schedulable (C : CoherentSeq W WI) (E : W → Nat)
+    (hE : ∀ w, FiniteP (fun u => WI.lt u w ∧ E u ≠ C.e w u)) (t : W) :
+    FiniteP (scheduleLeftover C E t) :=
+  FiniteP.mono (fun _ hu => thmA_leftover_subset C E t _ hu) (hE t)
+
+/-- **Lemma F (below-level absorption).** Below an element's own level `lx`, if the fiber
+    functions satisfy `s_x ≤ s_u` (the order relation `x ⊑ u`) and the floors agree with
+    the fiber functions there, then the coordinate carries no upward defect: the below-
+    level leftover is contained in the two finite fiber-deviation sets. -/
+theorem lemmaF_below_subset (C : CoherentSeq W WI) (sx su : W → Nat) (gx gu lx u : W)
+    (hle : sx u ≤ su u) (hu : WI.lt u lx ∧ upDefect C gx gu u) :
+    C.e gx u ≠ sx u ∨ C.e gu u ≠ su u := by
+  obtain ⟨_, hdef⟩ := hu
+  obtain ⟨_, hgt⟩ := hdef
+  by_cases h1 : C.e gx u = sx u
+  · by_cases h2 : C.e gu u = su u
+    · exfalso; rw [h1, h2] at hgt; omega
+    · exact Or.inr h2
+  · exact Or.inl h1
+
+/-- **Lemma F, finiteness form.** With `s_x ≤ s_u` throughout the below-level region, the
+    below-level leftover is finite, being covered by the two fiber-deviation sets (finite
+    since fiber functions are `=*` their floors). -/
+theorem lemmaF_below_finite (C : CoherentSeq W WI) (sx su : W → Nat) (gx gu lx : W)
+    (hle : ∀ u, WI.lt u lx → sx u ≤ su u)
+    (hfibx : FiniteP (fun u => C.e gx u ≠ sx u))
+    (hfibu : FiniteP (fun u => C.e gu u ≠ su u)) :
+    FiniteP (fun u => WI.lt u lx ∧ upDefect C gx gu u) :=
+  FiniteP.mono (fun u hu => lemmaF_below_subset C sx su gx gu lx u (hle u hu.1) hu)
+    (hfibx.union hfibu)
+
+end DipSchedule
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*

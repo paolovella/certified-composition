@@ -24,6 +24,29 @@ landed.
 
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
+- **Dip-schedulability skeleton, machine-checked (`DipSchedule` section).**
+  Theorem A (trivial ⟹ strongly schedulable) and Lemma F (below-level
+  absorption) — two index-agnostic pillars of the set-theoretic
+  development — formalized over the `CoherentSeq` abstraction:
+  `thmA_leftover_subset`/`thmA_schedulable` (canonical dips route every
+  surviving `upDefect` at a top into one finite set) and
+  `lemmaF_below_subset`/`lemmaF_below_finite` (the fiber inequality
+  `s_x ≤ s_u` transfers through the floors below the element's level;
+  the finiteness form is choice-free, `propext, Quot.sound`). These are
+  the proved results the open heart (Question 5) rests on; hardening
+  them leaves the residual — a `lim¹`-type independence (notes §24–§26)
+  — as the only open point. No `sorry`.
+- **Set-theory research line (notes §14–§26, problem statement).** The
+  qualitative residual driven to a single named question in five
+  equivalent forms (wildness cap / finite-row incidence covering /
+  finite-fan / profile-diagonal / poset-ccc): Lemma F, Theorems E (the
+  game is Φ-complete), F (block-wild cap), G (finite-fan ⟹ coverable);
+  the ◊ results C (a non-schedulable coherent sequence) and D (its
+  lethal pressure is illegal); and the §22–§26 reductions locating the
+  residual as a `lim¹`/derived-limit independence, ccc of the frozen-dip
+  realization poset `P(Σ)` against walk oscillation. Eleven recorded
+  verdict flips, each argument-forced; the ZFC skeleton is proved, the
+  heart handed to set theory in final form.
 - **0.1** — first cut: a `Bridge` carrying a certificate, `Bridge.comp`
   accumulating it; existence demonstrated by *composition* of two certified
   bridges (not a single morphism). Zero axioms.

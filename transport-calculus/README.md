@@ -630,6 +630,21 @@ load-bearing — `nat_not_sigma_directed` shows ℕ fails σ-directedness, and
 fails at index ℕ: the coherent, level-monotone family `χ_{<n}` moves at every
 coordinate. The shadow theorem is exactly why the argument works at ω₁ and not below.
 
+**Theorem A and Lemma F, machine-checked (`thmA_schedulable`, `lemmaF_below_finite`).**
+Two proved pillars of the dip-schedulability development (problem statement §1) are
+index-agnostic and now formalized over the same `CoherentSeq` abstraction, in the
+`DipSchedule` section: **Theorem A** — a trivial coherent sequence is strongly
+schedulable, because the canonical trivialization dips route every surviving upward
+defect (`upDefect`) at a top `t` into the single finite set where the global row
+disagrees with row `t` (`thmA_leftover_subset`, then finiteness by `FiniteP.mono`); and
+**Lemma F** — below an element's own level the fiber inequality `s_x ≤ s_u` transfers
+through the floors, so the below-level leftover is covered by the two finite
+fiber-deviation sets (`lemmaF_below_subset`/`lemmaF_below_finite`, the latter choice-free:
+axioms `propext, Quot.sound`). These are exactly the results the contested open heart
+(Question 5) rests on; machine-checking them hardens the proved skeleton while the heart
+stays open. Axioms otherwise the standard `propext, Classical.choice, Quot.sound`; no
+`sorry`.
+
 **The fiber-control gap closes — Theorem B, and Question 1′ proved (note §11).** The §7
 `H`-route is refuted by a counterexample (wasteful dips hide whole columns below an
 ω-cofinality level), and the theorem is proved by the *honest-column* extraction instead:
