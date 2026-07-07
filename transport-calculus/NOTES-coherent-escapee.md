@@ -1321,3 +1321,54 @@ infinite dips); frozen-dip poset installed; ccc reduced to a written-down ZFC
 cross-defect inequality. Found by trying to run the poset, per the standing discipline of
 auditing before believing. The `lim¹`-neighborhood placement (§24) stands and is
 reinforced: the deciding combinatorics is `osc(ρ)` against finite correction.
+
+## 27. Branch (1) setup: the osc-driven legal cross-defective family — a precise open target (not a result)
+
+The honest run at the one branch that would give a *ZFC* escapee with no independence
+caveat. I can pose it exactly; I do **not** claim it — completing it needs Todorcevic's
+oscillation combinatorics (Walks, ch. 1–2), which is a genuine development, not a
+prose flourish. Stated so a future session or a set theorist can attack it directly.
+
+**The target.** Exhibit, in ZFC, a coherent `e` (walk-based, `e_α := ρ₁(·, α)` or a
+binary refinement) and a **legal** system `Σ` over `D(e)` with induced pressure `μ`,
+admitting an uncountable family `{(x_i, u_i) : i < ω₁}` such that:
+- (internal clean) `D⁺(μ(x_i), μ(u_i)) = ∅`;
+- (cross defective, beyond finite correction) for `i < j` with `x_i ⊑ u_j`,
+  `D⁺(μ(x_i), μ(u_j)) ⊄ X(x_i) ∪ F(u_j)` for the frozen finite `X, F`.
+By §26 this makes `P(Σ)` non-ccc *and*, if the escape is witnessed in `V`, refutes
+schedulability of `μ` — a legal, ZFC non-schedulable induced pressure, i.e. an escapee.
+
+**The one lemma the construction must supply (isolated).**
+
+> **(osc-escape.)** There is a legal `Σ` such that the map `(i, j) ↦ D⁺(μ(x_i), μ(u_j))`
+> has the property: for every choice of finite `X(x_i), F(u_j)` (of the sizes a
+> condition allows), stationarily many `j` see cofinally many `i < j` with the defect
+> escaping — i.e. the defect count `|D⁺(μ(x_i), μ(u_j))|` is *unbounded* in `i` for
+> fixed `j`, faster than any fixed finite correction absorbs.
+
+This is where `osc(ρ₁)` enters: Todorcevic's theorem that `osc(ρ₁(·,α), ρ₁(·,β))` is
+**unbounded on a stationary set** is exactly a lower bound on alternation counts, and the
+defect `D⁺` between walk floors is governed by those alternations. The construction
+would push the oscillation into `D⁺` while keeping the *img-values* (columns) bounded —
+the split that Theorem D failed (its kills broke columns) but which walk oscillation,
+adding no kills, plausibly respects.
+
+**The two checkpoints, both real and both unverified here.**
+1. **Legality survives.** The osc-driven `Σ` must keep `Δ_Σ` (img-value diagonal)
+   locally dominated. Oscillation is a floor-structure phenomenon, not an added kill, so
+   columns *may* stay bounded — but this needs the actual computation of `Δ_Σ` for the
+   walk system, not an assertion. This is the checkpoint Theorem D shows is decisive.
+2. **The escape outruns correction in `V`.** Unbounded `osc` gives unbounded defect
+   counts, but "unbounded" must be upgraded to "escapes every *frozen finite* `X ∪ F`
+   simultaneously across an uncountable family" — a uniformity that unbounded-on-
+   stationary should give via a pressing-down, but the pressing-down interacts with the
+   `⊑`-comparabilities `x_i ⊑ u_j`, which must be arranged in the walk order.
+
+**Honest status.** Neither checkpoint is discharged here. The target is now *concrete*:
+a single osc-escape lemma with two named verification obligations, both of the exact type
+that the Walks machinery is built to handle and that this prose cannot responsibly fake.
+If (osc-escape) holds with legality, the transport residual is settled **positively in
+ZFC** (escapees exist, from any stationary-osc walk sequence). If legality provably fails
+for every osc-driver — the columns *always* break when the defect oscillates enough —
+that is a theorem pushing hard toward the no-escapee / independence side. Either resolution
+is a real result; the fork is now a computation about `ρ₁`, handed off intact.
