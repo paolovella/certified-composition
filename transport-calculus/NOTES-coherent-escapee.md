@@ -1911,3 +1911,67 @@ Sources: Todorcevic, *Directed sets and cofinal types* (Trans. AMS, 1985) and th
 five-types classification; the CH `2^{ℵ₁}`-types result; surveyed in "The Tukey Order and
 Subsets of ω₁" (arXiv:1608.00319) and the cofinal-types literature (arXiv:2108.03701,
 2211.13361).
+
+## 37. The exact reduction, attempted: Φ is finer than the Tukey type — the bridge to PFA/CH is the realization poset, not a citation (fifteenth flip, refining §36)
+
+Writing the reduction `Φ(e) ⟺ D(e)` tame-Tukey exposed a real gap: **`Φ` is not a coarse
+function of the Tukey type.** §36 correctly identified the *category* (Tukey / cofinal
+types) and the *independence* (PFA tame / CH wild), but the exact reduction is not a
+citation. Here is what is solid, where it breaks, and the correct bridge.
+
+**Solid: the three routes give Φ [proved].** A directed set `D` has `Φ` (every legal
+constraint system has a monotone dominator) if it has any of:
+- a **top** `⊤`: take `φ ≡ ⊤` (Dm's route — `Dm` has `Φ` though it is not bounded-complete);
+- **bounded-completeness**: `φ(u) := ⊔ M(u)` (Theorem H);
+- a **cofinal ruler**: dominate along the chain (`Fb`'s route).
+
+**Solid: all five PFA-tame types have Φ [proved].** `1` (top); `ω`, `ω₁`, `ω×ω₁`,
+`[ω₁]^{<ω}` are each **bounded-complete** — in `[ω₁]^{<ω}` a bounded set is `⊆ P(F)` for
+finite `F`, hence finite, so `⊔ M(u) = ⋃ M(u)` is finite and in the set. So every tame type
+has `Φ`.
+
+**The gap: Φ is finer than the Tukey type [the obstruction].** The reduction needs `Φ`
+downward-Tukey-closed (`D ≤_T E`, `Φ(E) ⟹ Φ(D)`). But `Φ` depends on **bounded-
+completeness**, which is *not* Tukey-invariant: `D(e)` for nontrivial `e` is **not**
+bounded-complete (the `Dm`/`Fb` coherence-defect gaps, §32–33), yet under PFA it is
+`≡_T [ω₁]^{<ω}`, which **is** bounded-complete. Tukey-equivalent, different bounded-
+completeness. So `Φ(e)` is **not** read off the Tukey type by the bounded-completeness
+route, and §36's "`Φ(e)` = cofinal-type" was optimistic: the cofinal type is a *coarser*
+invariant than `Φ(e)`. (Whether `Φ` is Tukey-invariant by some *other* argument is itself
+open — the honest crux lemma of any citation-style reduction.)
+
+**The correct bridge: the realization poset, not the classification [the actual reduction].**
+`Φ(e)` connects to PFA/CH through the **frozen-dip realization poset `P(Σ)`** (§25–26), not
+through Todorcevic's classification directly:
+- **Under PFA (properness side):** if `P(Σ)` is proper for every legal `Σ`, then a generic
+  realization exists and — meeting `ℵ₁` dense sets — `Φ(e)` holds. PFA making these
+  coherent-selection posets proper is the *same* phenomenon that collapses the cofinal
+  types to five; both are PFA killing wild ℵ₁-combinatorics. **PFA ⟹ no escapee**, via
+  `P(Σ)` properness.
+- **Under CH (proliferation side):** CH builds `2^{ℵ₁}` cofinal types and, by the same
+  coherence-oscillation, legal `Σ` with `P(Σ)` non-ccc *and a `V`-witness* — an escapee.
+  **CH ⟹ escapee**, via `P(Σ)` failure.
+
+So `Φ(e)` is governed by the **PFA/CH independence**, and Todorcevic's cofinal-types
+classification is its *parallel face* (same axioms, same wild-`ℵ₁`-combinatorics engine) —
+but the reduction runs through `P(Σ)`-properness (an order/forcing statement about `D(e)`
+directly), **not** through a Tukey-type equality that `Φ`'s finer-than-Tukey nature forbids.
+
+**Honest status of "the exact reduction."**
+- **[proved]** the three Φ-routes; all five tame types have `Φ`; `D(e)` not bounded-complete.
+- **[proved-structural]** `Φ(e) ⟺ P(Σ)` realizable for all legal `Σ` (Theorem E + §25 density).
+- **[argued, sourced parallel]** PFA ⟹ `P(Σ)` proper ⟹ `Φ(e)` (no escapee); CH ⟹ `P(Σ)`
+  failure ⟹ escapee — the same independence classifying cofinal types.
+- **[open lemma]** whether `Φ` is a genuine Tukey invariant (would upgrade the parallel to a
+  literal "`Φ(e)` = tame cofinal type" reduction). Not established; possibly false, since
+  bounded-completeness is finer than the cofinal type.
+
+**Net (refining §36).** §36's frame is right — order-theoretic, PFA/CH-independent — and its
+category (Tukey) is the one that survives Theorem F. But the *exact* reduction is **not**
+"`Φ(e)` equals the Tukey type"; it is "`Φ(e)` ⟺ `P(Σ)` realizable, governed by the
+PFA/CH independence, of which the cofinal-types classification is the parallel face." The
+residual is independent of ZFC (PFA: no escapee; CH: escapee), proved-structurally through
+the realization poset; the literal cofinal-type identification carries a genuine open lemma
+(Tukey-invariance of `Φ`) that this pass does **not** fabricate. Fifteenth flip: attempting
+the exact reduction found `Φ` finer than the cofinal type, and relocated the bridge to
+`P(Σ)`-properness — the honest, order-theoretic, forcing-axiom form.
