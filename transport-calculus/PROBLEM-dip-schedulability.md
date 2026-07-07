@@ -83,6 +83,16 @@ a **finite-row covering** of the gap-chain-divergence incidence matrix — the �
 rows/columns problem. Question 5 thereby unifies with the incidence machinery: block-wild
 (Theorem F) and tame (§20 Cor. 2) pressures are the proved coverable cases; the ◊-lethal
 pressure is the proved non-coverable case, but it is illegal, hence not an escapee.)*
+
+*(Final form, notes §23: with `γ = μ` and Lemma F's dips, the value-form rider is killed
+at `(u,ξ)` by dipping `dev(e_{γ(y_n)}, e_{γ(u)})`, finite at each chain level by
+coherence (**level-spike finiteness**). A monotone `γ ≥ μ` schedules `μ` as soon as it
+has the **finite-fan property** — `⋃_{u ⊒ x} dev(e_{γ(x)}, e_{γ(u)}) ∩ [ℓ(x),γ(x))`
+finite for every `x` (**Theorem G [proved]**). Block-wild and tame pressures have finite
+fan; the open content is whether *every* legal induced pressure admits a finite-fan `γ`
+— equivalently whether the ceilings can be **coherently selected**, a reps-theorem-type
+uniformization. ZFC-yes ⟹ no escapee; a consistent no ⟹ an escapee, and a witness must
+pair column-domination with an infinite fan at stationarily many elements.)*
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are

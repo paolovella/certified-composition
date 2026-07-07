@@ -1064,3 +1064,71 @@ coverable matrices. The next concrete target: does legality (column-domination o
 `Δ_Σ`) itself imply finite-row coverability — i.e. is there a legal induced pressure
 whose gap-chain incidences have a stationary heavy row? Theorem F says no for the
 block-wild shape; the general wild shape is the frontier.
+
+## 23. The finite-fan criterion: coverability stripped of the system, and the sharp final question
+
+Attacking §22's "does legality force finite-row coverability for the general wild shape."
+The system `Σ` drops out entirely; coverability becomes an intrinsic uniformization
+property of `e` relative to `γ`, with a clean criterion. No flip — reduction plus two
+proved positive cases and one sharp open question.
+
+**Level-spike finiteness [proved, trivial but load-bearing].** For a limit `δ` and any
+`β < δ`, the set `{ξ < β : e_β(ξ) ≠ e_δ(ξ)} = dev(e_β, e_δ)` is finite (coherence). So
+relative to any fixed ceiling floor `e_δ`, **each level spikes only finitely many
+coordinates.** The floor-divergence of §21 is thus never "wide at a level" — it is thin
+at every level and accumulates only across cofinally many levels.
+
+**The obstruction, u-independent form.** Take `γ = μ`, a chain `y_0 ⊑ y_1 ⊑ ⋯ ⊑ u`,
+`δ_u := sup_n γ(y_n) ≤ γ(u)`. Off Lemma F's below-level dips, the value-form rider fails
+at `(u,ξ)` iff `ξ ∈ dev(e_{γ(y_n)}, e_{γ(u)})` for cofinally many `n` with the values
+`e_{γ(y_n)}(ξ)` growing. To kill it, dip `ξ` at those `y_n`. The dip that works for a
+*single* ceiling is exactly `X(y_n) ⊇ dev(e_{γ(y_n)}, e_{γ(u)}) ∩ [ℓ(y_n), γ(y_n))` —
+**finite, by level-spike finiteness.** The entire difficulty is that `y_n`'s one finite
+dip must serve *every* ceiling `γ(u)` for `u ⊒ y_n` at once.
+
+**Definition (finite fan).** A monotone `γ ≥ μ` has the *finite-fan property* if for
+every element `x`,
+`Fan(x) := ⋃_{u ⊒ x} ( dev(e_{γ(x)}, e_{γ(u)}) ∩ [ℓ(x), γ(x)) )` is finite.
+
+**Theorem G (finite-fan ⟹ coverable) [proved].** If `γ ≥ μ` has the finite-fan
+property, then `(γ, X)` with `X(x) := Fan(x) ∪ (`Lemma F dips`)` schedules `μ` (value
+form). *Proof.* `X(x)` is finite by hypothesis. For any `u` and `ξ ∈ [ℓ(x), γ(x))` off
+`X(x)`, `ξ ∉ dev(e_{γ(x)}, e_{γ(u)})`, so `e_{γ(x)}(ξ) = e_{γ(u)}(ξ)`: no upward defect
+and the floor value equals the ceiling — set-form leftover `⊆` the Lemma F `u`-set, and
+`S_u(ξ) ≤ e_{γ(u)}(ξ) < ∞`. Below-level coordinates are Lemma F's. ∎
+
+**The two proved classes have finite fan.** *Block-wild* (Theorem F): `γ` is the
+`λ∘ℓ`-block closure; continuations `γ(u)` from `x` share `x`'s block ceiling, so
+`Fan(x)` is one block-deviation, finite. *Tame* (§20 Cor. 2): `γ = μ` is finite-raising,
+gaps finite, `Fan(x) ⊆ [ℓ(x), γ(x))` already finite. Both sidestep the accumulation by
+keeping continuations within a bounded ceiling band.
+
+**Why wildness threatens it, and the sharp question.** For strictly-wilder-than-block
+legal systems the induced `μ` forces `γ(u)` up to *limit* ceilings, and the
+continuations from `x` fan across cofinally many distinct `δ_u`, each contributing its
+own finite spike-set — whose union can be infinite. Finite fan is then not automatic; it
+must be *engineered* by choosing `γ` so that all continuations above `x` agree on a
+single ceiling mod finite. That is exactly a **coherent level-selection**: assigning
+levels `γ` so that `e_{γ(x)}` and `e_{γ(u)}` agree below `γ(x)` mod one finite set per
+`x`, uniformly. So:
+
+> **Question 5 (final form).** Does every legal induced pressure over every coherent
+> sequence admit a finite-fan monotone `γ ≥ μ`? Equivalently: can the ceilings always be
+> coherently selected? ZFC-yes ⟹ Φ(e) for all `e`, no transport escapee (residual
+> settled negatively). A consistent no ⟹ an escapee.
+
+**Where the evidence points (no claim).** A finite-fan `γ` over the whole order is a
+coherent choice of ceilings — structurally a *global* mod-finite trivialization datum of
+the reps-theorem type. The reps theorem (now machine-checked at ω₁, Tier 5) says
+nontrivial `e` admits *no* level-monotone representative system; a finite-fan selection
+is a cousin (level-valued, overshoot-allowed, so not literally refuted by it). The honest
+reading: for nontrivial `e`, sufficiently-wild legal systems force `γ` into the limit-
+ceiling zone where finite fan is a coherent-selection demand of exactly the flavor that
+fails for reps — suggesting **escapees exist for nontrivial `e`, i.e. Q5 is NO and the
+transport residual is settled *positively* (escapees exist in ZFC)**. But this is a
+suggestion, not a proof: a witness requires exhibiting a *legal* wild system whose
+induced pressure defeats every finite-fan `γ`, and legality is exactly the bar that
+Theorem D showed the ◊-lethal pressure fails to clear. The construction — a legal wild
+system forcing limit ceilings with a non-uniformizable spike pattern — is the single
+remaining target, now fully concrete: it needs column-domination (legality) to coexist
+with an infinite fan at stationarily many elements.
