@@ -1434,3 +1434,55 @@ robustly, every legal system over `ρ₁` is tame (`§20 Cor. 2`) and **`ρ₁` 
 an escapee** — Φ(ρ₁) in ZFC. The next real step is that single divergence computation for
 a concrete C-sequence, which needs Walks ch. 2's `ρ₁` estimates in hand — set up here,
 not fabricated.
+
+## 29. The ρ₁-floor-convergence computation: canonical ρ₁ clears checkpoint (1); the residual is confirmed at the forcing level
+
+Done explicitly for the canonical C-sequence. One solid walk computation, one sharpening
+of §28's condition, and a clear verdict: checkpoint (1) is *cleared positively* — legal
+limit-raising systems exist over canonical `ρ₁` — so the fork lives entirely at
+checkpoint (2), the poset ccc / `lim¹` independence. No fabrication; the walk values are
+computed, not asserted.
+
+**Walk computation [solid, explicit].** Canonical C-sequence:
+`C_{ω·n} = {ω·(n-1)+m : m<ω}`, `C_{α+1} = {α}`, `C_{ω²} = {ω·n : n<ω}`. For
+`ξ = ω·k+j` (`0<j<ω`) and `n>k`:
+- **`ρ₁(ω·k+j, ω·n) = j`** — the walk `ω·n → ω·(n-1) → ⋯ → ω·(k+1) → ξ` has weight
+  `|C_{ω·i} ∩ ξ| = 0` at every high step (ladders sit above `ξ`) and weight
+  `|C_{ω·(k+1)} ∩ ξ| = |{ω·k+m : m<j}| = j` at the last. **Constant in `n`.**
+- **`ρ₁(ω·k+j, ω²) = max(k+1, j)`** — the walk from `ω²` adds a first step of weight
+  `|C_{ω²} ∩ ξ| = |{0, ω, …, ω·k}| = k+1`, then descends as above.
+
+So `sup_n ρ₁(ξ, ω·n) = j < ∞`: **floor-convergence holds.** More: since
+`ρ₁(ξ, ω·n) = j ≤ max(k+1,j) = ρ₁(ξ, ω²)`, the defect `D⁺(ω·n, ω²) = ∅` for every `n`.
+
+**Sharpening §28's condition [correction].** §28 said joint-boundedness ⟺ floor-
+convergence (`sup_n ρ₁(ξ,β_n) < ∞`). That was slightly loose: floor-convergence makes
+`s := sup_n e_{β_n}` a total function, but a *fiber* bound at level `δ` needs
+`e_δ ≥ s` off a finite set, i.e. **`⋃_n D⁺(β_n, δ)` finite** (the finite-fan condition at
+the limit). Floor-convergence is necessary; `⋃ D⁺` finite is the exact condition. In the
+canonical case `⋃_n D⁺(ω·n, ω²) = ∅`, so `e_{ω²}` bounds the whole family
+`{e_{ω·n}}`: **the images at levels cofinal in `ω²` are jointly bounded — a legal
+limit-raising family.**
+
+**Verdict [computed ⟹ argued].** Over canonical `ρ₁`, **legal limit-raising systems
+exist** (checkpoint (1) cleared, positively). So `ρ₁` is *not* excluded from
+escapee-hood by tameness — the §20-Cor-2 route does not swallow it. Two riders keep the
+honesty exact:
+1. The *simplest* such system (everything pumped to `ω²`, `D⁺ = ∅`) is trivially
+   schedulable — clearing checkpoint (1) does not produce an escapee, only the *room*
+   for one. The escapee still requires a **cross-defective** legal system (`⋃ D⁺` finite
+   for the joint bound, yet the cross-terms `D⁺(μ(x_i), μ(u_j))` escaping frozen finite
+   correction, §26). That is checkpoint (2), untouched here.
+2. The result is C-sequence-specific in the *right* direction: a C-sequence with
+   `⋃_n D⁺(β_n, δ)` **infinite** at stationarily many `δ` would have *no* legal
+   limit-raising family there, hence only tame legal systems, hence `Φ` and **not an
+   escapee** — so the "not an escapee" verdict is *inhabited*, by floor-divergent
+   sequences, while canonical `ρ₁` sits on the live side.
+
+**Net.** The computation resolves checkpoint (1) for canonical `ρ₁`: legal wildness is
+genuinely available, the residual is not a tameness artifact, and the entire remaining
+question is checkpoint (2) — does a cross-defective legal system exist, i.e. is `P(Σ)`
+non-ccc-with-V-witness — the `lim¹`/additivity independence, now reached with the ground
+below it (checkpoints and legality) fully computed. The walk analysis has taken the fork
+as far as ZFC computation can before the forcing dichotomy; the next move is genuinely a
+consistency question, not another estimate.
