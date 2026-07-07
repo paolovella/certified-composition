@@ -114,15 +114,20 @@ escapee in ZFC; `P(Σ)` ccc for all legal `Σ` ⟹ no escapee under MA_{ω₁}; 
 V-correctable family ⟹ independence. Question 5 in its equivalent forms is this
 `lim¹`/additivity boundary, with the deciding inequality now written down.)*
 
-*(Located, notes §28–§30. The walk computations clear checkpoint (1): over canonical
+*(Located, notes §28–§31. The walk computations clear checkpoint (1): over canonical
 `ρ₁` legal limit-raising families exist (`ρ₁(ω·k+j, ω·n) = j`, `⋃_n D⁺(ω·n, ω²) = ∅`), so
-the residual is not a tameness artifact. Checkpoint (2) is an ω₁-scale question driven by
-`osc(ρ₁)` and is identified — structurally, with the theorem-to-theorem reduction named
-as remaining work — as an **additivity-of-`lim¹`** statement of the strong-homology /
-Bergfalk–Lambie-Hanson / Bannister family: `lim¹ ≠ 0` under ◊/CH (**escapee exists**),
-`lim¹ = 0` consistently under PFA / the Cohen model (**no escapee, Φ(e) for all `e`**).
-The transport residual is thus **independent of ZFC**, with its ZFC skeleton proved and
-machine-checked and its two models identified.)*
+the residual is not a tameness artifact. **Correction (notes §31, retracting a §30
+overreach):** checkpoint (2) is **not** the abelian strong-homology `lim¹` — Theorem F
+(block-wild legal systems over nontrivial `e` are schedulable, while `[e] ≠ 0`) shows
+schedulability is a **monotone order realization**, strictly weaker than cohomological
+triviality, so the Dow–Simon–Vaughan / BLH / Bannister independence does not transfer.
+The residual is an **order-theoretic / cofinality** question: does every legal constraint
+system on the directed fiber order `D(e)` admit a monotone dominating selection — the
+transfinite-selection question the line opened with (§4–§8). Its independence status is
+**open and unknown**: possibly ZFC-decidable (a uniform monotone-selection theorem ⟹ no
+escapee), possibly independent of a `pcf`/coherent-order flavor — not the strong-homology
+flavor. The ZFC skeleton stands and is machine-checked; the final question is honestly
+open.)*
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are

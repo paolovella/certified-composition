@@ -1553,3 +1553,62 @@ reduction named) to the strong-homology additivity program, its ZFC skeleton pro
 machine-checked, its two models identified. Twelve verdict flips, each argument-forced;
 the question is handed to set theory not as a mystery but as a located, named instance of
 a known independent phenomenon.
+
+## 31. CORRECTION to §30: the lim¹ identification overreached — schedulability is an ORDER realization, not a coboundary (thirteenth flip)
+
+Trying to *finish* the §30 reduction is what exposed its flaw — the honest outcome of the
+attempt. §30 identified schedulability with abelian `lim¹` vanishing (strong-homology
+additivity). That identification is wrong, and one already-proved theorem refutes it.
+
+**The refutation [proved, from Theorem F].** Schedulability of `Σ` = existence of a
+**monotone dominator** `φ` (Theorem E, both directions). Theorem F: over *every* coherent
+sequence, including nontrivial ones, block-wild legal systems have a monotone dominator —
+they are schedulable. But a nontrivial `e` has `[e] ≠ 0` in `H¹(ω₁)` (ZFC, via walks). If
+schedulability were "`[Ψ_Σ] = 0` in the abelian `lim¹`", a schedulable system over
+nontrivial `e` could not exist with a cohomologically nontrivial cochain — yet block-wild
+is schedulable and its profile diagonal `Ψ_Σ` is `≠*` any floor (`§24`, over nontrivial
+`e`). **So schedulability is strictly weaker than / different from cohomological
+triviality.** The dominator is a *monotone, order-valued* realization; the abelian
+coboundary operation does not preserve monotonicity (a coboundary may decrease). The
+correspondence §30 asserted does not hold.
+
+**What this retracts, precisely.**
+- §30's "checkpoint (2) = additivity-of-`lim¹`" and "the transport residual is
+  independent of ZFC" are **withdrawn**. The strong-homology / Dow–Simon–Vaughan / BLH /
+  Bannister results are about ℤ-valued `lim¹` vanishing; our object is a monotone
+  realization over the fiber order, and those independence proofs do **not** transfer
+  without a correspondence that Theorem F shows fails.
+- What stands from §30: nontrivial coherent sequences exist in ZFC (`H¹(ω₁) ≠ 0`), and
+  the residual is the *additivity* (universal over legal systems), not the raw
+  nonvanishing. But "additivity" here is **order-additivity** (monotone realizability),
+  not abelian `lim¹` additivity.
+
+**The correct classification [argued].** The residual is an **order-theoretic /
+cofinality** question about the fiber order `D(e)` under legal (countably-bounded)
+constraints: does every legal constraint system on the directed set `D(e)` admit a
+monotone dominating selection? This is exactly the transfinite-selection /
+σ-directed-cofinal-factorization question the transport line *opened* with (§4–§8:
+`prefix_bounded_cofinal_factors`, `sigma_directed_cofinal_factors`, the `D3`/`Dm`/`Fb`
+witnesses) — now with legality as the constraint and the coherent sequence supplying the
+branching. It is a `pcf`/ordered-derived-limit statement, not abelian strong homology.
+
+**Honest status after the correction.** Neither side of the claimed dichotomy is proved:
+the ◊-side legal non-schedulable system was **never** established (Theorem D blocked the
+natural ◊ construction by showing its pressure illegal), and the PFA-side ccc of `P(Σ)`
+was **never** proved. So:
+
+> **The residual is open — genuinely, and its independence status is *unknown*.** It is
+> an order-realization / cofinality question over `D(e)`; it may be ZFC-decidable (a
+> uniform monotone-selection theorem would give **no escapee** outright) or independent
+> (of a `pcf`/coherent-order flavor, *not* the abelian strong-homology flavor §30 named).
+> Identifying the exact statement — or proving ZFC-decidability — is the real open
+> problem, and §30's citation does not resolve it.
+
+**Trail note.** Thirteenth flip, and the most consequential correction: §30 reached for a
+clean "it's independent, here's the reference" resolution, and finishing the reduction
+showed the reference does not apply, because schedulability is order-realization not
+cohomological triviality — Theorem F, already proved, was the counterexample the whole
+time. The honest terminus is *less* closed than §30 claimed: the ZFC skeleton stands and
+is machine-checked, checkpoint (1) is cleared, but the final question is an **open**
+order-theoretic realizability problem whose independence is not established. Better an
+open question correctly classified than a resolution wrongly cited.
