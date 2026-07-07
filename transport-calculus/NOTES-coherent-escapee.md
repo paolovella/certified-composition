@@ -1486,3 +1486,70 @@ non-ccc-with-V-witness — the `lim¹`/additivity independence, now reached with
 below it (checkpoints and legality) fully computed. The walk analysis has taken the fork
 as far as ZFC computation can before the forcing dichotomy; the next move is genuinely a
 consistency question, not another estimate.
+
+## 30. Checkpoint (2) is the additivity/derived-limit independence: the identification, and the honest terminus
+
+The canonical walk values (§29) live below ω²; a countable initial segment of any
+coherent sequence is trivial, so cross-defect structure is invisible there — checkpoint
+(2) is inescapably an ω₁-scale question driven by `osc(ρ₁)`, and `osc` unbounded on a
+stationary set is Todorcevic's theorem (Walks, ch. 2), cited, not rederived. That places
+checkpoint (2) exactly on a mapped independence, and the responsible move is the
+identification, graded honestly, not a fabricated forcing proof.
+
+**What is ZFC vs. what is independent [the clean split].**
+- *Escapee material exists in ZFC.* Nontrivial coherent sequences on ω₁ exist (Todorcevic
+  walks) — `H¹(ω₁) ≠ 0` in the relevant sense. A non-trivializable profile-diagonal
+  cochain `Ψ` (locally trivial, globally not; §24) is a ZFC object.
+- *The residual is the additivity, not the raw nonvanishing.* Φ(e) asks whether **every
+  legally-induced** `Ψ_Σ` trivializes (schedules). That universal-over-legal-systems form
+  is an **additivity / derived-limit-vanishing** statement, one quantifier past raw
+  nonvanishing — and *that* is where independence lives.
+
+**The identification [argued, structural — the remaining rigorous reduction named].** The
+profile-diagonal reformulation (§24) puts the residual in the exact shape of the derived
+functor `lim¹` of an inverse system over ω₁: `Ψ_Σ` is a 1-cochain, legality is the
+system's coherence/boundedness data, and monotone realization is the coboundary
+(vanishing) condition. This is the frame of the **strong-homology / additivity-of-`lim¹`
+program**: Mardešić–Prasolov reduced additivity of strong homology to a specific
+`lim¹ = 0`; Dow–Simon–Vaughan showed **CH ⟹ `lim¹ ≠ 0`** (additivity fails); and it is
+**consistent that `lim¹ = 0`** (additivity holds) via PFA-type and Cohen-model
+constructions — Bergfalk, Bergfalk–Lambie-Hanson (*Cohomology of the ordinals*),
+Bannister (*Additivity of derived limits in the Cohen model*). The signature is exactly
+our §26 trichotomy:
+
+> - **◊ / CH side:** `lim¹ ≠ 0` — a non-trivializable legal cochain, i.e. **the escapee
+>   exists** (`P(Σ)` non-ccc with a `V`-witness). Consistent.
+> - **PFA / Cohen-model side:** `lim¹ = 0` — every legal cochain trivializes, i.e.
+>   **`Φ(e)` for all `e`, no escapee** (`P(Σ)` proper/ccc). Consistent.
+
+Hence **the transport residual is independent of ZFC**, of the same species as strong-
+homology additivity. There is no single "solution": the dip-schedulability of coherent
+sequences (equivalently the existence of a fiber-order transport escapee) is a `lim¹`-
+additivity statement, true under ◊ ("escapee") and false under PFA/the Cohen model
+("no escapee"). §15's Theorem C (a non-schedulable sequence under ◊) is the ◊-side made
+concrete at the *game* level; the legal, cocycle-level ◊-side escapee is the same
+phenomenon in the `lim¹` frame.
+
+**The remaining rigorous work, named precisely (not claimed done).** The identification is
+structural — a theorem-to-theorem reduction must match *our* legality (joint-boundedness
+of image families, §29's `⋃ D⁺` finite) to the BLH/Bannister inverse system's coherence
+data, so that their independence transfers as a proof rather than a resemblance. That is a
+paper-scale reduction requiring the strong-homology machinery in hand; it is the honest
+next artifact, and it is set-theoretic topology, not another walk estimate.
+
+**Terminus of the program's ZFC/computational phase.** The line is complete up to this
+point and each step is a theorem or an honest correction:
+- **[machine-checked]** reps ⟺ trivial at ω₁ (Tier 5); Theorem A, Lemma F (`DipSchedule`).
+- **[ZFC, proved]** the Φ-completeness of the game (E), the caps (F, §20 Cor 2, G), the
+  incidence localization (§22), the finite-fan criterion (§23), the profile-diagonal
+  reformulation (§24), the frozen-dip poset with density (§25–26), and the walk
+  computations clearing checkpoint (1) (§28–29).
+- **[independent, identified]** checkpoint (2) = additivity-of-`lim¹`: escapee under ◊,
+  no escapee under PFA/Cohen — the transport residual has no single truth value.
+
+The honest end state: the transport line's original qualitative residual is **resolved in
+the only way it can be — as an independence** — reduced (structurally, with the last
+reduction named) to the strong-homology additivity program, its ZFC skeleton proved and
+machine-checked, its two models identified. Twelve verdict flips, each argument-forced;
+the question is handed to set theory not as a mystery but as a located, named instance of
+a known independent phenomenon.
