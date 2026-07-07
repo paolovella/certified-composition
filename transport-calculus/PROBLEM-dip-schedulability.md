@@ -102,13 +102,17 @@ globally-nontrivial cochain — the `H¹(ω₁) ≠ 0` / derived-limit signature
 escapee exists iff such a cochain can be legally forced while resisting monotone
 realization. ZFC-yes ⟹ no escapee; consistent-no ⟹ escapee.)*
 
-*(Poset form, notes §25: the finite-approximation poset `P(Σ)` — monotone partial `γ ≥ μ`,
-finite dips, and *frozen* per-top promise sets `F_u` — is dense-generically a full
-schedule [density proved]; so `P(Σ)` ccc for every legal `Σ` under MA_{ω₁} ⟹ Φ(e) for all
-`e` ⟹ no escapee, consistently. The sole checkpoint is the ccc/properness of `P(Σ)`, whose
-antichains are walk-oscillation Δ-systems with incompatible frozen promises — a `lim¹`-type
-dichotomy of the Bergfalk–Lambie-Hanson / Bannister family. The ZFC skeleton is fully
-proved; Question 5 in its five equivalent forms is the independence-frontier heart.)*
+*(Poset form, notes §25–§26: the finite-approximation poset `P(Σ)` — monotone partial
+`γ ≥ μ` with **frozen** finite dips `X` and frozen per-top promises `F` (dips must be
+frozen, else the generic's dips blow up to infinite; §26 corrects §25) — realizes a full
+schedule generically iff it is ccc. With `γ = μ` the ccc obstruction is concrete: an
+uncountable **cross-defective** family, `D⁺(μ(x_i), μ(u_j))` escaping the frozen finite
+correction `X(x_i) ∪ F(u_j)` for `i ≠ j`, `x_i ⊑ u_j`. Whether one exists is a ZFC
+question about `e`'s floor-defect sets, governed by walk oscillation `osc(ρ)` against
+finite correction. The residual is a trichotomy: a legal ZFC cross-defective family ⟹
+escapee in ZFC; `P(Σ)` ccc for all legal `Σ` ⟹ no escapee under MA_{ω₁}; a ccc-fatal but
+V-correctable family ⟹ independence. Question 5 in its equivalent forms is this
+`lim¹`/additivity boundary, with the deciding inequality now written down.)*
 Here `Φ(e)` is the statement the program cares about ("every legal constraint system over
 `D(e)` admits a monotone dominating selection" — the precise form is in the notes; it is
 *not needed* to attack the questions below). The two horizontal **[argued]** arrows are

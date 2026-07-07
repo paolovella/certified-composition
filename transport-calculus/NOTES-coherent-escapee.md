@@ -1260,3 +1260,64 @@ The transport line's original residual is thereby *located*, not eliminated: it 
 concrete, named `lim¹`-type independence, with its ZFC skeleton fully proved and its
 combinatorial heart (Question 5, five equivalent forms) handed to set theory in final
 form. This is the honest terminus of the ZFC phase.
+
+## 26. CORRECTION to §25: the dips must be frozen, and the ccc reduces to a concrete ZFC defect-configuration (eleventh flip)
+
+Attempting to *run* §25's poset — the honest test the user pressed for — exposed a gap and
+sharpened the checkpoint to a concrete ZFC question.
+
+**The gap.** §25 let dips grow under extension (`X_q(x) ⊇ X_p(x)`) and claimed a generic
+realizes the schedule. But then `X(x) = ⋃{X_p(x) : p ∈ G}` is a union over uncountably
+many conditions; each finite, the union need not be. A schedule requires **finite** dips.
+So growing-dip genericity yields at best an infinite-dip pseudo-schedule — not a witness
+to Φ(e). The dip poset with growing dips is trivially ccc (σ-centered: dips only help),
+which is exactly why it proves nothing.
+
+**The repair: freeze the dips.** The correct poset `P(Σ)` freezes both `X` and `F`:
+`X_q(x) = X_p(x)` and `F_q(u) = F_p(u)` for `x, u ∈ d_p`. A generic then gives genuinely
+finite `X(x)` and `F_u`, and `L_u ⊆ F_u` — a real schedule. But freezing dips **removes**
+the free amalgamation: a new top `u ⊒ x` can no longer be served by *growing* `x`'s dip,
+so the cross-constraint `D⁺(μ(x), μ(u)) \ X_p(x) ⊆ F_q(u)` with both sides frozen is a
+hard compatibility condition. The obstruction §25 waved away is now first-class.
+
+**The ccc checkpoint, made concrete [reduction proved].** Take `γ = μ` (monotone
+already, so no γ-inversions). Δ-system a putative uncountable antichain to a fixed root
+with matching frozen data and disjoint iso stalks. Two conditions `p_i, p_j` are
+incompatible **iff** some cross pair `x ∈ a_i`, `u ∈ a_j` (or vice versa) with `x ⊑ u`
+has `D⁺(μ(x), μ(u)) \ X_{p_i}(x) ⊄ F_{p_j}(u)`. Since each condition is internally
+consistent (`D⁺` internal to a stalk already dipped/promised), an uncountable antichain
+is exactly:
+
+> an uncountable family of "internally clean" configurations that are pairwise
+> **cross-defective beyond their frozen finite corrections** — the defect
+> `D⁺(μ(x_i), μ(u_j))` escaping `X(x_i) ∪ F(u_j)` for `i ≠ j`.
+
+Whether such a family exists is a **ZFC combinatorial question about the defect sets
+`D⁺` of `e`'s floors at the pressure levels** — no forcing in the statement. It is
+governed by walk oscillation: `osc(ρ)` unbounded on a stationary set is precisely what
+would let the cross-defects outrun any fixed finite correction, building the antichain;
+`osc` tame would refine it away (ccc).
+
+**Honest status — the two decisive sub-questions.** The whole residual now rests on a
+fork, both sides concrete and neither requiring the other's machinery:
+
+1. **(ZFC escapee side.)** Does some legal `Σ` over a walk-based `e` admit an uncountable
+   cross-defective family whose defects provably cannot be finitely corrected *in V*?
+   That is a ZFC non-coverability — an escapee outright, no independence needed. Theorem
+   D built the shape under ◊ but illegally; the open question is a **legal, ZFC** version
+   driven by `osc(ρ₁)` rather than kills.
+2. **(No-escapee-consistent side.)** Is `P(Σ)` (frozen) ccc for every legal `Σ`? Then
+   MA_{ω₁} realizes every schedule ⟹ Φ(e) for all `e`, consistently.
+
+If (1) succeeds the residual is settled *positively in ZFC* (escapees exist); if (1)
+fails and (2) succeeds, escapees are *consistently absent*; and a walk-oscillation
+antichain that is ccc-fatal but V-correctable would put the object squarely independent.
+This is a genuine trichotomy, and which branch holds is exactly the `osc(ρ)`-vs-finite-
+correction combinatorics — the `lim¹`/additivity boundary, now with the deciding
+inequality written down.
+
+**Trail note.** Eleventh flip: §25's growing-dip genericity retracted (proves nothing —
+infinite dips); frozen-dip poset installed; ccc reduced to a written-down ZFC
+cross-defect inequality. Found by trying to run the poset, per the standing discipline of
+auditing before believing. The `lim¹`-neighborhood placement (§24) stands and is
+reinforced: the deciding combinatorics is `osc(ρ)` against finite correction.
