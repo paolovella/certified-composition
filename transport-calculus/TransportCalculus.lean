@@ -2009,6 +2009,49 @@ theorem phi_of_join {D : Type} (O : DirOrder D)
     Phi O :=
   phi_of_domRetraction (domRetraction_of_join O join join_ub join_mono)
 
+/-! ### The forcing bridge (PFA side): a generic covering family yields Φ
+
+`NOTES-coherent-escapee.md` §25–§26, §39: the PFA side of the escapee independence goes
+through the frozen-dip realization poset `P(Σ)` — its generic filter assembles a monotone
+dominator out of finite partial pieces. Proving `P(Σ)` *proper* is the open checkpoint and
+is **not** formalized (there is no proof). What is proved and machine-checked here is the
+*bridge*: the object a proper poset's generic filter would provide — a covering, coherent,
+cross-monotone family of finite partial dominators — yields `Φ`. This isolates the open part
+(existence of such a family = properness + forcing axiom) as the single hypothesis and
+verifies everything downstream. -/
+
+/-- A **partial dominator**: a domain predicate with values, monotone and dominating on the
+    domain (a finite condition of `P(Σ)`, here with an arbitrary domain). -/
+structure PartialDom {D : Type} {O : DirOrder D} (L : LegalSystem O) where
+  inDom     : D → Prop
+  val       : D → D
+  mono      : ∀ {u u'}, inDom u → inDom u' → O.le u u' → O.le (val u) (val u')
+  dominates : ∀ {u}, inDom u → ∀ w, L.M u w → O.le w (val u)
+
+/-- A **generic covering family** — the object a proper poset's generic filter provides:
+    a family of partial dominators covering `D`, with cohering values and monotonicity
+    across the whole family (the frozen, coherent selection). Its *existence* is the open
+    properness/forcing content; its *sufficiency* is `phi_of_generic`. -/
+structure GenericDom {D : Type} {O : DirOrder D} (L : LegalSystem O) where
+  ι     : Type
+  p     : ι → PartialDom L
+  cover : ∀ u, ∃ i, (p i).inDom u
+  cross : ∀ i j u u', (p i).inDom u → (p j).inDom u' → O.le u u' →
+            O.le ((p i).val u) ((p j).val u')
+
+/-- **The forcing bridge: a generic covering family yields `Φ`.** Choose a covering
+    condition per element; its value defines `φ`, monotone by cross-family monotonicity and
+    dominating by each condition's domination. (The generic family is what PFA supplies once
+    `P(Σ)` is proper — the open step, not this lemma.) -/
+theorem phi_of_generic {D : Type} {O : DirOrder D} {L : LegalSystem O}
+    (G : GenericDom L) : Nonempty (Dominator L) := by
+  classical
+  refine ⟨{ φ := fun u => (G.p (G.cover u).choose).val u, mono := ?_, dom := ?_ }⟩
+  · intro u u' huu'
+    exact G.cross _ _ u u' (G.cover u).choose_spec (G.cover u').choose_spec huu'
+  · intro u w hw
+    exact (G.p (G.cover u).choose).dominates (G.cover u).choose_spec w hw
+
 end EscapeeTheory
 
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`

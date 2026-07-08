@@ -32,7 +32,12 @@ landed.
   `phi_of_join` the bounded-complete/Theorem-H route). Abstract
   (`DirOrder`, `LegalSystem`, `Dominator`, `DomRetraction`) and dependent
   on **no axioms at all** — pure constructive order theory. The converse
-  (open uniformization, §39) is deliberately not formalized. The
+  (open uniformization, §39) is deliberately not formalized. The PFA-side
+  **forcing bridge** is machine-checked too (`phi_of_generic`, axioms
+  `Classical.choice`): a `GenericDom` — the covering, cross-monotone family
+  of partial dominators a proper `P(Σ)`'s generic filter provides — yields
+  `Φ`; proving `P(Σ)` proper is the open checkpoint and is *not* formalized,
+  and the bridge isolates it as the single structure hypothesis. The
   set-theory research line reached the Tukey/cofinal-types frame
   (Todorcevic: 5 types under PFA, `2^{ℵ₁}` under CH) as the correct
   order-theoretic home for the residual (notes §36–§39, fifteen recorded

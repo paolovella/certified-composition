@@ -657,6 +657,16 @@ order theory. The converse (`Phi ⟹` retraction, notes §39) is an open uniform
 is deliberately not formalized; what is machine-checked is exactly the proved,
 one-directional core.
 
+**The forcing bridge, machine-checked (`phi_of_generic`).** The PFA side of the escapee
+independence goes through the realization poset `P(Σ)` (notes §25–§26): proving `P(Σ)`
+*proper* is the open checkpoint and is **not** formalized (there is no proof). What is
+proved and machine-checked is the *bridge* — a `GenericDom`, the covering, cross-monotone
+family of partial dominators that a proper poset's generic filter provides, yields `Φ`
+(`phi_of_generic`, axioms `Classical.choice`). This isolates the open part (existence of
+the generic family = properness + forcing axiom) as the single structure hypothesis and
+verifies everything downstream, so the PFA-side reduction is machine-checked *modulo* the
+one honestly-open forcing step.
+
 **The fiber-control gap closes — Theorem B, and Question 1′ proved (note §11).** The §7
 `H`-route is refuted by a counterexample (wasteful dips hide whole columns below an
 ω-cofinality level), and the theorem is proved by the *honest-column* extraction instead:
