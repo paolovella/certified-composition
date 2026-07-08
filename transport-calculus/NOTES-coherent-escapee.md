@@ -2033,3 +2033,64 @@ are its three canonical instances. The escapee is now a single, sharp object (th
 retraction), whose existence is the PFA/CH independence via `P(Σ)`. The `⟹` amalgamation
 and the independence itself remain as the named open work — but the *form* of the question
 is now as clean as it can be: **is `D(e)` a dominating monotone retract of `Idl_σ(D(e))`?**
+
+## 39. The backward direction is a uniformization gap; the completion is Tukey-invisible — retraction is strictly finer than Φ (and than Tukey)
+
+Working Theorem I's `⟹` and the independence. Two genuine results: a clean fact (the
+σ-ideal completion does not change the Tukey type) and an honest correction (the `⟹` does
+not follow — the retraction is a *uniform* strengthening of per-system `Φ`). This refines
+§38 and pins the independence's exact shape.
+
+**Fact [proved]: `D ≡_T Idl_σ(D)`.** The embedding `ι : D → Idl_σ(D)`, `d ↦ ↓d`, has
+cofinal image: every `I ∈ Idl_σ(D)` is bounded by some `b ∈ D` (legality of its generating
+family), so `I ⊆ ↓b = ι(b)`, i.e. `I ≤ ι(b)`. A monotone embedding with cofinal image is a
+Tukey equivalence. **The completion is Tukey-invisible.**
+
+**Correction to §38's `⟹` [the uniformization gap].** `Φ(D) ⟹` retraction does **not**
+follow from per-system dominators:
+- `Idl_σ(D)` has *more ideals than `D` has elements* (countably-generated bounded ideals
+  number up to `2^{ℵ₀}` for `|D| = ℵ₁`), so **no single `D`-indexed legal system has all
+  ideals in its image** — the "universal system" that would produce `r` does not exist.
+- Per-system `Φ` gives, for each legal `M`, a dominator `φ_M`; but different systems sharing
+  an ideal `I` (as `M(u) = I`) may dominate it by *incomparable* values `φ_M(u)`, with no
+  coherent global choice `r(I)`. Assembling `r` needs a **monotone dominating selection on
+  the ideal lattice `Idl_σ(D)` itself** — which is a `Φ`-type condition one level up, not
+  delivered by `Φ(D)`.
+
+So **Theorem I is honestly one-directional**: *retraction `⟹ Φ`* [proved, §38]; the
+converse *`Φ ⟹` retraction* is a genuine uniformization, **open** (and plausibly false —
+the retraction is strictly stronger). Restated cleanly:
+
+> **Retraction exists `⟹` `Φ(D)` (no escapee)** [proved]. Contrapositive: **escapee
+> `⟹` no dominating retraction** [proved]. The reverse (*no retraction `⟹` escapee*) is
+> the open uniformization gap.
+
+**Structural payoff — the escapee is finer than Tukey, with a clean mechanism.** Since
+`D ≡_T Idl_σ(D)`, a dominating retraction is `D` retracting off a set *Tukey-equivalent to
+itself*. Tukey-equivalence gives a Tukey *reduction* `Idl_σ(D) → D`, but a *monotone
+dominating retraction* is strictly more (monotone + dominating + fixing `D`). The escapee
+is exactly the gap between "Tukey-equivalent" (always) and "dominating monotone retract"
+(the question) — which is precisely why `Φ` is **finer than the Tukey type** (§37), now
+with the mechanism named: *`D` and its completion are Tukey-equal but the completion may
+not monotonically dominating-retract onto `D`.*
+
+**The independence, its exact shape [honest].** Both sides are forcing constructions,
+stated precisely as the remaining work; neither is prose-provable here:
+- **PFA side (no escapee):** the frozen-dip poset `P(Σ)` — whose generic *is* a dominating
+  retraction restricted to `Σ`'s ideals — is proper for every legal `Σ`; PFA then supplies
+  the retraction. The theorem to prove: *`P(Σ)` is proper (ZFC or under PFA-friendly
+  hypotheses)*. This is the coherent-selection-poset properness, the same engine that
+  collapses cofinal types to five.
+- **CH side (escapee):** the coherence-defect ideals of `Idl_σ(D(e))` oscillate (via
+  `osc`) so that no monotone map threads them in `V`; a `V`-generic obstruction — the
+  standard CH proliferation of wild cofinal types — yields a legal `Σ` with no dominating
+  retraction. The theorem to prove: *under CH, some nontrivial `e` has a legal `Σ` whose
+  ideal-family admits no monotone dominating selection*.
+
+**Net.** Theorem I is a *proved sufficient condition* (retraction `⟹` no escapee) unifying
+the three routes and the machine-checked witnesses; its converse is an honest open
+uniformization. The new clean fact `D ≡_T Idl_σ(D)` explains, mechanistically, why `Φ` is
+finer than the Tukey type. The independence is two precisely-stated forcing theorems
+(`P(Σ)` proper; CH obstruction), which is where prose ends and model construction begins.
+The form is now exact: **does `D(e)` dominating-monotone-retract off its Tukey-equal σ-ideal
+completion? — no under CH, yes under PFA, both to be shown by forcing.**
