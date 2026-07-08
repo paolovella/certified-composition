@@ -24,6 +24,19 @@ landed.
 
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
+- **Escapee framework, machine-checked and axiom-free (`EscapeeTheory`
+  section).** Theorem I forward (notes §38): `Phi O` — every legal
+  constraint system on a directed order has a monotone dominator — follows
+  from a monotone dominating retraction (`phi_of_domRetraction`), and the
+  three sufficient routes are its instances (`phi_of_top` the ⊤-route,
+  `phi_of_join` the bounded-complete/Theorem-H route). Abstract
+  (`DirOrder`, `LegalSystem`, `Dominator`, `DomRetraction`) and dependent
+  on **no axioms at all** — pure constructive order theory. The converse
+  (open uniformization, §39) is deliberately not formalized. The
+  set-theory research line reached the Tukey/cofinal-types frame
+  (Todorcevic: 5 types under PFA, `2^{ℵ₁}` under CH) as the correct
+  order-theoretic home for the residual (notes §36–§39, fifteen recorded
+  verdict flips including two wrong frames caught and corrected).
 - **Dip-schedulability skeleton, machine-checked (`DipSchedule` section).**
   Theorem A (trivial ⟹ strongly schedulable) and Lemma F (below-level
   absorption) — two index-agnostic pillars of the set-theoretic

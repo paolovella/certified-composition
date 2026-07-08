@@ -645,6 +645,18 @@ axioms `propext, Quot.sound`). These are exactly the results the contested open 
 stays open. Axioms otherwise the standard `propext, Classical.choice, Quot.sound`; no
 `sorry`.
 
+**Theorem I forward, machine-checked and axiom-free (`EscapeeTheory` section).** The
+escapee framework of notes §38: `Phi O` — *every legal constraint system on a directed
+order has a monotone dominator* (its negation is the transport escapee) — follows from a
+**monotone dominating retraction** of the constraint sets (`phi_of_domRetraction`,
+**Theorem I forward**). The three sufficient routes are its instances: the top route
+(`phi_of_top`, `Dm`'s `⊤`-overshoot) and the bounded-complete route (`phi_of_join`,
+Theorem H / the join). All three are formalized abstractly (`DirOrder`, `LegalSystem`,
+`Dominator`, `DomRetraction`) and **depend on no axioms whatsoever** — pure constructive
+order theory. The converse (`Phi ⟹` retraction, notes §39) is an open uniformization and
+is deliberately not formalized; what is machine-checked is exactly the proved,
+one-directional core.
+
 **The fiber-control gap closes — Theorem B, and Question 1′ proved (note §11).** The §7
 `H`-route is refuted by a counterexample (wasteful dips hide whole columns below an
 ω-cofinality level), and the theorem is proved by the *honest-column* extraction instead:

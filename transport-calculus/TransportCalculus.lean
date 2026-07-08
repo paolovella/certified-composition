@@ -1918,6 +1918,99 @@ theorem lemmaF_below_finite (C : CoherentSeq W WI) (sx su : W → Nat) (gx gu lx
 
 end DipSchedule
 
+/-! ## The escapee framework, machine-checked: Theorem I (forward) and the top route
+
+`NOTES-coherent-escapee.md` §38 (Theorem I) reduces the transport line's qualitative
+residual `Φ(D)` — *every legal constraint system on a directed order `D` has a monotone
+dominator* — to a single condition: `D` admits a **monotone dominating retraction** of its
+σ-ideal completion. The forward direction (retraction ⟹ Φ) and the unification of the three
+sufficient routes (top / bounded-complete / ruler) as instances of one retraction are ZFC
+order theory, index-agnostic, and formalize directly. This is the proved core of the
+escapee analysis; the converse (Φ ⟹ retraction, §39) is an open uniformization and is *not*
+claimed here. -/
+
+section EscapeeTheory
+
+/-- A directed order (the abstract carrier of the escapee question): a preorder. -/
+structure DirOrder (D : Type) where
+  le       : D → D → Prop
+  le_refl  : ∀ a, le a a
+  le_trans : ∀ {a b c}, le a b → le b c → le a c
+
+/-- A **legal constraint system**: constraint sets `M u` monotone in `u` and bounded. -/
+structure LegalSystem {D : Type} (O : DirOrder D) where
+  M    : D → D → Prop
+  mono : ∀ {u u'}, O.le u u' → ∀ w, M u w → M u' w
+  bdd  : ∀ u, ∃ b, ∀ w, M u w → O.le w b
+
+/-- A **monotone dominator** of a legal system. -/
+structure Dominator {D : Type} {O : DirOrder D} (L : LegalSystem O) where
+  φ    : D → D
+  mono : ∀ {u u'}, O.le u u' → O.le (φ u) (φ u')
+  dom  : ∀ u w, L.M u w → O.le w (φ u)
+
+/-- **`Φ(D)`**: every legal constraint system admits a monotone dominator. Its negation is
+    the transport *escapee*. -/
+def Phi {D : Type} (O : DirOrder D) : Prop :=
+  ∀ L : LegalSystem O, Nonempty (Dominator L)
+
+/-- A **monotone dominating retraction** (the abstract form of §38's three routes): assigns
+    to each bounded constraint set an upper bound, monotonically. Not required to be a
+    *least* upper bound — so it covers the top route (`r ≡ ⊤`) and the ruler route, not only
+    bounded-completeness (`r = ⊔`). -/
+structure DomRetraction {D : Type} (O : DirOrder D) where
+  r    : (D → Prop) → D
+  ub   : ∀ (S : D → Prop) (b : D), (∀ w, S w → O.le w b) → ∀ w, S w → O.le w (r S)
+  mono : ∀ (S T : D → Prop) (b : D), (∀ w, T w → O.le w b) → (∀ w, S w → T w) →
+           O.le (r S) (r T)
+
+/-- **Theorem I (forward): a dominating retraction gives `Φ`.** For a legal `L`, the map
+    `u ↦ r (M u)` is a monotone dominator — domination from `r`'s upper-bound clause,
+    monotonicity from `r`'s monotone clause applied to `M u ⊆ M u'` under `u`'s bound. -/
+theorem phi_of_domRetraction {D : Type} {O : DirOrder D} (R : DomRetraction O) : Phi O := by
+  intro L
+  refine ⟨{ φ := fun u => R.r (L.M u), mono := ?_, dom := ?_ }⟩
+  · intro u u' huu'
+    obtain ⟨b', hb'⟩ := L.bdd u'
+    exact R.mono (L.M u) (L.M u') b' hb' (fun w hw => L.mono huu' w hw)
+  · intro u w hw
+    obtain ⟨b, hb⟩ := L.bdd u
+    exact R.ub (L.M u) b hb w hw
+
+/-- **The top route as a retraction.** A top element is a constant dominating retraction. -/
+def domRetraction_of_top {D : Type} (O : DirOrder D) (top : D) (htop : ∀ d, O.le d top) :
+    DomRetraction O where
+  r    := fun _ => top
+  ub   := fun _ _ _ w _ => htop w
+  mono := fun _ _ _ _ _ => O.le_refl top
+
+/-- **Top ⟹ `Φ`** (`Dm`'s route: `Dm_factors`), as an instance of Theorem I. -/
+theorem phi_of_top {D : Type} (O : DirOrder D) (top : D) (htop : ∀ d, O.le d top) : Phi O :=
+  phi_of_domRetraction (domRetraction_of_top O top htop)
+
+/-- **The bounded-complete route as a retraction** (Theorem H): a join operator that is an
+    upper bound and monotone on commonly-bounded sets is a dominating retraction. -/
+def domRetraction_of_join {D : Type} (O : DirOrder D)
+    (join : (D → Prop) → D)
+    (join_ub : ∀ (S : D → Prop) (b : D), (∀ w, S w → O.le w b) → ∀ w, S w → O.le w (join S))
+    (join_mono : ∀ (S T : D → Prop) (b : D), (∀ w, T w → O.le w b) → (∀ w, S w → T w) →
+                   O.le (join S) (join T)) :
+    DomRetraction O where
+  r    := join
+  ub   := join_ub
+  mono := join_mono
+
+/-- **Bounded-complete ⟹ `Φ`** (Theorem H; `Fb`/lattice route), as an instance of Theorem I. -/
+theorem phi_of_join {D : Type} (O : DirOrder D)
+    (join : (D → Prop) → D)
+    (join_ub : ∀ (S : D → Prop) (b : D), (∀ w, S w → O.le w b) → ∀ w, S w → O.le w (join S))
+    (join_mono : ∀ (S T : D → Prop) (b : D), (∀ w, T w → O.le w b) → (∀ w, S w → T w) →
+                   O.le (join S) (join T)) :
+    Phi O :=
+  phi_of_domRetraction (domRetraction_of_join O join join_ub join_mono)
+
+end EscapeeTheory
+
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
 
 Distance `|a-b|`, grade = Lipschitz constant — *both* `Nat`, the action *is*
