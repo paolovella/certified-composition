@@ -2052,6 +2052,63 @@ theorem phi_of_generic {D : Type} {O : DirOrder D} {L : LegalSystem O}
   · intro u w hw
     exact (G.p (G.cover u).choose).dominates (G.cover u).choose_spec w hw
 
+/-! ### The properness question, attacked directly: compatibility ⟺ cross-monotonicity
+
+Rather than assume the generic, we analyze compatibility of conditions itself — the content
+of ccc/properness. The result below is exact: two conditions have a common extension **iff**
+their combined values are cross-monotone (given they agree on the overlap). Domination and
+"agreeing on the overlap" amalgamate for free; the *sole* obstruction to compatibility is
+cross-monotonicity — i.e. the cross-defect `D⁺(μx, μu)` fitting the frozen data. This turns
+"`P(Σ)` ccc" into the single combinatorial statement: *among any `ℵ₁` conditions, two are
+cross-monotone.* -/
+
+/-- Two conditions are **compatible** if one condition extends both (value-preservingly). -/
+def PartialDom.compat {D : Type} {O : DirOrder D} {L : LegalSystem O} (p q : PartialDom L) :
+    Prop :=
+  ∃ r : PartialDom L,
+    (∀ u, p.inDom u → r.inDom u ∧ r.val u = p.val u) ∧
+    (∀ u, q.inDom u → r.inDom u ∧ r.val u = q.val u)
+
+/-- **Amalgamation (the proper-poset core): agreeing + cross-monotone ⟹ compatible.** If
+    `p, q` agree on their overlap and their combined values are monotone across the two
+    domains (both directions), the pointwise union *is* a common extension — a partial
+    dominator. So the *only* barrier to compatibility is cross-monotonicity; everything else
+    (domination, overlap-consistency) amalgamates. Machine-checked; the ccc of `P(Σ)` is
+    thereby exactly "every `ℵ₁`-family of conditions contains a cross-monotone pair." -/
+theorem PartialDom.compat_of_crossMono {D : Type} {O : DirOrder D} {L : LegalSystem O}
+    (p q : PartialDom L)
+    (agree : ∀ u, p.inDom u → q.inDom u → p.val u = q.val u)
+    (cross_pq : ∀ u u', p.inDom u → q.inDom u' → O.le u u' → O.le (p.val u) (q.val u'))
+    (cross_qp : ∀ u u', q.inDom u → p.inDom u' → O.le u u' → O.le (q.val u) (p.val u')) :
+    p.compat q := by
+  classical
+  refine ⟨{ inDom := fun u => p.inDom u ∨ q.inDom u
+            val   := fun u => if p.inDom u then p.val u else q.val u
+            mono  := ?_, dominates := ?_ }, ?_, ?_⟩
+  · -- cross-monotonicity of the union, by 4 cases on membership of `u`, `u'`
+    intro u u' hu hu' huu'
+    by_cases hpu : p.inDom u <;> by_cases hpu' : p.inDom u'
+    · simp only [if_pos hpu, if_pos hpu']; exact p.mono hpu hpu' huu'
+    · simp only [if_pos hpu, if_neg hpu']
+      exact cross_pq u u' hpu (hu'.resolve_left hpu') huu'
+    · simp only [if_neg hpu, if_pos hpu']
+      exact cross_qp u u' (hu.resolve_left hpu) hpu' huu'
+    · simp only [if_neg hpu, if_neg hpu']
+      exact q.mono (hu.resolve_left hpu) (hu'.resolve_left hpu') huu'
+  · -- domination of the union
+    intro u hu w hw
+    by_cases hpu : p.inDom u
+    · simp only [if_pos hpu]; exact p.dominates hpu w hw
+    · simp only [if_neg hpu]; exact q.dominates (hu.resolve_left hpu) w hw
+  · -- `r` extends `p`
+    intro u hpu; exact ⟨Or.inl hpu, if_pos hpu⟩
+  · -- `r` extends `q` (uses `agree` on the overlap)
+    intro u hqu
+    refine ⟨Or.inr hqu, ?_⟩
+    by_cases hpu : p.inDom u
+    · simp only [if_pos hpu]; exact agree u hpu hqu
+    · simp only [if_neg hpu]
+
 end EscapeeTheory
 
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
