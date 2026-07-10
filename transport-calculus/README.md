@@ -667,6 +667,19 @@ the generic family = properness + forcing axiom) as the single structure hypothe
 verifies everything downstream, so the PFA-side reduction is machine-checked *modulo* the
 one honestly-open forcing step.
 
+**The single-element ccc, machine-checked (ZFC) — the exact boundary.** Compatibility of
+two conditions reduces exactly to cross-monotonicity (`PartialDom.compat_of_crossMono`,
+machine-checked). For **single-element** conditions this is a ZFC theorem:
+incomparable-domain conditions are compatible (`singletonDom_compat_of_incomp`), so a
+pairwise-incompatible family of single-element conditions has pairwise-comparable domains —
+a chain (`singleton_antichain_is_chain`). A nontrivial coherent sequence's fiber order has
+no uncountable chain (`Lemma D`, the one cardinality fact left in prose), so the
+single-element poset is ccc. This is *precisely* where ZFC stops: single-element conditions
+are ccc for free, but the **multi-element** case is where cross-defects conspire, and that
+is the axiom-dependent core (notes §40) whose proof is Todorcevic's oscillation lemma — not
+formalized, because it is *not* a ZFC theorem (it fails under CH, which is the escapee). All
+`Classical`-only or axiom-standard; no `sorry`.
+
 **The fiber-control gap closes — Theorem B, and Question 1′ proved (note §11).** The §7
 `H`-route is refuted by a counterexample (wasteful dips hide whole columns below an
 ω-cofinality level), and the theorem is proved by the *honest-column* extraction instead:

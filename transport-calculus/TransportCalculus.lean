@@ -2109,6 +2109,61 @@ theorem PartialDom.compat_of_crossMono {D : Type} {O : DirOrder D} {L : LegalSys
     · simp only [if_pos hpu]; exact agree u hpu hqu
     · simp only [if_neg hpu]
 
+/-! ### The single-element case, machine-checked (ZFC)
+
+The one fragment of the ccc/properness analysis that is a genuine ZFC theorem — the boundary
+where ZFC stops. A *single-element condition* is one whose domain is a point `u₀` (value a
+bound of `M u₀`). Two such with **incomparable** domains are compatible (`compat_of_crossMono`
+with vacuous cross-clauses), so a pairwise-*incompatible* family of single-element conditions
+has pairwise-*comparable* domains — a chain. Since a nontrivial coherent sequence's fiber
+order has no uncountable chain (`Lemma D` — the one cardinality fact, left in prose), any
+uncountable such family is impossible: the single-element poset is ccc. The multi-element
+case is where the cross-defects conspire, and that is the axiom-dependent part (§40) — not
+formalized, because it is not a ZFC theorem. -/
+
+/-- A **single-element condition** at `u₀`: domain `{u₀}`, value a bound of `M u₀`. -/
+noncomputable def singletonDom {D : Type} {O : DirOrder D} (L : LegalSystem O) (u₀ : D) :
+    PartialDom L where
+  inDom     := fun u => u = u₀
+  val       := fun _ => (L.bdd u₀).choose
+  mono      := fun _ _ _ => O.le_refl _
+  dominates := fun {u} hu w hw => (L.bdd u₀).choose_spec w (hu ▸ hw)
+
+/-- **Incomparable single-element conditions are compatible.** The cross-clauses of
+    `compat_of_crossMono` are vacuous (the only possible cross-comparabilities are
+    `u₀ ⊑ v₀` / `v₀ ⊑ u₀`, both excluded), and the overlap is empty (`u₀ ≠ v₀`). -/
+theorem singletonDom_compat_of_incomp {D : Type} {O : DirOrder D} (L : LegalSystem O)
+    (u₀ v₀ : D) (hne : u₀ ≠ v₀) (h1 : ¬ O.le u₀ v₀) (h2 : ¬ O.le v₀ u₀) :
+    (singletonDom L u₀).compat (singletonDom L v₀) := by
+  apply PartialDom.compat_of_crossMono
+  · intro u hpu hqu; exact absurd (hpu.symm.trans hqu) hne
+  · intro u u' hpu hqu' hle; subst hpu; subst hqu'; exact absurd hle h1
+  · intro u u' hqu hpu' hle; subst hqu; subst hpu'; exact absurd hle h2
+
+/-- **Incompatible single-element conditions have comparable domains.** Contrapositive of
+    the above — the ccc core. -/
+theorem singletonDom_incompat_comparable {D : Type} {O : DirOrder D} (L : LegalSystem O)
+    (u₀ v₀ : D) (hne : u₀ ≠ v₀)
+    (hincompat : ¬ (singletonDom L u₀).compat (singletonDom L v₀)) :
+    O.le u₀ v₀ ∨ O.le v₀ u₀ :=
+  Classical.byContradiction (fun h =>
+    hincompat (singletonDom_compat_of_incomp L u₀ v₀ hne
+      (fun h1 => h (Or.inl h1)) (fun h2 => h (Or.inr h2))))
+
+/-- **The single-element poset is ccc, in ZFC (the antichain-is-a-chain core).** A family of
+    single-element conditions at distinct points that is pairwise incompatible (an antichain)
+    has pairwise-comparable domains — a **chain**. Combined with `Lemma D` (a nontrivial
+    coherent sequence's fiber order has no uncountable chain — the one cardinality fact, cited
+    not formalized), no uncountable such antichain exists: ccc. The multi-element case is
+    axiom-dependent (§40) and deliberately absent. -/
+theorem singleton_antichain_is_chain {D : Type} {O : DirOrder D} (L : LegalSystem O)
+    {I : Type} (u : I → D) (hinj : ∀ i j, u i = u j → i = j)
+    (hanti : ∀ i j, i ≠ j → ¬ (singletonDom L (u i)).compat (singletonDom L (u j))) :
+    ∀ i j, i ≠ j → O.le (u i) (u j) ∨ O.le (u j) (u i) := by
+  intro i j hij
+  exact singletonDom_incompat_comparable L (u i) (u j)
+    (fun h => hij (hinj i j h)) (hanti i j hij)
+
 end EscapeeTheory
 
 /-! ## The degenerate instance that hid the conflation: `M = D = Nat`
