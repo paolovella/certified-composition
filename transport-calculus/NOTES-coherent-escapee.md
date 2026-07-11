@@ -2337,3 +2337,63 @@ is Lemma 1.4; coherent-is-Lipschitz is Lemma 1.10 + MA-specialness; `(*)` = MA_{
 the exact forcing-axiom shape of `P(e,μ)`. The MA-side conjecture now cites specific numbered
 theorems, and the reduction bottoms out on the machine-checked amalgamation lemma. The only
 remaining open joint in the whole program is the CH-side verifiability gap (§43).
+
+## 45. The CH verifiability gap, attacked: weak diamond hits the thinness wall — but the independence stands via ◊ (Theorem C), which the gap was never needed for
+
+Going at §43's open joint directly. The finding is two-sided and corrects §43's optimism:
+weak diamond (one bit) genuinely does **not** close the dodge — but the independence of
+"every coherent sequence is strongly schedulable" does **not need** the weak-diamond
+strengthening, because the ◊ side is already **proved** (Theorem C, §15). So the gap is real
+but not load-bearing.
+
+**Why weak diamond hits the thinness wall [careful-prose].** The weak-diamond design wants,
+at a limit `δ`, two continuations `e_δ^0, e_δ^1` (built from `e↾δ`, *not* from a schedule)
+such that every partial schedule `(γ,X)↾D_δ` is defeated by at least one, with `c(f↾δ)`
+computing which. Defeating `f` at the top `u = (δ, e_δ)` means a **surviving kill** — a kill
+point `ξ ∉ X(x_δ)` (undipped by `f`) whose `0` propagates up to every floor `e_{γ(u)}` by
+coherence. But `X(x_δ)` is a finite **set**, unknown, and:
+- a *fixed* kill point `ξ_δ` fails — `f` may dip it (`ξ_δ ∈ X(x_δ)`), one point in a finite
+  set it is free to include;
+- *two* fixed kill points fail — `f` may dip both;
+- dodging `f`'s finite dip set requires **seeing the set** (choosing `ξ ∉ X(x_δ)`), which is
+  `|X(x_δ)|`-many bits, not one.
+
+This is the **thinness wall** (the toolbox Remark): `f` can dip any single `e`-definable point
+per element, so a surviving kill needs a point outside `f`'s finite dip — and identifying one
+is multi-bit. The ladder-uniformization use of weak diamond escapes this because *there* the
+adversary controls the target (the ladder colour) and sets it to differ from a *predicted
+bit*; here the schedule defends by dipping a finite **set**, not by matching a bit. **The two
+problems are not isomorphic, and one bit does not suffice.** So `Φ_{ℵ₁}` (CH) does not
+obviously drive the kill; the construction wants the full countable partial schedule —
+**◊-strength**.
+
+**But the ◊ side is already proved, and the independence needs only that [proved].** The
+statement whose independence the program wants is `S :≡ ` "every coherent sequence is strongly
+dip-schedulable." A `∃`-refutation suffices for `¬S`, and **Theorem C (§15) proves under ◊
+one nontrivial `e` is not strongly schedulable** — its staggered kill, guided by ◊'s full
+guess of `(γ,X)↾D_β`, dodges the seen dips (exactly the multi-bit move weak diamond cannot
+make). So **◊ ⟹ ¬S**. With the MA side (§42, §44: MA_{ω₁} ⟹ every coherent tree Lipschitz ⟹
+every `P(e,μ)` ccc via Lemma 1.4 ⟹ `S`, conjecture on cited machinery), `S` is **independent**:
+
+> **`S` = "every coherent sequence is strongly dip-schedulable" is independent of ZFC:
+> TRUE under MA_{ω₁} (Lipschitz; conjecture on cited numbered theorems), FALSE under ◊
+> (Theorem C, proved).** The strong-schedulability escapee exists under ◊, is absent under MA.
+
+**Correction to §43.** §43 proposed the CH-side via Devlin–Shelah weak diamond and framed the
+verifiability as the one gap. Corrected: weak diamond hits the thinness wall (the dodge is
+multi-bit), so **CH-via-weak-diamond does not obviously work**; the ◊ side is instead carried
+by the already-proved Theorem C, and the independence stands with ◊ (not CH) on the false
+side. The genuinely open **refinement** is exactly: *does CH-alone (weaker than ◊) suffice for
+`¬S`?* The thinness wall is evidence it may **not** — that `¬S` may need ◊-strength guessing,
+not mere `2^{ℵ₀} < 2^{ℵ₁}`. This is a sharper and more honest open question than §43's, and it
+sits precisely where ◊ and weak diamond part company for uniformization problems whose
+"defense" is a finite set rather than a single value.
+
+**The finer `Φ`/legal-escapee question, kept distinct [honest].** `S` is the
+*strong-schedulability* (all pressures) statement. The *transport `Φ`-escapee* (a **legal**
+system with no monotone dominator) is finer: Theorem C's lethal pressure is **illegal**
+(Theorem D), so ◊ ⟹ ¬S does **not** yet give a legal ◊-escapee — that remains the §34–§40
+open construction (legal value-gap ingredient in hand, global conflict open). So: `S`
+independent (◊/MA); the legal-`Φ` escapee under ◊ still open; MA kills both. The
+strong-schedulability frontier closes as independent; the legal-escapee frontier does not, and
+the distinction is now explicit.

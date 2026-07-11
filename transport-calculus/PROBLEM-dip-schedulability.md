@@ -375,15 +375,15 @@ Question 1 false, Question 4 affirmative. (The machine-checked single-element cc
 `n=1` shadow of Lemma 1.4; the ZFC/axiom boundary in Lean is exactly `n=1` vs `n≥2`.) The fractal regress of Question 2 is exactly the promise-budget
 bookkeeping that becomes *generic* under MA, as with ladder-system uniformization.
 
-**CH side (escapee).** Weak diamond `Φ_{ℵ₁}` (Devlin–Shelah 1978; `Φ ⟺ 2^{ℵ₀} < 2^{ℵ₁}`, so
-CH ⟹ Φ) kills ladder-system uniformization — the shape of "no schedule survives." A recursion
-building `e` codes each partial schedule on a countable `D_β` as `f↾β ∈ 2^{<ω₁}`, and uses the
-Φ-prediction `g(β)` to pick, at stationarily many `β`, the continuation of `e_β` the predicted
-schedule fails against. This evades the §9 no-go (weak diamond is a counting principle, not a
-guessing recursion, and needs only *one* stationary failure per total schedule). **Target:
-CH ⟹ some nontrivial coherent sequence is not strongly dip-schedulable** — Question 1 true.
-**The open joint:** making failure-at-`β` verifiable from the countable `D_β`-data — the exact
-point where thinness fought ◊; weak diamond's one-stage advantage does not yet close it.
+**◊ side (escapee), proved.** The false side of "every coherent sequence is strongly
+schedulable" needs only *one* non-schedulable witness, and **Theorem C (notes §15) proves under
+◊ one nontrivial `e` is not strongly dip-schedulable** — its staggered kill, guided by ◊'s full
+guess of `(γ,X)↾D_β`, dodges the seen dips. So **◊ ⟹ some nontrivial coherent sequence is not
+strongly dip-schedulable.** (The originally-proposed CH-via-weak-diamond route hits the
+**thinness wall** — dodging a schedule's finite dip *set* is multi-bit, not the one bit weak
+diamond predicts; notes §45. So the false side is carried by ◊, not by CH alone. **Open
+refinement:** does CH-alone suffice, or is ◊-strength genuinely needed? The thinness wall is
+evidence for the latter.)
 
 **The 0–1 law (PFA).** By the Invariance Lemma (Lemma G below) dip-schedulability is invariant
 under level-preserving club-isomorphism of `T(e)`; under PFA all normal ω₁-Aronszajn trees are
@@ -391,10 +391,17 @@ club-isomorphic (Abraham–Shelah, *Isomorphism types of Aronszajn trees*, Israe
 (1985)). So under PFA schedulability is a **0–1 law** across all nontrivial coherent sequences
 — Questions 3(a) and 3(b) collapse, and the MA-side conjecture need be checked for one `e`.
 
-**Net.** Question 1 is predicted **independent of ZFC**: false under MA_{ω₁}, true under CH.
-`Φ(e)` sits at the independence boundary via the §12 arrow, and the transport escapee exists
-in the CH model and is absent under MA. This is the intended terminus of the program — the
-qualitative frontier closes as an independence, not a one-sided theorem.
+**Net.** "Every coherent sequence is strongly dip-schedulable" is **independent of ZFC**:
+**FALSE under ◊** (Theorem C, *proved*), **TRUE under MA_{ω₁}** (Lipschitz; conjecture on the
+cited numbered theorems). The strong-schedulability escapee exists under ◊, is absent under MA.
+Two honest caveats: (i) the MA side is a conjecture reduced to a known theorem's applicability
+(§44), not yet a full proof; (ii) the finer *transport `Φ`-escapee* — a **legal** system with
+no monotone dominator — is not settled by this, since Theorem C's lethal pressure is illegal
+(Theorem D): the legal escapee under ◊ remains the §34–§40 open construction, while MA kills it
+too. So the *strong-schedulability* frontier closes as an independence (◊/MA); the *legal-`Φ`*
+frontier is open on the ◊ side and closed on the MA side. This is the terminus — the
+qualitative question resolves as an independence, with the one-sided ◊ half proved and the MA
+half reduced to cited machinery.
 
 ## 6. Provenance
 
