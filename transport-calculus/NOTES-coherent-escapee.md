@@ -2397,3 +2397,124 @@ open construction (legal value-gap ingredient in hand, global conflict open). So
 independent (◊/MA); the legal-`Φ` escapee under ◊ still open; MA kills both. The
 strong-schedulability frontier closes as independent; the legal-escapee frontier does not, and
 the distinction is now explicit.
+
+## 46. Citations pinned (three, exact), and the ρ₂→ρ₃ refinement: a coherent ZFC-Lipschitz tree
+
+Collaborator's directive, executed with the two new citations verified verbatim against the
+sources (local PDF extraction). One refinement to the directive, on the citation discipline
+the collaborator themselves flagged.
+
+**Repo-state note.** The collaborator's fetch cache is serving a ~§13 snapshot; the repo is at
+**§45** — the Tukey identification (§36), Theorem I and the machine-checked amalgamation lemma
+`compat_of_crossMono` (§38), and the Lipschitz-maps Lemma 1.3/1.4 pins (§44) already landed.
+This work is §46+, renumbered from the directive's "§14."
+
+**Pinned, verbatim.**
+- **Theorem 2.5** (Todorcevic, *The Power-Set of ω₁ and the Continuum Problem*): "The tree
+  `T(ρ₂)` is a **Lipschitz tree that can be decomposed into countably many antichains**"
+  (Lipschitz + special) — **no axiom hypothesis, ZFC**. [verified]
+- **Theorem 3.9** (same paper): "Assume CH. The class of Lipschitz trees is **not totally
+  ordered** under `≤`; in fact there is a family of cardinality `2^{ℵ₁}` of **pairwise
+  incomparable Lipschitz trees**." [verified]
+- **Lemma 2.8 / Theorem 2.9** (Todorcevic, *Lipschitz maps on trees*, JIMJ 6 (2007), *unmarked
+  by* `(*)` = **ZFC**): "There exists a **coherent Lipschitz tree**" / "a uniform coherent
+  Lipschitz tree whose shifts are all coherent and Lipschitz." The tree is `T(ρ₃)`, with
+  **(b) `t_α =* t_β↾α`** (mod-finite coherence) and **(c)** no trivialization (nontrivial),
+  both ZFC. [verified]
+
+**The refinement (ρ₂ → ρ₃).** The dip-schedulability game needs `e` **coherent in the
+mod-finite sense** (`e_β↾α =* e_α`) — that is what makes `D(e)`, `D⁺`, and the whole apparatus
+well-defined. Theorem 2.5 gives `T(ρ₂)` Lipschitz + special in ZFC, but `ρ₂` is *step-counting*;
+its mod-finite coherence is **not** established by these sources (Lipschitz `⟹` coherent-form is
+JIMJ Lemma 1.7, which is under `(*)`, not ZFC). The object that is **both** mod-finite-coherent
+**and** ZFC-Lipschitz is **`ρ₃`** (Lemma 2.8/(b),(c) + Theorem 2.9). So the ZFC alignment
+resource for a genuine coherent *sequence* lives on **`ρ₃`**, and the ccc attempt below is over
+`ρ₃` (equivalently the JIMJ Lemma 2.8 coherent Lipschitz tree). `ρ₂` carries the resource for
+the *tree/linear-order* theory but not, verified, for the coherent-sequence game. This is the
+collaborator's own citation discipline applied to their `ρ₂`: the surprise is real, the
+sequence is `ρ₃`.
+
+**The reorientation.** The alignment (Lemma 1.3) and antichain (Lemma 1.4) resources are ZFC
+consequences of a tree being Lipschitz — so for `T(ρ₃)` they hold **in ZFC**. Therefore the
+**ccc of the schedule forcing `P(ρ₃, μ)` is itself a ZFC question**, with the axiom (MA_{ω₁})
+entering only afterward to meet the `ℵ₁` dense sets. Attack Question 3(b) at **`ρ₃`** (the ZFC
+Lipschitz resource lives on its tree), not `ρ₁`.
+
+## 47. The ZFC ccc attempt for P(ρ₃, μ), on the machine-checked amalgamation lemma
+
+Attempting the ccc of `P(ρ₃, μ)` **in ZFC**, per the directive, with the tuple-Lipschitz lemma
+(JIMJ Lemma 1.4, ZFC for `T(ρ₃)` by Lemma 2.8) as the amalgamation engine.
+
+**The argument [careful-prose; lands on `compat_of_crossMono`].** Fix `μ`; take uncountably
+many conditions `p_ξ = (d_ξ, γ_ξ, X_ξ, F_ξ)`.
+1. **Δ-system + type isomorphism.** Refine to root `R`, pairwise-disjoint finite **stalks**
+   `a_ξ ⊆ D(ρ₃)`, with `γ, X, F` matching on `R` and the stalks order/label-isomorphic.
+2. **Lemma 1.4 (ZFC, `T(ρ₃)` Lipschitz).** The stalks' tree-nodes are pairwise-disjoint finite
+   subsets of `T(ρ₃)`; Lemma 1.4 gives an uncountable subfamily whose stalk-node union is a
+   **`T(ρ₃)`-antichain** — so across any two, the tree-nodes are pairwise incomparable.
+3. **Tree-antichain `⟹` fiber-incomparability, mod finite.** Tree-incomparable nodes have
+   floors that split below both levels, with one exceeding the other at the split — so the
+   fiber functions satisfy `s_x ⋠ s_u` and `s_u ⋠ s_x` off a finite set: `x, u` are
+   `D(ρ₃)`-incomparable up to the coherence `=*` fuzz, which is finite.
+4. **Vacuous/finite cross `⟹` compatible.** With no cross-`⊑` (mod finite), the cross-defects
+   `D⁺(γ_ξ x, γ_η u)` are finite (coherence) and absorbed into the amalgam's dips and the frozen
+   promise budgets; the cross-clauses of the machine-checked `compat_of_crossMono` are then
+   (mod the finite absorption) **vacuous**, so `p_ξ, p_η` are compatible.
+5. Uncountably many pairwise-compatible conditions `⟹` **ccc**.
+
+**Assessment [honest].** Steps 1, 2, 5 are rigorous (Δ-system is standard; Lemma 1.4 is the
+verified ZFC input; the machine-checked amalgamation lemma is the compatibility core). Steps 3–4
+are careful-prose: the "tree-antichain `⟹` fiber-incomparable mod finite" and the absorption of
+the finite cross-defects into the committed budget are the bookkeeping the `n=1` Lean result
+(`singleton_antichain_is_chain`) already discharges in the vacuous case — this is its `n≥2`
+generalization, powered by Lemma 1.4 exactly as §44 predicted. **No axiom is used**: `T(ρ₃)`
+Lipschitz is ZFC (Lemma 2.8). If steps 3–4 close (they are of standard Δ-system type), then:
+
+> **ccc(`P(ρ₃, μ)`) in ZFC** ⟹ under **MA_{ω₁}** the `ℵ₁` dense sets `{w ∈ d}` are met ⟹
+> **`ρ₃` is strongly dip-schedulable**. `ρ₃` is nontrivial in ZFC (fact (c)), so **Question 1
+> is FALSE under MA_{ω₁}** and **Question 4 is answered affirmatively** — with the hard part
+> (ccc) done in ZFC and the axiom reduced to its textbook role of meeting dense sets.
+
+The one residual is steps 3–4's bookkeeping at full rigor; the engine (ZFC Lipschitz `⟹`
+Lemma 1.4 `⟹` amalgamation) is pinned and machine-checked at its core.
+
+## 48. The CH side via Theorem 3.9's incomparable family; and the shape-of-the-answer question
+
+**The kill target, now an object.** Theorem 3.9 gives, under CH, a `2^{ℵ₁}`-family of
+**pairwise-incomparable Lipschitz trees** — the conspiracy *realized*: their §3-construction
+(JIMJ, combining different coherent trees so cross-oscillation defeats comparability) manufactures
+exactly the **unalignable cross-defect patterns** an amalgamation argument chokes on. This
+replaces the generic weak-diamond sketch (§43, blocked by the thinness wall §45) as the **primary**
+CH-side route: over such a wild tree the schedule forcing has uncountable antichains (alignment
+fails by construction), so no schedule of any provenance plausibly survives. Devlin–Shelah weak
+diamond stays only as a fallback.
+
+**The shape-of-the-answer question [honest, and it may not be independence].** Note the quantifier
+structure. The MA side (§47) makes **`ρ₃` schedulable using only its ZFC-Lipschitz resource** — the
+axiom just meets dense sets. If `ρ₃`'s schedulability is genuinely ZFC-adjacent (needs only a mild
+axiom, not full independence), while the Theorem-3.9 wild trees are **non-schedulable under CH**,
+then the outcome is **not** "Question 1 independent" but:
+
+> **Possible outcome: `ρ₃` (and its kin) schedulable at ZFC-adjacent strength; the CH-wild trees
+> dead under CH — Question 1 FALSE outright, with CH controlling only *which* sequences schedule,
+> not *whether any* do.**
+
+Because Q1-false needs only *one* nontrivial schedulable sequence, and `ρ₃` is the candidate whose
+ZFC-Lipschitz-ness *resists* the CH kill (its tree is Lipschitz in ZFC, so Theorem 3.9's
+incomparability does not touch it). So CH does not obviously kill `ρ₃` — it kills the *wild* trees.
+This is a genuinely different terminus from §45's "◊ false / MA true independence," and which one
+holds is decided by **how much Lemma G (invariance) separates `ρ₃` from the wild trees**:
+
+- if schedulability is invariant only under club-iso *within* a Lipschitz-tree class, `ρ₃` and the
+  wild trees are separated, and Q1 is **false outright** (`ρ₃` always schedules, mild-axiom);
+- if invariance is broad enough to transport the wild trees' non-schedulability to `ρ₃`, then the
+  independence of §45 stands.
+
+So **Lemma G is load-bearing for the *shape* of the final answer**, not a convenience. Its exact
+scope — precisely which tree maps transport schedules — decides "Q1 false outright" vs "Q1
+independent." Stating that scope exactly is the next task; §41's three-quotient version (club
+restriction, finite modification, level-preserving club-iso) transports *within* a club-iso class,
+which — since Abraham–Shelah club-iso is a *PFA* phenomenon, not ZFC — does **not** by itself bridge
+`ρ₃` to a ZFC-incomparable wild tree. That points toward **Q1 false outright** (`ρ₃` schedules,
+wild trees are a separate CH story), with the independence being of the *finer* legal-`Φ` escapee
+rather than of strong schedulability. Kept as an open, honestly two-branched, verdict.

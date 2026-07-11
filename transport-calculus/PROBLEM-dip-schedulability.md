@@ -367,13 +367,19 @@ JIMJ 6 (2007) (uncountable Δ-preserving subfamily). Even cleaner: **Lemma 1.4**
 pairwise-disjoint finite subsets of a Lipschitz tree has an uncountable subfamily whose union
 is an antichain) makes Δ-system'd stalks pairwise cross-incomparable, so the machine-checked
 amalgamation lemma (`compat_of_crossMono`, vacuous cross-clauses) gives pairwise
-compatibility — ccc. Under MA_{ω₁} every coherent tree is Lipschitz (Lemma 1.10 + MA
-specialness; `(*)` there is exactly "meet `ℵ₁` dense sets in a proper poset of size `≤ ℵ₁`",
-= MA_{ω₁} for ccc). So MA_{ω₁} makes every `P(e, μ)` ccc, meets the `ℵ₁` dense sets, produces
-a schedule. **Conjecture: MA_{ω₁} ⟹ every coherent sequence is strongly dip-schedulable** —
-Question 1 false, Question 4 affirmative. (The machine-checked single-element ccc is the
-`n=1` shadow of Lemma 1.4; the ZFC/axiom boundary in Lean is exactly `n=1` vs `n≥2`.) The fractal regress of Question 2 is exactly the promise-budget
-bookkeeping that becomes *generic* under MA, as with ladder-system uniformization.
+compatibility — ccc. **The surprise (notes §46): there is a coherent, nontrivial, Lipschitz
+tree `T(ρ₃)` in ZFC** — Todorcevic, *Lipschitz maps on trees*, Lemma 2.8 / Theorem 2.9
+(unmarked by `(*)`), with mod-finite coherence and nontriviality. (Todorcevic's *Power-Set of
+ω₁*, Theorem 2.5 gives `T(ρ₂)` Lipschitz + special in ZFC, but `ρ₂`'s mod-finite coherence is
+not established there, so the coherent-*sequence* resource is `ρ₃`.) Since Lemma 1.4 is a ZFC
+consequence of Lipschitz-ness, **the ccc of `P(ρ₃, μ)` is a ZFC question** — the amalgamation
+runs with no axiom, and MA_{ω₁} enters only to meet the `ℵ₁` dense sets. **Conjecture:
+MA_{ω₁} ⟹ `ρ₃` (nontrivial in ZFC) is strongly dip-schedulable** — Question 1 false, Question 4
+affirmative, with the hard part (ccc) in ZFC and the axiom textbook. (The machine-checked
+single-element ccc is the `n=1` shadow of Lemma 1.4; the ZFC/axiom boundary in Lean is exactly
+`n=1` vs `n≥2`.) **Attack Question 3(b) at `ρ₃`, not `ρ₁`** — the ZFC Lipschitz resource lives
+on its tree. The fractal regress of Question 2 is the promise-budget bookkeeping that becomes
+*generic* under MA, as with ladder-system uniformization.
 
 **◊ side (escapee), proved.** The false side of "every coherent sequence is strongly
 schedulable" needs only *one* non-schedulable witness, and **Theorem C (notes §15) proves under
@@ -391,17 +397,26 @@ club-isomorphic (Abraham–Shelah, *Isomorphism types of Aronszajn trees*, Israe
 (1985)). So under PFA schedulability is a **0–1 law** across all nontrivial coherent sequences
 — Questions 3(a) and 3(b) collapse, and the MA-side conjecture need be checked for one `e`.
 
-**Net.** "Every coherent sequence is strongly dip-schedulable" is **independent of ZFC**:
-**FALSE under ◊** (Theorem C, *proved*), **TRUE under MA_{ω₁}** (Lipschitz; conjecture on the
-cited numbered theorems). The strong-schedulability escapee exists under ◊, is absent under MA.
-Two honest caveats: (i) the MA side is a conjecture reduced to a known theorem's applicability
-(§44), not yet a full proof; (ii) the finer *transport `Φ`-escapee* — a **legal** system with
-no monotone dominator — is not settled by this, since Theorem C's lethal pressure is illegal
-(Theorem D): the legal escapee under ◊ remains the §34–§40 open construction, while MA kills it
-too. So the *strong-schedulability* frontier closes as an independence (◊/MA); the *legal-`Φ`*
-frontier is open on the ◊ side and closed on the MA side. This is the terminus — the
-qualitative question resolves as an independence, with the one-sided ◊ half proved and the MA
-half reduced to cited machinery.
+**The CH-wild kill target (notes §48).** Theorem 3.9 (Todorcevic, *Power-Set of ω₁*): under CH,
+`2^{ℵ₁}` **pairwise-incomparable Lipschitz trees** — the conspiracy realized as objects, with
+cross-oscillation defeating alignment by construction, so the schedule forcing over them has
+uncountable antichains. This is the primary CH-side kill target (weak diamond, §45, only a
+fallback).
+
+**Net — two honestly-branched termini (notes §48).** The `ρ₃` schedule uses *only its
+ZFC-Lipschitz resource*; the axiom merely meets dense sets. If that is genuinely ZFC-adjacent
+strength while the Theorem-3.9 wild trees die under CH, the outcome is **not** independence but
+**Question 1 FALSE outright**, CH controlling only *which* sequences schedule (Q1-false needs one
+witness, and `ρ₃`'s ZFC-Lipschitz-ness resists the CH kill). The alternative — the §45
+independence (◊ false / MA true) — requires **Lemma G (invariance)** to be broad enough to
+transport the wild trees' non-schedulability to `ρ₃`; but §41's club-iso quotient is a *PFA*
+phenomenon (Abraham–Shelah), not ZFC, so it does **not** by itself bridge `ρ₃` to a
+ZFC-incomparable wild tree — evidence toward **Q1 false outright**, with the independence being
+of the *finer* legal-`Φ` escapee (Theorem C's pressure is illegal, Theorem D) rather than of
+strong schedulability. So **Lemma G's exact scope decides the shape of the answer**, and both
+branches are kept open. This is the terminus: either a clean ZFC refutation of Q1 with CH
+sorting the sequences, or the §45 independence — decided by an invariance-scope question now
+made precise.
 
 ## 6. Provenance
 
