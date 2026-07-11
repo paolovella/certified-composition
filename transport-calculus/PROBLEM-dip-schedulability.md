@@ -362,12 +362,17 @@ monotone `γ ≥ μ`, finite dips, finite frozen promises — has routine densit
 machine-checked amalgamation lemma its ccc is equivalent to an **alignment statement** `A(e)`:
 among any uncountable family of finite defect-labeled configurations in the coherent tree
 `T(e)`, two have aligning cross-defect patterns. The cross-defect patterns are exactly the
-Δ-patterns of `T(e)`, so `A(e)` follows from `T(e)` being **Lipschitz** — and under MA_{ω₁}
-*every* coherent tree is Lipschitz (Todorcevic, *Lipschitz maps on trees*, JIMJ 6 (2007)). So
-MA_{ω₁} makes every `P(e, μ)` ccc, meets the `ℵ₁` dense sets, and produces a schedule.
-**Conjecture: MA_{ω₁} ⟹ every coherent sequence is strongly dip-schedulable** — Question 1
-false, Question 4 affirmative. (The one open citation-precision task: pin `A(e) ⟸ Lipschitz`
-to the exact lemma number.) The fractal regress of Question 2 is exactly the promise-budget
+Δ-patterns of `T(e)`, so `A(e)` is **Lemma 1.3** of Todorcevic, *Lipschitz maps on trees*,
+JIMJ 6 (2007) (uncountable Δ-preserving subfamily). Even cleaner: **Lemma 1.4** (a family of
+pairwise-disjoint finite subsets of a Lipschitz tree has an uncountable subfamily whose union
+is an antichain) makes Δ-system'd stalks pairwise cross-incomparable, so the machine-checked
+amalgamation lemma (`compat_of_crossMono`, vacuous cross-clauses) gives pairwise
+compatibility — ccc. Under MA_{ω₁} every coherent tree is Lipschitz (Lemma 1.10 + MA
+specialness; `(*)` there is exactly "meet `ℵ₁` dense sets in a proper poset of size `≤ ℵ₁`",
+= MA_{ω₁} for ccc). So MA_{ω₁} makes every `P(e, μ)` ccc, meets the `ℵ₁` dense sets, produces
+a schedule. **Conjecture: MA_{ω₁} ⟹ every coherent sequence is strongly dip-schedulable** —
+Question 1 false, Question 4 affirmative. (The machine-checked single-element ccc is the
+`n=1` shadow of Lemma 1.4; the ZFC/axiom boundary in Lean is exactly `n=1` vs `n≥2`.) The fractal regress of Question 2 is exactly the promise-budget
 bookkeeping that becomes *generic* under MA, as with ladder-system uniformization.
 
 **CH side (escapee).** Weak diamond `Φ_{ℵ₁}` (Devlin–Shelah 1978; `Φ ⟺ 2^{ℵ₀} < 2^{ℵ₁}`, so

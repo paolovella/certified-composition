@@ -2237,9 +2237,10 @@ Note on Question 2's fractal regress: the promise-budget self-similarity (§8) b
 bookkeeping. The regress was the symptom of building the schedule by hand in ZFC.
 
 Honest grade: `ccc ⟺ A(e)` is careful-prose on the machine-checked amalgamation lemma;
-**`A(e) ⟸ Lipschitz` is load-bearing and pinned to the paper but not yet to the exact lemma
-number** in *Lipschitz maps on trees* — the remaining citation-precision task before this
-ships.
+`A(e) ⟸ Lipschitz` is now **pinned to Lemma 1.3** of *Lipschitz maps on trees*, and §44
+gives the cleaner ccc route via **Lemma 1.4** (disjoint finite stalks have an antichain
+subfamily) landing directly on the machine-checked `compat_of_crossMono`. Citation precision
+for the MA side is closed; see §44.
 
 ## 43. The CH side: Devlin–Shelah weak-diamond coding, and the one open joint
 
@@ -2279,3 +2280,60 @@ there — **relayed from the collaborator's verification, not independently conf
 the §12 arrow; the transport escapee **exists under CH, is absent under MA**. The qualitative
 frontier of the program closes as *independent of ZFC* — the honest terminus, and exactly the
 shape §5 of the problem statement predicted.
+
+## 44. Lipschitz citations extracted, exact — and Lemma 1.4 upgrades the ccc proof (and ties to the machine-checked amalgamation lemma)
+
+Extracted from the source PDF (Todorcevic, *Lipschitz maps on trees*, JIMJ 6 (2007);
+`math.toronto.edu/stevo/l-map2.pdf`). The numbers are pinned, and the extraction *sharpens*
+the MA-side argument rather than merely citing it.
+
+**The standing postulate `(*)` [exact].** Def. (Introduction): the existence of filters
+meeting given families of `ℵ₁`-many dense sets in **proper** partial orderings of size
+`≤ ℵ₁` — the bounded proper-forcing-axiom shape; **for ccc posets this is MA_{ω₁}**, the
+framework Todorcevic notes covers "a large majority" of the results. This is *precisely* the
+shape of `P(e,μ)`: meet `ℵ₁` dense sets in a ccc poset of size `ℵ₁`.
+
+**The exact statements.**
+- **Definition 1.1.** `T` is *Lipschitz* iff it is Aronszajn and every level-preserving map
+  from an uncountable subset of `T` into `T` is Lipschitz on an uncountable subset.
+- **Lemma 1.3 [ZFC].** `T` Lipschitz, `A` uncountable `⊆ Tⁿ` ⟹ ∃ uncountable `B ⊆ A` with
+  `Δ(aᵢ,bᵢ) = Δ(aⱼ,bⱼ)` for all `a ≠ b ∈ B`, `i,j < n`. **This is `A(e)`** — the alignment
+  of cross-defect (= Δ-) patterns on an uncountable subfamily.
+- **Lemma 1.4 [ZFC].** Every family of pairwise-disjoint *finite* subsets of a Lipschitz
+  tree has an uncountable subfamily whose **union is an antichain**.
+- **Lemma 1.7 (*), Lemma 1.10 [ZFC].** A coherent tree is Lipschitz iff every uncountable
+  subset contains an uncountable antichain (1.10); every Lipschitz tree is a downward-closed
+  subtree of the coherent (maps-mod-finite) tree (1.7, under `(*)`).
+- **Lemma 7.2 (*).** Every Aronszajn tree embeds a Lipschitz (coherent) tree.
+
+**MA_{ω₁} ⟹ coherent is Lipschitz [precise chain].** MA_{ω₁} ⟹ every Aronszajn tree is
+special (classical) ⟹ every uncountable subset has an uncountable antichain ⟹ (Lemma 1.10)
+every coherent tree is Lipschitz. So `A(e)` (= Lemma 1.3) holds for every coherent `e`
+under MA_{ω₁}.
+
+**The upgrade: Lemma 1.4 gives ccc directly, through the machine-checked amalgamation
+lemma.** §42 routed ccc through the Δ-alignment (Lemma 1.3). Lemma 1.4 is cleaner and lands
+exactly on the Lean result:
+1. Δ-system the conditions ⟹ pairwise-disjoint finite **stalks** `a_ξ ⊆ T(e)` (root handled
+   by isomorphism-over-root refinement).
+2. Under MA_{ω₁} (`T(e)` Lipschitz), **Lemma 1.4** gives an uncountable subfamily whose stalk
+   union is an **antichain** — so across any two, `a_ξ` and `a_η` have **no
+   cross-comparabilities**.
+3. No cross-comparabilities ⟹ the cross-clauses of `compat_of_crossMono` are **vacuous** ⟹
+   the two conditions are **compatible** (the machine-checked amalgamation lemma, exactly the
+   vacuous-cross case).
+4. Uncountably many pairwise-compatible conditions ⟹ **ccc** (the family is linked).
+
+So the MA-side ccc proof is: **Δ-system + Lemma 1.4 + `compat_of_crossMono`** — and the last
+step is the *same* vacuous-cross mechanism the Lean `singleton_antichain_is_chain` uses. In
+fact `singleton_antichain_is_chain` (single-element ccc, ZFC, machine-checked) is exactly the
+**`n = 1` shadow of Lemma 1.4**: for singletons, "no ℵ₁-chain" *is* Lemma 1.4 at `n=1`; the
+general finite-stalk case is Lemma 1.4 proper, which needs MA_{ω₁} (Lipschitz-ness). The ZFC
+boundary the Lean file draws (single-element yes, multi-element axiom-dependent) is *exactly*
+the boundary between `n=1` (ZFC) and `n≥2` (MA) of Lemma 1.4.
+
+**Net [citation precision closed for the MA side].** `A(e) = ` Lemma 1.3; the clean ccc route
+is Lemma 1.4; coherent-is-Lipschitz is Lemma 1.10 + MA-specialness; `(*)` = MA_{ω₁} for ccc,
+the exact forcing-axiom shape of `P(e,μ)`. The MA-side conjecture now cites specific numbered
+theorems, and the reduction bottoms out on the machine-checked amalgamation lemma. The only
+remaining open joint in the whole program is the CH-side verifiability gap (§43).
