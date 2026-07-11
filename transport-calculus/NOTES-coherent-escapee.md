@@ -2154,3 +2154,128 @@ bridge; the oscillation lemma I cite. That lemma is not a gap in effort — it i
 irreducible engine, provable only with the axiom and only by the walks machinery, and I will
 not transcribe a proof of it I cannot verify. This is the honest maximum: a complete proof
 *relative to* the one theorem that is the actual heart of the subject.
+
+## 41. The two-sided independence program: citations pinned, and the Invariance Lemma
+
+Executing the collaborator's work order. Three load-bearing sources verified against the
+literature; the residual is now a concrete two-sided program (MA reduces to a known
+theorem's applicability; CH reduces to one coding gap).
+
+**Citations pinned [verified this pass, except as flagged].**
+- **Lipschitz / MA.** Todorcevic, *Lipschitz maps on trees*, J. Inst. Math. Jussieu **6**
+  (2007) 527–556 (`math.toronto.edu/stevo/l-map2.pdf`). Under MA(ω₁): every coherent tree
+  is **Lipschitz** (every level-preserving map on an uncountable subset has an uncountable
+  Δ-preserving restriction), and every Aronszajn tree embeds into a coherent one. [verified]
+- **Club-iso / PFA, and CH types.** Abraham–Shelah, *Isomorphism types of Aronszajn trees*,
+  Israel J. Math. **50** (1985) 75–113 (`shelah.logic.at/files/95522/114.pdf`). Under PFA
+  any two **normal** ω₁-Aronszajn trees are **club-isomorphic**; no prime tree; the CH side
+  carries the many-non-isomorphic-types constructions. [verified]
+- **Weak diamond / CH.** Devlin–Shelah, *A weak version of ◊ which follows from
+  2^{ℵ₀} < 2^{ℵ₁}*, Israel J. Math. **29** (1978) 239–247. `Φ_{ℵ₁} ⟺ 2^{ℵ₀} < 2^{ℵ₁}`
+  (so **CH ⟹ Φ**); predicts `c(f↾α) = g(α)` stationarily for every `f`; **kills
+  ladder-system uniformization** — the exact shape of "no schedule survives." [verified]
+
+**The Invariance Lemma (dip-schedulability is a tree-quotient invariant) [careful-prose].**
+Schedulability of `e` is invariant under the three quotients the coherent-tree theory works
+modulo:
+1. **Club restriction** — Lemma E (§12), done.
+2. **Finite modification** — if `e'_α =* e_α` for every `α`, a schedule `(γ, X)` for `e`
+   schedules `e'` after enlarging each `X(x)` by the finite set `dev(e_{γ(x)}, e'_{γ(x)})`:
+   the defects `D⁺` change only inside those finite sets, absorbed. [proved]
+3. **Level-preserving club-isomorphism of `T(e)`** — if `φ : T(e)↾C → T(e')↾C` is a
+   level-preserving club-isomorphism, a schedule for `e` transports to `e'` along `φ` with
+   per-node finite error: `φ` carries defect patterns `D⁺(ζ, η)` to those of `e'` up to
+   `φ`'s per-node finite error (level-preserving maps between coherent trees are Lipschitz —
+   finite error, Todorcevic), which the dips absorb. [careful-prose; the finite-error step
+   is the Lipschitz property, cited]
+
+**The 0–1 law under PFA [conditional on Invariance + Abraham–Shelah].** `T(e)` for nontrivial
+`e` is a normal ω₁-Aronszajn tree (coherent ⟹ Aronszajn; normalize). Under PFA all such are
+club-isomorphic (Abraham–Shelah), so by the Invariance Lemma dip-schedulability is a **0–1
+law**: under PFA either *every* nontrivial coherent sequence is schedulable or *none* is.
+Consequences: the MA-side conjecture need be checked for **one** sequence; and Questions
+3(a) (`ρ₁`) and 3(b) (`ρ₂`) **collapse** to the same question under PFA.
+
+## 42. The MA side: the schedule forcing `P(e,μ)`, ccc reduced to alignment, alignment from Lipschitz
+
+**The forcing `P(e,μ)` [defined].** Fix nontrivial `e` and pressure `μ` (per-`μ` suffices —
+strong schedulability is `∀μ ∃schedule`, so MA_{ω₁} applies to each `P(e,μ)` separately).
+Conditions `p = (d_p, γ_p, X_p, {(u, F_u) : u ∈ d_p})`: finite `⊑`-suitable `d_p ⊆ D(e)`;
+monotone `γ_p ≥ μ↾d_p`; finite dips `X_p`; finite **promises** `F_u` sealing
+`⋃_{x ⊑ u}(D⁺(γx, γu) \ X_x) ⊆ F_u`. Extension refines `d, γ`, grows `X`, **freezes** promises.
+
+**Density [routine, ZFC].** `{p : w ∈ d_p}` is dense — chain-continuation dips (§10) give the
+extension move (`γ(w) ≥ μ(w)` and above the down-set; `X(w)` absorbs into the frozen promises
+of the finitely many tops above `w`).
+
+**ccc ⟺ alignment [reduced, on the machine-checked amalgamation lemma].** Δ-system uncountably
+many `p_α` (supports = domain ∪ dip/promise ordinals), isomorph over root `R`. Amalgamating
+`p_α, p_β` requires the **cross-defects** `D⁺(γ_α(x), γ_β(u))` (`x ∈ d_α∖R`, `u ∈ d_β∖R`,
+`x ⊑ u`) to land inside the already-committed `X_α(x) ∪ F_β(u)` — finite sets fixed *before*
+seeing the partner. By `compat_of_crossMono` (machine-checked), amalgamation succeeds iff two
+members' cross-defect patterns align:
+
+> **A(e) (alignment).** Among any uncountable family of finite defect-labeled configurations
+> in `T(e)`, two have aligning cross-defect patterns (on their overlap, mod committed finite
+> sets). Then `ccc(P(e,μ)) ⟺ A(e)`.
+
+**A(e) from Lipschitz [the crux, cited].** The cross-defect pattern `D⁺(ζ, η)` *is* the
+difference-pattern of the coherent-tree nodes at `ζ, η` — the Δ-pattern the Lipschitz
+property governs. Lipschitz-ness of `T(e)` (every level-preserving map on an uncountable
+subset has an uncountable Δ-preserving restriction) yields an uncountable subfamily on which
+patterns are Δ-preserved, hence align. So **Lipschitz(`T(e)`) ⟹ A(e) ⟹ ccc(`P(e,μ)`)**.
+Under MA_{ω₁} every coherent tree is Lipschitz (Todorcevic), so A(e) holds for *every* `e`,
+MA_{ω₁} meets the `ℵ₁` dense sets `{w ∈ d}`, and the generic is a schedule (`phi_of_generic`).
+
+> **Conjecture (sharp): MA_{ω₁} ⟹ every coherent sequence is strongly dip-schedulable.**
+> Hence **Question 1 is FALSE under MA_{ω₁}**, and **Question 4 affirmative**. Nontrivial
+> coherent sequences exist absolutely (walks survive ω₁-preserving forcing), so this is a
+> genuine model.
+
+Note on Question 2's fractal regress: the promise-budget self-similarity (§8) becomes
+**generic** under MA — the same dissolution MA performs on ladder-system uniformization
+bookkeeping. The regress was the symptom of building the schedule by hand in ZFC.
+
+Honest grade: `ccc ⟺ A(e)` is careful-prose on the machine-checked amalgamation lemma;
+**`A(e) ⟸ Lipschitz` is load-bearing and pinned to the paper but not yet to the exact lemma
+number** in *Lipschitz maps on trees* — the remaining citation-precision task before this
+ships.
+
+## 43. The CH side: Devlin–Shelah weak-diamond coding, and the one open joint
+
+**The tool [verified].** Weak diamond `Φ_{ℵ₁}` (Devlin–Shelah; CH ⟹ Φ): for every
+`c : 2^{<ω₁} → 2` there is `g : ω₁ → 2` with `{α : c(f↾α) = g(α)}` stationary for every
+`f : ω₁ → 2`. It kills ladder-system uniformization — precisely "no schedule survives."
+
+**The construction [sketch, one gap flagged].** Build `e` by recursion. At a limit `β`, a
+schedule restricted to the countable `D_β` is a countable object, coded `f↾β ∈ 2^{<ω₁}`. Let
+`c(f↾β)` predict one bit of *which continuation of `e_β` the partial schedule fails against*.
+Φ gives `g` with `c(f↾β) = g(β)` stationarily for every total schedule `f`; at stage `β` use
+`g(β)` to choose the continuation of `e_β` the predicted partial schedule cannot survive. At
+the stationarily-many correct-prediction stages, the total schedule `f` fails at `β`.
+
+**Why it evades the §9 no-go.** That no-go covered ◊-template kills (guess-and-lower
+recursions vs *systems*). Weak diamond is a different species — a counting/prediction
+principle (`2^ω < 2^{ω₁}`), not a guessing recursion — and post-§10 the target is
+right-shaped: it needs only to defeat each *total* schedule at *one* stationary stage, not to
+make any single stage's damage unabsorbable everywhere (which is what thinness fought in every
+◊ design).
+
+**The open joint [flagged, not papered].** Making "the partial schedule cannot survive
+continuation-`g(β)`" **verifiable from the partial schedule at `β`** (countable data) is the
+hard step — the exact point where thinness resisted ◊. Weak diamond's advantage (one
+stationary stage suffices) is real but does *not* close it; the verifiability of failure-at-`β`
+from `D_β`-data is the open joint.
+
+> **Target: CH ⟹ some (plausibly every) nontrivial coherent sequence is not strongly
+> dip-schedulable.** Hence **Question 1 TRUE under CH**.
+
+The CH many-types structure (Abraham–Shelah 1985; Walks §4.3 CH constructions) is the ambient
+source; the specific *wild-oscillation coherent tree* underneath the coding should be pinned
+there — **relayed from the collaborator's verification, not independently confirmed this pass
+(flagged per the citation discipline).**
+
+**Both sides: Question 1 is independent of ZFC.** `Φ(e)` sits at the independence boundary via
+the §12 arrow; the transport escapee **exists under CH, is absent under MA**. The qualitative
+frontier of the program closes as *independent of ZFC* — the honest terminus, and exactly the
+shape §5 of the problem statement predicted.

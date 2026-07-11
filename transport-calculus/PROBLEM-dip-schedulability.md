@@ -240,17 +240,21 @@ other way. By Lemma E the question may be attacked on any club.
 
 **Question 4 (consistency).** Is "some nontrivial coherent sequence is strongly
 dip-schedulable" consistent with ZFC? Natural candidate axioms: MA_{ω₁} or PFA, via a
-forcing whose conditions are countable partial schedules; the ccc/properness of that
+forcing whose conditions are finite partial schedules; the ccc/properness of that
 forcing over the ◊-sequence is precisely where the fractal regress of Question 2
-reappears, and is open. *(Update: the complementary consistency statement is settled —
-by Theorem C, "some coherent sequence is NOT strongly dip-schedulable" holds under ◊,
-so schedulability-for-all is not a ZFC theorem.)*
+reappears. *(Update: the complementary consistency statement is settled — by Theorem C,
+"some coherent sequence is NOT strongly dip-schedulable" holds under ◊, so
+schedulability-for-all is not a ZFC theorem. And §5 now gives the affirmative side a
+concrete route: the schedule forcing `P(e, μ)` is ccc iff the alignment statement `A(e)`
+holds, which follows from `T(e)` Lipschitz — true for every `e` under MA_{ω₁}, Todorcevic.
+So MA_{ω₁} ⟹ every coherent sequence schedulable is conjectured, reducing Question 4 to a
+known theorem's applicability plus one citation-precision task.)*
 
 A negative answer to Question 1 with a ZFC witness would (via the argued arrows) refute
 `Φ` in ZFC for that sequence; a positive answer makes `Φ(e) ⟺ e trivial` plausible; an
 independence answer to Question 3(a)/4 would place `Φ` at the independence boundary.
 
-## 4. Toolbox — short ZFC lemmas [all proved]
+## 4. Toolbox — short lemmas [A–E proved (ZFC); G careful-prose, notes §41]
 
 **Lemma A (chain-continuation).** For `μ ≤ δ ≤ γ`:
 `D⁺(μ, γ) \ D⁺(μ, δ) ⊆ D⁺(δ, γ)`.
@@ -310,6 +314,16 @@ set at `u` or into the single finite set `dev(e_{γ(u)}, e_{γ_C(u)})`. ∎
 club, where e.g. the walk structure of `ρ₁` can be standardized first; nontriviality is
 club-robust.
 
+**Lemma G (invariance) [careful-prose; notes §41].** Dip-schedulability is invariant under
+the three quotients the coherent-tree theory works modulo: (i) *club restriction* (Lemma E);
+(ii) *finite modification* — if `e'_α =* e_α` for all `α`, enlarge each dip by the finite
+`dev(e_{γ(x)}, e'_{γ(x)})`; (iii) *level-preserving club-isomorphism of `T(e)`* — a schedule
+transports along the isomorphism with per-node finite error (level-preserving maps between
+coherent trees are Lipschitz — finite error), absorbed into dips.
+*Use (0–1 law):* under PFA all normal ω₁-Aronszajn trees are club-isomorphic
+(Abraham–Shelah 1985), so schedulability is a 0–1 law across all nontrivial coherent
+sequences; Questions 3(a)/3(b) collapse there and the MA-side conjecture reduces to one `e`.
+
 **Remark (thinness).** Coherence forces any single level's deviation from its
 predecessors to be finite below every smaller ordinal — so "kills" (as in Question 3(a))
 are ω-sequences cofinal in their level, and any fixed lower level sees only finitely many
@@ -336,20 +350,46 @@ monotonicity-after-finite-deletions machinery on the level index. To our knowled
 schedule game, Theorem B's dip mechanism, and Lemma C's monotone-representatives
 equivalence do not appear in this literature.
 
-## 5. Why this may sit at the independence boundary
+## 5. The independence program (concrete, two-sided)
 
-The game asks for a global choice of finite correction sets, coherent across all
-countable directed families of a chain-free (Aronszajn-type) order — structurally between
-ladder-system uniformization (◊ refutes, MA_{ω₁} proves, for 2-colorings) and the
-triviality of coherent sequences (genuinely ZFC-nontrivial, by walks). Lemma C says the
-*chain-indexed* version of the choice problem collapses to triviality; Lemma D says the
-index order never contains long chains unless `e` is trivial; Lemma A says every single
-chain is harmless. The entire content is the branching overlap — the same locus where
-Aronszajn-tree uniformization problems bifurcate under ◊ versus MA/PFA. Against
-independence: the per-pair finiteness caps (coherence) have so far defeated every
-diagonalization template (§9 no-go), which is weak evidence that ZFC may prove strong
-schedulability for *every* coherent sequence — which, note, would answer Question 1
-negatively in the strongest way, since nontrivial sequences exist in ZFC.
+The prediction "this sits at the independence boundary" is no longer structural — it is a
+concrete two-sided program, with the MA side reduced to a known theorem's applicability and
+the CH side reduced to one coding gap. Full detail and rigor grades in the notes, §41–§43;
+citations verified against the sources.
+
+**MA_{ω₁} side (no escapee).** The schedule forcing `P(e, μ)` — finite `⊑`-suitable domains,
+monotone `γ ≥ μ`, finite dips, finite frozen promises — has routine density, and by the
+machine-checked amalgamation lemma its ccc is equivalent to an **alignment statement** `A(e)`:
+among any uncountable family of finite defect-labeled configurations in the coherent tree
+`T(e)`, two have aligning cross-defect patterns. The cross-defect patterns are exactly the
+Δ-patterns of `T(e)`, so `A(e)` follows from `T(e)` being **Lipschitz** — and under MA_{ω₁}
+*every* coherent tree is Lipschitz (Todorcevic, *Lipschitz maps on trees*, JIMJ 6 (2007)). So
+MA_{ω₁} makes every `P(e, μ)` ccc, meets the `ℵ₁` dense sets, and produces a schedule.
+**Conjecture: MA_{ω₁} ⟹ every coherent sequence is strongly dip-schedulable** — Question 1
+false, Question 4 affirmative. (The one open citation-precision task: pin `A(e) ⟸ Lipschitz`
+to the exact lemma number.) The fractal regress of Question 2 is exactly the promise-budget
+bookkeeping that becomes *generic* under MA, as with ladder-system uniformization.
+
+**CH side (escapee).** Weak diamond `Φ_{ℵ₁}` (Devlin–Shelah 1978; `Φ ⟺ 2^{ℵ₀} < 2^{ℵ₁}`, so
+CH ⟹ Φ) kills ladder-system uniformization — the shape of "no schedule survives." A recursion
+building `e` codes each partial schedule on a countable `D_β` as `f↾β ∈ 2^{<ω₁}`, and uses the
+Φ-prediction `g(β)` to pick, at stationarily many `β`, the continuation of `e_β` the predicted
+schedule fails against. This evades the §9 no-go (weak diamond is a counting principle, not a
+guessing recursion, and needs only *one* stationary failure per total schedule). **Target:
+CH ⟹ some nontrivial coherent sequence is not strongly dip-schedulable** — Question 1 true.
+**The open joint:** making failure-at-`β` verifiable from the countable `D_β`-data — the exact
+point where thinness fought ◊; weak diamond's one-stage advantage does not yet close it.
+
+**The 0–1 law (PFA).** By the Invariance Lemma (Lemma G below) dip-schedulability is invariant
+under level-preserving club-isomorphism of `T(e)`; under PFA all normal ω₁-Aronszajn trees are
+club-isomorphic (Abraham–Shelah, *Isomorphism types of Aronszajn trees*, Israel J. Math. 50
+(1985)). So under PFA schedulability is a **0–1 law** across all nontrivial coherent sequences
+— Questions 3(a) and 3(b) collapse, and the MA-side conjecture need be checked for one `e`.
+
+**Net.** Question 1 is predicted **independent of ZFC**: false under MA_{ω₁}, true under CH.
+`Φ(e)` sits at the independence boundary via the §12 arrow, and the transport escapee exists
+in the CH model and is absent under MA. This is the intended terminus of the program — the
+qualitative frontier closes as an independence, not a one-sided theorem.
 
 ## 6. Provenance
 
