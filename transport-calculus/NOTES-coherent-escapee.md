@@ -2518,3 +2518,69 @@ which — since Abraham–Shelah club-iso is a *PFA* phenomenon, not ZFC — doe
 `ρ₃` to a ZFC-incomparable wild tree. That points toward **Q1 false outright** (`ρ₃` schedules,
 wild trees are a separate CH story), with the independence being of the *finer* legal-`Φ` escapee
 rather than of strong schedulability. Kept as an open, honestly two-branched, verdict.
+
+## 49. Lemma G's exact scope: the value/tree boundary — part (iii) retracted, the 0–1 law withdrawn, the terminus decided (sixteenth flip)
+
+Nailing the scope, as directed. The finding is sharp and partly a retraction: **schedule
+transport lives in the value category, not the tree category** — and this decides the
+terminus.
+
+**What the game data actually is.** The fiber order `D(e)` is *pointwise value dominance*
+(`s ≤ t↾α` in the ω-order at every coordinate); the defects `D⁺(a,b) = {ξ : e_a(ξ) > e_b(ξ)}`
+are *value comparisons at deviation coordinates*. The tree `T(e)` is ordered by *exact
+extension*; its isomorphism invariants are levels and **splits** (`Δ` = *first*
+disagreement). Two facts, both checkable:
+1. **Deviation sets are not tree data.** For same-level nodes `x, y`, the tree order sees
+   only `Δ(x,y)` (`x↾ξ = y↾ξ` iff `ξ ≤ Δ`); the *later* disagreements — their positions and
+   their value-directions — leave no trace in the tree order.
+2. **Value permutations are tree isos.** Permuting `ω`-values independently at each
+   coordinate maps `T(e)` level-preserving-isomorphically onto `T(e″)` (it preserves
+   equality/disagreement of restrictions) while **flipping value comparisons arbitrarily**
+   (only the identity is an increasing bijection of ω): `D(e″)` and its `D⁺` bear no fixed
+   relation to `D(e)`'s.
+
+**Retraction (part iii of Lemma G, §41).** The §41 sketch — "schedules transport along
+level-preserving club-isos with per-node finite error, since level-preserving maps between
+coherent trees are Lipschitz" — is **wrong as stated**: the Lipschitz property controls
+`Δ` (splits, on an uncountable subset), *not values*; the "per-node finite error" in the
+value sense was never established, and by fact 2 it is not establishable from tree data.
+**Lemma G(iii) is retracted.** With it falls the **PFA 0–1 law** (§41/§48), which ran
+Abraham–Shelah club-isomorphism through (iii): club-isos are tree-category maps, and they do
+not transport schedules. Withdrawn.
+
+**Lemma G, correct scope [stated exactly].** Dip-schedulability transports along `h` iff `h`
+is a **value-category** morphism: a club-level correspondence `σ` together with row
+correspondences that preserve *pointwise ω-order mod finite* — precisely: for a club of
+levels, `e'_{σ(a)}` and `e_a` compare with **finite value-distortion per pair, locally finite
+per top** (so dips/promises absorb the distortion). Parts (i) club restriction and (ii)
+finite modification are instances and stand [proved]. Tree-embeddability, tree-isomorphism,
+and club-isomorphism are **not** in scope.
+
+**The terminus, decided.** The §48 fork asked whether the Theorem-3.9 wild trees'
+(conjectured) CH-non-schedulability can transport to `ρ₃`. Answer: **no bridge exists in any
+model** — (a) transport needs a value-category map, strictly finer than tree maps; (b) under
+CH the wild family is pairwise tree-incomparable and any wild↔ρ₃ tree map, if one existed,
+still wouldn't transport; (c) the club-iso quotient was the only proposed broad bridge and it
+is both PFA-only *and* out of scope. **`ρ₃` is separated. The §45 "Q1 independent via
+invariance" route is dead.** What stands, with honest grades:
+- **Q1 FALSE under MA_{ω₁}**, witness `ρ₃` — nontrivial in ZFC, schedulable under MA via the
+  §47 ccc (mod steps 3–4 rigor). [the MA half of the terminus]
+- **Under CH/◊, Q1 is genuinely open, and the obstruction is now precise**: Theorem C's kill
+  *builds* its sequence and cannot target the *fixed* `ρ₃`; transport cannot reach `ρ₃`; the
+  wild trees bear on `S` (all-schedulable), not on Q1. **The program's new central open
+  problem: is `ρ₃` strongly dip-schedulable under CH (or ◊)?** Its ZFC-Lipschitz-ness gives
+  ccc but not a filter (MA_{ω₁} contradicts CH), so both answers are live.
+- **`S` = "every coherent sequence is strongly schedulable" remains independent-shaped**:
+  FALSE under ◊ (Theorem C, proved — the custom-built witness), TRUE under MA (the §42/§47
+  conjecture). Unchanged by this section.
+- **The 0–1 law: withdrawn**; Questions 3(a)/3(b) do *not* collapse under PFA by any argument
+  currently on the table.
+
+**Why this is the right kind of ending for the scope question.** The collaborator's
+instinct — "Lemma G is load-bearing for the shape of the final answer" — is confirmed, but
+in the negative direction: its honest scope is *narrow* (value category), the broad
+invariance that would have forced independence-of-Q1 does not exist, and the terminus is the
+**separated** picture: MA schedules `ρ₃` (Q1 false there); CH's wildness kills only wild
+trees (bearing on `S`); and the last question standing between the program and a full
+answer is `ρ₃`-under-CH — a single, concrete, well-posed problem about the canonical walk
+sequence. Sixteenth flip: a retraction (G(iii), the 0–1 law) that *decides* a fork.

@@ -314,15 +314,18 @@ set at `u` or into the single finite set `dev(e_{γ(u)}, e_{γ_C(u)})`. ∎
 club, where e.g. the walk structure of `ρ₁` can be standardized first; nontriviality is
 club-robust.
 
-**Lemma G (invariance) [careful-prose; notes §41].** Dip-schedulability is invariant under
-the three quotients the coherent-tree theory works modulo: (i) *club restriction* (Lemma E);
-(ii) *finite modification* — if `e'_α =* e_α` for all `α`, enlarge each dip by the finite
-`dev(e_{γ(x)}, e'_{γ(x)})`; (iii) *level-preserving club-isomorphism of `T(e)`* — a schedule
-transports along the isomorphism with per-node finite error (level-preserving maps between
-coherent trees are Lipschitz — finite error), absorbed into dips.
-*Use (0–1 law):* under PFA all normal ω₁-Aronszajn trees are club-isomorphic
-(Abraham–Shelah 1985), so schedulability is a 0–1 law across all nontrivial coherent
-sequences; Questions 3(a)/3(b) collapse there and the MA-side conjecture reduces to one `e`.
+**Lemma G (invariance) [scope corrected; notes §49].** Dip-schedulability transports along
+**value-category** morphisms: club-level correspondences with row comparisons preserving
+*pointwise ω-order mod finite* (finite value-distortion per pair, locally finite per top —
+absorbed by dips/promises). Instances, both [proved]: (i) *club restriction* (Lemma E);
+(ii) *finite modification* — enlarge each dip by the finite `dev(e_{γ(x)}, e'_{γ(x)})`.
+**Out of scope: tree maps.** The earlier part (iii) — transport along level-preserving
+club-isomorphisms of `T(e)` — is **retracted** (notes §49): tree isomorphisms preserve
+splits (`Δ`), but the game runs on deviation *sets* and value *comparisons*, which are not
+tree data (per-coordinate value permutations are level-preserving tree isos that scramble
+`D⁺` arbitrarily); the Lipschitz property controls `Δ`, not values. Consequently the
+previously-stated *PFA 0–1 law* (via Abraham–Shelah club-isomorphism) is **withdrawn**:
+Questions 3(a)/3(b) do not collapse by any argument on the table.
 
 **Remark (thinness).** Coherence forces any single level's deviation from its
 predecessors to be finite below every smaller ordinal — so "kills" (as in Question 3(a))
@@ -391,32 +394,37 @@ diamond predicts; notes §45. So the false side is carried by ◊, not by CH alo
 refinement:** does CH-alone suffice, or is ◊-strength genuinely needed? The thinness wall is
 evidence for the latter.)
 
-**The 0–1 law (PFA).** By the Invariance Lemma (Lemma G below) dip-schedulability is invariant
-under level-preserving club-isomorphism of `T(e)`; under PFA all normal ω₁-Aronszajn trees are
-club-isomorphic (Abraham–Shelah, *Isomorphism types of Aronszajn trees*, Israel J. Math. 50
-(1985)). So under PFA schedulability is a **0–1 law** across all nontrivial coherent sequences
-— Questions 3(a) and 3(b) collapse, and the MA-side conjecture need be checked for one `e`.
+**The 0–1 law: withdrawn (notes §49).** The previously-stated PFA 0–1 law ran Abraham–Shelah
+club-isomorphism through Lemma G's part (iii), which is retracted: tree isomorphisms do not
+transport schedules (the game's data — deviation sets and value comparisons — is not tree
+data). Questions 3(a)/3(b) do not collapse by any argument on the table.
 
 **The CH-wild kill target (notes §48).** Theorem 3.9 (Todorcevic, *Power-Set of ω₁*): under CH,
 `2^{ℵ₁}` **pairwise-incomparable Lipschitz trees** — the conspiracy realized as objects, with
 cross-oscillation defeating alignment by construction, so the schedule forcing over them has
 uncountable antichains. This is the primary CH-side kill target (weak diamond, §45, only a
-fallback).
+fallback) — but note it bears on `S` ("every sequence schedulable"), **not on Question 1**, by
+the separation below.
 
-**Net — two honestly-branched termini (notes §48).** The `ρ₃` schedule uses *only its
-ZFC-Lipschitz resource*; the axiom merely meets dense sets. If that is genuinely ZFC-adjacent
-strength while the Theorem-3.9 wild trees die under CH, the outcome is **not** independence but
-**Question 1 FALSE outright**, CH controlling only *which* sequences schedule (Q1-false needs one
-witness, and `ρ₃`'s ZFC-Lipschitz-ness resists the CH kill). The alternative — the §45
-independence (◊ false / MA true) — requires **Lemma G (invariance)** to be broad enough to
-transport the wild trees' non-schedulability to `ρ₃`; but §41's club-iso quotient is a *PFA*
-phenomenon (Abraham–Shelah), not ZFC, so it does **not** by itself bridge `ρ₃` to a
-ZFC-incomparable wild tree — evidence toward **Q1 false outright**, with the independence being
-of the *finer* legal-`Φ` escapee (Theorem C's pressure is illegal, Theorem D) rather than of
-strong schedulability. So **Lemma G's exact scope decides the shape of the answer**, and both
-branches are kept open. This is the terminus: either a clean ZFC refutation of Q1 with CH
-sorting the sequences, or the §45 independence — decided by an invariance-scope question now
-made precise.
+**Net — the terminus, decided (notes §49).** Lemma G's exact scope (value category, not tree
+category) resolves the §48 fork: **no transport bridge between the Theorem-3.9 wild trees and
+`ρ₃` exists in any model** — value-category maps are strictly finer than tree maps, the wild
+family is pairwise tree-incomparable under CH anyway, and the club-iso bridge was both PFA-only
+and out of scope. So `ρ₃` is **separated**, and the standing picture is:
+- **Q1 FALSE under MA_{ω₁}**, witness `ρ₃` (nontrivial in ZFC; schedulable under MA via the ccc
+  of `P(ρ₃, μ)`, whose hard part is ZFC — mod the §47 steps-3–4 rigor).
+- **Under CH/◊, Q1 is open, with the obstruction precise**: Theorem C's kill *builds* its
+  witness and cannot target the fixed `ρ₃`; transport cannot reach `ρ₃`; the wild trees bear
+  only on `S`. **The program's central open problem is now: is `ρ₃` strongly dip-schedulable
+  under CH (or ◊)?** Its ZFC-Lipschitz-ness gives ccc but not a filter (MA_{ω₁} contradicts
+  CH), so both answers are live.
+- **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
+  (conjecture on the cited machinery).
+This is the terminus the scope question was load-bearing for: not "Q1 independent via
+invariance" (dead — the invariance doesn't exist) and not "Q1 false outright in ZFC"
+(schedulability is model-dependent), but **Q1 false under MA with a canonical witness, and a
+single concrete open problem — `ρ₃` under CH — standing between the program and a full
+answer.**
 
 ## 6. Provenance
 
