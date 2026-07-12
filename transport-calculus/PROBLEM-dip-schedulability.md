@@ -417,7 +417,16 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   witness and cannot target the fixed `ρ₃`; transport cannot reach `ρ₃`; the wild trees bear
   only on `S`. **The program's central open problem is now: is `ρ₃` strongly dip-schedulable
   under CH (or ◊)?** Its ZFC-Lipschitz-ness gives ccc but not a filter (MA_{ω₁} contradicts
-  CH), so both answers are live.
+  CH), so both answers are live. *(Reduced, notes §50: CH breaks the §45 thinness wall — only
+  `ℵ₁`-many countable partial schedules under CH, enumerable as full objects — and by the
+  verified Lemma 2.8 facts the kill over `ρ₃` is exactly the **block-accumulation game**:
+  undipped support-points accumulating in one block-class `Λ+k` form a *permanent* leak (every
+  floor meets every block finitely), while each element can guard only finitely many blocks.
+  The schedule's necessary-and-sufficient counter is a diagonal ranking, existing iff `D(ρ₃)`
+  is **fiber-special** — `⋃_n R_n` with each `R_n ∩ ↓u` finite. Tree-specialness does *not*
+  supply this (a tree-antichain can meet one fiber-down-set infinitely). So the crux is:
+  **is `D(ρ₃)` fiber-special?** ZFC-yes ⟹ the block game dies, `ρ₃` plausibly schedules under
+  CH, Q1-false-everywhere-flavored; no ⟹ CH kills `ρ₃`, Q1 independent.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via

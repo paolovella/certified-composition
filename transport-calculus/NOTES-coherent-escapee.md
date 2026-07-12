@@ -2584,3 +2584,71 @@ invariance that would have forced independence-of-Q1 does not exist, and the ter
 trees (bearing on `S`); and the last question standing between the program and a full
 answer is `ρ₃`-under-CH — a single, concrete, well-posed problem about the canonical walk
 sequence. Sixteenth flip: a retraction (G(iii), the 0–1 law) that *decides* a fork.
+
+## 50. ρ₃ under CH: the wall breaks, the kill becomes the block-accumulation game, and the crux is fiber-specialness
+
+Going at the central open problem. Three findings at careful-prose rigor, each two-sided-honest;
+the problem does not fall, but it reduces to one new, concrete invariant of `D(ρ₃)`.
+
+**Finding 1: CH breaks the thinness wall.** §45's protection was specific to *weak diamond's one
+bit*: dodging a finite dip set is multi-bit. But under CH there are only `ℵ₁`-many countable
+partial schedules (each is a countable object over a countable set; `2^{ℵ₀} = ℵ₁`), so a
+CH-adversary can **enumerate them as full objects** — dips visible, the exact information ◊
+supplied in Theorem C and weak diamond lacked. So ρ₃-under-CH is genuinely threatened: the
+enumeration resource is available. What the CH-adversary does *not* have is Theorem C's other
+resource: it cannot build `e` — `ρ₃` is fixed — so the kill must be manufactured from `ρ₃`'s own
+drop structure, steered only through the pressure map `μ`.
+
+**Finding 2: over ρ₃ the kill is exactly the block-accumulation game.** From the verified
+construction (Lemma 2.8): rows are binary, and **(a)** `supp(t_β) ∩ (Λ+k)` is *finite for every
+`β` and every `k`* — every row meets every block-class finitely. Since drops are
+`D⁺(c, γ) = supp(t_c) \ supp(t_γ)` (binary values), fact (a) cuts both ways:
+
+> **Permanent-leak mechanism [careful-prose].** If commitments `c_n` (the schedule's chosen
+> levels, at elements `x_n ⊑ u`) have support points `ξ_n ∈ supp(t_{c_n}) ∩ (Λ+k₀) ∩ gap(x_n)`,
+> *distinct, undipped, in a single block-class `Λ+k₀`*, then for **every** later floor `γ`:
+> `supp(t_γ) ∩ (Λ+k₀)` is finite (fact (a)), so all but finitely many `ξ_n` are drops surviving
+> at `γ` — the leftover at `u` is infinite for *all* continuations. **A block-accumulation is a
+> permanent leak: no future floor ever absorbs it.** Conversely, per-element exposure *per
+> block* is finite (fact (a) again), so each element can dip its exposure in any *finitely many*
+> named blocks — but its total gap-exposure (across all blocks) may be infinite, so it cannot
+> guard every block at once.
+
+So the CH-kill has a precise shape: force pressure so gaps are long, then use the enumeration to
+pick, against each candidate's committed dips, a block-class its commitments under-guard, and
+accumulate. And the schedule's precise counter: guard blocks *diagonally*.
+
+**Finding 3: the schedule's counter is a ranking, and its existence is the crux.** The diagonal
+strategy — element `x` dips its exposure in blocks `k ≤ rank(x)` — blocks every accumulation
+*iff* along every down-set, every fixed block-class is eventually guarded, i.e. iff the ranking
+has **finite fibers on every down-set**:
+
+> **Definition (fiber-special).** `D(e)` is *fiber-special* if `D(e) = ⋃_{n<ω} R_n` with each
+> `R_n ∩ ↓u` **finite** for every `u ∈ D(e)`.
+
+If `D(ρ₃)` is fiber-special (in ZFC), the diagonal dips defeat every block-accumulation, and the
+CH-kill's *only known mechanism* dies — evidence that **ρ₃ is schedulable under CH too**, which
+with §47/§49 would push toward *Q1 false in both models* (false outright-flavored, modulo the
+value-form bookkeeping). If fiber-specialness fails — or holds only off a Φ-guessable core — the
+enumeration + block game plausibly kills, and **Q1 goes independent** (`ρ₃` dead under CH, alive
+under MA). Two honest checks already run:
+- *Tree-specialness does not give it*: `T(ρ₂)`-style specialness decomposes into
+  tree-antichains, but a tree-antichain can meet a single ⊑-down-set infinitely (turn off one
+  point of `s_u↾α_n` at distinct points: pairwise tree-incomparable, all `⊑ u`) — checked, so
+  the known ZFC specialness of walk trees does **not** settle it.
+- *The regress signature is present*: a global ranking is a uniformization-type object (its
+  per-down-set order types are countable but the ranks must cohere across overlapping
+  down-sets) — the same self-similarity the program has met at every level. This is where the
+  problem's difficulty genuinely lives, not an artifact.
+
+**Status after the attack.**
+- ρ₃-under-CH does **not** fall this session, in either direction — honestly.
+- It **reduces** to: *is `D(ρ₃)` fiber-special?* — a new, sharply-posed, ZFC-or-not invariant
+  (σ-decomposition into pieces finite in every down-set), now the program's crux. ZFC-yes ⟹
+  the block-game dies and `ρ₃` plausibly schedules under CH (Q1 false everywhere reachable);
+  no/Φ-defeatable ⟹ CH kills `ρ₃` and Q1 is independent.
+- The findings sharpen both sides: the CH-adversary's wall is *down* (Finding 1) and its
+  mechanism is *explicit* (Finding 2); the schedule's necessary-and-sufficient counter is
+  *named* (Finding 3). The next session's target is fiber-specialness of `D(ρ₃)` — and note it
+  is a **pure order-theoretic question about the fiber order**, back in the value category
+  where (§49) the game actually lives.
