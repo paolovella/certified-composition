@@ -254,7 +254,7 @@ A negative answer to Question 1 with a ZFC witness would (via the argued arrows)
 `Φ` in ZFC for that sequence; a positive answer makes `Φ(e) ⟺ e trivial` plausible; an
 independence answer to Question 3(a)/4 would place `Φ` at the independence boundary.
 
-## 4. Toolbox — short lemmas [A–E proved (ZFC); G careful-prose, notes §41]
+## 4. Toolbox — short lemmas [A–E, H proved (ZFC); G value-category scope, notes §49]
 
 **Lemma A (chain-continuation).** For `μ ≤ δ ≤ γ`:
 `D⁺(μ, γ) \ D⁺(μ, δ) ⊆ D⁺(δ, γ)`.
@@ -327,6 +327,16 @@ tree data (per-coordinate value permutations are level-preserving tree isos that
 previously-stated *PFA 0–1 law* (via Abraham–Shelah club-isomorphism) is **withdrawn**:
 Questions 3(a)/3(b) do not collapse by any argument on the table.
 
+**Lemma H (uncountable chains) [proved, notes §51].** `D(e)` has an *uncountable* `⊑`-chain
+iff `e` is trivial. (Levels of `D(e)` are countable, so an uncountable chain has uncountably
+many levels and an ω₁-subchain with increasing cofinal levels is extractable — Lemma D
+applies.) Consequently any σ-decomposition of `D(e)` into *down-finite* pieces (pieces meeting
+every `↓u` finitely — "fiber-specialness", notes §50) forces `e` nontrivial; and **Theorem J
+(notes §51)**: fiber-specialness of `D(e)` implies the full `=*`-closure tree of `e` is a
+*special* Aronszajn tree — end-extension implies pointwise domination, so the closure tree is
+a suborder of `D(e)`, and for trees specialness is exactly σ-down-finiteness. The converse
+fails at the dips (a tree-antichain can be infinite inside one fiber-down-set).
+
 **Remark (thinness).** Coherence forces any single level's deviation from its
 predecessors to be finite below every smaller ordinal — so "kills" (as in Question 3(a))
 are ω-sequences cofinal in their level, and any fixed lower level sees only finitely many
@@ -351,7 +361,14 @@ higher-walks introduction (arXiv 2410.00607) reviews ρ₁/ρ₂ coherence (mod
 finitely-supported, mod locally-constant respectively) and contains no
 monotonicity-after-finite-deletions machinery on the level index. To our knowledge the
 schedule game, Theorem B's dip mechanism, and Lemma C's monotone-representatives
-equivalence do not appear in this literature.
+equivalence do not appear in this literature. *(Verified first-hand, notes §51, from
+Todorcevic's Handbook chapter "Coherent Sequences" and the JIMJ paper: Lemma 3.8 — ρ₃'s ones
+are block-finite (`(Λ+n) ∩ B_β` finite) and fan-cofinite (`[λ, λ+ω) ⊆* B_β`); Remark 1.17 —
+`T(ρ₁)`, the full `=*`-closure, is a special Aronszajn tree in ZFC, with finite-to-one rows;
+JIMJ Lemma 1.10 — a coherent tree is Lipschitz iff every uncountable subset contains an
+uncountable antichain, so `T(ρ₃)` is hereditarily non-Souslin in ZFC. No source states
+`T(ρ₃)` special; JIMJ footnote 10's `supp` = zero-set is a typo — it contradicts Handbook
+3.8 and JIMJ Lemma 2.8's own orthogonality claim; the 1-set reading is correct.)*
 
 ## 5. The independence program (concrete, two-sided)
 
@@ -426,7 +443,19 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   is **fiber-special** — `⋃_n R_n` with each `R_n ∩ ↓u` finite. Tree-specialness does *not*
   supply this (a tree-antichain can meet one fiber-down-set infinitely). So the crux is:
   **is `D(ρ₃)` fiber-special?** ZFC-yes ⟹ the block game dies, `ρ₃` plausibly schedules under
-  CH, Q1-false-everywhere-flavored; no ⟹ CH kills `ρ₃`, Q1 independent.)*
+  CH, Q1-false-everywhere-flavored; no ⟹ CH kills `ρ₃`, Q1 independent.)* *(Bracketed, notes
+  §51: fiber-special ⟺ σ-decomposition into strongly unbounded sets. **Necessary** — Theorem J:
+  the `=*`-closure tree must be special, so "is `T(ρ₃)` special?" (Q-T) is the gate: unstated
+  in the verified sources, its ρ₁/ρ₂ proof engines unavailable (binary values), with the
+  verified ZFC approximation being hereditary non-Souslinness (Lipschitz + JIMJ 1.10).
+  **Cheap** — the Tukey half: `D(ρ₃) ≡_T [ω₁]^{<ω}` outright in ZFC (value-spikes /
+  block-spikes via Lemma 3.8(2)), so the crux is the σ-covering, not the cofinal type.
+  **Crux** — after the flat-core reduction, whether infinite families can be *jointly almost-
+  inside one row*: `{(α_i, A_i)}` is bounded iff `⋃_i (A_i \ B_β)` is finite for some `β`, so
+  the canonical-rows instance (Q-rows) is verbatim the game's own absorption quantity
+  `⋃ D⁺(α, β)` — the self-similarity is an identity. Any CH-model with `T(ρ₃)` non-special
+  kills the diagonal counter there; conversely under CH the C-sequence defining ρ₃ is ours to
+  choose.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via

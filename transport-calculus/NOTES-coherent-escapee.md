@@ -2652,3 +2652,149 @@ under MA). Two honest checks already run:
   *named* (Finding 3). The next session's target is fiber-specialness of `D(ρ₃)` — and note it
   is a **pure order-theoretic question about the fiber order**, back in the value category
   where (§49) the game actually lives.
+
+## 51. Fiber-specialness is σ-down-finiteness: Theorem J transfers it to the tree order, Theorem K lands the Tukey frame, and the sources yield three new verified resources — "T(ρ₃) special?" is now the necessary gate
+
+Going at the §50 crux. It does not fall, but it is structurally located this session: three
+proved theorems, a first-hand source-verification round (both ρ₃ sources fetched and
+extracted; one typo caught *in the source*), and the crux split into a necessary
+tree-condition — a new, named, classical-flavored subproblem — plus a dip-refinement.
+
+**Source round [verified, verbatim quotes].** Both sources are now first-hand: Todorcevic,
+*Lipschitz maps on trees* (JIMJ 6 (2007); `l-map2.pdf`, author's Toronto page) and Todorcevic,
+*Coherent Sequences* (Handbook of Set Theory, ch. 1; `coherent.pdf`, ibid.) — the latter being
+the JIMJ paper's own reference [15] for the `T(ρ₃)` facts (its §3: Def 3.3, ρ₃ = last-step-of-
+maximal-weight indicator; Lemma 3.4, coherence).
+- **§50's fact (a) CONFIRMED — and a typo found in the source.** Handbook Lemma 3.8, verbatim,
+  for `B_α = {ξ < α : ρ₃(ξ, α) = 1}`: "(1) `B_α =∗ B_β ∩ α` for `α < β`, (2) `(Λ + n) ∩ B_β`
+  is finite for all `n < ω` and `β < ω₁`, (3) `{λ + n : n < ω} ⊆∗ B_β` whenever `λ + ω ≤ β`."
+  So (2) is §50's "every row meets every block-class finitely" — for the **ones**, as §50 used
+  it. The scare: JIMJ footnote 10 defines `supp(t_β) = {α < β : t_β(α) = 0}` — the *zero*-set —
+  under which §50's game would invert (single-block accumulations would be absorbed, not
+  permanent). The second source killed the scare in §50's favor: blocks are infinite, so
+  zeros-per-block-finite (footnote-10 reading of JIMJ (a)) and ones-per-block-finite (3.8(2))
+  cannot both hold, and JIMJ Lemma 2.8's own claim ("orthogonal to `Λ + k` for every `k`")
+  matches 3.8(2) exactly under `supp` = ones. **Footnote 10 is a typo; fact (a) means the
+  1-set; the §50 block-accumulation game stands unchanged.** (A seventeenth flip threatened by
+  a footnote and averted by a second source — the citation discipline paying for itself.)
+- **New resource 1 (fan-cofiniteness, 3.8(3)) [verified]:** every row is 1 on all but finitely
+  much of every fan `[λ, λ+ω)` below it. Dual orthogonal pictures: ones are *column*-finite
+  (3.8(2)), zeros are *fan*-finite (3.8(3)). The Handbook also frames ρ₃ as the prototype
+  *nowhere dense* coherent map — `ω₁ = ⋃_n (Λ+n)` with each block orthogonal to ρ₃ (Def 3.12)
+  — and Prop 3.13: under the **P-ideal dichotomy** (CH-compatible!) every nowhere dense
+  coherent map's domain so decomposes. Filed for the CH game.
+- **New resource 2 (Remark 1.17 + Lemma 1.16(a)) [verified]:** `T(ρ₁) := {t : α → ω : t =∗
+  (ρ₁)_α}` — the **full =∗-closure**, i.e. literally the element set of `D(ρ₁)` — "is a
+  homogeneous, special Aronszajn tree", ZFC; and the rows `(ρ₁)_α` are finite-to-one
+  (`{ξ ≤ α : ρ₁(ξ, α) ≤ n}` finite). The ρ₀/ρ₁/ρ₂ specializations all run on value-
+  unboundedness — the resource binary ρ₃ maximally lacks. **No specialness statement for
+  `T(ρ₃)` appears in either source** (grep-verified: "special" occurs in the JIMJ paper only
+  at Lemma 1.9 and its footnote 9).
+- **New resource 3 (JIMJ Lemma 1.10, ZFC) [verified]:** "A coherent tree T is Lipschitz if and
+  only if every uncountable subset of T contains an uncountable antichain." With Lemma 2.8
+  (`T(ρ₃)` Lipschitz, ZFC): **`T(ρ₃)` is hereditarily non-Souslin in ZFC** — every uncountable
+  subset, in every model, contains an uncountable antichain. Meanwhile coherent *Souslin*
+  trees exist under ◊ (secondary: Todorcevic, *Forcing with a coherent Souslin tree*; Rinot's
+  microscopic-approach papers), and by 1.10 they are exactly non-Lipschitz coherent trees. So
+  coherence alone never yields specialness, and Lipschitzness is precisely what separates
+  `T(ρ₃)` from the ◊-wild coherent trees — it closes the Souslin door but not the
+  non-special door.
+
+**Reformulation [proved].** Call `R ⊆ D(e)` **down-finite** if `R ∩ ↓u` is finite for every
+`u`; equivalently (two lines): every infinite subset of `R` is `⊑`-unbounded — `R` is
+*strongly unbounded* in the Tukey sense. Fiber-special = `D(e) = ⋃_{n<ω} R_n` with each `R_n`
+down-finite = there is `r : D(e) → ω` finite-to-one on every down-set. Note each level of
+`D(e)` is countable (`[α]^{<ω} × ω^{<ω}` many elements), so per-level injectivity is free; the
+entire content is cross-level.
+
+**Lemma H (chains) [proved].** For coherent `e`: `D(e)` has an *uncountable* `⊑`-chain iff `e`
+is trivial. *Proof.* Levels are countable, so an uncountable chain uses uncountably many
+levels; comparability orders levels, so a recursion (elements at levels `≤ δ` form a countable
+union of countable level-fibers) extracts an ω₁-subchain with strictly increasing cofinal
+levels — Lemma D applies. Converse: Lemma D's chain. ∎ Corollary: fiber-special ⟹ nontrivial
+(each `R_n` meets every initial segment of an ω₁-chain finitely, hence meets the chain in
+order type ≤ ω; countably many such sets cannot cover it).
+
+**Theorem J [proved]: fiber-special ⟹ the closure tree is special.** Let `U(e)` be the full
+=∗-closure tree — all fiber elements ordered by **end-extension** (`⊇ T(e)` as the
+restriction-closure of the exact tree). Three observations:
+1. *For trees, special ⟺ σ-down-finite.* (⟸) If `B` meets every tree-down-set finitely, then
+   since tree-predecessors `↓_T x` form a chain, `ρ(x) := |↓_T x ∩ B|` is a finite rank on
+   `B`, strictly increasing along comparabilities — its fibers are antichains, so `B` is a
+   countable union of antichains. (⟹) An antichain meets each `↓_T x` (a chain) in ≤ 1 point.
+2. *End-extension implies pointwise domination.* If `s ⊆ s'` then `(dom s, s) ⊑ (dom s', s')`
+   — equality below `dom s` is domination. So `U(e)` is a **suborder of `D(e)` on the same
+   element set**, and every tree-down-set `↓_T s` (the restrictions `s↾ξ`, which stay in the
+   closure) is contained in the fiber-down-set `↓(dom s, s)`.
+3. *σ-down-finiteness passes to suborders.* Immediate: fewer relations, smaller down-sets.
+Chaining 1–3: `D(e)` fiber-special ⟹ `U(e)` = ⋃ of tree-down-finite pieces ⟹ **`U(e)` (hence
+`T(e)`) is special** — hence Aronszajn, hence `e` nontrivial. ∎
+The converse **fails at the dips** — §50's check stands: a tree-antichain (turn off one point
+of `s_u↾α_n` at distinct points) can be infinite inside a single fiber-down-set, so
+tree-specialness is the *order-reduct* necessary condition, not the whole invariant.
+
+**The gate.** By Theorem J, **"`T(ρ₃)` is special" is formally necessary for fiber-specialness
+of `D(ρ₃)`** — and it is *not* among the verified facts (resource 2), its classical proof
+engines don't apply (binary kills the value-labeled antichains that specialize ρ₁/ρ₂), and
+what is verified is strictly weaker (hereditary non-Souslinness, resource 3). Named:
+- **(Q-T)** Is `T(ρ₃)` special — in ZFC? under CH? *(New subproblem, classical flavor. If
+  some CH-model has `T(ρ₃)` non-special, fiber-specialness fails there and §50's diagonal
+  counter dies in that model — though not schedulability itself; honest. Note also `T(ρ₃)`
+  is one tree per C-sequence satisfying (d): under CH the choice of C-sequence is *ours*,
+  a freedom the positive side should exploit.)*
+
+**Theorem K (the Tukey landing) [proved].** (i) Always `D(e) ≤_T [ω₁]^{<ω}` (directed, size
+ℵ₁, finite sets bounded — map `x` to a singleton). (ii) If `D(e)` is fiber-special, some piece
+is uncountable, i.e. an uncountable strongly unbounded set exists, i.e. `[ω₁]^{<ω} ≤_T D(e)`
+(map a finite set to an upper bound of its elements' witnesses; unbounded families have
+infinite unions, whose witness-sets no single element bounds). So **fiber-special ⟹ `D(e) ≡_T
+[ω₁]^{<ω}`**, the maximal cofinal type of size ℵ₁ — the exact σ-refinement of §36's frame.
+**Calibration [proved]: for ρ₃ the Tukey half is ZFC-cheap, two ways.** (a) *Value-spikes*:
+`x_α := (α+1, row-with-value-2-at-α)`; a top's function is =∗ a binary row, so it exceeds 1
+only finitely often — every infinite subfamily is unbounded. (b) *Flat block-spikes*: by
+3.8(2) pick recursively `α_ι` increasing and fresh `ζ_ι ∈ (Λ+1) ∩ α_ι \ B_{α_ι}` above all
+previous; `x_ι := (α_ι, χ_{B_{α_ι}} ∪ {ζ_ι})`. Any top's ones meet `Λ+1` finitely (3.8(2)),
+so it bounds only finitely many `x_ι`. **So `D(ρ₃) ≡_T [ω₁]^{<ω}` outright in ZFC**, and the
+crux is *not* the Tukey type: it is the σ-*covering* — every element, in particular every
+canonical one, must land in some strongly unbounded piece. Third occurrence of the program's
+"strictly finer than Tukey" signature (§37 Φ, §39 retraction, now fiber-specialness).
+
+**Flat-core reduction [proved].** `flat(α, s) := (α, {ξ : s(ξ) ≥ 1})` is monotone into the
+binary core `{(α, A) : A =∗ B_α}` with countable fibers (the exceptional values form a finite
+partial function into ω), so pairing a flat decomposition with fiber-indices pulls
+down-finiteness back: **`D(ρ₃)` is fiber-special iff its flat support core is** — a pure
+statement about the coherent set-system `{B_α}` under (level, ⊆). There, boundedness is
+explicit: an infinite `{(α_i, A_i)}` is bounded iff `∃β ≥ sup α_i` with `⋃_i (A_i \ B_β)`
+**finite** (then `χ_{B_β ∪ ⋃(A_i\B_β)}` is a legitimate top). So a piece is strongly unbounded
+iff no infinite subfamily is *jointly almost-inside one row*.
+
+**The canonical-rows subquestion.** Specializing to the rows themselves:
+- **(Q-rows)** Is `{(α, B_α) : α < ω₁}` strongly unbounded — i.e. is `⋃_{α∈I}(B_α \ B_β)`
+  infinite for every `β` and every infinite `I ⊆ β`?
+This is *verbatim* the schedule game's central quantity: `B_α \ B_β = D⁺(α, β)`, so (Q-rows)
+is the `γ = id`, `X = ∅` instance of "the leftover `⋃_{x⊑u} D⁺(γ(x), γ(u)) \ X(x)` is infinite
+for every top." **The absorption phenomenon the game is about *is* the boundedness relation of
+`D(ρ₃)`** — the self-similarity met at every level (§32, §50) is here an identity, not an
+analogy. Two-sided: if some infinite row-family is jointly absorbed, those rows are exactly
+the hard-to-cover elements (a trivial-direction germ inside a nontrivial sequence); if none
+is, the canonical rows form a single strongly unbounded piece — one piece of the needed
+decomposition, for free. Resource note: each deviation `B_α \ B_β` lives inside `α \ B_β`,
+which meets every fan finitely (3.8(3)) — joint absorption would confine infinitely many
+rows' deviations to one finite set, a very rigid alignment that ρ₃'s oscillation plausibly
+forbids; unresolved this session.
+
+**Status after the attack.**
+- Fiber-specialness of `D(ρ₃)` does not fall, but is now bracketed: **necessary** — `T(ρ₃)`
+  special (Q-T, open, unverified in the sources, ZFC-plausible since the Souslin obstruction
+  is dead in ZFC); **cheap** — the Tukey type (`≡_T [ω₁]^{<ω}` in ZFC, Theorem K); **crux** —
+  the σ-covering of the flat core, whose boundedness relation is the game's own absorption
+  condition (Q-rows).
+- The §50 dichotomy sharpens: the "ZFC-yes" branch must first clear Q-T in ZFC — a wall with
+  independent classical interest; the "CH-kills" branch gains a new mechanism — any CH-model
+  with `T(ρ₃)` non-special refutes fiber-specialness there via Theorem J's contrapositive.
+- Verified base extended: fact (a) re-confirmed against [15] with the JIMJ footnote-10 typo
+  flagged; fan-cofiniteness, `T(ρ₁)`-specialness (full closure, ZFC), and hereditary
+  non-Souslinness of `T(ρ₃)` (ZFC) added as resources. `D(ρ₁)` is now also a live secondary
+  target: *its* tree-special gate is already verified-ZFC, so fiber-specialness of `D(ρ₁)` is
+  unobstructed at the gate — though the §50 game analysis (blocks, fans) is ρ₃-specific and
+  would need its ρ₁ analogue before feeding a CH-schedulability claim.
