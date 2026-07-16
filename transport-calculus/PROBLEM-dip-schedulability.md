@@ -254,7 +254,7 @@ A negative answer to Question 1 with a ZFC witness would (via the argued arrows)
 `Φ` in ZFC for that sequence; a positive answer makes `Φ(e) ⟺ e trivial` plausible; an
 independence answer to Question 3(a)/4 would place `Φ` at the independence boundary.
 
-## 4. Toolbox — short lemmas [A–E, H proved (ZFC); G value-category scope, notes §49]
+## 4. Toolbox — short lemmas [A–E, H, I, I′ proved (ZFC); G value-category scope, notes §49]
 
 **Lemma A (chain-continuation).** For `μ ≤ δ ≤ γ`:
 `D⁺(μ, γ) \ D⁺(μ, δ) ⊆ D⁺(δ, γ)`.
@@ -336,6 +336,24 @@ every `↓u` finitely — "fiber-specialness", notes §50) forces `e` nontrivial
 *special* Aronszajn tree — end-extension implies pointwise domination, so the closure tree is
 a suborder of `D(e)`, and for trees specialness is exactly σ-down-finiteness. The converse
 fails at the dips (a tree-antichain can be infinite inside one fiber-down-set).
+
+**Lemma I (successor riding) [proved, notes §52].** For the walk sequence ρ₃ under the
+Handbook's C-sequence normalizations ((a) `C_{α+1} = {α}`, (c) no limits in ladders, (d)
+the nth ladder element is `λ+n+1`): `B_{γ+1} = B_γ ∪ {γ}`, hence `B_{λ+m} = B_λ ∪ [λ, λ+m)`
+— successor rows ride their fans. Consequently **(Q-rows) is false** (notes §52, Theorem L):
+the infinite canonical family `{(λ+m, B_{λ+m}) : m ≥ 1}` is bounded in `D(ρ₃)` by any
+`(β, B_β ∪ D⁺(λ,β) ∪ ([λ,λ+ω) \ B_β) ∪ ({λ} \ B_β))`, `β ≥ λ+ω` — coherence at one pair
+plus fan-cofiniteness. The canonical rows are not strongly unbounded; every fan witnesses it.
+
+**Lemma I′ (successor collapse) [proved, notes §52].** For any coherent `e`, `D(e)` is
+fiber-special iff its restriction to limit levels is (split successor levels by
+(limit-part, level offset, tail values); restriction maps each piece injectively into a
+limit-level down-set). So Lemma I costs fiber-specialness nothing, and the residue of
+(Q-rows) is its limit-level form **(Q-rows-lim)** — open, and by notes §52 (Theorems M, N)
+equivalent to a one-sided uniformization question for the **threshold sequence θ(ρ₃)**
+(`thr_α(λ)` := least N with `ρ₃(λ+n, α) = 1` for all n ≥ N), which is coherent,
+finite-to-one, and ω-valued on the fan-top index Λ — Lemma 3.8's clauses are exactly "θ
+well-defined" and "θ finite-to-one".
 
 **Remark (thinness).** Coherence forces any single level's deviation from its
 predecessors to be finite below every smaller ordinal — so "kills" (as in Question 3(a))
@@ -455,7 +473,19 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   the canonical-rows instance (Q-rows) is verbatim the game's own absorption quantity
   `⋃ D⁺(α, β)` — the self-similarity is an identity. Any CH-model with `T(ρ₃)` non-special
   kills the diagonal counter there; conversely under CH the C-sequence defining ρ₃ is ours to
-  choose.)*
+  choose.)* *(Advanced, notes §52 — one subproblem settled, the other bracketed. **(Q-rows)
+  is FALSE in ZFC** (Theorem L): successor rows ride their fans (`B_{γ+1} = B_γ ∪ {γ}`,
+  Lemma I), so each fan's canonical family is jointly absorbed — §51's oscillation hunch
+  corrected. Benign: fiber-specialness reduces to limit levels (Lemma I′), where the residue
+  (Q-rows-lim) is open and **descends** (Theorems M, N — the pruning formula
+  `ρ₃(ξ,β) = ρ₃(ξ,α) ∧ [ρ₁(ξ,α) ≥ ρ₁(α,β)]` above the full lower trace, via Handbook 1.6)
+  to a one-sided uniformization game for the coherent finite-to-one threshold sequence
+  θ(ρ₃) on fan-tops: absorption ⟺ downward θ-deviations concentrate in a finite set +
+  scatter alignment; cheap window fans leak explicitly (N1) and failure forces the trace to
+  chase the cheap region forever (N2). And **(Q-T) is bracketed from one side** (Theorem O):
+  Con(CH + `T(ρ₃)` special) via BMR specialization — size-ℵ₁ ccc, CH survives, the tree is
+  level-absolute — so the Theorem-J-contrapositive CH-kill needs strictly more than CH and a
+  non-Souslin non-specialness mechanism that does not yet exist.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via

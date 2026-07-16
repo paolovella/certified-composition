@@ -2798,3 +2798,188 @@ forbids; unresolved this session.
   target: *its* tree-special gate is already verified-ZFC, so fiber-specialness of `D(ρ₁)` is
   unobstructed at the gate — though the §50 game analysis (blocks, fans) is ρ₃-specific and
   would need its ρ₁ analogue before feeding a CH-schedulability claim.
+
+## 52. Q-rows falls (answer: NO) — successor rows ride their fans; the crux descends to a threshold sequence θ(ρ₃) of ρ₁-species; and CH alone cannot slam the Q-T gate
+
+Going at §51's two open subproblems. One of them is *settled*: (Q-rows) is **false**, by a
+two-line ZFC argument that §51's closing plausibility remark got exactly wrong. The failure
+is benign for the crux (successor levels collapse onto limit levels) and productive beyond
+it: the same source round that verified the conventions yields an exact pruning formula for
+the deviation sets, and through it the whole absorption game descends one level — from ρ₃'s
+binary rows to a canonical ω-valued, coherent, *finite-to-one* "threshold sequence" on the
+fan-top index. On the second subproblem (Q-T), the gate is shown consistently open with CH
+(Theorem O), so the CH-kill branch needs strictly more than CH.
+
+**Source round 3 [verified, verbatim].** From `coherent.pdf` (Handbook ch. 1), closing §51's
+gaps and correcting one attribution:
+- Standing normalizations of the C-sequence, verbatim: **(a)** `C_{α+1} = {α}`; **(c)** "If α
+  is a limit ordinal, then C_α does not contain limit ordinals"; **(d)** "If α is a limit
+  ordinal > 0 and if ξ occupies the nth place in the increasing enumeration of C_α ..., then
+  ξ = λ + n + 1 for some limit ordinal λ (possibly 0)". All of §3's ρ₃-facts assume these;
+  so does everything below. Note the rigidity (d) buys: an ordinal ξ can appear in a ladder
+  only if ξ = λ+n+1, and then only at place n — *the place is intrinsic to ξ*. Consequently
+  a walk arrives at ξ = λ+n (n ≥ 1) with last weight n−1 (off a limit's ladder) or 0 (off
+  `C_{λ+n+1} = {λ+n}`), and walks reach a limit ordinal only through its successor.
+- Def 3.3, verbatim: `ρ₃(α,β) = 1 iff ρ₀(α,β)(ρ₂(α,β)−1) = ρ₁(α,β)` — "the last step of
+  the walk β → α comes with the maximal weight". **Weak tie convention**; in particular a
+  one-step walk always has ρ₃ = 1. Here ρ₁ is Handbook **1.15** (maximal weight = largest
+  entry of ρ₀), with **1.16(a)** (rows finite-to-one: `{ξ ≤ α : ρ₁(ξ,α) ≤ n}` finite),
+  **1.16(b)** (ρ₁ coherent), **1.17** (`T(ρ₁)` special). Correction of record: §51's
+  "resource 2" citations are *Handbook* numbers — the JIMJ paper has no 1.16/1.17.
+- **Lemma 1.6(b)**, the factoring engine, verbatim: `ρ₀(α,γ) = ρ₀(min(F(β,γ)\α), γ)⌢
+  ρ₀(α, min(F(β,γ)\α))` for α ≤ β ≤ γ, with F the full lower trace (1.4; subadditive, 1.5).
+- JIMJ **Lemma 1.9** now read — the one "special" occurrence §51 left unopened: "The square
+  of every special coherent tree T can be covered by the graphs of countably many Lipschitz
+  functions." Specialness is a *hypothesis* there, not a conclusion (footnote 9 is just the
+  definition). No specialness dichotomy for `T(ρ₃)` hides in either source; Q-T stands.
+- Every walk-level formula below was additionally brute-checked on a randomized
+  (d)-conforming C-sequence over the ordinals below ω·25 (scratch script: the pruning
+  formula and the arrival rigidity at ~42k sample points, the successor and fan-absorption
+  identities across hundreds of instances; all pass). [proved + numerically checked]
+
+**Lemma I (successor riding) [proved].** `B_{γ+1} = B_γ ∪ {γ}` for every γ. *Proof.*
+`C_{γ+1} = {γ}` gives `ρ₀(ξ, γ+1) = ⟨0⟩⌢ρ₀(ξ,γ)` for ξ < γ, and prepending a 0 changes
+neither the last entry nor the maximum of a weight sequence; and `ρ₀(γ,γ+1) = ⟨0⟩` has
+last = max. ∎ (Uses (a) only.) Iterating: **`B_{λ+m} = B_λ ∪ [λ, λ+m)`** for λ limit-or-0,
+m ≥ 1 — inside a fan the canonical rows just eat the fan from the bottom.
+
+**Theorem L (Q-rows is FALSE) [proved].** For every limit λ and every β ≥ λ+ω the infinite
+canonical family `I = {λ+m : 0 < m < ω} ⊆ β` satisfies
+`⋃_{α∈I}(B_α \ B_β) ⊆ D⁺(λ,β) ∪ ([λ, λ+ω) \ B_β) ∪ ({λ} \ B_β)` — finite, by coherence at
+the single pair (λ,β) and fan-cofiniteness 3.8(3). So `{(λ+m, χ_{B_{λ+m}}) : m ≥ 1}` is
+bounded in `D(ρ₃)` (top `(β, χ_C)`, `C := B_β ∪` that finite set), and §51's (Q-rows) is
+settled: **the canonical rows are not strongly unbounded — every fan witnesses it.** Two
+corrections to §51's record follow. Its closing remark ("joint absorption would confine
+infinitely many rows' deviations to one finite set — a very rigid alignment that ρ₃'s
+oscillation plausibly forbids") was wrong: the rigid alignment is realized, everywhere, by
+the cheapest structure in sight. And its two-sided note "absorbed rows are exactly the
+hard-to-cover elements" fails for these witnesses — they are cover-trivial:
+
+**Lemma I′ (successor collapse) [proved].** For any coherent e: `D(e)` is fiber-special iff
+its restriction to limit levels is. *Proof of the substantive direction.* Given a
+σ-down-finite cover `{R_n}` of the limit-level suborder, split the successor levels as
+`R′_{n,k,T} := {(λ+k, s) : (λ, s↾λ) ∈ R_n, s↾[λ, λ+k) = T}` (λ limit-or-0, k ≥ 1,
+`T ∈ ω^k` — countably many pieces). If `(λ+k, s) ⊑ u = (β,t)` then `(λ, s↾λ) ⊑ u`; and if
+β = μ+j is itself a successor then, λ being a limit ≤ μ, also `(λ, s↾λ) ⊑ (μ, t↾μ)`. So
+restriction maps `R′_{n,k,T} ∩ ↓u` injectively (s is recovered from s↾λ and T) into the
+intersection of `R_n` with a limit-level down-set — finite. ∎ So Theorem L costs the crux
+nothing: the absorbed families are successor-padding, coverable for free. The invariant
+content of §50's crux — and the true residue of Q-rows — lives at limit levels:
+> **(Q-rows-lim)** Is `{(λ, B_λ) : λ ∈ Λ}` strongly unbounded — i.e. is
+> `⋃_{λ∈I}(B_λ \ B_β)` infinite for every β and every infinite `I ⊆ Λ ∩ β`? (At limit
+> levels the fan trick is dead: `B_λ ∩ Λ` is finite — 3.8(2) at n = 0 — so limit rows do
+> not contain their own fan-bottoms.)
+
+**Theorem M (the pruning formula) [proved].** For α < β put `λ_F(α,β) := max(F(α,β) ∖ {α})`
+and `W := ρ₁(α,β)`. For every ξ with `λ_F(α,β) < ξ < α`:
+1. `ρ₀(ξ,β) = ρ₀(α,β)⌢ρ₀(ξ,α)` — Lemma 1.6(b) at (ξ,α,β), since `min(F(α,β)\ξ) = α` there;
+2. `ρ₁(ξ,β) = max(W, ρ₁(ξ,α))`;
+3. **`ρ₃(ξ,β) = 1 iff ρ₃(ξ,α) = 1 and ρ₁(ξ,α) ≥ W`.**
+Consequences for the deviation sets the game runs on:
+- **(M1) one-sided pruning.** `B_β ∩ (λ_F(α,β), α) ⊆ B_α`: above the full trace, the later
+  row only turns coordinates *off*; all of `D⁻(α,β)` lives at or below `λ_F(α,β)`.
+- **(M2)** `D⁺(α,β) ∩ (λ_F, α) = {ξ ∈ (λ_F, α) : ρ₃(ξ,α) = 1, ρ₁(ξ,α) < W}` — *the walk
+  from β prunes exactly α's ρ₁-cheap ones* — finite outright by 1.16(a), re-deriving
+  coherence above the trace and identifying the deviation set as a ρ₁-object.
+- **(M3) bars diverge [proved].** Along any infinite `I ⊆ β` (ordered `α_n ↗ γ := sup`),
+  `ρ₁(α_n, β) → ∞`: for γ = β since `ρ₁(α,β) ≥ |C_β ∩ α|`; for γ < β apply (1) at the
+  triple (α,γ,β) to get `ρ₁(α,β) ≥ ρ₁(α,γ) ≥ |C_γ ∩ α|` on the tail of I above `λ_F(γ,β)`.
+
+**The threshold sequence θ(ρ₃) [proved].** For λ limit-or-0 and λ < α let
+`thr_α(λ) :=` the least N such that `ρ₃(λ+n, α) = 1` for all n ≥ N with λ+n < α
+(well-defined by Lemma 3.6). The sequence `θ := ⟨thr_α⟩`:
+- **(T1)** is fan-cofinite by construction (3.6 *is* well-definedness);
+- **(T2) finite-to-one:** `{λ : λ+ω ≤ α, thr_α(λ) ≤ n}` is finite — else the column Λ+n
+  meets `B_α` infinitely, against 3.8(2);
+- **(T3) coherent:** `{λ : λ+ω ≤ α, thr_α(λ) ≠ thr_β(λ)}` is finite for α < β — a fan with
+  `thr_α < thr_β` contains a point of `B_α \ B_β` (some λ+m, m ≥ thr_α(λ), with
+  `ρ₃(λ+m,β) = 0`, which exists by minimality of `thr_β`), a fan with `thr_α > thr_β`
+  symmetrically a point of `(B_β ∩ α) \ B_α`, and distinct fans give distinct points of the
+  finite set `B_α △ (B_β ∩ α)`. ∎
+So **θ(ρ₃) is a coherent, finite-to-one, ω-valued sequence on the fan-top index Λ — a
+ρ₁-species object canonically extracted from ρ₃**: Lemma 3.8's clauses (2) and (3) are
+exactly "θ is finite-to-one" and "θ is well-defined". Whether θ is *nontrivial* is not
+established — named **(Q-thr)** — and neither implication with ρ₃'s nontriviality is
+visible: the sub-threshold scatter (ones of `B_β` below its own thresholds) can be infinite
+in total (finitely many per column, infinitely many columns), so a θ-trivialization would
+not obviously trivialize ρ₃, nor conversely. (Pointer: JIMJ's shift operation `T^{(m)}`
+(§2) acts within fans; the suspicion that θ is the invariant connecting `T(ρ₃)` to its
+shift chain is natural and unexplored.)
+
+**Theorem N (absorption = threshold domination + scatter alignment) [proved].** Fix
+α < β and a fan λ with λ+ω ≤ α. Then
+`D⁺(α,β) ∩ [λ, λ+ω) = {λ+n : n ≥ thr_α(λ), ρ₃(λ+n,β) = 0} ∪ {λ+n ∈ B_α : n < thr_α(λ),
+ρ₃(λ+n,β) = 0}`, where the first ("tail") set is nonempty **iff** `thr_α(λ) < thr_β(λ)`
+(and is then contained in `[thr_α(λ), thr_β(λ))`), and the second is α's sub-threshold
+scatter escaping `B_β`. Hence for finite F: `D⁺(α,β) ⊆ F` iff **(A)** every fan with
+`thr_α(λ) < thr_β(λ)` has its tail-witnesses inside F, and **(B)** α's scatter escapes
+`B_β` only inside F (the top fan, λ < α < λ+ω, is successor territory — Lemma I). So:
+> **(Q-rows-lim) is exactly a one-sided uniformization question for θ(ρ₃):** strong
+> unboundedness of the limit rows fails at (β, I, F) iff for every α ∈ I the *downward*
+> θ-deviations `{λ : thr_α(λ) < thr_β(λ)}` concentrate their witnesses in F and the
+> scatters align mod F. The binary absorption game over ρ₃ **descends** to an ω-valued
+> domination game over the coherent finite-to-one θ — one level down, landing in ρ₁'s
+> species, where the classical finite-to-one machinery (1.15–1.17) lives. The program's
+> self-similarity signature (§32, §50, §51) is here an exact identity of games.
+
+**Corollary N1 (cheap window fans leak) [proved].** If `λ_F(α,β) < λ`, `λ+ω ≤ α`,
+`W := ρ₁(α,β) ≥ 3`, and `thr_α(λ) ≤ W−2`, then `λ+(W−2) ∈ D⁺(α,β)`. *Proof.* n := W−2 ≥
+thr_α(λ) gives `ρ₃(λ+n, α) = 1`; arrival rigidity under (c)+(d) forces `ρ₁(λ+n, α)` = the
+last weight ∈ {n−1, 0}, both < W; M(3) prunes. ∎ The deviation witness is *explicit*, at a
+controlled column — the CH-adversary's §50 block game meets it head-on.
+
+**Corollary N2 (the necessary geometry) [proved].** Let `c(α, w) := max{λ : λ+ω ≤ α,
+thr_α(λ) ≤ w}` (a maximum over a finite set, by T2). If `⋃_{α∈I}(B_α \ B_β) ⊆ F` then for
+every α ∈ I with `ρ₁(α,β) ≥ 3`: **`c(α, ρ₁(α,β)−2) ≤ max(λ_F(α,β), max F)`** — all of α's
+cheap fans must hide at or below the walk's own trace (or inside F). With M3's diverging
+bars, a Q-rows-lim failure needs the trace to chase an ever-growing cheap region along all
+of I — the C-sequence must be persistently *front-loaded* along the family. Both sides
+look constructible: the condition is not absurd (traces do climb toward sup I) and not
+free (T2 makes cheap fans few, but says nothing about *where* they sit). Q-rows-lim is
+unresolved this session — but it is now a quantitative C-sequence/walk question, with the
+below-trace scatter (B) as its recursive residue.
+
+**Theorem O (CH cannot slam the Q-T gate) [careful-prose].**
+Con(ZFC) ⟹ Con(ZFC + CH + "`T(ρ₃)` is special").
+*Proof sketch.* First, a level-absoluteness lemma [proved]: for coherent a, in any outer
+model with the same ω₁, `T(a)` *is the same set* — a node at level α is a_α plus a finite
+patch, finite patches are absolute, so the =*-closure grows no new nodes. Now force over a
+CH-model with the Baumgartner–Malitz–Reinhardt specializing poset of `T(ρ₃)` (finite
+partial `f : T → ω` injective on chains): ccc for any Aronszajn tree (BMR 1970), and
+`T(ρ₃)` is Aronszajn in ZFC (coherent + nontrivial: Handbook 3.4, 3.8 and the remark after
+3.11; verified §46–§51). The poset has size ℵ₁ and is ccc, so ω₁ survives and nice-name
+counting keeps `2^ω = ℵ₁`; the C-sequence and ρ₃ are untouched, the tree is unchanged by
+level-absoluteness, and the generic specializes it. ∎
+Consequences for the dichotomy:
+- **"CH ⟹ `T(ρ₃)` non-special" is false.** The Theorem-J-contrapositive kill (find a
+  CH-model where the gate fails) cannot be won from CH alone: the adversary needs a
+  ◊-style construction of a *non-special Lipschitz coherent* tree, and the classical
+  mechanism for ◊-non-specialness — Souslin subtrees — is dead for `T(ρ₃)` in ZFC
+  (hereditary non-Souslinness, §51 resource 3). A genuinely new mechanism is required;
+  independent classical interest, both ways.
+- In the specialized model CH holds *and* the necessary gate for fiber-specialness stands
+  open — a canonical test model where the sharpened crux "is `D(ρ₃)` fiber-special under
+  CH?" has its necessary condition satisfied by force. (Theorem J is not reversible — the
+  dips — so nothing further is free.)
+- Under MA_ω₁ the gate is trivially open (every Aronszajn tree is special) — consistent
+  with the program's MA side.
+
+**Status after the attack.**
+- **(Q-rows): resolved, NO** (Theorem L) — the first of §51's subproblems settled, in ZFC,
+  by successor riding; benign for the crux (Lemma I′), corrective for two §51 side-remarks.
+  The absorption phenomenon the game is about provably *occurs* on canonical rows — but
+  only as successor-padding; §50's CH-adversary gains nothing at successor levels, and its
+  block-accumulations must be built at limit levels, where **(Q-rows-lim)** is open.
+- **The crux descends.** Fiber-specialness of `D(ρ₃)` — Q-rows-lim included — is governed
+  (Theorems M, N) by the threshold sequence θ(ρ₃): coherent, finite-to-one, ω-valued on Λ,
+  with the pruning bar `ρ₁(α,β)` and the trace `λ_F(α,β)` as the game's two dials, explicit
+  leak witnesses (N1), a quantitative front-loading criterion (N2), and the sub-threshold
+  scatter as the recursive residue. The regress met at every level of the program is now an
+  exact descent: ρ₃'s binary absorption game *is* θ's ω-valued one-sided game.
+- **(Q-T): bracketed from one side** (Theorem O) — the gate is consistently open with CH,
+  so the CH-kill branch needs strictly more than CH plus a new non-specialness mechanism.
+  Q-T's ZFC content stays open, as do (Q-thr) and (Q-rows-lim).
+- Verified base extended and corrected: normalizations (a)/(c)/(d) and Def 3.3's weak tie
+  convention verbatim; Lemma 1.6 as the factoring engine; JIMJ Lemma 1.9 read (specialness
+  a hypothesis there — no hidden dichotomy); resource-2 citations relocated to Handbook
+  1.15–1.17; all new walk formulas machine-sampled on a randomized (d)-sequence.
