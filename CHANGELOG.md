@@ -24,6 +24,25 @@ landed.
 
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
+- **Set-theory research line, the independence program (notes §40–§52).**
+  The terminus decided (§49, sixteenth flip): tree-transport invariance
+  retracted at its exact scope (the game's data — deviation sets, value
+  comparisons — is value-category, not tree-category; the PFA 0–1 law
+  withdrawn), separating the canonical walk sequence ρ₃ from the CH-wild
+  trees. Standing picture: Question 1 conjectured **false under MA_ω₁**
+  with witness ρ₃ — Todorcevic's `T(ρ₃)` is coherent, nontrivial, and
+  Lipschitz in ZFC, so the schedule forcing's ccc is a ZFC question — and
+  **open under CH**, where it reduces (§50–§51) to fiber-specialness of
+  `D(ρ₃)`: gated by "is `T(ρ₃)` special?" (Theorem J), Tukey-cheap
+  (Theorem K: `D(ρ₃) ≡_T [ω₁]^{<ω}` in ZFC). §52 settles one subproblem:
+  **Q-rows is false** — successor rows ride their fans
+  (`B_{γ+1} = B_γ ∪ {γ}`), every fan's canonical row family is jointly
+  absorbed — benignly, since fiber-specialness reduces to limit levels,
+  where the absorption game descends to a one-sided domination game for
+  the canonical threshold sequence θ(ρ₃) (coherent, finite-to-one,
+  ω-valued on fan-tops). Theorem O: Con(CH + `T(ρ₃)` special), so the
+  CH-kill needs strictly more than CH. Both ρ₃ sources verified
+  first-hand; one in-source typo caught (JIMJ footnote 10).
 - **Escapee framework, machine-checked and axiom-free (`EscapeeTheory`
   section).** Theorem I forward (notes §38): `Phi O` — every legal
   constraint system on a directed order has a monotone dominator — follows

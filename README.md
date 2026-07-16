@@ -60,14 +60,18 @@ The same accountancy appears at every level:
   regularity hypothesis is load-bearing (`omega_concentration_fails`);
 - the **research line** the frontier opened, in prose at graded rigor:
   [`NOTES-coherent-escapee.md`](transport-calculus/NOTES-coherent-escapee.md)
-  (thirteen sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
+  (fifty-two sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
   order, the no-go for kill templates, forcing-locality, Theorem B —
-  uniformizing dip systems ⟺ trivial — and the reduction of the whole
-  question to one game invariant), and the standalone problem statement for
-  set theorists,
+  uniformizing dip systems ⟺ trivial — the reduction of the whole question
+  to one game invariant, the game's Φ-completeness, the ◊-side kill of
+  "everything schedules" (Theorem C), and the two-sided independence
+  program whose standing open problem is the canonical walk sequence ρ₃
+  under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):
   **is every strongly dip-schedulable coherent sequence on ω₁ trivial?** —
-  with the level-factored case proved and the toolbox machine-checked.
+  level-factored case proved, toolbox machine-checked; conjectured false
+  under MA_ω₁ with canonical witness ρ₃ (the hard part, a ccc, is in ZFC),
+  open under CH.
 
 **`transport-kernel`** (mathlib + Physlib + `transport-calculus`):
 - **Tier 2** — `comp_reconstructs_lipschitz`, `comp_reconstructs_holder`: the
@@ -107,9 +111,11 @@ The same accountancy appears at every level:
   independent instance families now inhabit under one composition law —
   status earned by instances, revisable by counterexamples.
 - The qualitative frontier's last question — dip-schedulability — is **open**,
-  not settled: the notes record four verdict flips, each forced by a proof or
-  a refutation, and the problem statement grades every arrow ([proved] /
-  [argued] / [open]). The independence suspicion is a suspicion.
+  not settled: the notes record sixteen verdict flips, each forced by a proof
+  or a refutation, and the problem statement grades every arrow ([proved] /
+  [argued] / [open]). The MA side of the independence program is a conjecture
+  on a cited ccc, not a theorem; the CH side is one standing open problem
+  (ρ₃), not a verdict.
 - The quantum-DP row (Q4) is a research-pass verdict with two live readings
   (literature gap vs. genuine interface boundary), deliberately unresolved.
 - "First machine-checked theorem about coherent sequences on ω₁" is a

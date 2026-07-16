@@ -610,10 +610,34 @@ self-contained (no transport calculus needed): definitions, the game, the implic
 diagram `trivial ⟹ strong-schedulable ⟹ Φ ⟹ weak-schedulable` with rigor grading on
 every arrow, four numbered questions (the main one; the realizability/fractal gap; the
 ◊-sequence and walks instances; the MA/PFA consistency route with the schedule-forcing's
-ccc-ness as the crux), a toolbox of four proved ZFC lemmas with proofs
-(chain-continuation, single-target, representative systems ⟺ trivial, chain-freeness of
-the fiber order), the thinness remark explaining why naive ◊-attacks fail, and the
-independence-boundary discussion. Questions 1–4 are pure ω₁ combinatorics.
+ccc-ness as the crux), a toolbox of proved ZFC lemmas with proofs (A–I′: chain-continuation,
+single-target, representative systems ⟺ trivial, chain-freeness of the fiber order,
+uncountable chains, successor riding and collapse), the thinness remark explaining why
+naive ◊-attacks fail, and the two-sided independence program (its §5). Questions 1–4 are
+pure ω₁ combinatorics.
+
+**Since the handoff (notes §12–§52) — Φ-completeness, the ◊ kill, the MA program, and the
+ρ₃-under-CH crux.** The game is exactly the transport question: `Φ(e)` ⟺ every
+legally-induced pressure over `e` is schedulable (Theorem E, both directions). Under ◊ some
+nontrivial coherent sequence is **not** strongly schedulable (Theorem C) — so "every
+coherent sequence schedules" is not a ZFC theorem — but its lethal pressure is not weakly
+realizable (Theorem D), so the kill does not by itself yield a transport escapee. The
+affirmative side went concrete: the schedule forcing `P(e,μ)` is ccc iff an alignment
+statement supplied by the tree `T(e)` being Lipschitz, and Todorcevic's last-step tree
+`T(ρ₃)` is coherent, nontrivial, and Lipschitz **in ZFC** — so `MA_ω₁ ⟹ ρ₃ schedulable` is
+conjectured with the hard part in ZFC, making Question 1 false under MA with a canonical
+witness. Tree-transport invariance was retracted at its exact scope (the game's data is
+value-category, not tree-category; the PFA 0–1 law withdrawn), separating ρ₃ from the
+CH-wild trees, and the line's standing open problem is: **is ρ₃ schedulable under CH?**
+That reduced (§50–§51) to *fiber-specialness* of `D(ρ₃)` — σ-decomposability into pieces
+finite in every down-set — gated by "is `T(ρ₃)` special?" (Theorem J) while Tukey-cheap
+(Theorem K: `D(ρ₃) ≡_T [ω₁]^{<ω}` in ZFC). §52 settled one subproblem and descended the
+other: successor rows ride their fans (`B_{γ+1} = B_γ ∪ {γ}`), so the canonical rows are
+**not** strongly unbounded (Q-rows: NO) — benignly, since fiber-specialness reduces to
+limit levels — where the absorption game equals a one-sided domination game for a canonical
+coherent finite-to-one **threshold sequence** θ(ρ₃) on fan-tops; and Con(CH + `T(ρ₃)`
+special) (Theorem O), so the CH-kill needs strictly more than CH. Sixteen verdict flips
+recorded, each forced by a proof or a refutation; both ρ₃ sources verified first-hand.
 
 **The reps theorem, machine-checked in shadow (`reps_implies_trivial`).** The
 set-theoretic hunt's four-step engine is now formalized: over an abstract index carrying
