@@ -18,7 +18,7 @@ done
 # 1b. The top-level README must mention every tier-bearing module family and note file.
 for name in DobrushinMeasureReceive tvDist_toMeasure QuantumDobrushinReceive \
             OmegaOneCoherent NOTES-coherent-escapee.md PROBLEM-dip-schedulability.md \
-            reps_implies_trivial; do
+            reps_implies_trivial VULN-COVERAGE.md; do
   if ! grep -q "$name" README.md; then
     echo "DRIFT: top-level README does not mention $name"; fail=1
   fi

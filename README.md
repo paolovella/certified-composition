@@ -104,6 +104,18 @@ The same accountancy appears at every level:
   mathlib-free engine and its mathlib model are verified separately and
   compose.
 
+## The security claim (the original goal)
+
+The program's origin is a framework for coding that is *inherently* free of
+vulnerabilities. The honest form of that claim — which real vulnerability classes
+are excluded by construction, relative to which model, spec, and TCB, and which are
+merely carried, assumed, or out of scope — is maintained as a verdict-per-class map
+in [`VULN-COVERAGE.md`](VULN-COVERAGE.md), built on the proved classification
+machinery (`qualitative_admissible_is_JNI`, `simA3_iff_respectsCoarsening`,
+`summary_not_composable`, `confidential_transport`, `Bridge.comp`). Twelve classes,
+eight verdicts, every verdict graded; the popular-but-wrong formulations (output
+blacklists, `(ε,δ)`-composition) are rejected by theorems, not by taste.
+
 ## Scope — what is *not* claimed
 
 - The transport interface is **not** asserted to be the "correct general
