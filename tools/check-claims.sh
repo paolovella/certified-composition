@@ -24,6 +24,31 @@ for name in DobrushinMeasureReceive tvDist_toMeasure QuantumDobrushinReceive \
   fi
 done
 
+# 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
+#     the map's verdicts are only as good as their citations.
+for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \
+            no_irreducible_admissible ksafety_above_twosafety Rbad_nonseparable \
+            summary_not_composable confidential_transport pleak_confidential_deploy \
+            taint_is_JNI admissible_taint_is_Jtaint InfluencedAtMost \
+            sanitize_const_is_taint value_predicate_not_admissible \
+            blacklist_not_admissible ReleasesAtMost attest_is_not_J_evidence; do
+  if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
+    echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
+  fi
+done
+
+# 1d. Row 3's [proved] verdict is only valid while its theorems are in the build.
+if grep -q "proved: T1, T2" VULN-COVERAGE.md; then
+  for thm in "theorem taint_is_JNI" "theorem blacklist_not_admissible"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/Integrity.lean 2>/dev/null; then
+      echo "DRIFT: VULN-COVERAGE row 3 is [proved] but '$thm' is missing"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.Integrity" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: Integrity.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
 # 2. Every transport-kernel Lean module must be mentioned in its README.
 for f in transport-kernel/TransportKernel/*.lean; do
   base=$(basename "$f")

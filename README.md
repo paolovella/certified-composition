@@ -112,9 +112,12 @@ are excluded by construction, relative to which model, spec, and TCB, and which 
 merely carried, assumed, or out of scope — is maintained as a verdict-per-class map
 in [`VULN-COVERAGE.md`](VULN-COVERAGE.md), built on the proved classification
 machinery (`qualitative_admissible_is_JNI`, `simA3_iff_respectsCoarsening`,
-`summary_not_composable`, `confidential_transport`, `Bridge.comp`). Twelve classes,
-eight verdicts, every verdict graded; the popular-but-wrong formulations (output
-blacklists, `(ε,δ)`-composition) are rejected by theorems, not by taste.
+`summary_not_composable`, `confidential_transport`, `Bridge.comp`) and the
+integrity module it forced into existence (`taint_is_JNI` — integrity NI is a
+relabeling, axiom-free; `blacklist_not_admissible` — output-blacklist
+sanitization fails A3, axiom-free). Twelve classes, eight verdicts, every verdict
+graded; the popular-but-wrong formulations (output blacklists,
+`(ε,δ)`-composition) are rejected by theorems, not by taste.
 
 ## Scope — what is *not* claimed
 

@@ -11,7 +11,7 @@ slogan into a claim with a proved boundary.
 Rigor grades, house style: **[proved]** — a Lean theorem is cited by name;
 **[argued]** — derived in prose from proved parts; **[classified]** — taxonomic
 placement only, no new mathematics; **[to prove]** — precise statement given,
-scheduled (session 2 of this brick).
+scheduled (no row currently carries it).
 
 ## 0. The claim template — and its three irreducible gaps
 
@@ -182,8 +182,10 @@ accumulable, spec-gap-heavy (π's correctness is not a theorem anywhere). But th
 economically load-bearing sub-case is better than that: **cross-tenant data
 isolation — tenant A's response is independent of tenant B's data — is literally
 noninterference** at the partition "other tenants' data := High", i.e. region 1, the
-proved machinery. [argued] only because no multi-tenant instance is mechanized; the
-reduction is the same relabeling as T1.
+proved machinery. The reduction is the T1 relabeling pattern, and T1 proved that
+pattern costs nothing (`taint_is_JNI` is an `Iff.rfl` — the apparatus is
+`(P, o)`-parametric). [argued] remains only for want of a mechanized multi-tenant
+instance; no new mathematics is missing.
 
 ### 3.8 Races / TOCTOU — OUT-OF-MODEL [classified]
 
@@ -234,14 +236,15 @@ the supply-chain security statement.
 
 ## 4. What the map implies for brick 2
 
-The predicted IN column is: information flow (confidentiality, timing, taint,
+The IN column is: information flow (confidentiality, timing, taint,
 declassification, isolation) + quantitative bounds + the composition seam. The
 CARRIED/LEDGER rows show the framework acting as a *certificate bus*, not a universal
-verifier. If T1/T2 land as predicted, the honest product identity is: **a certified
-composition framework — vulnerability classes excluded by flow properties, everything
-else carried as explicit accumulated assumptions** — and brick 2 should target
-*component boundaries* (the seam story, where the differentiator is proved) rather
-than a general-purpose language frontend.
+verifier. With T1/T2 landed as predicted, the fork is settled: the honest product
+identity is **a certified composition framework — vulnerability classes excluded by
+flow properties, everything else carried as explicit accumulated assumptions** — and
+brick 2 targets *component boundaries* (the seam story, where the differentiator is
+proved: `Bridge.comp` + `confidential_transport` + the T1 relabeling for per-boundary
+partitions), not a general-purpose language frontend.
 
 ## 5. Session ledger
 
@@ -254,5 +257,10 @@ than a general-purpose language frontend.
   two `P_leak` endorsement witnesses — the standard three. The predicted
   "near-instantiation" held exactly: T1's identity is an `Iff.rfl`. Row 3 upgraded
   to [proved].
-- **Session 3 (next):** re-audit all [argued] rows against the landed theorems;
-  extend `tools/check-claims.sh` verdict guards; final claim statement pass.
+- **Session 3 (done):** [argued] rows re-audited — row 7's isolation note now rests
+  on the *proved* relabeling pattern (only a mechanized multi-tenant instance is
+  wanting); rows 5, 6, 8–11 unchanged by T1/T2, as expected. `tools/check-claims.sh`
+  extended with two guards: every Lean name the map cites must exist in the sources
+  (1c), and row 3's [proved] is only valid while T1/T2 are present and imported
+  (1d). §4's fork recorded as settled: brick 2 = component boundaries. **Brick 1
+  complete.**
