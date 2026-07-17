@@ -88,7 +88,7 @@ this repeatedly.
 |---|---|---|---|---|---|
 | 1 | direct confidentiality leaks (CWE-200) | 2-safety (NI) | 1 | IN | [proved] |
 | 2 | timing side channels (CWE-208) | 2-safety over instrumented semantics | 1 | IN-WITH-MODEL | [proved] |
-| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow; OUT-INADMISSIBLE as blacklist | [to prove: T1, T2] |
+| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow; OUT-INADMISSIBLE as blacklist | [proved: T1, T2] |
 | 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
 | 6 | memory safety (CWE-119/416) | 1-safety of a richer semantics | — | CARRIED (+ OUT-OF-MODEL for IMP) | [classified] |
@@ -116,25 +116,35 @@ development. The verdict is conditional in exactly one place: coverage extends t
 channel iff the channel is in the semantics. That is not a weakness to paper over; it
 is the recipe (see #9 for its limit).
 
-### 3.3 Injection — IN as taint-flow [T1, to prove]; OUT-INADMISSIBLE as blacklist [T2, to prove]
+### 3.3 Injection — IN as taint-flow [proved: T1]; OUT-INADMISSIBLE as blacklist [proved: T2]
 
-The industry's two formulations, separated by a theorem each:
+The industry's two formulations, separated by a theorem each
+(`conf-typing/ConfTyping/Integrity.lean`, built, `no sorry`, axiom-audited):
 
-- **T1 (taint duality).** Integrity noninterference — untrusted sources cannot
-  influence trusted sinks — is `J_NI` at the relabeled partition (High := untrusted)
-  with `o` = the trusted-sink observation (e.g. the query-string channel). Since the
-  §10 apparatus is parametric in `(P, o)`, admissibility and the 2-safety uniqueness
-  theorem apply verbatim: **the taint form of injection-freedom is the unique
-  admissible 2-safety formulation**. Sanitizers are the Policy stratum's dual — an
-  *endorsement* carries a proof obligation ("influenced at most through φ"), the
-  mirror of `ReleasesAtMost`; a declared sanitizer is not a free pass.
-- **T2 (blacklist inadmissibility).** The formulation "output never contains the bad
-  string" is a value predicate; it fails A3 by a one-line post-processor (an encoder),
-  hence is inadmissible. The security reading is the well-known field fact, now as a
-  theorem: **blacklist sanitization dies to encodings** — post-processing is exactly
-  what adversarial contexts do to outputs — so the framework *forces* the flow
+- **T1 (taint duality) [proved].** Integrity noninterference — untrusted sources
+  cannot influence trusted sinks — *is* `J_NI` at the relabeled partition
+  (High := untrusted) with `o` = the trusted-sink observation: `taint_is_JNI` is an
+  axiom-free `Iff.rfl`, and A3/separability transfer verbatim (`Jtaint_postproc`,
+  `Jtaint_separable`, axiom-free). The uniqueness half (`admissible_taint_is_Jtaint`,
+  standard axioms): any admissible, nondegenerate, inhabited 2-safety integrity
+  judgment coincides with `J_taint` — **the taint form of injection-freedom is the
+  unique admissible 2-safety formulation**. Sanitizers are the Policy stratum's dual:
+  `InfluencedAtMost` is definitionally `ReleasesAtMost` at the relabeling, the const
+  sanitizer is full taint-freedom (`sanitize_const_is_taint`), and the obligation has
+  teeth both ways (`pleak_influenced_at_most_bit`, `full_flow_defeats_sanitizer`).
+- **T2 (blacklist inadmissibility) [proved, axiom-free].** The formulation "output
+  never contains the bad value" is a value predicate, and *no* nontrivial
+  value-predicate judgment satisfies A3 (`value_predicate_not_admissible`): one
+  post-processor — an encoder — breaks any of them. The concrete instance
+  (`blacklist_not_admissible`) holds of a real channel and dies to the constant
+  re-encoder. The security reading is the field's folklore as a theorem:
+  **blacklist sanitization dies to encodings**, so the framework *forces* the flow
   formulation. This is the map's clearest example of the framework rejecting a
   popular-but-wrong property shape rather than failing to express it.
+
+Scope honesty: IMP has no strings; row 3's [proved] is the property *shape*
+(influence of untrusted sources on trusted sinks, with endorsement obligations),
+made non-vacuous by the `P_leak` witnesses — not a model of SQL.
 
 ### 3.4 Improper declassification — IN [proved]
 
@@ -237,9 +247,12 @@ than a general-purpose language frontend.
 
 - **Session 1 (this document):** all twelve classifications placed; engine table;
   claim template with the three gaps; rubric. Grades as marked.
-- **Session 2 (next):** T1 (`Integrity`/taint instantiation — predicted a
-  near-instantiation since the §10 apparatus is `(P, o)`-parametric) and T2
-  (blacklist A3-refutation, ~20 lines), both mathlib-free, no `sorry`, axiom-audited;
-  upgrade row 3 grades to [proved].
-- **Session 3:** re-audit all [argued] rows against the landed theorems; extend
-  `tools/check-claims.sh` verdict guards; final claim statement pass.
+- **Session 2 (done):** T1 and T2 landed in `conf-typing/ConfTyping/Integrity.lean`
+  (mathlib-free, `no sorry`). Axiom audit: `taint_is_JNI`, `Jtaint_postproc`,
+  `Jtaint_separable`, `sanitize_const_is_taint`, `value_predicate_not_admissible`,
+  `blacklist_not_admissible` — **no axioms**; `admissible_taint_is_Jtaint` and the
+  two `P_leak` endorsement witnesses — the standard three. The predicted
+  "near-instantiation" held exactly: T1's identity is an `Iff.rfl`. Row 3 upgraded
+  to [proved].
+- **Session 3 (next):** re-audit all [argued] rows against the landed theorems;
+  extend `tools/check-claims.sh` verdict guards; final claim statement pass.

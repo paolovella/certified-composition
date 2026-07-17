@@ -20,6 +20,7 @@ lake build          # builds all four layers
 | `ConfTyping/Typing.lean` | §6–9 | strata, discharge judgment, T-Reject, conformance + transport, soundness |
 | `ConfTyping/Joint.lean`  | framework §4,§8 | joint generation `𝒜̂`, completeness (Thm. 2), separability-equivalence |
 | `ConfTyping/TwoSafety.lean` | framework §10 | abstract 2-safety lift; A3-collapse; corrected §10 conjecture |
+| `ConfTyping/Integrity.lean` | `VULN-COVERAGE.md` row 3 | taint duality (T1), endorsement dual, blacklist inadmissibility (T2) |
 
 ## Result map
 
@@ -161,6 +162,32 @@ claim is *conditional on observation cardinality* — "realizable kernels = full
 Πₖ" needs `Finset.min'`-style combinatorics that would pull in mathlib, so it
 stays argued, the condition pinned rather than hidden. The iff has no such
 dependence.
+
+## The integrity/taint module (`Integrity.lean`) — VULN-COVERAGE row 3
+
+The vulnerability coverage map's injection row, proved. The module's content is
+that the integrity side costs *nothing*: the whole §3–§10 apparatus is
+parametric in `(P, o)`, so relabeling the partition (High := untrusted) and
+pointing `o` at trusted sinks turns confidentiality machinery into taint
+machinery — identities and instantiations, not new proofs.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **T1, identity** | `taint_is_JNI` | none (`Iff.rfl`) | integrity NI *is* `J_NI` at the source/sink relabeling |
+| T1, inheritance | `Jtaint_postproc`, `Jtaint_separable` | none | A3 and separability transfer verbatim |
+| **T1, uniqueness** | `admissible_taint_is_Jtaint` | standard 3 | admissible nondegenerate 2-safety integrity = `J_taint` (via `qualitative_admissible_is_JNI`) |
+| endorsement dual | `InfluencedAtMost`, `sanitize_const_is_taint` | none | sanitizers carry proof obligations; the const sanitizer is full taint-freedom |
+| endorsement teeth | `pleak_influenced_at_most_bit`, `full_flow_defeats_sanitizer` | standard 3 | `P_leak` integrity-read passes the bit-sanitizer bound; the full-copy program fails it |
+| **T2, general** | `value_predicate_not_admissible` | **none** | no nontrivial value-predicate judgment satisfies A3 — one encoder breaks it |
+| **T2, instance** | `blacklist_not_admissible` | **none** | the blacklist judgment holds of a real channel (`wall_never_bits`) and dies to the constant re-encoder |
+
+The security reading of T2 is the field's folklore as a theorem: post-processing
+is exactly what adversarial contexts do to outputs, so blacklist sanitization
+dies to encodings, and with T1's uniqueness the flow formulation of
+injection-freedom is *forced* — the unique admissible 2-safety shape. Scope
+honesty: IMP has no strings; row 3's claim is the property *shape* (influence of
+untrusted sources on trusted sinks), with the `P_leak` witnesses for
+non-vacuity, not a model of SQL.
 
 ## §11 pre-mechanization checklist (framework doc)
 

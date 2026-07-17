@@ -4,3 +4,4 @@ import ConfTyping.Pleak
 import ConfTyping.Typing
 import ConfTyping.Joint
 import ConfTyping.TwoSafety
+import ConfTyping.Integrity
