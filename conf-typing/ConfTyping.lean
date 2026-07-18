@@ -5,3 +5,4 @@ import ConfTyping.Typing
 import ConfTyping.Joint
 import ConfTyping.TwoSafety
 import ConfTyping.Integrity
+import ConfTyping.Compose

@@ -21,6 +21,7 @@ lake build          # builds all four layers
 | `ConfTyping/Joint.lean`  | framework §4,§8 | joint generation `𝒜̂`, completeness (Thm. 2), separability-equivalence |
 | `ConfTyping/TwoSafety.lean` | framework §10 | abstract 2-safety lift; A3-collapse; corrected §10 conjecture |
 | `ConfTyping/Integrity.lean` | `VULN-COVERAGE.md` row 3 | taint duality (T1), endorsement dual, blacklist inadmissibility (T2) |
+| `ConfTyping/Compose.lean` | `VULN-COVERAGE.md` row 12 | the seam theorems: boundary certificates compose, releases compose non-scalarly |
 
 ## Result map
 
@@ -188,6 +189,37 @@ injection-freedom is *forced* — the unique admissible 2-safety shape. Scope
 honesty: IMP has no strings; row 3's claim is the property *shape* (influence of
 untrusted sources on trusted sinks), with the `P_leak` witnesses for
 non-vacuity, not a model of SQL.
+
+## The seam module (`Compose.lean`) — certified composition of components
+
+Brick 2 of the security program: nobody had ever composed two *certified
+programs* in this repo — conf-typing certified whole programs, the transport
+interface composed certified maps abstractly. `Compose.lean` proves the seam
+theorems at the IMP instance. A *component* is a program with a **boundary
+certificate** — a claim at the Low-boundary granularity, which is itself a
+channel claim (`boundaryNI_iff_resultNI`: the boundary is the `resultO`
+channel; components speak the adversaries' observation language). The writer
+structure of `eval` (`eval_seq`, `rfl`: stores thread, costs add, traces
+concatenate) does the semantic work.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| writer decomposition | `eval_seq`, `obs_seq` | none (`rfl`) | composite runs are glued component runs; composite observations factor through component outcomes |
+| boundary = channel | `boundaryNI_iff_resultNI`, `boundaryReleases_iff` | `propext, Quot.sound` | boundary certificates are `resultO`-channel claims (Closure and Policy forms) |
+| **seam, Closure form** | `boundaryNI_seq`, `resultNI_seq` | **none** | boundary certificates compose; `c₁`'s certified boundary is what `c₂`'s certificate consumes |
+| **seam, total form** | `outNI_seq` (via `outO := tup (resultO P) (tup wall branchO)`) | choice-free | Low store, cost, and branch trace of the composite all certified from the two component certificates |
+| all channels | `seq_all_channels` | choice-free | every A3-derivable composite channel is certified — the seam adds no new obligations |
+| integrity reading | `taint_result_seq` | **none** | untrusted data crossing two components cannot reach the composite sink unless a certificate lets it (T1, applied) |
+| **seam, Policy form — the headline** | `releases_seq` with `seqRelease c₁ φ₁ φ₂ = ⟨φ₁, φ₂ ∘ boundary⟩` | **none** | delimited release composes; the composite certificate is *computed*, threading `c₁`'s map through `φ₂` — the same non-scalar semidirect shape as the Hölder certificate |
+| strata nest across seams | `releases_seq_const_consistency` | none | constant releases specialize the Policy seam to the Closure seam |
+| non-vacuity | `pleak_boundary_releases`, `pleak_chain_releases` | standard 3 | two policy components in sequence: the composite releases at most the paired bits, computed — no re-verification of the composite |
+
+The `seqRelease` shape is the load-bearing observation: release certificates
+compose by *pairing through the first component's map* — declassification
+budgets accumulate across the seam and nothing is silently discharged, which
+is the repo's through-line discipline appearing at the security seam. The
+Bridge reception (`Bridge.ofComponent`, `comp_reconstructs_seq_release`) is
+brick 2 session 2.
 
 ## §11 pre-mechanization checklist (framework doc)
 
