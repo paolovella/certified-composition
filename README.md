@@ -12,7 +12,7 @@ mathlib olean cache (and compiles its Physlib dependency locally).
 
 | dir | what | deps | status |
 |---|---|---|---|
-| [`conf-typing/`](conf-typing) | confidentiality-typing framework (the IMP timing instance + meta-theory) | none (mathlib-free) | closed |
+| [`conf-typing/`](conf-typing) | confidentiality-typing framework (the IMP timing instance + meta-theory) + the security seam/reception modules | `transport-calculus` (path; mathlib-free) | core closed; security program active (`VULN-COVERAGE.md`) |
 | [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question, shipped to its community |
 | [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` (path) | tiers 1–5 done |
 

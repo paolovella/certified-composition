@@ -6,3 +6,4 @@ import ConfTyping.Joint
 import ConfTyping.TwoSafety
 import ConfTyping.Integrity
 import ConfTyping.Compose
+import ConfTyping.FlowBridge

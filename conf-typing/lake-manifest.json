@@ -1,6 +1,13 @@
 {"version": "1.2.0",
  "packagesDir": ".lake/packages",
- "packages": [],
+ "packages":
+ [{"type": "path",
+   "scope": "",
+   "name": "TransportCalculus",
+   "manifestFile": "lake-manifest.json",
+   "inherited": false,
+   "dir": "../transport-calculus",
+   "configFile": "lakefile.toml"}],
  "name": "ConfTyping",
  "lakeDir": ".lake",
  "fixedToolchain": false}

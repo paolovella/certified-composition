@@ -3,3 +3,7 @@ defaultTargets = ["ConfTyping"]
 
 [[lean_lib]]
 name = "ConfTyping"
+
+[[require]]
+name = "TransportCalculus"
+path = "../transport-calculus"

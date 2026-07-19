@@ -22,6 +22,7 @@ lake build          # builds all four layers
 | `ConfTyping/TwoSafety.lean` | framework §10 | abstract 2-safety lift; A3-collapse; corrected §10 conjecture |
 | `ConfTyping/Integrity.lean` | `VULN-COVERAGE.md` row 3 | taint duality (T1), endorsement dual, blacklist inadmissibility (T2) |
 | `ConfTyping/Compose.lean` | `VULN-COVERAGE.md` row 12 | the seam theorems: boundary certificates compose, releases compose non-scalarly |
+| `ConfTyping/FlowBridge.lean` | `VULN-COVERAGE.md` row 12 | the reception: certified components are Bridges in the transport interface; `Bridge.comp` reconstructs the seam (path-dep: `../transport-calculus`, mathlib-free) |
 
 ## Result map
 
@@ -217,9 +218,40 @@ concatenate) does the semantic work.
 The `seqRelease` shape is the load-bearing observation: release certificates
 compose by *pairing through the first component's map* — declassification
 budgets accumulate across the seam and nothing is silently discharged, which
-is the repo's through-line discipline appearing at the security seam. The
-Bridge reception (`Bridge.ofComponent`, `comp_reconstructs_seq_release`) is
-brick 2 session 2.
+is the repo's through-line discipline appearing at the security seam.
+
+## The flow Bridge (`FlowBridge.lean`) — security received into the transport interface
+
+The reception (brick 2, session 2): certified components live in the *same*
+`GradedAction` interface as Lipschitz maps, Hölder maps, Markov kernels, and
+quantum channels. The package now path-depends on `../transport-calculus`
+(itself mathlib-free; the pattern `transport-kernel` already uses), so the
+build stays instant and mathlib-free.
+
+The instance: distance = `qd`, the **query distance** (which observations
+`Store → Val` separate two stores — a distinguishability metric valued in the
+lattice `QD` under pointwise implication); map = the component's boundary map;
+certificates = monotone self-maps of `QD` in the `universalGA` (Cayley) form.
+Two certificates per component: the **exact transform** `pull` (query
+precomposition — composes definitionally, axiom-free) and the **leak bound**
+`leakBound P φ` ("an output query separates only if it is non-Low, or a Low
+input atom or the declared release already separated the inputs").
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| exact bridge | `Bridge.ofComponent`, `ofComponent_cert` | **none** | every component is a Bridge, definitionally |
+| **the reception equivalence** | `bridge_iff_releases`, `Bridge.ofRelease` | standard 3 | a `leakBound P φ`-certified Bridge exists **iff** `BoundaryReleases c P φ` — the security certificate and the transport certificate are the same datum |
+| seam at the boundary | `boundaryReleases_seq` | choice-free | `releases_seq` restated at boundary granularity through the channel equivalences |
+| **the reconstruction** | `comp_reconstructs_seq_release`, `comp_map_is_seq` | standard 3 | the *generic* `Bridge.comp` of (exact `c₁`-bridge, certified `c₂`-bridge) yields a certificate dominated by `leakBound P (seqRelease c₁ φ₁ φ₂)` — the seam theorem, computed by the interface with no security-specific reasoning |
+
+Lossiness, recorded deliberately: composing two *abstraction* bridges
+(`leakBound φ₂ ∘ leakBound φ₁`) is sound but trivial — the second bound cannot
+know `φ₂` is evaluated at the boundary. The informative composition threads
+the first component's *map* (`pull`), exactly as `seqRelease` threads `c₁`.
+The supply-chain moral, as mathematics: **ship the boundary abstraction, not
+just the budget.** With this module the repo's through-line closes at the
+security end: security composition *is* certificate accumulation in the same
+interface as the quantitative tiers.
 
 ## §11 pre-mechanization checklist (framework doc)
 
