@@ -31,7 +31,11 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             summary_not_composable confidential_transport pleak_confidential_deploy \
             taint_is_JNI admissible_taint_is_Jtaint InfluencedAtMost \
             sanitize_const_is_taint value_predicate_not_admissible \
-            blacklist_not_admissible ReleasesAtMost attest_is_not_J_evidence; do
+            blacklist_not_admissible ReleasesAtMost attest_is_not_J_evidence \
+            releases_seq seqRelease boundaryNI_seq outNI_seq seq_all_channels \
+            taint_result_seq boundaryNI_iff_resultNI bridge_iff_releases \
+            comp_reconstructs_seq_release broken_seam \
+            channel_certs_do_not_compose pleak_chain_releases; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -47,6 +51,24 @@ if grep -q "proved: T1, T2" VULN-COVERAGE.md; then
   if ! grep -q "import ConfTyping.Integrity" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: Integrity.lean not imported by the ConfTyping root"; fail=1
   fi
+fi
+
+# 1e. Row 12's end-to-end [proved] is only valid while the seam and reception
+#     theorems are in the build.
+if grep -q "proved, end-to-end" VULN-COVERAGE.md; then
+  for pair in "theorem releases_seq:conf-typing/ConfTyping/Compose.lean" \
+              "theorem broken_seam:conf-typing/ConfTyping/Compose.lean" \
+              "theorem comp_reconstructs_seq_release:conf-typing/ConfTyping/FlowBridge.lean"; do
+    thm="${pair%%:*}"; file="${pair##*:}"
+    if ! grep -q "$thm" "$file" 2>/dev/null; then
+      echo "DRIFT: VULN-COVERAGE row 12 is end-to-end [proved] but '$thm' is missing from $file"; fail=1
+    fi
+  done
+  for mod in "import ConfTyping.Compose" "import ConfTyping.FlowBridge"; do
+    if ! grep -q "$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
+      echo "DRIFT: row 12 module not imported by the ConfTyping root: $mod"; fail=1
+    fi
+  done
 fi
 
 # 2. Every transport-kernel Lean module must be mentioned in its README.

@@ -214,6 +214,7 @@ concatenate) does the semantic work.
 | **seam, Policy form — the headline** | `releases_seq` with `seqRelease c₁ φ₁ φ₂ = ⟨φ₁, φ₂ ∘ boundary⟩` | **none** | delimited release composes; the composite certificate is *computed*, threading `c₁`'s map through `φ₂` — the same non-scalar semidirect shape as the Hölder certificate |
 | strata nest across seams | `releases_seq_const_consistency` | none | constant releases specialize the Policy seam to the Closure seam |
 | non-vacuity | `pleak_boundary_releases`, `pleak_chain_releases` | standard 3 | two policy components in sequence: the composite releases at most the paired bits, computed — no re-verification of the composite |
+| **the teeth** | `broken_seam`, `channel_certs_do_not_compose`, `pleak_not_boundaryNI` | standard 3 | an uncertified upstream poisons a certified downstream; a wall-certificate is not a boundary certificate — both seam hypotheses are load-bearing, the granularity is forced |
 
 The `seqRelease` shape is the load-bearing observation: release certificates
 compose by *pairing through the first component's map* — declassification

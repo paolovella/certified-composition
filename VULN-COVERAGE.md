@@ -97,7 +97,7 @@ this repeatedly.
 | 9 | speculative execution (Spectre-class) | 2-safety over microarchitectural model | 1* | OUT-OF-MODEL | [classified] |
 | 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER | [classified] |
-| 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved at interface level] |
+| 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
 
 ### 3.1 Direct confidentiality leaks — IN [proved]
 
@@ -222,17 +222,40 @@ but never silently discharge them, and composition accumulates them into a visib
 ledger. The *leakage* side of crypto misuse (non-constant-time implementations) is
 row #2 and inherits its IN-WITH-MODEL verdict.
 
-### 3.12 Composition seams / supply chain — IN-BY-DESIGN [proved at interface level]
+### 3.12 Composition seams / supply chain — IN-BY-DESIGN [proved, end-to-end]
 
-The differentiator. Real-world guarantees die at boundaries: a component's property
-is silently weakened, re-asserted, or dropped when composed. Here that failure mode
-is excluded by construction, twice: `Bridge.comp` makes the composite's certificate
-`mul` of the parts and *fails to type-check* if accumulation is dropped;
-`confidential_transport` carries both strata (Closure and Policy) across the
-artifact→deploy gate with no asymmetry. What is proved is conditional — *if* each
-component carries a certificate, composition preserves and accumulates it; the
-per-component certificates are the other rows' business. That conditional is exactly
-the supply-chain security statement.
+The differentiator, now proved at every level (brick 2, `conf-typing/ConfTyping/
+Compose.lean` + `FlowBridge.lean`, both built, `no sorry`, axiom-audited):
+
+- **The seam theorems** (`Compose.lean`): components carry *boundary certificates*
+  — which are exactly channel claims (`boundaryNI_iff_resultNI`) — and certified
+  components compose with the composite certificate *computed*: Closure form
+  (`boundaryNI_seq`, `resultNI_seq` — axiom-free), total form (`outNI_seq` — Low
+  store, cost, and branch trace jointly), all derivable channels
+  (`seq_all_channels` — the seam adds no new obligations), integrity reading
+  (`taint_result_seq`), and the headline Policy form (`releases_seq` —
+  **axiom-free**): the composite releases at most `seqRelease c₁ φ₁ φ₂ =
+  ⟨φ₁, φ₂ ∘ boundary⟩`, a non-scalar semidirect certificate algebra.
+  Non-vacuity: `pleak_chain_releases`, a concrete certified seam.
+- **The reception** (`FlowBridge.lean`): certified components live in the *same*
+  `GradedAction` interface as Lipschitz/Hölder/Dobrushin/quantum — distance = the
+  query distance `qd`, certificates = monotone transforms of it, and the reception
+  is an *equivalence* (`bridge_iff_releases`): a `leakBound`-certified Bridge
+  exists iff `BoundaryReleases`. The generic `Bridge.comp` **reconstructs the seam
+  theorem** (`comp_reconstructs_seq_release`): its computed certificate is
+  dominated by the seam certificate, with no security-specific reasoning.
+- **The teeth** (both directions): `broken_seam` — an uncertified upstream poisons
+  a perfectly certified downstream (the upstream hypothesis is load-bearing);
+  `channel_certs_do_not_compose` — a wall-certificate is not a boundary
+  certificate, and only boundary certificates compose (the granularity is forced).
+- **The gate**: `confidential_transport` carries both strata across
+  artifact→deploy, as before.
+
+Still conditional in exactly one honest place: *if* each component carries a
+certificate, composition preserves and accumulates it; generating per-component
+certificates is the other rows' business. The assumption-*ledger* certificate
+(composite TCB computed as the append of component ledgers) is deferred to the
+next brick, where a real component vocabulary exists to name assumptions in.
 
 ## 4. What the map implies for brick 2
 
@@ -264,3 +287,20 @@ partitions), not a general-purpose language frontend.
   (1c), and row 3's [proved] is only valid while T1/T2 are present and imported
   (1d). §4's fork recorded as settled: brick 2 = component boundaries. **Brick 1
   complete.**
+
+### Brick 2 ledger (the seam)
+
+- **Session 1:** `Compose.lean` — writer decomposition (`rfl`), boundary
+  certificates = channel claims, seam theorems in Closure/total/Policy forms;
+  `releases_seq` axiom-free with the semidirect `seqRelease`.
+- **Session 2:** `FlowBridge.lean` — the reception into the transport interface
+  (`conf-typing` now path-depends on `transport-calculus`, both mathlib-free);
+  `bridge_iff_releases` (an equivalence), `comp_reconstructs_seq_release` (the
+  generic composition law recomputes the seam certificate). Lossiness recorded:
+  abstraction bridges alone compose trivially — ship the boundary abstraction,
+  not just the budget.
+- **Session 3:** the negative space (`broken_seam`,
+  `channel_certs_do_not_compose`, `pleak_not_boundaryNI`) — both seam hypotheses
+  proved load-bearing; row 12 upgraded to end-to-end [proved]; guards extended
+  (1c names, 1e row-12). Deferred, named: the assumption-ledger certificate; a
+  mechanized multi-tenant isolation instance (row 7). **Brick 2 complete.**

@@ -117,7 +117,13 @@ integrity module it forced into existence (`taint_is_JNI` — integrity NI is a
 relabeling, axiom-free; `blacklist_not_admissible` — output-blacklist
 sanitization fails A3, axiom-free). Twelve classes, eight verdicts, every verdict
 graded; the popular-but-wrong formulations (output blacklists,
-`(ε,δ)`-composition) are rejected by theorems, not by taste.
+`(ε,δ)`-composition) are rejected by theorems, not by taste. The seam row is
+proved end-to-end: certified components compose with *computed* certificates
+(`releases_seq`, axiom-free; the non-scalar `seqRelease`), the reception into
+the transport interface is an equivalence (`bridge_iff_releases`), the generic
+`Bridge.comp` reconstructs the seam theorem (`comp_reconstructs_seq_release`),
+and both seam hypotheses are proved load-bearing by explicit failure witnesses
+(`broken_seam`, `channel_certs_do_not_compose`).
 
 ## Scope — what is *not* claimed
 

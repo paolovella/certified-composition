@@ -235,4 +235,50 @@ theorem pleak_chain_releases :
       (seqRelease Pleak φ_bit φ_bit) :=
   releases_seq pleak_boundary_releases result_releases_at_most_bit
 
+
+/-! ## The negative space: the seam discipline has teeth
+
+Two failure witnesses, mirroring the per-claim non-vacuity style of the rest
+of the repo. (a) An *uncertified upstream poisons a certified downstream*:
+the seam theorem's hypothesis on `c₁` is necessary, not bookkeeping. (b)
+*Channel certificates at non-boundary channels do not compose*: the boundary
+granularity of the seam hypotheses is forced. -/
+
+/-- `P_leak` is not boundary-certified: it writes the secret's bit into Low
+    `l` by design — its sink claim lives at the Policy stratum, not Closure. -/
+theorem pleak_not_boundaryNI : ¬ BoundaryNI Pleak Phigh := by
+  intro h
+  have key := h σ0 σ1 lowEq_σ "l" (Phigh_false (by decide))
+  rw [show evalStore Pleak σ0 "l" = 1 from eval_σ0_l,
+      show evalStore Pleak σ1 "l" = 0 from eval_σ1_l] at key
+  exact absurd key (by decide)
+
+/-- **(a) Broken seam, realized.** `P_full` (copies the whole secret;
+    uncertified — `result_full_not_bounded_by_bit`) wired into the perfectly
+    certified `skip`: the composite violates the bit-bound even though the
+    downstream component is as certified as a component can be. The upstream
+    hypothesis of `releases_seq` is load-bearing. -/
+theorem broken_seam :
+    BoundaryNI .skip Phigh ∧
+    ¬ ReleasesAtMost (.seq Pfull .skip) (resultO Phigh) Phigh φ_bit := by
+  refine ⟨boundaryNI_skip Phigh, ?_⟩
+  intro h
+  apply result_full_not_bounded_by_bit
+  intro σ σ' hle hφ
+  exact h σ σ' hle hφ
+
+/-- **(b) Non-boundary certificates do not compose.** `P_leak` is
+    wall-certified (`wall_closure`), `skip` is boundary-certified, and the
+    composite's data sink is still uncertified: a certificate at *some*
+    channel is not a certificate at the *boundary*, and only the latter
+    composes. The granularity of the seam hypotheses is forced. -/
+theorem channel_certs_do_not_compose :
+    J_NI Pleak wall Phigh ∧ BoundaryNI .skip Phigh ∧
+    ¬ J_NI (.seq Pleak .skip) (resultO Phigh) Phigh := by
+  refine ⟨wall_closure, boundaryNI_skip Phigh, ?_⟩
+  intro h
+  apply result_not_closable
+  intro σ σ' hle
+  exact h σ σ' hle
+
 end ConfTyping
