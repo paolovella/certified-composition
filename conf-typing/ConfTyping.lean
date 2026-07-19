@@ -7,3 +7,4 @@ import ConfTyping.TwoSafety
 import ConfTyping.Integrity
 import ConfTyping.Compose
 import ConfTyping.FlowBridge
+import ConfTyping.SecTy

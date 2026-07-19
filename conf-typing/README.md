@@ -23,6 +23,7 @@ lake build          # builds all four layers
 | `ConfTyping/Integrity.lean` | `VULN-COVERAGE.md` row 3 | taint duality (T1), endorsement dual, blacklist inadmissibility (T2) |
 | `ConfTyping/Compose.lean` | `VULN-COVERAGE.md` row 12 | the seam theorems: boundary certificates compose, releases compose non-scalarly |
 | `ConfTyping/FlowBridge.lean` | `VULN-COVERAGE.md` row 12 | the reception: certified components are Bridges in the transport interface; `Bridge.comp` reconstructs the seam (path-dep: `../transport-calculus`, mathlib-free) |
+| `ConfTyping/SecTy.lean` | brick 3 | the checker: a flow type system whose derivations manufacture the boundary certificates; executable, sound, honest about timing |
 
 ## Result map
 
@@ -253,6 +254,25 @@ The supply-chain moral, as mathematics: **ship the boundary abstraction, not
 just the budget.** With this module the repo's through-line closes at the
 security end: security composition *is* certificate accumulation in the same
 interface as the quantitative tiers.
+
+## The checker (`SecTy.lean`) — certificates from syntax
+
+Brick 3, session 1: the step from "prove your component's certificate" to
+"type-check your component". `SecTy P pc c` is the classic pc-label flow
+discipline (Volpano–Smith shape) over the four `Cmd` constructors; `secCheck`
+is its executable shadow; soundness turns the decidable check into the
+semantic `BoundaryNI` certificate — the input to every seam theorem and the
+Bridge reception. Concrete components are certified by `decide`, not proof.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| expression labels | `exprLow`, `evalE_lowEq` | `propext` | Low expressions are functions of the Low store |
+| **confinement** | `confinement` | **none** | High-context programs write no Low variable |
+| **soundness** | `secTy_boundaryNI` | `propext` (choice-free) | a typed component carries the boundary certificate; the seam cases reuse brick 2 |
+| the checker | `secCheck`, `secCheck_sound` | `propext` | executable; sound for the judgment (completeness not claimed — the usual price of decidability) |
+| **certificates by `decide`** | `boundaryNI_of_check`, `resultNI_of_check`, `pok_certified`, `pok_seq_certified` | `propext`-ish | one decidable check yields the certificate; checker output composes through the seam with zero per-composite reasoning |
+| the rejection | `pleak_rejected` | **none** | the checker rejects `P_leak` — and brick 2 proved that rejection semantically correct (`pleak_not_boundaryNI`): checker and semantics point at the same culprit |
+| **the honesty theorem** | `typed_but_wall_leaks` | standard 3 | a well-typed program whose *running time* reveals the secret: session-1 soundness certifies the store boundary only; the timing channel needs the Policy stratum (session 2) or a padding discipline (out of scope) |
 
 ## §11 pre-mechanization checklist (framework doc)
 
