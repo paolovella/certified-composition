@@ -24,6 +24,7 @@ lake build          # builds all four layers
 | `ConfTyping/Compose.lean` | `VULN-COVERAGE.md` row 12 | the seam theorems: boundary certificates compose, releases compose non-scalarly |
 | `ConfTyping/FlowBridge.lean` | `VULN-COVERAGE.md` row 12 | the reception: certified components are Bridges in the transport interface; `Bridge.comp` reconstructs the seam (path-dep: `../transport-calculus`, mathlib-free) |
 | `ConfTyping/SecTy.lean` | brick 3 | the checker: a flow type system whose derivations manufacture the boundary certificates; executable, sound, honest about timing |
+| `ConfTyping/SecTyD.lean` | brick 3 | the Policy checker: declared releases, the computed ledger `relOf` (composes by `seqRelease`, `rfl`), the Paper-1 bound rederived by `decide` |
 
 ## Result map
 
@@ -273,6 +274,27 @@ Bridge reception. Concrete components are certified by `decide`, not proof.
 | **certificates by `decide`** | `boundaryNI_of_check`, `resultNI_of_check`, `pok_certified`, `pok_seq_certified` | `propext`-ish | one decidable check yields the certificate; checker output composes through the seam with zero per-composite reasoning |
 | the rejection | `pleak_rejected` | **none** | the checker rejects `P_leak` — and brick 2 proved that rejection semantically correct (`pleak_not_boundaryNI`): checker and semantics point at the same culprit |
 | **the honesty theorem** | `typed_but_wall_leaks` | standard 3 | a well-typed program whose *running time* reveals the secret: session-1 soundness certifies the store boundary only; the timing channel needs the Policy stratum (session 2) or a padding discipline (out of scope) |
+
+## The Policy checker (`SecTyD.lean`) — declared releases and the ledger
+
+Brick 3, session 2. `SecTyD P Δ pc c` adds declared releases to the checker: a
+policy budget `Δ` of permits (expression values, guard bits), demanded by the
+check and *visible in what it certifies*. What a typed program reveals is the
+**computed ledger** `relOf P c`, read off the syntax — and the ledger composes
+by the brick-2 certificate algebra **definitionally**:
+`relOf P (c₁; c₂) = seqRelease c₁ (relOf P c₁) (relOf P c₂)` is `rfl`.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **the ledger law** | `relOf_seq` | **none** (`rfl`) | the checker's pipeline output *is* the seam theorem's computed certificate |
+| soundness | `secTyD_sound`, `ite_aux` | choice-free | a typed component reveals at most its ledger (`BoundaryReleases c P (relOf P c)`); the `seq` case is literally `boundaryReleases_seq` |
+| the checker | `secCheckD`, `secCheckD_sound`, `boundaryReleases_of_check` | choice-free | executable, budget-gated; certificates by `decide` |
+| **the teeth** | `pfull_rejected_undeclared`, `pfull_accepted_declared`, `pfull_ledger` | `propext` / none | undeclared High flow rejected; declared, it passes *with the full release as a visible line item* — declaration is not a bypass |
+| **the money theorem** | `pleak_checksD`, `checker_rederives_pleak_bound` | **choice-free** | `P_leak` checks under one guard permit, and the checker rederives the hand-proved Paper-1 bound (`result_releases_at_most_bit`'s exact statement) — with a *smaller* axiom footprint than the hand proof |
+
+Honesty carried forward: `relOf` is deliberately coarse for undeclared High
+guards (a weaker, still-sound claim), and the instrumented channels stay at
+session-1 honesty — the ledger certifies the store boundary.
 
 ## §11 pre-mechanization checklist (framework doc)
 
