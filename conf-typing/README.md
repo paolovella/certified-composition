@@ -25,6 +25,7 @@ lake build          # builds all four layers
 | `ConfTyping/FlowBridge.lean` | `VULN-COVERAGE.md` row 12 | the reception: certified components are Bridges in the transport interface; `Bridge.comp` reconstructs the seam (path-dep: `../transport-calculus`, mathlib-free) |
 | `ConfTyping/SecTy.lean` | brick 3 | the checker: a flow type system whose derivations manufacture the boundary certificates; executable, sound, honest about timing |
 | `ConfTyping/SecTyD.lean` | brick 3 | the Policy checker: declared releases, the computed ledger `relOf` (composes by `seqRelease`, `rfl`), the Paper-1 bound rederived by `decide` |
+| `ConfTyping/Pipeline.lean` | brick 3 / `VULN-COVERAGE.md` row 7 | multi-tenant isolation (checked both ways), and the pipeline theorem: two syntactic checks → one certified composed Bridge |
 
 ## Result map
 
@@ -295,6 +296,30 @@ by the brick-2 certificate algebra **definitionally**:
 Honesty carried forward: `relOf` is deliberately coarse for undeclared High
 guards (a weaker, still-sound claim), and the instrumented channels stay at
 session-1 honesty — the ledger certifies the store boundary.
+
+## The product (`Pipeline.lean`) — multi-tenant isolation and the pipeline theorem
+
+Brick 3, session 3: the two demos closing the security program's
+component-boundary fork.
+
+**Multi-tenant isolation is noninterference, checked** (VULN-COVERAGE row 7,
+now [proved]). Two tenants share a multiplexer; each tenant's data and output
+channel are classified together. The checker proves isolation both ways, and
+it survives composition.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| isolation each way | `multiplex_isolates_A`, `multiplex_isolates_B` | choice-free | cross-tenant isolation *is* `J_NI` at the tenant's partition — the T1 relabeling made concrete, from a `decide` |
+| isolation composes | `multiplex_pipeline_isolates_B` | `propext` | two multiplexer stages stay isolated, zero per-composite reasoning |
+| **teeth** | `leaky_rejected`, `leaky_not_isolated` | none / standard 3 | a component routing B's data into A's channel is rejected by the checker *and* proved non-isolated — they agree |
+
+**The pipeline theorem: syntax in, certified composed Bridge out.**
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| composed certificate | `certified_pipeline` | choice-free | a Closure-checked then Policy-checked pair composes into one `BoundaryReleases` certificate, computed — no semantic reasoning about the composite |
+| **the product** | `certified_pipeline_bridge`, `certified_pipeline_reconstruction` | choice-free / standard 3 | the pipeline is a Bridge in the transport interface, and the *generic* `Bridge.comp` reconstructs its seam certificate — security composition by the same law that composes contraction estimates |
+| concrete demo | `demo_pipeline`, `demo_pipeline_bridge` | choice-free | `P_ok` then `P_leak`: the whole stack certified from two `decide`s |
 
 ## §11 pre-mechanization checklist (framework doc)
 

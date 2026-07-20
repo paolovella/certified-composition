@@ -82,31 +82,43 @@ this repeatedly.
 - **OUT-NONCOMPOSABLE** — the class's popular *summary* admits no `mul`, as a
   theorem; the composable invariant underneath is named.
 
+The **(generated)** annotation (brick 3) marks an IN verdict whose certificate is
+now *manufactured by a syntactic checker* (`conf-typing/ConfTyping/SecTy.lean`,
+`SecTyD.lean`), not proved by hand per component: `secCheck`/`secCheckD` return a
+Boolean, and soundness turns a passing check into the semantic certificate — so a
+concrete component earns its verdict by `decide`, and the certificate flows through
+the seam theorems and Bridge reception untouched. Without the annotation, an IN
+verdict is proved semantically but per-component by hand.
+
 ## 3. The map
 
 | # | class (CWE anchor) | semantic form | region | verdict | grade |
 |---|---|---|---|---|---|
-| 1 | direct confidentiality leaks (CWE-200) | 2-safety (NI) | 1 | IN | [proved] |
+| 1 | direct confidentiality leaks (CWE-200) | 2-safety (NI) | 1 | IN (generated) | [proved] |
 | 2 | timing side channels (CWE-208) | 2-safety over instrumented semantics | 1 | IN-WITH-MODEL | [proved] |
-| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow; OUT-INADMISSIBLE as blacklist | [proved: T1, T2] |
-| 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN | [proved] |
+| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow (generated); OUT-INADMISSIBLE as blacklist | [proved: T1, T2] |
+| 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN (generated) | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
 | 6 | memory safety (CWE-119/416) | 1-safety of a richer semantics | — | CARRIED (+ OUT-OF-MODEL for IMP) | [classified] |
-| 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN | [classified] / [argued] |
+| 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN (generated) | [classified] / [proved] |
 | 8 | races / TOCTOU (CWE-362/367) | 1-safety over interleavings | — | OUT-OF-MODEL | [classified] |
 | 9 | speculative execution (Spectre-class) | 2-safety over microarchitectural model | 1* | OUT-OF-MODEL | [classified] |
 | 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER | [classified] |
 | 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
 
-### 3.1 Direct confidentiality leaks — IN [proved]
+### 3.1 Direct confidentiality leaks — IN, generated [proved]
 
 Home turf. `J_NI` at partition `P` and adversary capability set; per-channel reasoning
 legitimate by `JNI_separable`, joint completeness by `completeness_thm2`, and the
 end-to-end witness is `pleak_confidential_deploy`: the *running* `P_leak` leaks at most
 the declared bit on `result`, against the local adversary, through the deploy gate.
 Model: instrumented IMP; adversary = subset of `𝒪` closed under post-processing and
-tupling. This row is the exemplar all others are measured against.
+tupling. This row is the exemplar all others are measured against. **Generated** (brick
+3): the store-boundary certificate is now checker output — `secCheck P false c = true`
+yields `BoundaryNI c P` (`boundaryNI_of_check`), so a component earns this row by
+`decide` (`pok_certified`). The honesty theorem `typed_but_wall_leaks` marks the
+boundary: the checker certifies the store channel, not the timing channel (row 2).
 
 ### 3.2 Timing side channels — IN-WITH-MODEL [proved]
 
@@ -144,16 +156,26 @@ The industry's two formulations, separated by a theorem each
 
 Scope honesty: IMP has no strings; row 3's [proved] is the property *shape*
 (influence of untrusted sources on trusted sinks, with endorsement obligations),
-made non-vacuous by the `P_leak` witnesses — not a model of SQL.
+made non-vacuous by the `P_leak` witnesses — not a model of SQL. **Generated** (brick
+3): since taint-freedom is `J_NI` at the untrusted relabeling and the checker
+generates `J_NI`, the taint certificate is checker output at the relabeled partition
+— the same `secCheck` under `P := untrusted`.
 
-### 3.4 Improper declassification — IN [proved]
+### 3.4 Improper declassification — IN, generated [proved]
 
 The Policy stratum: a discharge requires a declared release `φ` *plus* a proof
 `ReleasesAtMost c o P φ`; Closure is the `φ = const` special case as a theorem
 (`closure_is_const_policy`), the bound has teeth (`result_full_not_bounded_by_bit`),
 and both strata transport through the gate (`confidential_transport`). The spec gap
 lives here and is named: the framework proves "at most φ", not "φ was the right thing
-to release."
+to release." **Generated** (brick 3, `SecTyD.lean`): the release is now *computed
+from syntax* — a declared-permit checker (`secCheckD`) whose derivation yields the
+ledger `relOf P c`, with `boundaryReleases_of_check` turning a passing check into the
+bound. `checker_rederives_pleak_bound` reproduces the hand-proved Paper-1 bound
+(`result_releases_at_most_bit`) from `decide` + soundness, choice-free — a *smaller*
+axiom footprint than the original. Declaration is disclosure, not bypass: an
+undeclared High flow is rejected (`pfull_rejected_undeclared`), and a declared one
+appears in the ledger as a visible line item (`pfull_ledger`).
 
 ### 3.5 Privacy / DP — IN as the f-DP invariant [argued]; OUT-NONCOMPOSABLE as (ε,δ) [proved in miniature]
 
@@ -175,17 +197,21 @@ also OUT-OF-MODEL. The framework's honest contribution is transport, not generat
 composition seams. Generating it is an ownership/separation-logic engine's job —
 external, and *not* claimed. Carrying a certificate is plumbing, not memory safety.
 
-### 3.7 Authz — CARRIED [classified]; cross-tenant isolation — IN [argued]
+### 3.7 Authz — CARRIED [classified]; cross-tenant isolation — IN, generated [proved]
 
 "All accesses mediated per policy π" is 1-safety relative to π: transportable,
 accumulable, spec-gap-heavy (π's correctness is not a theorem anywhere). But the
 economically load-bearing sub-case is better than that: **cross-tenant data
 isolation — tenant A's response is independent of tenant B's data — is literally
 noninterference** at the partition "other tenants' data := High", i.e. region 1, the
-proved machinery. The reduction is the T1 relabeling pattern, and T1 proved that
-pattern costs nothing (`taint_is_JNI` is an `Iff.rfl` — the apparatus is
-`(P, o)`-parametric). [argued] remains only for want of a mechanized multi-tenant
-instance; no new mathematics is missing.
+proved machinery. Now mechanized (brick 3, `Pipeline.lean`): a multiplexing
+component is checked against each tenant's partition and proved isolated both ways
+(`multiplex_isolates_A/B` — `J_NI` from a `decide`), the isolation survives
+composition (`multiplex_pipeline_isolates_B`), and a cross-tenant leak is caught by
+the checker *and* proved non-isolated (`leaky_rejected`, `leaky_not_isolated`). The
+[argued] gap ("no mechanized instance") is closed; the isolation verdict is now
+[proved] and generated. Authz-in-general stays CARRIED (π's correctness is the
+spec gap, not a theorem).
 
 ### 3.8 Races / TOCTOU — OUT-OF-MODEL [classified]
 
@@ -304,3 +330,44 @@ partitions), not a general-purpose language frontend.
   proved load-bearing; row 12 upgraded to end-to-end [proved]; guards extended
   (1c names, 1e row-12). Deferred, named: the assumption-ledger certificate; a
   mechanized multi-tenant isolation instance (row 7). **Brick 2 complete.**
+
+### Brick 3 ledger (the checker — certificates from syntax)
+
+- **Session 1:** `SecTy.lean` — a syntax-directed flow type system whose
+  derivations manufacture the boundary certificates. Confinement (axiom-free),
+  soundness `secTy_boundaryNI` (choice-free), executable `secCheck`, certificates
+  by `decide` (`boundaryNI_of_check`, `pok_certified`). Non-vacuity both ways:
+  `pleak_rejected` (the checker rejects `P_leak`, matching the brick-2 semantic
+  fact). Honesty theorem `typed_but_wall_leaks`: the checker certifies the store
+  boundary, not the timing channel.
+- **Session 2:** `SecTyD.lean` — declared releases and the computed ledger
+  `relOf`, which composes by the brick-2 certificate algebra definitionally
+  (`relOf_seq` is `rfl`). Soundness `secTyD_sound` (choice-free); the money
+  theorem `checker_rederives_pleak_bound` reproduces the hand-proved Paper-1 bound
+  from `decide`, with a *smaller* axiom footprint. Declaration is disclosure, not
+  bypass (`pfull_rejected_undeclared`, `pfull_ledger`).
+- **Session 3:** `Pipeline.lean` — multi-tenant isolation checked both ways
+  (`multiplex_isolates_A/B`, with teeth: `leaky_rejected`/`leaky_not_isolated`),
+  closing row 7 to [proved]/generated; and the pipeline theorem
+  (`certified_pipeline`, `certified_pipeline_bridge`,
+  `certified_pipeline_reconstruction`, `demo_pipeline`): two syntactic checks
+  compose into one certified Bridge in the transport interface, the generic
+  `Bridge.comp` reconstructing the seam certificate. Rows 1, 3, 4, 7 annotated
+  **(generated)**; guard 1c extended, guard 1f added for the pipeline theorems.
+  Still deferred, named: the **assumption/TCB ledger** — `relOf` computes the
+  *release* ledger; accumulating each component's trusted-base assumptions is a
+  distinct list-monoid certificate, natural once components name external
+  dependencies (a real interface vocabulary, brick 4+). **Brick 3 complete.**
+
+### The security program, standing state (three bricks)
+
+The original goal — a framework for coding inherently free of vulnerabilities —
+now has: a **map** with a proved boundary (12 classes, brick 1); a **seam** so
+guarantees survive composition in the transport interface (brick 2); and a
+**checker** so the certificates come from a decidable syntactic check, not hand
+proof (brick 3). What "bulletproof" means is stated at proved strength, the
+flow-property classes are excluded *by type-checking*, and composition is
+certificate accumulation by the same law that composes contraction estimates. The
+honest edges are all named as theorems or deferrals: timing/microarchitecture
+stay OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay
+CARRIED, and the spec/model/TCB gaps of §0 are unmovable by construction.

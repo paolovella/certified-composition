@@ -123,7 +123,13 @@ proved end-to-end: certified components compose with *computed* certificates
 the transport interface is an equivalence (`bridge_iff_releases`), the generic
 `Bridge.comp` reconstructs the seam theorem (`comp_reconstructs_seq_release`),
 and both seam hypotheses are proved load-bearing by explicit failure witnesses
-(`broken_seam`, `channel_certs_do_not_compose`).
+(`broken_seam`, `channel_certs_do_not_compose`). And the flow-property verdicts
+are **generated, not hand-proved**: a syntax-directed checker (`secCheck`,
+`secCheckD`) manufactures the boundary certificates, so a component earns its
+verdict by `decide` — `checker_rederives_pleak_bound` reproduces the hand-proved
+Paper-1 release bound as checker output (choice-free), multi-tenant isolation is
+checked both ways (`multiplex_isolates_A/B`), and two syntactic checks compose
+into one certified Bridge in the transport interface (`certified_pipeline`).
 
 ## Scope — what is *not* claimed
 
