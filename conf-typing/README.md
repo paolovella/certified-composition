@@ -26,6 +26,7 @@ lake build          # builds all four layers
 | `ConfTyping/SecTy.lean` | brick 3 | the checker: a flow type system whose derivations manufacture the boundary certificates; executable, sound, honest about timing |
 | `ConfTyping/SecTyD.lean` | brick 3 | the Policy checker: declared releases, the computed ledger `relOf` (composes by `seqRelease`, `rfl`), the Paper-1 bound rederived by `decide` |
 | `ConfTyping/Pipeline.lean` | brick 3 / `VULN-COVERAGE.md` row 7 | multi-tenant isolation (checked both ways), and the pipeline theorem: two syntactic checks → one certified composed Bridge |
+| `ConfTyping/Ledger.lean` | brick 4 / `VULN-COVERAGE.md` rows 11–12 | the assumption ledger: conditional certificates that accumulate their trusted base under composition, and never silently discharge it |
 
 ## Result map
 
@@ -320,6 +321,29 @@ it survives composition.
 | composed certificate | `certified_pipeline` | choice-free | a Closure-checked then Policy-checked pair composes into one `BoundaryReleases` certificate, computed — no semantic reasoning about the composite |
 | **the product** | `certified_pipeline_bridge`, `certified_pipeline_reconstruction` | choice-free / standard 3 | the pipeline is a Bridge in the transport interface, and the *generic* `Bridge.comp` reconstructs its seam certificate — security composition by the same law that composes contraction estimates |
 | concrete demo | `demo_pipeline`, `demo_pipeline_bridge` | choice-free | `P_ok` then `P_leak`: the whole stack certified from two `decide`s |
+
+## The assumption ledger (`Ledger.lean`) — the trusted base as a composable certificate
+
+Brick 4, session 1: the deferral bricks 2 and 3 both named. A real component
+relies on things it does not verify — an upstream's data classification, a
+library's correctness, a crypto primitive's security. Those are *assumptions*,
+not evidence. A **ledger** `Γ : List Prop` records a component's trusted base; a
+**conditional certificate** `CondBoundary c P Γ := Sat Γ → BoundaryNI c P` is a
+guarantee relative to it.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| ledger satisfaction | `Sat`, `sat_append` | `propext` | a ledger holds when all its assumptions do; append splits |
+| **accumulation** | `condBoundary_seq`, `condReleases_seq` | choice-free | the composite's trusted base is the *union* (`Γ₁ ++ Γ₂`) — every part's assumptions carried, none dropped |
+| discharge is explicit | `condBoundary_nil`, `condBoundary_discharge`, `condBoundary_discharge_head` | **none** | empty ledger = unconditional certificate; collapsing a conditional one requires *proving* the ledger |
+| over-approximation | `condBoundary_of_unconditional`, `condBoundary_weaken` | **none** | unused assumptions are always sound to add |
+| **no silent discharge** | `ledger_no_silent_discharge` (`cx_cond`, `cx_not_unconditional`) | standard 3 | a component secure *only if* input `x` is classified Low: the conditional certificate holds for every classification, but the unconditional one is **false** where `x` is High — the ledger entry is load-bearing, dropping it unsound |
+
+`ledger_no_silent_discharge` is the composition-level analogue of
+`attest_is_not_J_evidence` (§6.1): an assumption coexists with an obligation but
+never becomes its proof. Session 2 rides the ledger on `Bridge.comp` (a phantom
+grade accumulating by append); session 3 has the checker emit conditional
+certificates from declared assumptions, with the worked supply-chain instance.
 
 ## §11 pre-mechanization checklist (framework doc)
 
