@@ -138,7 +138,10 @@ supply chain (`supply_chain_ledger`) — the bill of materials as a theorem. And
 clock is a certified channel, not just a caveat: a timing-sensitive checker
 (`secCheckT`) forbids secret-dependent branching and certifies the whole
 instrumented outcome — store, running time, and branch trace (`secTyT_sound`) —
-rejecting the store-checker's timing-leak witness (`ptime_rejected_T`).
+rejecting the store-checker's timing-leak witness (`ptime_rejected_T`) — and a
+secret branch whose duration is *declared* released is bounded rather than forbidden
+(`ptime_timing_released`), so the clock is closed by construction or opened exactly
+as far as declared.
 
 ## Scope — what is *not* claimed
 

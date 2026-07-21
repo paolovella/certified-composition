@@ -45,7 +45,9 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             ledger_supply_chain_ledger condBoundary_of_check_assuming \
             supply_chain_ledger biz_needs_assumption \
             secTyT_sound secCheckT outNI_of_checkT secCheckT_imp_secCheck \
-            ptime_rejected_T; do
+            ptime_rejected_T \
+            secTyTD_sound secCheckTD releasesAtMost_of_checkTD \
+            ptime_timing_released ptime_wall_of_bit ptime_rejected_TD; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi

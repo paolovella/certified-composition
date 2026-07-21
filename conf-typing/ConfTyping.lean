@@ -14,3 +14,4 @@ import ConfTyping.Ledger
 import ConfTyping.LedgerBridge
 import ConfTyping.SupplyChain
 import ConfTyping.SecTyT
+import ConfTyping.SecTyTD

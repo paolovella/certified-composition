@@ -135,9 +135,15 @@ store, running time, and branch trace jointly (`secTyT_sound`, `outNI_of_checkT`
 (`secCheckT_imp_secCheck`) and rejects the brick-3 leak witness `Ptime`
 (`ptime_rejected_T`) — the program `typed_but_wall_leaks` proved leaks the clock.
 So `secCheck` and `secCheckT` bracket the channel: store-safe vs. store-and-clock-
-safe. Honest scope: this certifies timing-*insensitivity* (secret-dependent
-branching is rejected, not repaired); declassified timing (a High branch whose
-duration is declared released) is the Policy-stratum analogue, a later brick.
+safe. And declassified timing is now covered too (brick 6, `SecTyTD.lean`): a
+secret branch whose bit is *declared released* type-checks (`iteD`), and
+`secTyTD_sound` certifies the whole outcome reveals at most the ledger `relOf P c`
+— `ReleasesAtMost c (outO P) P (relOf P c)`. The money theorem `ptime_timing_released`
+turns the brick-5-rejected `Ptime` into a bounded, declared release: under one guard
+permit its running time reveals at most the secret bit (`ptime_wall_of_bit`).
+`secCheckT` closes the clock by construction; `secCheckTD` opens it exactly as far as
+declared. No open honesty gap remains on this row — the only uncovered timing is
+*microarchitectural* (row 9, OUT-OF-MODEL).
 
 ### 3.3 Injection — IN as taint-flow [proved: T1]; OUT-INADMISSIBLE as blacklist [proved: T2]
 
@@ -422,20 +428,36 @@ partitions), not a general-purpose language frontend.
   timing-*insensitivity* (secret-dependent branching rejected, not repaired);
   declassified timing is a later brick. **Brick 5 complete.**
 
-### The security program, standing state (five bricks)
+### Brick 6 ledger (declassified timing)
+
+- `SecTyTD.lean` — the Policy analogue of the clock. A secret branch is allowed
+  when its bit is *declared released* (`iteD`, the brick-3 budget `Δ` over the
+  timing checker), and `secTyTD_sound` (choice-free) certifies the whole outcome
+  reveals at most the ledger `relOf P c` — `ReleasesAtMost c (outO P) P (relOf
+  P c)`. Money theorem: `ptime_timing_released`/`ptime_wall_of_bit` — the
+  brick-5-rejected `Ptime`, under one declared permit, has its running time bounded
+  to the secret bit. Executable `secCheckTD` by `decide`; `ptime_rejected_TD`
+  matches brick 5 under an empty budget. Row 2's honesty gap fully closed (only
+  microarchitectural timing, row 9, stays OUT-OF-MODEL); guard 1c extended.
+  **Brick 6 complete.**
+
+### The security program, standing state (six bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (12 classes, brick 1); a **seam** so
 guarantees survive composition in the transport interface (brick 2); a **checker**
 so the certificates come from a decidable syntactic check, not hand proof (brick
 3); a **ledger** so the assumptions a guarantee rests on are tracked, unioned
-under composition, and never silently laundered into evidence (brick 4); and a
+under composition, and never silently laundered into evidence (brick 4); a
 **timing-sensitive checker** so the clock is a certified channel, not just an
-honesty caveat (brick 5). What "bulletproof" means is stated at proved strength,
-the flow-property classes are excluded *by type-checking* (store and clock),
-composition is certificate accumulation by the same law that composes contraction
-estimates, and every guarantee carries its trusted base as an automatic bill of
-materials. The honest edges are all named as theorems or deferrals:
-microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE,
-memory-safety/authz stay CARRIED, declassified timing is deferred, and the
-spec/model/TCB gaps of §0 are unmovable by construction.
+honesty caveat (brick 5); and **declassified timing** so a secret branch can be
+declared-and-bounded rather than only forbidden (brick 6). What "bulletproof"
+means is stated at proved strength, the flow-property classes are excluded *by
+type-checking* (store and clock, closed-or-declared), composition is certificate
+accumulation by the same law that composes contraction estimates, and every
+guarantee carries its trusted base as an automatic bill of materials. The honest
+edges are all named as theorems or deferrals: microarchitecture stays
+OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED,
+and the spec/model/TCB gaps of §0 are unmovable by construction. The remaining
+frontier is *model growth* (a richer language: strings, heap, loops), a larger
+commitment than the composition discipline the six bricks completed.

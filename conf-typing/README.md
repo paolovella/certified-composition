@@ -30,6 +30,7 @@ lake build          # builds all four layers
 | `ConfTyping/LedgerBridge.lean` | brick 4 / `VULN-COVERAGE.md` row 12 | the ledger rides `Bridge.comp` as a phantom grade — provenance accumulates by the same law as the guarantee (the SBOM as a theorem) |
 | `ConfTyping/SupplyChain.lean` | brick 4 / `VULN-COVERAGE.md` row 11 | the checker emits conditional certificates from declared assumptions; a worked trust pipeline, dischargeable and load-bearing |
 | `ConfTyping/SecTyT.lean` | brick 5 / `VULN-COVERAGE.md` row 2 | the timing-sensitive checker: forbids High-guarded branches, certifies the whole instrumented outcome (store, cost, trace) |
+| `ConfTyping/SecTyTD.lean` | brick 6 / `VULN-COVERAGE.md` row 2 | declassified timing: a secret branch is allowed when its bit is declared released; the outcome reveals at most the declared bits |
 
 ## Result map
 
@@ -401,6 +402,27 @@ branching); a program that must branch on a secret is rejected, not repaired —
 channel closed by construction, the price being expressiveness. The declassified
 case (a High branch whose timing is *declared* released) is the Policy-stratum
 analogue, for a later brick.
+
+## Declassified timing (`SecTyTD.lean`) — the Policy analogue of the clock
+
+Brick 6. Brick 5 closed the timing channel by *forbidding* secret-dependent
+branching; a program that must branch on a secret was rejected, not certified.
+`SecTyTD` adds the declassification stratum to the clock: a High guard is allowed
+**when its branch bit is declared released** (`iteD`, the brick-3 policy budget
+`Δ` over the timing checker), and the outcome is then certified to reveal at most
+the declared bits.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| the judgment | `SecTyTD` | — | `SecTyT` + declared guards (`iteD`) and writes (`assignD`); still no *undeclared* secret branch |
+| **soundness** | `secTyTD_outReleases`, `iteTD_aux`, `secTyTD_sound` | choice-free | the whole outcome (store, running time, trace) reveals at most the ledger `relOf P c` — `ReleasesAtMost c (outO P) P (relOf P c)`; the declared bit forces same-branch, bounding the timing |
+| executable | `secCheckTD`, `secCheckTD_sound`, `releasesAtMost_of_checkTD` | choice-free | certificates by `decide` |
+| **money theorem** | `ptime_rejected_TD`, `ptime_checksTD`, `ptime_timing_released`, `ptime_wall_of_bit` | choice-free | `Ptime` (secret branch, unequal costs): rejected under an empty budget (brick 5), but under one declared permit its running time is certified to reveal *at most* the secret bit — a rejected leak becomes a bounded, declared release |
+
+The ledger `relOf` (brick 3) already carries each non-Low guard's branch bit, so
+the released quantity *is* the declassified timing — no new bookkeeping. Together
+with brick 5: `secCheckT` closes the clock by construction, `secCheckTD` opens it
+exactly as far as declared and no further.
 
 ## §11 pre-mechanization checklist (framework doc)
 
