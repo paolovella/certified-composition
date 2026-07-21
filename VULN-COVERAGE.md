@@ -74,7 +74,8 @@ this repeatedly.
   composition seams but does not *generate* it; generation is an external engine.
 - **LEDGER** — the class is assumption-shaped, not proof-shaped; the framework's
   contribution is that assumptions accumulate explicitly and never silently become
-  evidence (`attest_is_not_J_evidence`).
+  evidence (`attest_is_not_J_evidence`, and — brick 4 — the composable
+  `CondBoundary` ledger with `ledger_no_silent_discharge`).
 - **OUT-INADMISSIBLE** — the popular formulation of the class fails admissibility
   (A2/A3), as a theorem; the framework *forces* a reformulation.
 - **OUT-OF-MODEL** — the class's channel or execution structure is outside the
@@ -104,7 +105,7 @@ verdict is proved semantically but per-component by hand.
 | 8 | races / TOCTOU (CWE-362/367) | 1-safety over interleavings | — | OUT-OF-MODEL | [classified] |
 | 9 | speculative execution (Spectre-class) | 2-safety over microarchitectural model | 1* | OUT-OF-MODEL | [classified] |
 | 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
-| 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER | [classified] |
+| 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER (mechanized) | [proved] |
 | 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
@@ -239,14 +240,32 @@ accumulation. Liveness-shaped availability ("eventually responds") is not expres
 and not claimed. Generation (amortized cost analysis) is external; the reduction of
 the class to certificates over the instrumented model is the claim.
 
-### 3.11 Crypto misuse — LEDGER [classified]
+### 3.11 Crypto misuse — LEDGER, mechanized [proved]
 
-"IND-CPA holds for X" is an assumption, not a theorem of any program logic. The
-framework's contribution is the discipline proved in miniature by
-`attest_is_not_J_evidence`: attestations and assumptions coexist with obligations
-but never silently discharge them, and composition accumulates them into a visible
-ledger. The *leakage* side of crypto misuse (non-constant-time implementations) is
-row #2 and inherits its IN-WITH-MODEL verdict.
+"IND-CPA holds for X" is an assumption, not a theorem of any program logic — so the
+right verdict is never "proved secure" but "proved to *track the assumption
+honestly*." Brick 4 (`conf-typing/ConfTyping/Ledger.lean`, `LedgerBridge.lean`,
+`SupplyChain.lean`, all built, `no sorry`, axiom-audited) mechanizes exactly that:
+
+- a **composable ledger** — a component's trusted base `Γ : List Prop` and a
+  conditional certificate `CondBoundary c P Γ := Sat Γ → BoundaryNI c P`;
+- **accumulation by the same law** — `condBoundary_seq` unions the bases, and
+  `ledgerGA`/`ledgerBridge_comp_ledger` ride the ledger on `Bridge.comp` as a
+  phantom grade, so the trusted base of a composed guarantee is *computed* (the
+  SBOM as a theorem);
+- **no silent discharge** — `ledger_no_silent_discharge` / `biz_needs_assumption`:
+  a component whose security rests on an assumption cannot be certified with it
+  dropped (the composition-level `attest_is_not_J_evidence`);
+- **checker-generated** — `condBoundary_of_check_assuming`: checking a component
+  under a declared trust assumption emits the conditional certificate directly, and
+  the worked pipeline `supply_chain_ledger` carries exactly its one external
+  assumption, dischargeable when the dependency is later verified.
+
+Scope, honest: the external assumption ("the cipher/library is correct") *stays* an
+assumption — mechanizing the LEDGER discipline is proving it is tracked, unioned,
+and never laundered into evidence, not proving the crypto. The *leakage* side of
+crypto misuse (non-constant-time implementations) is row #2 and inherits its
+IN-WITH-MODEL verdict.
 
 ### 3.12 Composition seams / supply chain — IN-BY-DESIGN [proved, end-to-end]
 
@@ -280,8 +299,12 @@ Compose.lean` + `FlowBridge.lean`, both built, `no sorry`, axiom-audited):
 Still conditional in exactly one honest place: *if* each component carries a
 certificate, composition preserves and accumulates it; generating per-component
 certificates is the other rows' business. The assumption-*ledger* certificate
-(composite TCB computed as the append of component ledgers) is deferred to the
-next brick, where a real component vocabulary exists to name assumptions in.
+(composite trusted base computed as the append of component ledgers) — deferred here
+in brick 2 — is **delivered in brick 4** (`Ledger.lean`, `LedgerBridge.lean`):
+`CondBoundary`/`CondReleases` carry the base, `condBoundary_seq` and
+`ledgerBridge_comp_ledger` accumulate it by the same composition law, and
+`ledger_no_silent_discharge` proves it can never be laundered into evidence. See
+row 11.
 
 ## 4. What the map implies for brick 2
 
@@ -354,20 +377,40 @@ partitions), not a general-purpose language frontend.
   compose into one certified Bridge in the transport interface, the generic
   `Bridge.comp` reconstructing the seam certificate. Rows 1, 3, 4, 7 annotated
   **(generated)**; guard 1c extended, guard 1f added for the pipeline theorems.
-  Still deferred, named: the **assumption/TCB ledger** — `relOf` computes the
-  *release* ledger; accumulating each component's trusted-base assumptions is a
-  distinct list-monoid certificate, natural once components name external
-  dependencies (a real interface vocabulary, brick 4+). **Brick 3 complete.**
+  Still deferred, named: the **assumption/TCB ledger** (brick 4). **Brick 3
+  complete.**
 
-### The security program, standing state (three bricks)
+### Brick 4 ledger (the trusted base)
+
+- **Session 1:** `Ledger.lean` — the trusted base as a composable certificate.
+  `CondBoundary c P Γ := Sat Γ → BoundaryNI c P`; accumulation by union
+  (`condBoundary_seq`, choice-free); explicit discharge (`condBoundary_nil`,
+  `condBoundary_discharge`, axiom-free); no silent discharge
+  (`ledger_no_silent_discharge` — a used assumption cannot be dropped, the
+  composition-level `attest_is_not_J_evidence`).
+- **Session 2:** `LedgerBridge.lean` — the ledger rides `Bridge.comp` as a phantom
+  grade (`ledgerGA`, axiom-free; `ledgerBridge_comp_ledger` is `rfl`), so
+  provenance accumulates by the same law as the guarantee. The SBOM as a theorem
+  (`ledger_supply_chain_ledger`/`_map`/`_bound`).
+- **Session 3:** `SupplyChain.lean` — the checker emits conditional certificates
+  from declared assumptions (`condBoundary_of_check_assuming`); a worked trust
+  pipeline carrying exactly one external assumption (`supply_chain_ledger`),
+  dischargeable (`supply_chain_discharged`) and load-bearing
+  (`biz_needs_assumption`). Row 11 upgraded [classified] → [proved], the brick-2
+  row-12 deferral closed, guard 1c extended, guard 1g added. **Brick 4 complete.**
+
+### The security program, standing state (four bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (12 classes, brick 1); a **seam** so
-guarantees survive composition in the transport interface (brick 2); and a
-**checker** so the certificates come from a decidable syntactic check, not hand
-proof (brick 3). What "bulletproof" means is stated at proved strength, the
-flow-property classes are excluded *by type-checking*, and composition is
-certificate accumulation by the same law that composes contraction estimates. The
-honest edges are all named as theorems or deferrals: timing/microarchitecture
-stay OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay
-CARRIED, and the spec/model/TCB gaps of §0 are unmovable by construction.
+guarantees survive composition in the transport interface (brick 2); a **checker**
+so the certificates come from a decidable syntactic check, not hand proof (brick
+3); and a **ledger** so the assumptions a guarantee rests on are tracked, unioned
+under composition, and never silently laundered into evidence (brick 4). What
+"bulletproof" means is stated at proved strength, the flow-property classes are
+excluded *by type-checking*, composition is certificate accumulation by the same
+law that composes contraction estimates, and every guarantee carries its trusted
+base as an automatic bill of materials. The honest edges are all named as theorems
+or deferrals: timing/microarchitecture stay OUT-OF-MODEL, `(ε,δ)`-DP stays
+OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED, and the spec/model/TCB gaps of
+§0 are unmovable by construction.

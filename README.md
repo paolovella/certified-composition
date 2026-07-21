@@ -129,7 +129,12 @@ are **generated, not hand-proved**: a syntax-directed checker (`secCheck`,
 verdict by `decide` — `checker_rederives_pleak_bound` reproduces the hand-proved
 Paper-1 release bound as checker output (choice-free), multi-tenant isolation is
 checked both ways (`multiplex_isolates_A/B`), and two syntactic checks compose
-into one certified Bridge in the transport interface (`certified_pipeline`).
+into one certified Bridge in the transport interface (`certified_pipeline`). And
+every guarantee carries its **trusted base** as a composable ledger: a component's
+assumptions (`CondBoundary c P Γ`) accumulate by union under the same `Bridge.comp`
+(`ledgerBridge_comp_ledger`), can never be silently laundered into evidence
+(`ledger_no_silent_discharge`), and are surfaced automatically for a composed
+supply chain (`supply_chain_ledger`) — the bill of materials as a theorem.
 
 ## Scope — what is *not* claimed
 

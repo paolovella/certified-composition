@@ -28,6 +28,7 @@ lake build          # builds all four layers
 | `ConfTyping/Pipeline.lean` | brick 3 / `VULN-COVERAGE.md` row 7 | multi-tenant isolation (checked both ways), and the pipeline theorem: two syntactic checks → one certified composed Bridge |
 | `ConfTyping/Ledger.lean` | brick 4 / `VULN-COVERAGE.md` rows 11–12 | the assumption ledger: conditional certificates that accumulate their trusted base under composition, and never silently discharge it |
 | `ConfTyping/LedgerBridge.lean` | brick 4 / `VULN-COVERAGE.md` row 12 | the ledger rides `Bridge.comp` as a phantom grade — provenance accumulates by the same law as the guarantee (the SBOM as a theorem) |
+| `ConfTyping/SupplyChain.lean` | brick 4 / `VULN-COVERAGE.md` row 11 | the checker emits conditional certificates from declared assumptions; a worked trust pipeline, dischargeable and load-bearing |
 
 ## Result map
 
@@ -360,6 +361,23 @@ transform *and appending the ledgers*, `act` ignoring the ledger.
 
 The bill of materials (what a composed guarantee assumes) and the security proof
 are literally the same composition — computed, not maintained by hand.
+
+### The worked supply chain (`SupplyChain.lean`)
+
+Session 3: the checker *generates* conditional certificates, and a concrete
+trust pipeline (VULN-COVERAGE row 11).
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **checker emits conditional certs** | `condBoundary_of_check_assuming` | choice-free | check the component pretending untrusted input `x` is Low; success yields a certificate conditional on `x` actually being Low — the trust assumption made explicit |
+| `Biz` conditional cert | `biz_check`, `biz_cond` | standard 3 | business logic copying an upstream library's output is certified relative to the one assumption "the library output is Low" — generated, not hand-proved |
+| **pipeline carries one assumption** | `supply_chain_ledger` | standard 3 | `Biz; Log` is certified relative to `[P "safe" = false]` — the union of ledgers, accumulated automatically |
+| discharge | `supply_chain_discharged` | standard 3 | verify the library later → the pipeline's certificate collapses to unconditional |
+| **load-bearing** | `biz_needs_assumption` | standard 3 | without the assumption `Biz` provably leaks — the ledger entry is exactly as strong as the trust it names |
+
+Scope, honest: this is row 11 at IMP granularity — the *assumption-tracking
+mechanism* is proved; the external assumption ("the library/cipher is correct")
+stays an assumption, which is the entire content of a LEDGER verdict.
 
 ## §11 pre-mechanization checklist (framework doc)
 

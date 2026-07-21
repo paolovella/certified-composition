@@ -39,7 +39,11 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             secCheck boundaryNI_of_check pleak_rejected typed_but_wall_leaks \
             secCheckD relOf_seq checker_rederives_pleak_bound pfull_ledger \
             multiplex_isolates_B leaky_not_isolated certified_pipeline \
-            certified_pipeline_reconstruction; do
+            certified_pipeline_reconstruction \
+            CondBoundary condBoundary_seq condBoundary_discharge \
+            ledger_no_silent_discharge ledgerGA ledgerBridge_comp_ledger \
+            ledger_supply_chain_ledger condBoundary_of_check_assuming \
+            supply_chain_ledger biz_needs_assumption; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -90,6 +94,23 @@ if grep -q "IN (generated)" VULN-COVERAGE.md; then
   for mod in "import ConfTyping.SecTy" "import ConfTyping.SecTyD" "import ConfTyping.Pipeline"; do
     if ! grep -q "$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
       echo "DRIFT: checker module not imported by the ConfTyping root: $mod"; fail=1
+    fi
+  done
+fi
+
+# 1g. Row 11's [proved] LEDGER verdict rests on the brick-4 ledger theorems.
+if grep -q "LEDGER (mechanized)" VULN-COVERAGE.md; then
+  for pair in "theorem ledger_no_silent_discharge:conf-typing/ConfTyping/Ledger.lean" \
+              "theorem ledgerBridge_comp_ledger:conf-typing/ConfTyping/LedgerBridge.lean" \
+              "theorem condBoundary_of_check_assuming:conf-typing/ConfTyping/SupplyChain.lean"; do
+    thm="${pair%%:*}"; file="${pair##*:}"
+    if ! grep -q "$thm" "$file" 2>/dev/null; then
+      echo "DRIFT: VULN-COVERAGE row 11 is [proved] but '$thm' is missing from $file"; fail=1
+    fi
+  done
+  for mod in "import ConfTyping.Ledger" "import ConfTyping.LedgerBridge" "import ConfTyping.SupplyChain"; do
+    if ! grep -q "$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
+      echo "DRIFT: ledger module not imported by the ConfTyping root: $mod"; fail=1
     fi
   done
 fi
