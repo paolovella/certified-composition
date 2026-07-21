@@ -27,6 +27,7 @@ lake build          # builds all four layers
 | `ConfTyping/SecTyD.lean` | brick 3 | the Policy checker: declared releases, the computed ledger `relOf` (composes by `seqRelease`, `rfl`), the Paper-1 bound rederived by `decide` |
 | `ConfTyping/Pipeline.lean` | brick 3 / `VULN-COVERAGE.md` row 7 | multi-tenant isolation (checked both ways), and the pipeline theorem: two syntactic checks → one certified composed Bridge |
 | `ConfTyping/Ledger.lean` | brick 4 / `VULN-COVERAGE.md` rows 11–12 | the assumption ledger: conditional certificates that accumulate their trusted base under composition, and never silently discharge it |
+| `ConfTyping/LedgerBridge.lean` | brick 4 / `VULN-COVERAGE.md` row 12 | the ledger rides `Bridge.comp` as a phantom grade — provenance accumulates by the same law as the guarantee (the SBOM as a theorem) |
 
 ## Result map
 
@@ -341,9 +342,24 @@ guarantee relative to it.
 
 `ledger_no_silent_discharge` is the composition-level analogue of
 `attest_is_not_J_evidence` (§6.1): an assumption coexists with an obligation but
-never becomes its proof. Session 2 rides the ledger on `Bridge.comp` (a phantom
-grade accumulating by append); session 3 has the checker emit conditional
-certificates from declared assumptions, with the worked supply-chain instance.
+never becomes its proof.
+
+### The ledger rides the interface (`LedgerBridge.lean`)
+
+Session 2: the trusted base accumulates by the *same* composition law as every
+other certificate. `ledgerGA` is the flow `GradedAction` with a **phantom ledger
+grade** — certificate `(Mono QD qle × Ledger)`, `mul` composing the flow
+transform *and appending the ledgers*, `act` ignoring the ledger.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| the graded action | `ledgerGA`, `ledger_act_phantom` | **none** | a valid `GradedAction` (`act_mul` is `rfl`); flow behaviour is exactly `flowGA`'s, the ledger rides as provenance |
+| **accumulation law** | `ledgerBridge_comp_ledger`, `ledgerBridge_comp_flow` | **none** (`rfl`) | `Bridge.comp` appends the trusted base — the same law that composes flow certificates, Lipschitz constants, and Dobrushin coefficients |
+| components as ledger-Bridges | `Bridge.ofComponentL`, `Bridge.ofReleaseL` | none / standard 3 | `ofReleaseL` *demands* `Sat Γ` — no certified Bridge without discharging the base it carries |
+| **the SBOM as a theorem** | `ledger_supply_chain_ledger`, `_map`, `_bound` | standard 3 | composing a released downstream with an exact upstream: the composite's ledger is the union `Γ₂ ++ Γ₁`, its map is the composite boundary, and its flow certificate is the brick-2 seam certificate — provenance and guarantee by one `Bridge.comp` |
+
+The bill of materials (what a composed guarantee assumes) and the security proof
+are literally the same composition — computed, not maintained by hand.
 
 ## §11 pre-mechanization checklist (framework doc)
 
