@@ -13,3 +13,4 @@ import ConfTyping.Pipeline
 import ConfTyping.Ledger
 import ConfTyping.LedgerBridge
 import ConfTyping.SupplyChain
+import ConfTyping.SecTyT

@@ -29,6 +29,7 @@ lake build          # builds all four layers
 | `ConfTyping/Ledger.lean` | brick 4 / `VULN-COVERAGE.md` rows 11–12 | the assumption ledger: conditional certificates that accumulate their trusted base under composition, and never silently discharge it |
 | `ConfTyping/LedgerBridge.lean` | brick 4 / `VULN-COVERAGE.md` row 12 | the ledger rides `Bridge.comp` as a phantom grade — provenance accumulates by the same law as the guarantee (the SBOM as a theorem) |
 | `ConfTyping/SupplyChain.lean` | brick 4 / `VULN-COVERAGE.md` row 11 | the checker emits conditional certificates from declared assumptions; a worked trust pipeline, dischargeable and load-bearing |
+| `ConfTyping/SecTyT.lean` | brick 5 / `VULN-COVERAGE.md` row 2 | the timing-sensitive checker: forbids High-guarded branches, certifies the whole instrumented outcome (store, cost, trace) |
 
 ## Result map
 
@@ -378,6 +379,28 @@ trust pipeline (VULN-COVERAGE row 11).
 Scope, honest: this is row 11 at IMP granularity — the *assumption-tracking
 mechanism* is proved; the external assumption ("the library/cipher is correct")
 stays an assumption, which is the entire content of a LEDGER verdict.
+
+## The timing-sensitive checker (`SecTyT.lean`) — certifying the clock
+
+Brick 5. Brick 3's `typed_but_wall_leaks` was an honesty theorem: the store-only
+checker accepts programs that leak through the instrumented channels (a
+High-guarded branch with unequal branch costs leaks its running time). `SecTyT`
+closes that gap by **forbidding High-guarded branches** — only Low guards
+(`iteL`) survive, so two Low-equal runs always take the same branch and agree on
+cost and trace as well as the store.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| the judgment | `SecTyT`, `SecTyT.toSecTy` | — | `SecTy` at `pc=false` minus `iteH`; refines the store discipline |
+| **soundness** | `secTyT_outNI`, `outNI_to_JNI`, `secTyT_sound` | choice-free | the *whole* instrumented outcome — Low store, running time, branch trace — is Low-determined (`J_NI c (outO P) P`) |
+| executable | `secCheckT`, `secCheckT_sound`, `outNI_of_checkT` | choice-free | certificates by `decide`; `secCheckT_imp_secCheck` — certifying the clock implies certifying the store |
+| **teeth** | `ptime_rejected_T` | **none** | the checker rejects the brick-3 leak witness `Ptime` — correctly, since `typed_but_wall_leaks` proved it leaks the clock. `secCheck` = store-safe, `secCheckT` = store- and clock-safe: the two bracket the timing channel |
+
+Honest scope: this certifies timing-*insensitivity* (no secret-dependent
+branching); a program that must branch on a secret is rejected, not repaired — the
+channel closed by construction, the price being expressiveness. The declassified
+case (a High branch whose timing is *declared* released) is the Policy-stratum
+analogue, for a later brick.
 
 ## §11 pre-mechanization checklist (framework doc)
 

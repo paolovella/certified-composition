@@ -134,7 +134,11 @@ every guarantee carries its **trusted base** as a composable ledger: a component
 assumptions (`CondBoundary c P Γ`) accumulate by union under the same `Bridge.comp`
 (`ledgerBridge_comp_ledger`), can never be silently laundered into evidence
 (`ledger_no_silent_discharge`), and are surfaced automatically for a composed
-supply chain (`supply_chain_ledger`) — the bill of materials as a theorem.
+supply chain (`supply_chain_ledger`) — the bill of materials as a theorem. And the
+clock is a certified channel, not just a caveat: a timing-sensitive checker
+(`secCheckT`) forbids secret-dependent branching and certifies the whole
+instrumented outcome — store, running time, and branch trace (`secTyT_sound`) —
+rejecting the store-checker's timing-leak witness (`ptime_rejected_T`).
 
 ## Scope — what is *not* claimed
 

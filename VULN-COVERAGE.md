@@ -96,7 +96,7 @@ verdict is proved semantically but per-component by hand.
 | # | class (CWE anchor) | semantic form | region | verdict | grade |
 |---|---|---|---|---|---|
 | 1 | direct confidentiality leaks (CWE-200) | 2-safety (NI) | 1 | IN (generated) | [proved] |
-| 2 | timing side channels (CWE-208) | 2-safety over instrumented semantics | 1 | IN-WITH-MODEL | [proved] |
+| 2 | timing side channels (CWE-208) | 2-safety over instrumented semantics | 1 | IN-WITH-MODEL (generated) | [proved] |
 | 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow (generated); OUT-INADMISSIBLE as blacklist | [proved: T1, T2] |
 | 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN (generated) | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
@@ -121,13 +121,23 @@ yields `BoundaryNI c P` (`boundaryNI_of_check`), so a component earns this row b
 `decide` (`pok_certified`). The honesty theorem `typed_but_wall_leaks` marks the
 boundary: the checker certifies the store channel, not the timing channel (row 2).
 
-### 3.2 Timing side channels — IN-WITH-MODEL [proved]
+### 3.2 Timing side channels — IN-WITH-MODEL, generated [proved]
 
 The `wall` observation (accumulated cost) is *in the outcome*, so timing NI is just
 `J_NI` at a capability set containing `wall` — the local-adversary rows of the Pleak
 development. The verdict is conditional in exactly one place: coverage extends to a
 channel iff the channel is in the semantics. That is not a weakness to paper over; it
-is the recipe (see #9 for its limit).
+is the recipe (see #9 for its limit). **Generated** (brick 5,
+`conf-typing/ConfTyping/SecTyT.lean`): a *timing-sensitive* checker `secCheckT`
+forbids High-guarded branches and certifies the **whole instrumented outcome** —
+store, running time, and branch trace jointly (`secTyT_sound`, `outNI_of_checkT`:
+`J_NI c (outO P) P` by `decide`). It refines the store checker
+(`secCheckT_imp_secCheck`) and rejects the brick-3 leak witness `Ptime`
+(`ptime_rejected_T`) — the program `typed_but_wall_leaks` proved leaks the clock.
+So `secCheck` and `secCheckT` bracket the channel: store-safe vs. store-and-clock-
+safe. Honest scope: this certifies timing-*insensitivity* (secret-dependent
+branching is rejected, not repaired); declassified timing (a High branch whose
+duration is declared released) is the Policy-stratum analogue, a later brick.
 
 ### 3.3 Injection — IN as taint-flow [proved: T1]; OUT-INADMISSIBLE as blacklist [proved: T2]
 
@@ -399,18 +409,33 @@ partitions), not a general-purpose language frontend.
   (`biz_needs_assumption`). Row 11 upgraded [classified] → [proved], the brick-2
   row-12 deferral closed, guard 1c extended, guard 1g added. **Brick 4 complete.**
 
-### The security program, standing state (four bricks)
+### Brick 5 ledger (timing-sensitive certification)
+
+- `SecTyT.lean` — the timing-sensitive checker. Brick 3's `typed_but_wall_leaks`
+  honesty theorem is closed: `SecTyT` forbids High-guarded branches, and
+  `secTyT_sound`/`outNI_of_checkT` (choice-free) certify the *whole* instrumented
+  outcome — Low store, running time, branch trace — as Low-determined
+  (`J_NI c (outO P) P`), by `decide`. It refines the store checker
+  (`secCheckT_imp_secCheck`) and rejects the brick-3 leak witness `Ptime`
+  (`ptime_rejected_T`, axiom-free). Row 2 (timing) upgraded to **(generated)**,
+  guard 1c extended, guard 1h added. Honest scope: certifies
+  timing-*insensitivity* (secret-dependent branching rejected, not repaired);
+  declassified timing is a later brick. **Brick 5 complete.**
+
+### The security program, standing state (five bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (12 classes, brick 1); a **seam** so
 guarantees survive composition in the transport interface (brick 2); a **checker**
 so the certificates come from a decidable syntactic check, not hand proof (brick
-3); and a **ledger** so the assumptions a guarantee rests on are tracked, unioned
-under composition, and never silently laundered into evidence (brick 4). What
-"bulletproof" means is stated at proved strength, the flow-property classes are
-excluded *by type-checking*, composition is certificate accumulation by the same
-law that composes contraction estimates, and every guarantee carries its trusted
-base as an automatic bill of materials. The honest edges are all named as theorems
-or deferrals: timing/microarchitecture stay OUT-OF-MODEL, `(ε,δ)`-DP stays
-OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED, and the spec/model/TCB gaps of
-§0 are unmovable by construction.
+3); a **ledger** so the assumptions a guarantee rests on are tracked, unioned
+under composition, and never silently laundered into evidence (brick 4); and a
+**timing-sensitive checker** so the clock is a certified channel, not just an
+honesty caveat (brick 5). What "bulletproof" means is stated at proved strength,
+the flow-property classes are excluded *by type-checking* (store and clock),
+composition is certificate accumulation by the same law that composes contraction
+estimates, and every guarantee carries its trusted base as an automatic bill of
+materials. The honest edges are all named as theorems or deferrals:
+microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE,
+memory-safety/authz stay CARRIED, declassified timing is deferred, and the
+spec/model/TCB gaps of §0 are unmovable by construction.

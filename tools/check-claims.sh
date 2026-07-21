@@ -43,7 +43,9 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             CondBoundary condBoundary_seq condBoundary_discharge \
             ledger_no_silent_discharge ledgerGA ledgerBridge_comp_ledger \
             ledger_supply_chain_ledger condBoundary_of_check_assuming \
-            supply_chain_ledger biz_needs_assumption; do
+            supply_chain_ledger biz_needs_assumption \
+            secTyT_sound secCheckT outNI_of_checkT secCheckT_imp_secCheck \
+            ptime_rejected_T; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -113,6 +115,18 @@ if grep -q "LEDGER (mechanized)" VULN-COVERAGE.md; then
       echo "DRIFT: ledger module not imported by the ConfTyping root: $mod"; fail=1
     fi
   done
+fi
+
+# 1h. Row 2's (generated) verdict rests on the timing-sensitive checker.
+if grep -q "IN-WITH-MODEL (generated)" VULN-COVERAGE.md; then
+  for thm in "theorem secTyT_sound" "theorem ptime_rejected_T" "theorem outNI_of_checkT"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/SecTyT.lean 2>/dev/null; then
+      echo "DRIFT: VULN-COVERAGE row 2 is (generated) but '$thm' is missing from SecTyT.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.SecTyT" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: SecTyT.lean not imported by the ConfTyping root"; fail=1
+  fi
 fi
 
 # 2. Every transport-kernel Lean module must be mentioned in its README.
