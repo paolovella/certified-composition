@@ -37,6 +37,7 @@ lake build          # builds all four layers
 | `ConfTyping/WhileBridge.lean` | brick 10 / `VULN-COVERAGE.md` rows 12–13 | the Bridge reception over loops: looping components land in the transport interface with termination a first-class coordinate of the distance |
 | `ConfTyping/MemSafe.lean` | brick 11 / `VULN-COVERAGE.md` row 6 | heap and memory safety: a machine that can get stuck on a wild dereference, and a flow-sensitive checker whose programs provably never do |
 | `ConfTyping/MemFree.lean` | brick 12 / `VULN-COVERAGE.md` row 6 | free and use-after-free: a liveness-tracking machine and a linearity checker that rules out use-after-free and double-free by construction |
+| `ConfTyping/HeapFlow.lean` | brick 13 / `VULN-COVERAGE.md` rows 1, 6 | information flow through the heap: noninterference over a labeled heap — the unification of the confidentiality and memory halves |
 
 ## Result map
 
@@ -548,6 +549,36 @@ Since pointers are produced only by `alloc` (never copied into another tracked
 variable), the mark keeps every tracked address distinct for free — that is why the
 linearity clause holds inductively. Follow-on: pointer copying with alias tracking,
 heap loops, and information flow through the heap.
+
+## Information flow through the heap (`HeapFlow.lean`) — the unification
+
+Brick 13, where the two halves of the program meet. Bricks 1–10 certified
+*confidentiality* (noninterference) over the store; bricks 11–12 certified
+*memory safety* over a heap. This brick proves **noninterference over a heap**:
+the observable is the store *and* the Low region of the heap, and the leak it
+rules out is a secret in a High heap cell reaching a Low variable through a load
+(or High data reaching a Low cell through a store).
+
+The machine is a store plus a heap with a static address partition
+`Q : Int → Bool` (a "labeled memory" — each access's region is statically known).
+`iLowEq P Q` is Low-equivalence of the whole state: Low variables and Low cells
+equal. The type system `HSecTy` is the pc-label discipline plus heap rules —
+`storeL` (a Low cell takes only Low data in a Low context), `loadL` (a Low
+variable is loaded only from a Low cell in a Low context), and `storeH`/`loadH`
+(High cells and variables absorb anything).
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| confinement | `hconfine` | choice-free | a High-context command leaves Low variables *and* Low cells unchanged |
+| **noninterference** | `hsecTy_ni` | choice-free | a typed program maps Low-equivalent states to Low-equivalent states — no High variable or High cell leaks into the Low observation |
+| executable | `hcheck`, `hcheck_sound`, `ni_of_check` | choice-free | certificates by `decide` |
+| **the heap leak** | `heap_leak`, `leak_rejected` | standard 3 / **none** | loading a High cell into a Low variable leaks the secret (two heaps differing only on the secret cell give different Low output) and is rejected by the checker — the two halves agree |
+
+Orthogonality, recorded not re-proved: memory *safety* (bricks 11–12) and this
+*information-flow* property are independent invariants of the same heap — one
+keeps accesses in bounds, the other keeps them non-leaking — and compose. This
+brick is the natural culmination: the confidentiality discipline of the first ten
+bricks and the memory discipline of bricks 11–12, over one machine.
 
 ## §11 pre-mechanization checklist (framework doc)
 

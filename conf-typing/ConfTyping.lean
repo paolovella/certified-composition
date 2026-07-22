@@ -21,3 +21,4 @@ import ConfTyping.WhileLedger
 import ConfTyping.WhileBridge
 import ConfTyping.MemSafe
 import ConfTyping.MemFree
+import ConfTyping.HeapFlow

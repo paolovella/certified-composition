@@ -121,6 +121,13 @@ tupling. This row is the exemplar all others are measured against. **Generated**
 yields `BoundaryNI c P` (`boundaryNI_of_check`), so a component earns this row by
 `decide` (`pok_certified`). The honesty theorem `typed_but_wall_leaks` marks the
 boundary: the checker certifies the store channel, not the timing channel (row 2).
+**Extended to the heap** (brick 13, `HeapFlow.lean`): noninterference now covers a
+labeled heap — the observable is the store *and* the Low heap region, and
+`hsecTy_ni` (choice-free) proves a typed program never leaks a High cell into a
+Low variable. This is the unification point with the memory-safety sub-project
+(rows 6, 11–12): confidentiality and memory safety as two independent, composable
+invariants of one heap machine. Witness `heap_leak`/`leak_rejected`: a Low load of
+a High cell leaks and is rejected.
 
 ### 3.2 Timing side channels — IN-WITH-MODEL, generated [proved]
 
@@ -579,7 +586,20 @@ partitions), not a general-purpose language frontend.
   copying with alias tracking, heap loops, heap information flow. **Brick 12
   complete.**
 
-### The security program, standing state (twelve bricks)
+### Brick 13 ledger (information flow through the heap — the unification)
+
+- `HeapFlow.lean` — where the two halves meet. Noninterference over a labeled
+  heap: the observable is store + Low heap region, and `hsecTy_ni` (choice-free)
+  proves a typed program never leaks a High cell into a Low variable. The type
+  system `HSecTy` adds heap rules (`storeL`/`loadL` for Low regions,
+  `storeH`/`loadH` for High) to the pc-label discipline; confinement `hconfine`
+  handles the High-context case. Teeth `heap_leak`/`leak_rejected`. Memory
+  *safety* (rows 6, 11–12) and this *information-flow* property are independent,
+  composable invariants of one heap. Rows 1 and 6 both cite it. Guard 1c
+  extended, guard 1o added. **Brick 13 complete — the confidentiality and memory
+  disciplines unified over one machine.**
+
+### The security program, standing state (thirteen bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -601,16 +621,18 @@ contraction in the transport interface with halting a coordinate of the distance
 (brick 10) — the looping language now carries the full discipline; and **heap
 memory safety generated** so the first non-confidentiality property — a safety
 property of a stuck-able machine — is proved by construction, not merely carried
-(brick 11); and **use-after-free ruled out** so the sharpest heap bug — a
-dereference of a freed cell — is closed by a linearity checker (brick 12). What
+(brick 11); **use-after-free ruled out** so the sharpest heap bug — a dereference
+of a freed cell — is closed by a linearity checker (brick 12); and **information
+flow unified with memory** so noninterference now holds over a labeled heap and
+the confidentiality and memory disciplines meet on one machine (brick 13). What
 "bulletproof" means is stated at proved strength, the flow-property classes are
-excluded *by type-checking* (store, clock, and termination — closed-or-declared),
-memory safety (including use-after-free and double-free) is generated for the heap
-model, composition is certificate accumulation by the same law that composes
-contraction estimates, and every guarantee carries its trusted base as an automatic
-bill of materials. The honest edges are all named as theorems or deferrals:
-microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz
-stays CARRIED, pointer-aliasing / heap-loops / heap information-flow are
-memory-safety follow-ons, declassified termination and richer language features
-(strings) remain model-growth follow-ons, and the spec/model/TCB gaps of §0 are
-unmovable by construction.
+excluded *by type-checking* (store, clock, termination, and heap — closed,
+declared, or non-leaking), memory safety (including use-after-free and
+double-free) is generated for the heap model, composition is certificate
+accumulation by the same law that composes contraction estimates, and every
+guarantee carries its trusted base as an automatic bill of materials. The honest
+edges are all named as theorems or deferrals: microarchitecture stays
+OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz stays CARRIED,
+pointer-aliasing and heap-loops are memory-safety follow-ons, declassified
+termination and richer language features (strings) remain model-growth follow-ons,
+and the spec/model/TCB gaps of §0 are unmovable by construction.
