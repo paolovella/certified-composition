@@ -312,6 +312,12 @@ Compose.lean` + `FlowBridge.lean`, both built, `no sorry`, axiom-audited):
   certificate, and only boundary certificates compose (the granularity is forced).
 - **The gate**: `confidential_transport` carries both strata across
   artifact→deploy, as before.
+- **Over loops** (brick 8, `WhileCompose.lean`): the seam holds for the looping
+  language too — `WOutNI_seq` (choice-free) composes certified looping components,
+  with divergence threading through the boundary in lockstep (a clause the
+  loop-free seam did not need), and `wleak_poisons_seam` proving the upstream
+  hypothesis load-bearing there as well. The ledger and Bridge reception over
+  `WCmd` are still follow-on.
 
 Still conditional in exactly one honest place: *if* each component carries a
 certificate, composition preserves and accumulates it; generating per-component
@@ -348,9 +354,13 @@ built, `no sorry`, axiom-audited) grows the model to cover it:
 
 Honest scope: this certifies termination-*insensitivity* (secret-guarded loops
 rejected, not repaired); declassified termination is the Policy analogue, a later
-brick. And the flow discipline is re-established over `WCmd` for the store/timing/
-termination channels — porting the seam/ledger/Bridge reception to the looping
-language is tracked follow-on work, not yet done.
+brick. The **seam is now ported to loops** (brick 8, `WhileCompose.lean`):
+certified looping components compose (`WOutNI_seq`, choice-free), with the clause
+the loop-free seam never had — if the upstream diverges, the composite diverges in
+lockstep, so the termination channel stays closed across the boundary — and the
+teeth (`wleak_poisons_seam`) show the upstream hypothesis load-bearing. The ledger
+and Bridge reception over `WCmd` remain follow-on (the query-distance metric needs
+a termination coordinate).
 
 ## 4. What the map implies for brick 2
 
@@ -484,7 +494,19 @@ partitions), not a general-purpose language frontend.
   named: porting the seam/ledger/Bridge reception to `WCmd`, and declassified
   termination. **Brick 7 core complete.**
 
-### The security program, standing state (seven bricks)
+### Brick 8 ledger (the seam over loops)
+
+- `WhileCompose.lean` — the composition differentiator, ported from loop-free
+  `Cmd` to the looping language. Boundary certificate `WOutNI c P` (full fuelled
+  outcome, termination-sensitive), manufactured by the checker
+  (`WOutNI_of_wcheck`); the seam `WOutNI_seq` (choice-free) composes certified
+  looping components with **divergence threading through the boundary in
+  lockstep** — the clause the loop-free seam never had; `wok_pipeline_certified`
+  a two-`decide` certified pipeline; teeth `wleak_poisons_seam`. Guard 1c
+  extended, guard 1j added. Follow-on, named: the ledger and Bridge reception
+  over `WCmd`. **Brick 8 complete.**
+
+### The security program, standing state (eight bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -496,12 +518,13 @@ evidence (brick 4); a **timing-sensitive checker** so the clock is a certified
 channel (brick 5); **declassified timing** so a secret branch can be
 declared-and-bounded rather than only forbidden (brick 6); and **loops with a
 termination channel** so a language with unbounded iteration is covered and the
-halting-leak class is closed by construction (brick 7). What "bulletproof" means
-is stated at proved strength, the flow-property classes are excluded *by
+halting-leak class is closed by construction (brick 7); and **the seam ported to
+loops** so certified looping components compose with divergence threading through
+the boundary (brick 8). What "bulletproof" means is stated at proved strength, the flow-property classes are excluded *by
 type-checking* (store, clock, and termination — closed-or-declared), composition
 is certificate accumulation by the same law that composes contraction estimates,
 and every guarantee carries its trusted base as an automatic bill of materials.
 The honest edges are all named as theorems or deferrals: microarchitecture stays
 OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED,
-the composition machinery is not yet ported to the looping language, and the
-spec/model/TCB gaps of §0 are unmovable by construction.
+the ledger and Bridge reception are not yet ported to the looping language, and
+the spec/model/TCB gaps of §0 are unmovable by construction.

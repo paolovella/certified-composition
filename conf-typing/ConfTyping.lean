@@ -16,3 +16,4 @@ import ConfTyping.SupplyChain
 import ConfTyping.SecTyT
 import ConfTyping.SecTyTD
 import ConfTyping.WhileImp
+import ConfTyping.WhileCompose

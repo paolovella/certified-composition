@@ -32,6 +32,7 @@ lake build          # builds all four layers
 | `ConfTyping/SecTyT.lean` | brick 5 / `VULN-COVERAGE.md` row 2 | the timing-sensitive checker: forbids High-guarded branches, certifies the whole instrumented outcome (store, cost, trace) |
 | `ConfTyping/SecTyTD.lean` | brick 6 / `VULN-COVERAGE.md` row 2 | declassified timing: a secret branch is allowed when its bit is declared released; the outcome reveals at most the declared bits |
 | `ConfTyping/WhileImp.lean` | brick 7 / `VULN-COVERAGE.md` row 13 | loops: a fuel-indexed semantics, the termination channel, termination-sensitive soundness, and the faithful embedding of the loop-free fragment |
+| `ConfTyping/WhileCompose.lean` | brick 8 / `VULN-COVERAGE.md` rows 12–13 | the seam over loops: certified looping components compose, divergence threading through the boundary in lockstep |
 
 ## Result map
 
@@ -446,10 +447,26 @@ so the 22 existing modules are untouched) with a **fuel-indexed** evaluator.
 
 Honest scope: `WSecTy` certifies termination-*insensitivity* (secret-guarded
 loops rejected, not repaired). A declassified-termination stratum (a secret loop
-whose halting is *declared* released) is the Policy analogue, a later brick; and
-the flow discipline is currently re-established over `WCmd` for the store/timing/
-termination channels — porting the seam, ledger, and Bridge reception to `WCmd` is
-follow-on work, tracked in `VULN-COVERAGE.md`.
+whose halting is *declared* released) is the Policy analogue, a later brick.
+
+## The seam over loops (`WhileCompose.lean`)
+
+Brick 8: the composition differentiator, ported from loop-free `Cmd` (brick 2) to
+the looping language. The boundary certificate `WOutNI c P` — at every fuel,
+Low-equal runs are `optLowEq` (halt together, agree on Low store / time / trace) —
+is exactly what brick 7's soundness produces, so a `wcheck`-passing component earns
+it by `decide`.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| boundary cert from the checker | `wsecTy_WOutNI`, `WOutNI_of_wcheck` | choice-free | a typed/checked looping component carries the full-outcome termination-sensitive certificate |
+| **the seam over loops** | `WOutNI_seq`, `WOutNI_seq_of_check` | choice-free | two certified looping components compose; the new clause the loop-free seam never had: **if `c₁` diverges the composite diverges in lockstep** — divergence composes, the termination channel stays closed across the boundary |
+| certified pipeline | `wok_pipeline_certified` | choice-free | two Low-guarded loops in sequence, certified from two `decide`s, termination included |
+| **teeth** | `wleak_poisons_seam` (`skip_WOutNI`) | standard 3 | a divergence-leaking upstream (`Wleak`) wired into a certified `skip` makes the composite leak termination — the seam's upstream hypothesis is load-bearing, the looping analogue of `broken_seam` |
+
+Follow-on, named: the ledger and Bridge reception are not yet ported to `WCmd`
+(the query-distance metric would need a termination coordinate); tracked in
+`VULN-COVERAGE.md`.
 
 ## §11 pre-mechanization checklist (framework doc)
 

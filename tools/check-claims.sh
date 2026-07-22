@@ -49,7 +49,9 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             secTyTD_sound secCheckTD releasesAtMost_of_checkTD \
             ptime_timing_released ptime_wall_of_bit ptime_rejected_TD \
             wsecTy_sound wcheck wleak_leaks wleak_rejected wexec_embed_eq \
-            wexec_mono; do
+            wexec_mono \
+            WOutNI WOutNI_seq WOutNI_of_wcheck wok_pipeline_certified \
+            wleak_poisons_seam; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -142,6 +144,18 @@ if grep -q "termination / progress leaks" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.WhileImp" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: WhileImp.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1j. The seam-over-loops (brick 8) theorems must be in the build.
+if grep -q "WhileCompose.lean" VULN-COVERAGE.md; then
+  for thm in "theorem WOutNI_seq" "theorem wleak_poisons_seam"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/WhileCompose.lean 2>/dev/null; then
+      echo "DRIFT: brick-8 seam cited but '$thm' is missing from WhileCompose.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.WhileCompose" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: WhileCompose.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

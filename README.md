@@ -145,7 +145,9 @@ as far as declared. And the language now has **loops**: a fuel-indexed semantics
 opens the *termination* channel (a secret-guarded loop leaks its bit through
 whether it halts), which a termination-sensitive checker closes (`wsecTy_sound`),
 with the loop-free fragment embedding faithfully (`wexec_embed_eq`) — the model
-grew rather than forked.
+grew rather than forked. And the seam composes looping components too
+(`WOutNI_seq`), with divergence threading through the boundary in lockstep — the
+composition differentiator now covers unbounded iteration.
 
 ## Scope — what is *not* claimed
 
