@@ -20,3 +20,4 @@ import ConfTyping.WhileCompose
 import ConfTyping.WhileLedger
 import ConfTyping.WhileBridge
 import ConfTyping.MemSafe
+import ConfTyping.MemFree

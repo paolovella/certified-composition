@@ -55,7 +55,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             WCondBoundary WCondBoundary_seq wledger_no_silent_discharge \
             wcx_not_unconditional \
             haltQ wbridge_iff_sound wOutNI_contracts ofWComponent_comp_map \
-            mcheck_safe msafe_of_check mwild_store_errors mwild_rejected; do
+            mcheck_safe msafe_of_check mwild_store_errors mwild_rejected \
+            fcheck_safe uaf_errors uaf_rejected double_free_errors; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -196,6 +197,18 @@ if grep -q "MemSafe.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.MemSafe" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: MemSafe.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1n. The use-after-free (brick 12) theorems must be in the build.
+if grep -q "MemFree.lean" VULN-COVERAGE.md; then
+  for thm in "theorem fcheck_safe" "theorem uaf_errors" "theorem double_free_errors"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/MemFree.lean 2>/dev/null; then
+      echo "DRIFT: use-after-free cited but '$thm' is missing from MemFree.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.MemFree" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: MemFree.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

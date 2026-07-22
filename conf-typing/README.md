@@ -36,6 +36,7 @@ lake build          # builds all four layers
 | `ConfTyping/WhileLedger.lean` | brick 9 / `VULN-COVERAGE.md` rows 11–13 | the assumption ledger over loops: conditional termination-sensitive certificates whose no-silent-discharge witness guards the halting channel |
 | `ConfTyping/WhileBridge.lean` | brick 10 / `VULN-COVERAGE.md` rows 12–13 | the Bridge reception over loops: looping components land in the transport interface with termination a first-class coordinate of the distance |
 | `ConfTyping/MemSafe.lean` | brick 11 / `VULN-COVERAGE.md` row 6 | heap and memory safety: a machine that can get stuck on a wild dereference, and a flow-sensitive checker whose programs provably never do |
+| `ConfTyping/MemFree.lean` | brick 12 / `VULN-COVERAGE.md` row 6 | free and use-after-free: a liveness-tracking machine and a linearity checker that rules out use-after-free and double-free by construction |
 
 ## Result map
 
@@ -525,9 +526,28 @@ address). Memory safety is "never `none`".
 The checker `mcheck` is flow-sensitive: it threads the set of variables known to
 hold in-bounds addresses (`alloc` grows it, `assign`/`load` drop the reassigned
 variable, `ite` intersects the branches), and permits a load/store only through a
-tracked variable. This is the first step from CARRIED to generated for row 6;
-follow-on bricks add `free` (use-after-free — the sharpest witness), loops over
-the heap, and information flow through the heap.
+tracked variable. This is the first step from CARRIED to generated for row 6.
+
+## Free and use-after-free (`MemFree.lean`)
+
+Brick 12, the sub-project's sharpest witness. Brick 11's machine could only *grow*
+the live region; the real prize — **use-after-free** (CWE-416) — needs a machine
+that can *shrink* it, so the state gains a **liveness map** `L : Int → Bool` and a
+`free` operation, and `fexec` returns `none` on a use-after-free *or* a
+double-free. Freeing is sound only under **linearity**: the checker's tracked
+pointers must hold *distinct* live addresses, so freeing one cannot dangle another.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **safety with free** | `fcheck_safe` | standard 3 | a checked program never hits a use-after-free or double-free; the linearity invariant `FInv` (tracked ⟹ live, in-bounds, pairwise distinct) is preserved |
+| certified by `decide` | `fsafe_of_check`, `fpsafe_memsafe` | standard 3 | `alloc; store; free` runs clean |
+| **use-after-free teeth** | `uaf_errors`, `uaf_rejected` | choice-free | `alloc p; free p; store p` dereferences a freed cell — a runtime error, and rejected by the checker (which drops `p` at the `free`) |
+| **double-free teeth** | `double_free_errors`, `double_free_rejected` | choice-free | the second `free` of the same cell errors and is rejected |
+
+Since pointers are produced only by `alloc` (never copied into another tracked
+variable), the mark keeps every tracked address distinct for free — that is why the
+linearity clause holds inductively. Follow-on: pointer copying with alias tracking,
+heap loops, and information flow through the heap.
 
 ## §11 pre-mechanization checklist (framework doc)
 

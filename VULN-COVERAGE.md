@@ -221,9 +221,15 @@ region. Teeth: a store through an unallocated pointer errors at runtime
 (`mwild_store_errors`) and is rejected by the checker (`mwild_rejected`) — they
 agree. So "no undefined behavior" is now checker-generated for the heap model, not
 merely carried; the cross-language transport story (an *external* engine's
-certificate riding the seam) remains for models this machine does not cover. First
-brick of the memory-safety sub-project; `free`/use-after-free, heap loops, and
-information flow through the heap are follow-on.
+certificate riding the seam) remains for models this machine does not cover.
+Brick 12 (`MemFree.lean`) adds the sharpest case — **use-after-free** (CWE-416):
+a richer machine with a liveness map and a `free` operation, and a **linearity**
+checker (tracked pointers hold distinct live addresses) whose soundness
+`fcheck_safe` rules out use-after-free *and* double-free by construction. Teeth:
+`alloc p; free p; store p` errors and is rejected (`uaf_errors`/`uaf_rejected`),
+as is a double-free (`double_free_errors`/`double_free_rejected`). Follow-on:
+pointer copying with alias tracking, heap loops, and information flow through the
+heap.
 
 ### 3.7 Authz — CARRIED [classified]; cross-tenant isolation — IN, generated [proved]
 
@@ -561,7 +567,19 @@ partitions), not a general-purpose language frontend.
   `free`/use-after-free, heap loops, information flow through the heap. **Brick 11
   complete.**
 
-### The security program, standing state (eleven bricks)
+### Brick 12 ledger (free and use-after-free)
+
+- `MemFree.lean` — the memory-safety sub-project's sharpest witness. A machine
+  with a liveness map that can *shrink* the live set (a `free` operation), and a
+  **linearity** checker (`FInv`: tracked pointers live, in-bounds, pairwise
+  distinct) whose soundness `fcheck_safe` rules out use-after-free and double-free
+  by construction. Teeth: `uaf_errors`/`uaf_rejected` and
+  `double_free_errors`/`double_free_rejected` (choice-free). Row 6's generated
+  verdict now covers UAF. Guard 1c extended, guard 1n added. Follow-on: pointer
+  copying with alias tracking, heap loops, heap information flow. **Brick 12
+  complete.**
+
+### The security program, standing state (twelve bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -583,14 +601,16 @@ contraction in the transport interface with halting a coordinate of the distance
 (brick 10) — the looping language now carries the full discipline; and **heap
 memory safety generated** so the first non-confidentiality property — a safety
 property of a stuck-able machine — is proved by construction, not merely carried
-(brick 11). What "bulletproof" means is stated at proved strength, the
-flow-property classes are excluded *by type-checking* (store, clock, and
-termination — closed-or-declared), memory safety is generated for the heap model,
-composition is certificate accumulation by the same law that composes contraction
-estimates, and every guarantee carries its trusted base as an automatic bill of
-materials. The honest edges are all named as theorems or deferrals:
+(brick 11); and **use-after-free ruled out** so the sharpest heap bug — a
+dereference of a freed cell — is closed by a linearity checker (brick 12). What
+"bulletproof" means is stated at proved strength, the flow-property classes are
+excluded *by type-checking* (store, clock, and termination — closed-or-declared),
+memory safety (including use-after-free and double-free) is generated for the heap
+model, composition is certificate accumulation by the same law that composes
+contraction estimates, and every guarantee carries its trusted base as an automatic
+bill of materials. The honest edges are all named as theorems or deferrals:
 microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz
-stays CARRIED, `free`/use-after-free and heap information-flow are memory-safety
-follow-ons, declassified termination and richer language features (strings) remain
-model-growth follow-ons, and the spec/model/TCB gaps of §0 are unmovable by
-construction.
+stays CARRIED, pointer-aliasing / heap-loops / heap information-flow are
+memory-safety follow-ons, declassified termination and richer language features
+(strings) remain model-growth follow-ons, and the spec/model/TCB gaps of §0 are
+unmovable by construction.
