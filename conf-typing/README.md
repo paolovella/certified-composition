@@ -31,6 +31,7 @@ lake build          # builds all four layers
 | `ConfTyping/SupplyChain.lean` | brick 4 / `VULN-COVERAGE.md` row 11 | the checker emits conditional certificates from declared assumptions; a worked trust pipeline, dischargeable and load-bearing |
 | `ConfTyping/SecTyT.lean` | brick 5 / `VULN-COVERAGE.md` row 2 | the timing-sensitive checker: forbids High-guarded branches, certifies the whole instrumented outcome (store, cost, trace) |
 | `ConfTyping/SecTyTD.lean` | brick 6 / `VULN-COVERAGE.md` row 2 | declassified timing: a secret branch is allowed when its bit is declared released; the outcome reveals at most the declared bits |
+| `ConfTyping/WhileImp.lean` | brick 7 / `VULN-COVERAGE.md` row 13 | loops: a fuel-indexed semantics, the termination channel, termination-sensitive soundness, and the faithful embedding of the loop-free fragment |
 
 ## Result map
 
@@ -423,6 +424,32 @@ The ledger `relOf` (brick 3) already carries each non-Low guard's branch bit, so
 the released quantity *is* the declassified timing — no new bookkeeping. Together
 with brick 5: `secCheckT` closes the clock by construction, `secCheckTD` opens it
 exactly as far as declared and no further.
+
+## Loops and the termination channel (`WhileImp.lean`) — the model grows
+
+Brick 7, the frontier: bricks 1–6 worked over loop-free `Cmd`, where `eval` is a
+total structural recursion. Loops break that totality and open a genuinely new
+channel — **termination**: a `while` on a secret guard loops forever iff a secret
+bit is set, leaking it through *whether the program halts*, invisible to any
+analysis of terminating runs. This module adds loops additively (a fresh `WCmd`,
+so the 22 existing modules are untouched) with a **fuel-indexed** evaluator.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| the semantics | `wexec : Nat → WCmd → Store → Option Outcome` | — | total by recursion on fuel; `none` = fuel exhausted, which is how non-termination appears |
+| outcome low-eq | `optLowEq`, `optLowEq_bind`, `optLowEq_map` | — | agree on *whether* they halt and, if so, on Low store, cost, trace — the `none`/`some` mismatch being `False` **is** the termination channel |
+| **termination-sensitive soundness** | `wsecTy_sound` | choice-free | a Low-guarded discipline (`WSecTy`, no `iteH`/`whileH`) makes two Low-equal runs lockstep at every fuel — same halting, store, time, trace |
+| executable | `wcheck`, `wcheck_sound`, `optLowEq_of_wcheck` | choice-free | certificates by `decide` |
+| **the termination leak** | `wleak_leaks`, `wleak_rejected` | standard 3 / **none** | `while b skip` halts iff `b=0`; at one fuel one run halts and the other spins, so NI fails — and the checker rejects it. Checker and semantics agree the channel is real |
+| a certified loop | `wok_certified` | choice-free | a Low-guarded loop, certified from one `decide` |
+| **faithful embedding** | `embed`, `wexec_mono`, `wexec_embed_eq` | choice-free | every loop-free `Cmd` embeds into `WCmd`, and with enough fuel `wexec` computes exactly the total `eval` — the prior six-brick program is this one's loop-free fragment. The model **grew**, it did not fork |
+
+Honest scope: `WSecTy` certifies termination-*insensitivity* (secret-guarded
+loops rejected, not repaired). A declassified-termination stratum (a secret loop
+whose halting is *declared* released) is the Policy analogue, a later brick; and
+the flow discipline is currently re-established over `WCmd` for the store/timing/
+termination channels — porting the seam, ledger, and Bridge reception to `WCmd` is
+follow-on work, tracked in `VULN-COVERAGE.md`.
 
 ## §11 pre-mechanization checklist (framework doc)
 

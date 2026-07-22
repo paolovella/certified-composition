@@ -47,7 +47,9 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             secTyT_sound secCheckT outNI_of_checkT secCheckT_imp_secCheck \
             ptime_rejected_T \
             secTyTD_sound secCheckTD releasesAtMost_of_checkTD \
-            ptime_timing_released ptime_wall_of_bit ptime_rejected_TD; do
+            ptime_timing_released ptime_wall_of_bit ptime_rejected_TD \
+            wsecTy_sound wcheck wleak_leaks wleak_rejected wexec_embed_eq \
+            wexec_mono; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -128,6 +130,18 @@ if grep -q "IN-WITH-MODEL (generated)" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.SecTyT" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: SecTyT.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1i. Row 13 (termination leaks) rests on the brick-7 while development.
+if grep -q "termination / progress leaks" VULN-COVERAGE.md; then
+  for thm in "theorem wsecTy_sound" "theorem wleak_leaks" "theorem wexec_embed_eq"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/WhileImp.lean 2>/dev/null; then
+      echo "DRIFT: VULN-COVERAGE row 13 present but '$thm' is missing from WhileImp.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.WhileImp" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: WhileImp.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

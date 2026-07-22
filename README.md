@@ -115,7 +115,7 @@ machinery (`qualitative_admissible_is_JNI`, `simA3_iff_respectsCoarsening`,
 `summary_not_composable`, `confidential_transport`, `Bridge.comp`) and the
 integrity module it forced into existence (`taint_is_JNI` — integrity NI is a
 relabeling, axiom-free; `blacklist_not_admissible` — output-blacklist
-sanitization fails A3, axiom-free). Twelve classes, eight verdicts, every verdict
+sanitization fails A3, axiom-free). Thirteen classes, eight verdicts, every verdict
 graded; the popular-but-wrong formulations (output blacklists,
 `(ε,δ)`-composition) are rejected by theorems, not by taste. The seam row is
 proved end-to-end: certified components compose with *computed* certificates
@@ -141,7 +141,11 @@ instrumented outcome — store, running time, and branch trace (`secTyT_sound`) 
 rejecting the store-checker's timing-leak witness (`ptime_rejected_T`) — and a
 secret branch whose duration is *declared* released is bounded rather than forbidden
 (`ptime_timing_released`), so the clock is closed by construction or opened exactly
-as far as declared.
+as far as declared. And the language now has **loops**: a fuel-indexed semantics
+opens the *termination* channel (a secret-guarded loop leaks its bit through
+whether it halts), which a termination-sensitive checker closes (`wsecTy_sound`),
+with the loop-free fragment embedding faithfully (`wexec_embed_eq`) — the model
+grew rather than forked.
 
 ## Scope — what is *not* claimed
 

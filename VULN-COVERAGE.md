@@ -107,6 +107,7 @@ verdict is proved semantically but per-component by hand.
 | 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER (mechanized) | [proved] |
 | 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
+| 13 | termination / progress leaks (CWE-385-adjacent) | 2-safety over a fuel-indexed semantics with loops | 1 | IN-WITH-MODEL (generated) | [proved] |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
 
@@ -322,6 +323,35 @@ in brick 2 — is **delivered in brick 4** (`Ledger.lean`, `LedgerBridge.lean`):
 `ledger_no_silent_discharge` proves it can never be laundered into evidence. See
 row 11.
 
+### 3.13 Termination / progress leaks — IN-WITH-MODEL, generated [proved]
+
+The channel that only exists once the language has loops. A `while` on a secret
+guard loops forever iff a secret bit is set, so the *fact of halting* leaks the
+bit — invisibly to any analysis that only inspects terminating runs (store,
+timing, everything in bricks 1–6). Brick 7 (`conf-typing/ConfTyping/WhileImp.lean`,
+built, `no sorry`, axiom-audited) grows the model to cover it:
+
+- a **fuel-indexed semantics** `wexec : Nat → WCmd → Store → Option Outcome`
+  (total by recursion on fuel; `none` is how non-termination appears), with
+  `optLowEq` making a `none`/`some` mismatch — divergent halting — a leak;
+- **termination-sensitive soundness** `wsecTy_sound` (choice-free): a Low-guarded
+  discipline (no secret-guarded loops or branches) makes two Low-equal runs
+  lockstep at every fuel — same halting, store, time, and trace;
+- **the witness** `wleak_leaks`/`wleak_rejected`: `while b skip` halts iff `b=0`,
+  and at one fuel one run halts while the other spins — noninterference genuinely
+  fails, and `wcheck` rejects the program (axiom-free). Checker and semantics
+  agree the channel is real;
+- **the model grew, it did not fork** — `wexec_embed_eq` (choice-free): every
+  loop-free `Cmd` embeds into `WCmd` and, with enough fuel, `wexec` computes
+  exactly the total `eval`; the whole six-brick program is this one's loop-free
+  fragment.
+
+Honest scope: this certifies termination-*insensitivity* (secret-guarded loops
+rejected, not repaired); declassified termination is the Policy analogue, a later
+brick. And the flow discipline is re-established over `WCmd` for the store/timing/
+termination channels — porting the seam/ledger/Bridge reception to the looping
+language is tracked follow-on work, not yet done.
+
 ## 4. What the map implies for brick 2
 
 The IN column is: information flow (confidentiality, timing, taint,
@@ -441,23 +471,37 @@ partitions), not a general-purpose language frontend.
   microarchitectural timing, row 9, stays OUT-OF-MODEL); guard 1c extended.
   **Brick 6 complete.**
 
-### The security program, standing state (six bricks)
+### Brick 7 ledger (loops and the termination channel)
+
+- `WhileImp.lean` — the model grows past loop-free IMP. A fuel-indexed evaluator
+  `wexec` (total on fuel, `none` = non-termination), the termination channel
+  (`optLowEq`), termination-sensitive soundness `wsecTy_sound` (choice-free),
+  the executable `wcheck`, and the termination-leak witness
+  `wleak_leaks`/`wleak_rejected` (`while b skip`, halting = the secret bit). The
+  loop-free fragment embeds faithfully (`wexec_embed_eq`, choice-free): the prior
+  six bricks are this development's loop-free part. New map row 13 (termination
+  leaks), IN-WITH-MODEL (generated); guard 1c extended, guard 1i added. Follow-on,
+  named: porting the seam/ledger/Bridge reception to `WCmd`, and declassified
+  termination. **Brick 7 core complete.**
+
+### The security program, standing state (seven bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
-now has: a **map** with a proved boundary (12 classes, brick 1); a **seam** so
-guarantees survive composition in the transport interface (brick 2); a **checker**
-so the certificates come from a decidable syntactic check, not hand proof (brick
-3); a **ledger** so the assumptions a guarantee rests on are tracked, unioned
-under composition, and never silently laundered into evidence (brick 4); a
-**timing-sensitive checker** so the clock is a certified channel, not just an
-honesty caveat (brick 5); and **declassified timing** so a secret branch can be
-declared-and-bounded rather than only forbidden (brick 6). What "bulletproof"
-means is stated at proved strength, the flow-property classes are excluded *by
-type-checking* (store and clock, closed-or-declared), composition is certificate
-accumulation by the same law that composes contraction estimates, and every
-guarantee carries its trusted base as an automatic bill of materials. The honest
-edges are all named as theorems or deferrals: microarchitecture stays
+now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
+channel); a **seam** so guarantees survive composition in the transport interface
+(brick 2); a **checker** so the certificates come from a decidable syntactic
+check, not hand proof (brick 3); a **ledger** so the assumptions a guarantee rests
+on are tracked, unioned under composition, and never silently laundered into
+evidence (brick 4); a **timing-sensitive checker** so the clock is a certified
+channel (brick 5); **declassified timing** so a secret branch can be
+declared-and-bounded rather than only forbidden (brick 6); and **loops with a
+termination channel** so a language with unbounded iteration is covered and the
+halting-leak class is closed by construction (brick 7). What "bulletproof" means
+is stated at proved strength, the flow-property classes are excluded *by
+type-checking* (store, clock, and termination — closed-or-declared), composition
+is certificate accumulation by the same law that composes contraction estimates,
+and every guarantee carries its trusted base as an automatic bill of materials.
+The honest edges are all named as theorems or deferrals: microarchitecture stays
 OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED,
-and the spec/model/TCB gaps of §0 are unmovable by construction. The remaining
-frontier is *model growth* (a richer language: strings, heap, loops), a larger
-commitment than the composition discipline the six bricks completed.
+the composition machinery is not yet ported to the looping language, and the
+spec/model/TCB gaps of §0 are unmovable by construction.
