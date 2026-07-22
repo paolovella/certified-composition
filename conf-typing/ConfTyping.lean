@@ -23,3 +23,4 @@ import ConfTyping.MemSafe
 import ConfTyping.MemFree
 import ConfTyping.HeapFlow
 import ConfTyping.InjectionReal
+import ConfTyping.QueryProgram

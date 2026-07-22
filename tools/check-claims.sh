@@ -58,7 +58,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             mcheck_safe msafe_of_check mwild_store_errors mwild_rejected \
             fcheck_safe uaf_errors uaf_rejected double_free_errors \
             hsecTy_ni hconfine hcheck heap_leak leak_rejected \
-            concat_injectable param_immune param_correct param_noninterference; do
+            concat_injectable param_immune param_correct param_noninterference \
+            qcheck_ni injection_free_of_check unsafe_rejected unsafe_leaks; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -235,6 +236,18 @@ if grep -q "InjectionReal.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.InjectionReal" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: InjectionReal.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1q. The taint-flow-linter (brick 15) theorems must be in the build.
+if grep -q "QueryProgram.lean" VULN-COVERAGE.md; then
+  for thm in "theorem qcheck_ni" "theorem unsafe_rejected" "theorem unsafe_leaks"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/QueryProgram.lean 2>/dev/null; then
+      echo "DRIFT: taint-flow linter cited but '$thm' is missing from QueryProgram.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.QueryProgram" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: QueryProgram.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

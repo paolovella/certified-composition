@@ -39,6 +39,7 @@ lake build          # builds all four layers
 | `ConfTyping/MemFree.lean` | brick 12 / `VULN-COVERAGE.md` row 6 | free and use-after-free: a liveness-tracking machine and a linearity checker that rules out use-after-free and double-free by construction |
 | `ConfTyping/HeapFlow.lean` | brick 13 / `VULN-COVERAGE.md` rows 1, 6 | information flow through the heap: noninterference over a labeled heap — the unification of the confidentiality and memory halves |
 | `ConfTyping/InjectionReal.lean` | brick 14 / `VULN-COVERAGE.md` row 3 | injection made real: a tokenizer with quote-breaking, parameterization injection-safe by construction, concatenation injectable |
+| `ConfTyping/QueryProgram.lean` | brick 15 / `VULN-COVERAGE.md` row 3 | injection in a running program: a taint-flow checker over a string-manipulating language, proved sound (accepted programs are injection-free) |
 
 ## Result map
 
@@ -606,6 +607,28 @@ becomes a concrete query with a real tokenizer, the real attack (quote-breaking)
 and the real industrial fix (prepared statements) **proved correct by
 construction** — connected back to T1's `taint_is_JNI` as the property it
 satisfies.
+
+## Injection in a running program (`QueryProgram.lean`) — the taint-flow linter
+
+Brick 15 connects brick 14's real query mechanism to an actual program. A
+string-manipulating language (`input`, `lit`, `concat`, `emitC` = emit a built
+query, `emitP` = emit a parameterized query) runs against an untrusted input; a
+flow-sensitive taint checker `qcheck` tracks which variables the input reaches
+and rejects `emitC` of a tainted query. This is the shape of a real SQL-injection
+static analyzer — flag `q = tmpl + name; exec(q)`, bless `exec_param(tmpl, name)`
+— with the flagging **proved sound**.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **soundness** | `qcheck_ni` | choice-free | two-run noninterference: a checked program on any two inputs yields related states, so the emitted queries agree — the taint set precisely bounds the input's reach |
+| top-level guarantee | `injection_free_of_check`, `safe_injection_free` | choice-free | an accepted program emits the identical query structure for *every* untrusted input — injection-free, by `decide` on the check |
+| **the caught bug** | `unsafe_rejected`, `unsafe_leaks` | choice-free / **none** | `input; concat into template; emit` is rejected *and* genuinely leaks (a benign input vs. an injection payload `' R` emit different skeletons) — the warning is warranted |
+| the blessed fix | `safe_accepted` | choice-free | `input; emit-parameterized` passes |
+
+This is the closest the artifact gets to a real tool: a linter for a running
+program, with a machine-checked proof that what it accepts cannot be injected.
+Honest limit: the language is small (string variables, one concat, two emit
+sinks) and the query mechanism is brick 14's single quote-delimited literal.
 
 ## §11 pre-mechanization checklist (framework doc)
 

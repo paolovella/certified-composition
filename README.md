@@ -165,7 +165,10 @@ independent, composable invariants of one machine. And one channel is made
 **real**: injection is no longer an abstract property shape but an actual query
 with a real tokenizer — string concatenation is proved injectable
 (`concat_injectable`, `' OR …` as a theorem) and parameterized queries proved
-injection-safe by construction (`param_immune`), the real attack and the real fix.
+injection-safe by construction (`param_immune`), the real attack and the real fix
+— and connected to a running program by a flow-sensitive taint checker
+(`qcheck_ni`) that rejects the injectable sink with acceptance proved sound, the
+shape of a real SQL-injection static analyzer.
 
 ## Scope — what is *not* claimed
 

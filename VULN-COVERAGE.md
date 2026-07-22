@@ -199,6 +199,17 @@ correct. Still short of a full SQL grammar (one quote-delimited literal, not the
 whole language), but the channel is no longer a shape — the real attack and the
 real defense are theorems.
 
+**Connected to a running program** (brick 15, `QueryProgram.lean`): a
+flow-sensitive **taint checker** over a string-manipulating language (input,
+literals, concatenation, and query-emit sinks). `qcheck_ni` (choice-free) proves
+soundness as two-run noninterference — a checked program emits the same query
+structure for *every* untrusted input (`injection_free_of_check`) — and
+`unsafe_rejected`/`unsafe_leaks` witness a concatenated-tainted query being both
+rejected and genuinely leaking, while the parameterized program passes
+(`safe_accepted`). This is the shape of a real SQL-injection static analyzer, with
+what it accepts proved un-injectable. Honest limit: a small language and brick
+14's single-literal query mechanism.
+
 ### 3.4 Improper declassification — IN, generated [proved]
 
 The Policy stratum: a discharge requires a declared release `φ` *plus* a proof
@@ -625,7 +636,19 @@ partitions), not a general-purpose language frontend.
   added. Honest limit: one quote-delimited literal, not a full SQL grammar.
   **Brick 14 complete.**
 
-### The security program, standing state (fourteen bricks)
+### Brick 15 ledger (injection in a running program)
+
+- `QueryProgram.lean` — the taint-flow linter, connecting brick 14's query
+  mechanism to an actual program. A string-manipulating language with a
+  flow-sensitive taint checker `qcheck`; soundness `qcheck_ni` (choice-free) is
+  two-run NI of the emitted queries, `injection_free_of_check` the top-level
+  guarantee. Witnesses `unsafe_rejected`/`unsafe_leaks` (a concatenated tainted
+  query caught and shown to leak) and `safe_accepted` (parameterized passes).
+  The closest the artifact gets to a real static analyzer, with acceptance proved
+  sound. Guard 1c extended, guard 1q added. Honest limit: small language,
+  single-literal query mechanism. **Brick 15 complete.**
+
+### The security program, standing state (fifteen bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -653,13 +676,16 @@ flow unified with memory** so noninterference now holds over a labeled heap and
 the confidentiality and memory disciplines meet on one machine (brick 13); and
 **injection made real** so the property shape becomes an actual query with a real
 tokenizer, the real attack (quote-breaking) and the real fix (prepared statements)
-proved (brick 14). What "bulletproof" means is stated at proved strength, the
-flow-property classes are excluded *by type-checking* (store, clock, termination,
-and heap — closed, declared, or non-leaking), memory safety (including
-use-after-free and double-free) is generated for the heap model, injection is
-proved on a real query (not just a shape), composition is certificate accumulation
-by the same law that composes contraction estimates, and every guarantee carries
-its trusted base as an automatic bill of materials. The honest edges are all named
+proved (brick 14); and **injection caught in a running program** so a
+flow-sensitive taint checker over a string-manipulating language rejects the
+injectable sink with acceptance proved sound (brick 15). What "bulletproof" means
+is stated at proved strength, the flow-property classes are excluded *by
+type-checking* (store, clock, termination, and heap — closed, declared, or
+non-leaking), memory safety (including use-after-free and double-free) is generated
+for the heap model, injection is proved on a real query and caught in a running
+program by a sound taint checker, composition is certificate accumulation by the
+same law that composes contraction estimates, and every guarantee carries its
+trusted base as an automatic bill of materials. The honest edges are all named
 as theorems or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
 OUT-NONCOMPOSABLE, authz stays CARRIED, pointer-aliasing and heap-loops are
 memory-safety follow-ons, a full SQL grammar (beyond one quote-delimited literal)
