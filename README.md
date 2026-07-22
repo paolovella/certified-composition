@@ -171,7 +171,10 @@ injection-safe by construction (`param_immune`), the real attack and the real fi
 shape of a real SQL-injection static analyzer — extended to **stored
 (second-order) injection** over a persistent database, where per-cell taint
 catches what the per-request shortcut misses (`dbcheck_ni`, the shortcut proved
-unsound).
+unsound). The same "make a channel real" method then generalizes to a second
+class: **path traversal** (CWE-22) — the `../../etc/passwd` attack proved
+(`traversal_escapes`) and the leaf-name API proved safe by construction
+(`openLeaf_contained`).
 
 ## Scope — what is *not* claimed
 

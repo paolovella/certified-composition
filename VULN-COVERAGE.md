@@ -108,6 +108,7 @@ verdict is proved semantically but per-component by hand.
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER (mechanized) | [proved] |
 | 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
 | 13 | termination / progress leaks (CWE-385-adjacent) | 2-safety over a fuel-indexed semantics with loops | 1 | IN-WITH-MODEL (generated) | [proved] |
+| 14 | path traversal (CWE-22) | untrusted structure in a filesystem-path sink | 1* | IN (real; safe-by-construction) | [proved] |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
 
@@ -428,6 +429,22 @@ teeth (`wleak_poisons_seam`) show the upstream hypothesis load-bearing. The ledg
 and Bridge reception over `WCmd` remain follow-on (the query-distance metric needs
 a termination coordinate).
 
+### 3.14 Path traversal — IN, real, safe-by-construction [proved]
+
+Added by brick 17 (`PathTraversal.lean`) to show the depth *method* generalizes:
+injection (rows 3, 14 in the arc) is one instance of "untrusted data changing the
+meaning of a structured sink"; path traversal (CWE-22) is another — an untrusted
+filename with `..` escapes the base directory. A path input is a list of steps
+(`down`/`up`); resolution against a base either stays contained or escapes.
+`traversal_escapes` (choice-free) proves `foo/../../` escapes — `../../etc/passwd`
+as a theorem. `flat_contained` proves a `..`-free input stays contained (untrusted
+*names* can't escape, only untrusted *structure* can). The by-construction fix is
+`openLeaf` (an API taking a leaf name, not a path — the path-analog of a bound
+parameter, `openLeaf_contained` axiom-free), and the runtime check "reject `..`"
+is sound (`pathCheck_sound`). Same shape as parameterized queries; this is breadth
+of the depth method — a second real, named class made real. Honest limit: an
+abstract step-list, not a real filesystem/OS path parser.
+
 ## 4. What the map implies for brick 2
 
 The IN column is: information flow (confidentiality, timing, taint,
@@ -671,7 +688,18 @@ partitions), not a general-purpose language frontend.
   persistence). Proves the per-request shortcut unsound and the per-cell
   discipline necessary. Guard 1c extended, guard 1r added. **Brick 16 complete.**
 
-### The security program, standing state (sixteen bricks)
+### Brick 17 ledger (path traversal — the method generalizes)
+
+- `PathTraversal.lean` — the "make a channel real" method applied to a *second*
+  named class (CWE-22), not another injection variant. `traversal_escapes`
+  (choice-free, the `../../` attack), `flat_contained` (safe when `..`-free),
+  `openLeaf`/`openLeaf_contained` (axiom-free, the leaf-name fix — path-analog of
+  a bound parameter), `pathCheck_sound` (the "reject `..`" check is sound). New
+  map row 14; the map now covers 14 classes. Guard 1c extended, guard 1s added.
+  Honest limit: abstract step-list, not a real OS path parser. **Brick 17
+  complete.**
+
+### The security program, standing state (seventeen bricks, fourteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -703,14 +731,18 @@ proved (brick 14); and **injection caught in a running program** so a
 flow-sensitive taint checker over a string-manipulating language rejects the
 injectable sink with acceptance proved sound (brick 15); and **stored injection
 caught** so per-cell taint over a persistent store rejects second-order injection
-and the per-request shortcut is proved unsound (brick 16). What "bulletproof"
-means is stated at proved strength, the flow-property classes are excluded *by
-type-checking* (store, clock, termination, and heap — closed, declared, or
-non-leaking), memory safety (including use-after-free and double-free) is generated
-for the heap model, injection is proved on a real query and caught in a running
-program (first- and second-order) by a sound taint checker, composition is
-certificate accumulation by the same law that composes contraction estimates, and
-every guarantee carries its trusted base as an automatic bill of materials. The honest edges are all named
+and the per-request shortcut is proved unsound (brick 16); and **the method
+generalized** so path traversal (CWE-22) is made real with the same
+attack/safe-by-construction shape, showing "make a channel real" is not
+injection-specific (brick 17). What "bulletproof" means is stated at proved
+strength, the flow-property classes are excluded *by type-checking* (store, clock,
+termination, and heap — closed, declared, or non-leaking), memory safety
+(including use-after-free and double-free) is generated for the heap model,
+injection is proved on a real query and caught in a running program (first- and
+second-order) by a sound taint checker, path traversal is closed by the same
+data-not-structure discipline, composition is certificate accumulation by the same
+law that composes contraction estimates, and every guarantee carries its trusted
+base as an automatic bill of materials. The honest edges are all named
 as theorems or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
 OUT-NONCOMPOSABLE, authz stays CARRIED, pointer-aliasing and heap-loops are
 memory-safety follow-ons, a full SQL grammar (beyond one quote-delimited literal)

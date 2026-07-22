@@ -25,3 +25,4 @@ import ConfTyping.HeapFlow
 import ConfTyping.InjectionReal
 import ConfTyping.QueryProgram
 import ConfTyping.DbInjection
+import ConfTyping.PathTraversal

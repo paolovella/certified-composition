@@ -41,6 +41,7 @@ lake build          # builds all four layers
 | `ConfTyping/InjectionReal.lean` | brick 14 / `VULN-COVERAGE.md` row 3 | injection made real: a tokenizer with quote-breaking, parameterization injection-safe by construction, concatenation injectable |
 | `ConfTyping/QueryProgram.lean` | brick 15 / `VULN-COVERAGE.md` row 3 | injection in a running program: a taint-flow checker over a string-manipulating language, proved sound (accepted programs are injection-free) |
 | `ConfTyping/DbInjection.lean` | brick 16 / `VULN-COVERAGE.md` row 3 | stored / second-order injection: per-cell taint over a persistent store; the per-request shortcut proved unsound |
+| `ConfTyping/PathTraversal.lean` | brick 17 / `VULN-COVERAGE.md` row 14 | path traversal (CWE-22): the `..` attack and the leaf-name fix, proved — the injection method generalized to a second class |
 
 ## Result map
 
@@ -651,6 +652,27 @@ taint does.** The discipline that catches second-order injection is exactly
 per-cell taint tracking, and the per-request shortcut is proved unsound — a
 concrete demonstration that the framework's soundness catches a class real
 analyzers routinely miss.
+
+## Path traversal (`PathTraversal.lean`) — the method generalizes
+
+Brick 17 shows the "make a channel real" method is not injection-specific.
+Injection is one instance of *untrusted data changing the meaning of a
+structured sink*; **path traversal** (CWE-22) is another — an untrusted filename
+containing `..` escapes the intended base directory. A path input is a list of
+steps (`down n` = enter a subdirectory, `up` = `..`); resolving it against a base
+either stays under it (contained) or pops above it (escape).
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **the attack** | `traversal_escapes`, `dotdot_escapes` | choice-free | `foo/../../` (and a bare `..`) escapes the base — the resolver returns `none`, `../../etc/passwd` as a theorem |
+| **safe when flat** | `flat_contained` | choice-free | a `..`-free input always stays contained — untrusted *names* can't escape, only untrusted *structure* (`..`) can |
+| **the fix by construction** | `openLeaf`, `openLeaf_contained` | **none** | an API taking a *leaf name* (not a path) never traverses, whatever the name — the path-analog of a bound query parameter |
+| **the check is sound** | `pathCheck_sound`, `pathCheck_rejects` | choice-free / none | "reject inputs containing `..`" is sound (accepted ⟹ contained) and rejects the traversal witness |
+
+Same pattern as parameterized queries: keep the untrusted value in a data
+position (a leaf), never a structural one (a `..`), and containment is a theorem.
+This is breadth of the *depth method* — a second real, named vulnerability class
+made real, reusing the injection line's structure.
 
 ## §11 pre-mechanization checklist (framework doc)
 
