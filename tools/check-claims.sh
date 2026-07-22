@@ -59,7 +59,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             fcheck_safe uaf_errors uaf_rejected double_free_errors \
             hsecTy_ni hconfine hcheck heap_leak leak_rejected \
             concat_injectable param_immune param_correct param_noninterference \
-            qcheck_ni injection_free_of_check unsafe_rejected unsafe_leaks; do
+            qcheck_ni injection_free_of_check unsafe_rejected unsafe_leaks \
+            dbcheck_ni naive_accepts_stored sound_rejects_stored stored_injection_leaks; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -248,6 +249,18 @@ if grep -q "QueryProgram.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.QueryProgram" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: QueryProgram.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1r. The stored-injection (brick 16) theorems must be in the build.
+if grep -q "DbInjection.lean" VULN-COVERAGE.md; then
+  for thm in "theorem dbcheck_ni" "theorem naive_accepts_stored" "theorem sound_rejects_stored"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/DbInjection.lean 2>/dev/null; then
+      echo "DRIFT: stored injection cited but '$thm' is missing from DbInjection.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.DbInjection" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: DbInjection.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

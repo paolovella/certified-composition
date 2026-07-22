@@ -210,6 +210,18 @@ rejected and genuinely leaking, while the parameterized program passes
 what it accepts proved un-injectable. Honest limit: a small language and brick
 14's single-literal query mechanism.
 
+**Stored / second-order injection** (brick 16, `DbInjection.lean`): the sharpest
+missed class. Untrusted data written to the database in one request, read back in
+a later one, concatenated into a query. The machine gains a persistent store, and
+the result is a *soundness* statement about the analysis itself: a **naive**
+checker treating database reads as clean *accepts* a stored-injection program that
+genuinely leaks (`naive_accepts_stored` + `stored_injection_leaks`, the latter
+axiom-free) — it is unsound — while the **sound** checker tracks taint *per cell*
+and rejects it (`sound_rejects_stored`), with `dbcheck_ni` (choice-free) proving
+acceptance means injection-free across the persistence boundary. The moral as a
+theorem: injection-freedom does not survive persistence unless taint does — the
+framework catches a class real analyzers routinely miss.
+
 ### 3.4 Improper declassification — IN, generated [proved]
 
 The Policy stratum: a discharge requires a declared release `φ` *plus* a proof
@@ -648,7 +660,18 @@ partitions), not a general-purpose language frontend.
   sound. Guard 1c extended, guard 1q added. Honest limit: small language,
   single-literal query mechanism. **Brick 15 complete.**
 
-### The security program, standing state (fifteen bricks)
+### Brick 16 ledger (stored / second-order injection)
+
+- `DbInjection.lean` — persistent taint. A machine with a database (`dbwrite`/
+  `dbread`) and a per-cell taint checker. The centerpiece is a soundness
+  statement about the *analysis*: `naive_accepts_stored` (a per-request checker
+  accepts the stored-injection program), `stored_injection_leaks` (axiom-free — it
+  leaks through the DB), `sound_rejects_stored` (per-cell taint catches it), and
+  `dbcheck_ni` (choice-free — the sound checker is injection-free across
+  persistence). Proves the per-request shortcut unsound and the per-cell
+  discipline necessary. Guard 1c extended, guard 1r added. **Brick 16 complete.**
+
+### The security program, standing state (sixteen bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -678,14 +701,16 @@ the confidentiality and memory disciplines meet on one machine (brick 13); and
 tokenizer, the real attack (quote-breaking) and the real fix (prepared statements)
 proved (brick 14); and **injection caught in a running program** so a
 flow-sensitive taint checker over a string-manipulating language rejects the
-injectable sink with acceptance proved sound (brick 15). What "bulletproof" means
-is stated at proved strength, the flow-property classes are excluded *by
+injectable sink with acceptance proved sound (brick 15); and **stored injection
+caught** so per-cell taint over a persistent store rejects second-order injection
+and the per-request shortcut is proved unsound (brick 16). What "bulletproof"
+means is stated at proved strength, the flow-property classes are excluded *by
 type-checking* (store, clock, termination, and heap — closed, declared, or
 non-leaking), memory safety (including use-after-free and double-free) is generated
 for the heap model, injection is proved on a real query and caught in a running
-program by a sound taint checker, composition is certificate accumulation by the
-same law that composes contraction estimates, and every guarantee carries its
-trusted base as an automatic bill of materials. The honest edges are all named
+program (first- and second-order) by a sound taint checker, composition is
+certificate accumulation by the same law that composes contraction estimates, and
+every guarantee carries its trusted base as an automatic bill of materials. The honest edges are all named
 as theorems or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
 OUT-NONCOMPOSABLE, authz stays CARRIED, pointer-aliasing and heap-loops are
 memory-safety follow-ons, a full SQL grammar (beyond one quote-delimited literal)

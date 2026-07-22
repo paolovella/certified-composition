@@ -40,6 +40,7 @@ lake build          # builds all four layers
 | `ConfTyping/HeapFlow.lean` | brick 13 / `VULN-COVERAGE.md` rows 1, 6 | information flow through the heap: noninterference over a labeled heap — the unification of the confidentiality and memory halves |
 | `ConfTyping/InjectionReal.lean` | brick 14 / `VULN-COVERAGE.md` row 3 | injection made real: a tokenizer with quote-breaking, parameterization injection-safe by construction, concatenation injectable |
 | `ConfTyping/QueryProgram.lean` | brick 15 / `VULN-COVERAGE.md` row 3 | injection in a running program: a taint-flow checker over a string-manipulating language, proved sound (accepted programs are injection-free) |
+| `ConfTyping/DbInjection.lean` | brick 16 / `VULN-COVERAGE.md` row 3 | stored / second-order injection: per-cell taint over a persistent store; the per-request shortcut proved unsound |
 
 ## Result map
 
@@ -629,6 +630,27 @@ This is the closest the artifact gets to a real tool: a linter for a running
 program, with a machine-checked proof that what it accepts cannot be injected.
 Honest limit: the language is small (string variables, one concat, two emit
 sinks) and the query mechanism is brick 14's single quote-delimited literal.
+
+## Stored / second-order injection (`DbInjection.lean`) — taint that persists
+
+Brick 16, a sharp named class brick 15 could not see. **Stored (second-order)
+injection**: untrusted data is written to the database in one request, read back
+in a later one, and concatenated into a query — where a per-request analysis has
+forgotten it was ever tainted. The machine gains a **persistent store** (`db`)
+with `dbwrite`/`dbread`.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **soundness across persistence** | `dbcheck_ni`, `db_injection_free_of_check` | choice-free | the sound checker tracks taint *per database cell* (a cell is tainted once tainted data is written; a read of a tainted cell taints the variable) — a checked program emits the same queries for every input, even through the database |
+| **the per-request shortcut is unsound** | `naive_accepts_stored` | choice-free | a naive checker that treats reads as clean *accepts* the stored-injection program |
+| **and it really leaks** | `stored_injection_leaks` | **none** | routed through the database, a benign input and an injection payload emit different skeletons — the naive acceptance is genuinely wrong |
+| the sound checker catches it | `sound_rejects_stored` | choice-free | per-cell taint rejects the same program |
+
+The moral, as a theorem: **injection-freedom does not survive persistence unless
+taint does.** The discipline that catches second-order injection is exactly
+per-cell taint tracking, and the per-request shortcut is proved unsound — a
+concrete demonstration that the framework's soundness catches a class real
+analyzers routinely miss.
 
 ## §11 pre-mechanization checklist (framework doc)
 

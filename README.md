@@ -168,7 +168,10 @@ with a real tokenizer — string concatenation is proved injectable
 injection-safe by construction (`param_immune`), the real attack and the real fix
 — and connected to a running program by a flow-sensitive taint checker
 (`qcheck_ni`) that rejects the injectable sink with acceptance proved sound, the
-shape of a real SQL-injection static analyzer.
+shape of a real SQL-injection static analyzer — extended to **stored
+(second-order) injection** over a persistent database, where per-cell taint
+catches what the per-request shortcut misses (`dbcheck_ni`, the shortcut proved
+unsound).
 
 ## Scope — what is *not* claimed
 
