@@ -51,7 +51,9 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             wsecTy_sound wcheck wleak_leaks wleak_rejected wexec_embed_eq \
             wexec_mono \
             WOutNI WOutNI_seq WOutNI_of_wcheck wok_pipeline_certified \
-            wleak_poisons_seam; do
+            wleak_poisons_seam \
+            WCondBoundary WCondBoundary_seq wledger_no_silent_discharge \
+            wcx_not_unconditional; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -156,6 +158,18 @@ if grep -q "WhileCompose.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.WhileCompose" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: WhileCompose.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1k. The ledger-over-loops (brick 9) theorems must be in the build.
+if grep -q "WhileLedger.lean" VULN-COVERAGE.md; then
+  for thm in "theorem WCondBoundary_seq" "theorem wledger_no_silent_discharge"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/WhileLedger.lean 2>/dev/null; then
+      echo "DRIFT: brick-9 ledger cited but '$thm' is missing from WhileLedger.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.WhileLedger" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: WhileLedger.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

@@ -33,6 +33,7 @@ lake build          # builds all four layers
 | `ConfTyping/SecTyTD.lean` | brick 6 / `VULN-COVERAGE.md` row 2 | declassified timing: a secret branch is allowed when its bit is declared released; the outcome reveals at most the declared bits |
 | `ConfTyping/WhileImp.lean` | brick 7 / `VULN-COVERAGE.md` row 13 | loops: a fuel-indexed semantics, the termination channel, termination-sensitive soundness, and the faithful embedding of the loop-free fragment |
 | `ConfTyping/WhileCompose.lean` | brick 8 / `VULN-COVERAGE.md` rows 12–13 | the seam over loops: certified looping components compose, divergence threading through the boundary in lockstep |
+| `ConfTyping/WhileLedger.lean` | brick 9 / `VULN-COVERAGE.md` rows 11–13 | the assumption ledger over loops: conditional termination-sensitive certificates whose no-silent-discharge witness guards the halting channel |
 
 ## Result map
 
@@ -464,8 +465,22 @@ it by `decide`.
 | certified pipeline | `wok_pipeline_certified` | choice-free | two Low-guarded loops in sequence, certified from two `decide`s, termination included |
 | **teeth** | `wleak_poisons_seam` (`skip_WOutNI`) | standard 3 | a divergence-leaking upstream (`Wleak`) wired into a certified `skip` makes the composite leak termination — the seam's upstream hypothesis is load-bearing, the looping analogue of `broken_seam` |
 
-Follow-on, named: the ledger and Bridge reception are not yet ported to `WCmd`
-(the query-distance metric would need a termination coordinate); tracked in
+## The assumption ledger over loops (`WhileLedger.lean`)
+
+Brick 9: the trusted-base discipline of brick 4, ported to the looping language
+(reusing the `Sat`/`Ledger` infrastructure verbatim — only the certificate
+changes from `BoundaryNI` to the termination-sensitive `WOutNI`).
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| conditional cert | `WCondBoundary c P Γ := Sat Γ → WOutNI c P` | — | a looping component's termination-sensitive guarantee relative to a trusted base |
+| **accumulation** | `WCondBoundary_seq` | choice-free | the composite's base is the union `Γ₁ ++ Γ₂` — via the looping seam, so the divergence guarantee accumulates with the base |
+| discharge | `WCondBoundary_nil`, `WCondBoundary_discharge`, `WCondBoundary_weaken` | choice-free | empty base = unconditional; collapsing requires proving the base |
+| checker-generated | `WCondBoundary_of_check_assuming` | choice-free | check under a declared trust assumption about an untrusted input |
+| **no silent discharge — termination form** | `wledger_no_silent_discharge` (`wcx_cond`, `wcx_not_unconditional`) | standard 3 | `while x skip` guarded by an untrusted `x`: termination-safe *assuming* `x` is Low, but if `x` is High the loop's *halting* depends on the secret — the ledger entry guards the **termination channel itself**, the sharpest form of the discipline |
+
+Follow-on, named: only the Bridge reception remains unported to `WCmd` (its
+query-distance metric needs a termination coordinate); tracked in
 `VULN-COVERAGE.md`.
 
 ## §11 pre-mechanization checklist (framework doc)

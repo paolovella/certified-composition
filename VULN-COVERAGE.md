@@ -316,8 +316,11 @@ Compose.lean` + `FlowBridge.lean`, both built, `no sorry`, axiom-audited):
   language too — `WOutNI_seq` (choice-free) composes certified looping components,
   with divergence threading through the boundary in lockstep (a clause the
   loop-free seam did not need), and `wleak_poisons_seam` proving the upstream
-  hypothesis load-bearing there as well. The ledger and Bridge reception over
-  `WCmd` are still follow-on.
+  hypothesis load-bearing there as well. The ledger is now ported too (brick 9,
+  `WhileLedger.lean`: `WCondBoundary_seq` accumulates trusted bases over the
+  looping seam, and `wledger_no_silent_discharge` witnesses an assumption that
+  guards the *termination* channel); only the Bridge reception over `WCmd`
+  remains follow-on.
 
 Still conditional in exactly one honest place: *if* each component carries a
 certificate, composition preserves and accumulates it; generating per-component
@@ -506,7 +509,18 @@ partitions), not a general-purpose language frontend.
   extended, guard 1j added. Follow-on, named: the ledger and Bridge reception
   over `WCmd`. **Brick 8 complete.**
 
-### The security program, standing state (eight bricks)
+### Brick 9 ledger (the assumption ledger over loops)
+
+- `WhileLedger.lean` — brick 4's trusted-base discipline ported to the looping
+  language (reusing the `Sat`/`Ledger` infrastructure; the certificate becomes
+  the termination-sensitive `WOutNI`). `WCondBoundary_seq` (choice-free)
+  accumulates bases by union through the looping seam; discharge is explicit; and
+  `wledger_no_silent_discharge` is the sharpest form of the discipline — its
+  witness `while x skip` rests on a trust assumption about its guard `x`, so
+  dropping the assumption is a *halting* leak. Guard 1c extended, guard 1k added.
+  Follow-on, named: the Bridge reception over `WCmd`. **Brick 9 complete.**
+
+### The security program, standing state (nine bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -520,11 +534,14 @@ declared-and-bounded rather than only forbidden (brick 6); and **loops with a
 termination channel** so a language with unbounded iteration is covered and the
 halting-leak class is closed by construction (brick 7); and **the seam ported to
 loops** so certified looping components compose with divergence threading through
-the boundary (brick 8). What "bulletproof" means is stated at proved strength, the flow-property classes are excluded *by
+the boundary (brick 8); and **the assumption ledger ported to loops** so a
+looping guarantee's trusted base accumulates under composition and its
+no-silent-discharge witness guards the halting channel (brick 9). What
+"bulletproof" means is stated at proved strength, the flow-property classes are excluded *by
 type-checking* (store, clock, and termination — closed-or-declared), composition
 is certificate accumulation by the same law that composes contraction estimates,
 and every guarantee carries its trusted base as an automatic bill of materials.
 The honest edges are all named as theorems or deferrals: microarchitecture stays
 OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED,
-the ledger and Bridge reception are not yet ported to the looping language, and
+the Bridge reception is not yet ported to the looping language, and
 the spec/model/TCB gaps of §0 are unmovable by construction.
