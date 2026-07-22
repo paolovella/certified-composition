@@ -54,7 +54,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             wleak_poisons_seam \
             WCondBoundary WCondBoundary_seq wledger_no_silent_discharge \
             wcx_not_unconditional \
-            haltQ wbridge_iff_sound wOutNI_contracts ofWComponent_comp_map; do
+            haltQ wbridge_iff_sound wOutNI_contracts ofWComponent_comp_map \
+            mcheck_safe msafe_of_check mwild_store_errors mwild_rejected; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -183,6 +184,18 @@ if grep -q "WhileBridge.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.WhileBridge" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: WhileBridge.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1m. The memory-safety (brick 11) theorems must be in the build.
+if grep -q "MemSafe.lean" VULN-COVERAGE.md; then
+  for thm in "theorem mcheck_safe" "theorem mwild_store_errors" "theorem mwild_rejected"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/MemSafe.lean 2>/dev/null; then
+      echo "DRIFT: memory-safety cited but '$thm' is missing from MemSafe.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.MemSafe" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: MemSafe.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

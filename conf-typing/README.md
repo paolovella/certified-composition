@@ -35,6 +35,7 @@ lake build          # builds all four layers
 | `ConfTyping/WhileCompose.lean` | brick 8 / `VULN-COVERAGE.md` rows 12–13 | the seam over loops: certified looping components compose, divergence threading through the boundary in lockstep |
 | `ConfTyping/WhileLedger.lean` | brick 9 / `VULN-COVERAGE.md` rows 11–13 | the assumption ledger over loops: conditional termination-sensitive certificates whose no-silent-discharge witness guards the halting channel |
 | `ConfTyping/WhileBridge.lean` | brick 10 / `VULN-COVERAGE.md` rows 12–13 | the Bridge reception over loops: looping components land in the transport interface with termination a first-class coordinate of the distance |
+| `ConfTyping/MemSafe.lean` | brick 11 / `VULN-COVERAGE.md` row 6 | heap and memory safety: a machine that can get stuck on a wild dereference, and a flow-sensitive checker whose programs provably never do |
 
 ## Result map
 
@@ -501,6 +502,32 @@ bounded by the downstream's input Low-atoms, so it is not folded into a single
 leak-bound Bridge — the exact Bridge covers all inputs, the leak-bound
 equivalence covers the halting ones. **With this the looping language has the
 full discipline: soundness, seam, ledger, and reception.**
+
+## Heap and memory safety (`MemSafe.lean`) — a new *kind* of property
+
+Brick 11, the first brick of the memory-safety sub-project. Every prior brick
+certified a *confidentiality* channel (store, timing, termination); memory safety
+is a **safety property of a richer machine** — the semantics can get *stuck* on a
+wild dereference. The map carried memory safety as CARRIED (transported, not
+generated) since brick 1; this generates it.
+
+The machine (additive: fresh `MCmd`/`MState`) has a heap and an allocation
+high-water mark `n` — addresses `[0, n)` are live, the rest wild. `mexec` returns
+`Option MState`, and `none` is a **memory error** (a load/store through a wild
+address). Memory safety is "never `none`".
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **safety by construction** | `mcheck_safe` | standard 3 | a checked program never hits a memory error, and its tracked pointers stay valid — proved by induction on an invariant tying the flow-sensitive tracked set to the heap's live region |
+| certified by `decide` | `msafe_of_check`, `mpsafe_memsafe` | standard 3 | from the empty tracked set a checked program runs to a real state, never stuck |
+| **teeth** | `mwild_store_errors`, `mwild_rejected` | choice-free | a store through an unallocated pointer errors at runtime *and* is rejected by the checker — the two agree the access is unsafe |
+
+The checker `mcheck` is flow-sensitive: it threads the set of variables known to
+hold in-bounds addresses (`alloc` grows it, `assign`/`load` drop the reassigned
+variable, `ite` intersects the branches), and permits a load/store only through a
+tracked variable. This is the first step from CARRIED to generated for row 6;
+follow-on bricks add `free` (use-after-free — the sharpest witness), loops over
+the heap, and information flow through the heap.
 
 ## §11 pre-mechanization checklist (framework doc)
 

@@ -100,7 +100,7 @@ verdict is proved semantically but per-component by hand.
 | 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow (generated); OUT-INADMISSIBLE as blacklist | [proved: T1, T2] |
 | 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN (generated) | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
-| 6 | memory safety (CWE-119/416) | 1-safety of a richer semantics | — | CARRIED (+ OUT-OF-MODEL for IMP) | [classified] |
+| 6 | memory safety (CWE-119/416) | safety of a richer (heap) semantics | — | IN-WITH-MODEL (generated); CARRIED cross-language | [proved] |
 | 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN (generated) | [classified] / [proved] |
 | 8 | races / TOCTOU (CWE-362/367) | 1-safety over interleavings | — | OUT-OF-MODEL | [classified] |
 | 9 | speculative execution (Spectre-class) | 2-safety over microarchitectural model | 1* | OUT-OF-MODEL | [classified] |
@@ -206,14 +206,24 @@ invariant (Dong–Roth–Su; advanced composition factors through it). The frame
 rule "when a summary does not compose, don't summarize" is the DP literature's own
 conclusion, derived from the interface.
 
-### 3.6 Memory safety — CARRIED [classified]
+### 3.6 Memory safety — IN-WITH-MODEL, generated [proved]; CARRIED cross-language
 
-A 1-safety property of a semantics with a heap; IMP has none, so for this model it is
-also OUT-OF-MODEL. The framework's honest contribution is transport, not generation:
-"no undefined behavior relative to model M" is a Boolean certificate with trivial
-`mul` (conjunction), so it rides `Bridge.comp` and the assumption ledger across
-composition seams. Generating it is an ownership/separation-logic engine's job —
-external, and *not* claimed. Carrying a certificate is plumbing, not memory safety.
+Brick 1 filed this CARRIED: loop-free IMP has no heap, so memory safety could only
+be *transported* (a Boolean certificate with trivial `mul` riding `Bridge.comp` and
+the ledger), never *generated*. Brick 11 (`conf-typing/ConfTyping/MemSafe.lean`,
+built, `no sorry`, axiom-audited) grows the model and generates it. The machine has
+a heap and an allocation high-water mark `n`; `mexec` returns `Option MState` with
+`none` a **memory error** (a wild dereference), and a flow-sensitive checker
+`mcheck` tracks which variables hold in-bounds addresses. Soundness `mcheck_safe`
+is memory-safety *by construction*: a checked program **never** hits a memory
+error, proved by induction on an invariant tying the tracked set to the heap's live
+region. Teeth: a store through an unallocated pointer errors at runtime
+(`mwild_store_errors`) and is rejected by the checker (`mwild_rejected`) — they
+agree. So "no undefined behavior" is now checker-generated for the heap model, not
+merely carried; the cross-language transport story (an *external* engine's
+certificate riding the seam) remains for models this machine does not cover. First
+brick of the memory-safety sub-project; `free`/use-after-free, heap loops, and
+information flow through the heap are follow-on.
 
 ### 3.7 Authz — CARRIED [classified]; cross-tenant isolation — IN, generated [proved]
 
@@ -539,7 +549,19 @@ partitions), not a general-purpose language frontend.
   (`none`) regime is covered only by the exact Bridge. **Brick 10 complete — the
   looping language now has soundness, seam, ledger, and reception.**
 
-### The security program, standing state (ten bricks)
+### Brick 11 ledger (heap and memory safety — a new kind of property)
+
+- `MemSafe.lean` — the first brick of the memory-safety sub-project, and the
+  first *safety* property (vs. the confidentiality channels of bricks 1–10). A
+  heap machine whose `mexec` can get stuck (`none` = memory error), and a
+  flow-sensitive checker `mcheck` tracking in-bounds pointer variables. Soundness
+  `mcheck_safe`: a checked program never errors, by induction on a heap invariant.
+  Teeth `mwild_store_errors`/`mwild_rejected` (choice-free). Row 6 moved CARRIED →
+  IN-WITH-MODEL (generated). Guard 1c extended, guard 1m added. Follow-on:
+  `free`/use-after-free, heap loops, information flow through the heap. **Brick 11
+  complete.**
+
+### The security program, standing state (eleven bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -558,13 +580,17 @@ looping guarantee's trusted base accumulates under composition and its
 no-silent-discharge witness guards the halting channel (brick 9); and **the
 Bridge reception ported to loops** so termination-sensitive security is a
 contraction in the transport interface with halting a coordinate of the distance
-(brick 10) — the looping language now carries the full discipline. What
-"bulletproof" means is stated at proved strength, the flow-property classes are excluded *by
-type-checking* (store, clock, and termination — closed-or-declared), composition
-is certificate accumulation by the same law that composes contraction estimates,
-and every guarantee carries its trusted base as an automatic bill of materials.
-The honest edges are all named as theorems or deferrals: microarchitecture stays
-OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED,
-declassified termination and richer language features (heap, strings) remain
-model-growth follow-ons, and
-the spec/model/TCB gaps of §0 are unmovable by construction.
+(brick 10) — the looping language now carries the full discipline; and **heap
+memory safety generated** so the first non-confidentiality property — a safety
+property of a stuck-able machine — is proved by construction, not merely carried
+(brick 11). What "bulletproof" means is stated at proved strength, the
+flow-property classes are excluded *by type-checking* (store, clock, and
+termination — closed-or-declared), memory safety is generated for the heap model,
+composition is certificate accumulation by the same law that composes contraction
+estimates, and every guarantee carries its trusted base as an automatic bill of
+materials. The honest edges are all named as theorems or deferrals:
+microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz
+stays CARRIED, `free`/use-after-free and heap information-flow are memory-safety
+follow-ons, declassified termination and richer language features (strings) remain
+model-growth follow-ons, and the spec/model/TCB gaps of §0 are unmovable by
+construction.
