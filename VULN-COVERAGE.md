@@ -97,7 +97,7 @@ verdict is proved semantically but per-component by hand.
 |---|---|---|---|---|---|
 | 1 | direct confidentiality leaks (CWE-200) | 2-safety (NI) | 1 | IN (generated) | [proved] |
 | 2 | timing side channels (CWE-208) | 2-safety over instrumented semantics | 1 | IN-WITH-MODEL (generated) | [proved] |
-| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI; blacklist = value predicate | 1 / — | IN as flow (generated); OUT-INADMISSIBLE as blacklist | [proved: T1, T2] |
+| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI on a real query skeleton; blacklist = value predicate | 1 / — | IN as flow (generated, real query); OUT-INADMISSIBLE as blacklist | [proved: T1, T2, + real] |
 | 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN (generated) | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
 | 6 | memory safety (CWE-119/416) | safety of a richer (heap) semantics | — | IN-WITH-MODEL (generated); CARRIED cross-language | [proved] |
@@ -179,12 +179,25 @@ The industry's two formulations, separated by a theorem each
   formulation. This is the map's clearest example of the framework rejecting a
   popular-but-wrong property shape rather than failing to express it.
 
-Scope honesty: IMP has no strings; row 3's [proved] is the property *shape*
-(influence of untrusted sources on trusted sinks, with endorsement obligations),
-made non-vacuous by the `P_leak` witnesses — not a model of SQL. **Generated** (brick
-3): since taint-freedom is `J_NI` at the untrusted relabeling and the checker
-generates `J_NI`, the taint certificate is checker output at the relabeled partition
-— the same `secCheck` under `P := untrusted`.
+**Generated** (brick 3): since taint-freedom is `J_NI` at the untrusted relabeling
+and the checker generates `J_NI`, the taint certificate is checker output at the
+relabeled partition — the same `secCheck` under `P := untrusted`.
+
+**Made real** (brick 14, `InjectionReal.lean`): the earlier caveat "IMP has no
+strings; this is the property shape, not a model of SQL" is now closed for the core
+mechanism. A query is a character string with a real tokenizer where a quote `'`
+toggles in/out of a string literal (the actual SQLi mechanism); the *skeleton*
+(structural segments) is the executed command, and injection is untrusted data
+changing it. `concat_injectable` (axiom-free) proves string concatenation is
+injectable — a benign value and an injection payload `' R` give different skeletons
+(`' OR …` as a theorem); `param_immune`/`param_noninterference` (axiom-free) prove
+**parameterization is injection-safe by construction** — the executed structure is
+independent of the untrusted value — and `param_correct` proves it computes the
+intended structure for benign input. This is exactly T1's integrity-NI form, now on
+a real query construction, with the industrial fix (prepared statements) proved
+correct. Still short of a full SQL grammar (one quote-delimited literal, not the
+whole language), but the channel is no longer a shape — the real attack and the
+real defense are theorems.
 
 ### 3.4 Improper declassification — IN, generated [proved]
 
@@ -599,7 +612,20 @@ partitions), not a general-purpose language frontend.
   extended, guard 1o added. **Brick 13 complete — the confidentiality and memory
   disciplines unified over one machine.**
 
-### The security program, standing state (thirteen bricks)
+### Brick 14 ledger (injection made real)
+
+- `InjectionReal.lean` — the depth step: one channel made real. A query is a
+  character string with a real quote-toggling tokenizer; the skeleton (structural
+  segments) is the executed command. `concat_injectable` (axiom-free) — string
+  concatenation is injectable (`' OR …` as a theorem); `param_immune` /
+  `param_noninterference` (axiom-free) — parameterization is injection-safe by
+  construction; `param_correct` — it computes the intended structure for benign
+  input. The real attack and the real fix (prepared statements), proved,
+  connected to T1's integrity-NI. Row 3 → "+ real". Guard 1c extended, guard 1p
+  added. Honest limit: one quote-delimited literal, not a full SQL grammar.
+  **Brick 14 complete.**
+
+### The security program, standing state (fourteen bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -624,15 +650,18 @@ property of a stuck-able machine — is proved by construction, not merely carri
 (brick 11); **use-after-free ruled out** so the sharpest heap bug — a dereference
 of a freed cell — is closed by a linearity checker (brick 12); and **information
 flow unified with memory** so noninterference now holds over a labeled heap and
-the confidentiality and memory disciplines meet on one machine (brick 13). What
-"bulletproof" means is stated at proved strength, the flow-property classes are
-excluded *by type-checking* (store, clock, termination, and heap — closed,
-declared, or non-leaking), memory safety (including use-after-free and
-double-free) is generated for the heap model, composition is certificate
-accumulation by the same law that composes contraction estimates, and every
-guarantee carries its trusted base as an automatic bill of materials. The honest
-edges are all named as theorems or deferrals: microarchitecture stays
-OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz stays CARRIED,
-pointer-aliasing and heap-loops are memory-safety follow-ons, declassified
-termination and richer language features (strings) remain model-growth follow-ons,
-and the spec/model/TCB gaps of §0 are unmovable by construction.
+the confidentiality and memory disciplines meet on one machine (brick 13); and
+**injection made real** so the property shape becomes an actual query with a real
+tokenizer, the real attack (quote-breaking) and the real fix (prepared statements)
+proved (brick 14). What "bulletproof" means is stated at proved strength, the
+flow-property classes are excluded *by type-checking* (store, clock, termination,
+and heap — closed, declared, or non-leaking), memory safety (including
+use-after-free and double-free) is generated for the heap model, injection is
+proved on a real query (not just a shape), composition is certificate accumulation
+by the same law that composes contraction estimates, and every guarantee carries
+its trusted base as an automatic bill of materials. The honest edges are all named
+as theorems or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
+OUT-NONCOMPOSABLE, authz stays CARRIED, pointer-aliasing and heap-loops are
+memory-safety follow-ons, a full SQL grammar (beyond one quote-delimited literal)
+and other richer language features remain depth follow-ons, and the spec/model/TCB
+gaps of §0 are unmovable by construction.

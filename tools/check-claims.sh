@@ -57,7 +57,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             haltQ wbridge_iff_sound wOutNI_contracts ofWComponent_comp_map \
             mcheck_safe msafe_of_check mwild_store_errors mwild_rejected \
             fcheck_safe uaf_errors uaf_rejected double_free_errors \
-            hsecTy_ni hconfine hcheck heap_leak leak_rejected; do
+            hsecTy_ni hconfine hcheck heap_leak leak_rejected \
+            concat_injectable param_immune param_correct param_noninterference; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -222,6 +223,18 @@ if grep -q "HeapFlow.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.HeapFlow" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: HeapFlow.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1p. The real-injection (brick 14) theorems must be in the build.
+if grep -q "InjectionReal.lean" VULN-COVERAGE.md; then
+  for thm in "theorem concat_injectable" "theorem param_immune" "theorem param_correct"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/InjectionReal.lean 2>/dev/null; then
+      echo "DRIFT: real injection cited but '$thm' is missing from InjectionReal.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.InjectionReal" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: InjectionReal.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

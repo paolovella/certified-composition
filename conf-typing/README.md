@@ -38,6 +38,7 @@ lake build          # builds all four layers
 | `ConfTyping/MemSafe.lean` | brick 11 / `VULN-COVERAGE.md` row 6 | heap and memory safety: a machine that can get stuck on a wild dereference, and a flow-sensitive checker whose programs provably never do |
 | `ConfTyping/MemFree.lean` | brick 12 / `VULN-COVERAGE.md` row 6 | free and use-after-free: a liveness-tracking machine and a linearity checker that rules out use-after-free and double-free by construction |
 | `ConfTyping/HeapFlow.lean` | brick 13 / `VULN-COVERAGE.md` rows 1, 6 | information flow through the heap: noninterference over a labeled heap — the unification of the confidentiality and memory halves |
+| `ConfTyping/InjectionReal.lean` | brick 14 / `VULN-COVERAGE.md` row 3 | injection made real: a tokenizer with quote-breaking, parameterization injection-safe by construction, concatenation injectable |
 
 ## Result map
 
@@ -579,6 +580,32 @@ Orthogonality, recorded not re-proved: memory *safety* (bricks 11–12) and this
 keeps accesses in bounds, the other keeps them non-leaking — and compose. This
 brick is the natural culmination: the confidentiality discipline of the first ten
 bricks and the memory discipline of bricks 11–12, over one machine.
+
+## Injection, for real (`InjectionReal.lean`) — the property shape becomes a query
+
+Brick 14, making one channel *real*. Brick 1 handled injection as a property
+shape (T1: taint-freedom is integrity NI; T2: blacklists fail A3) — honest, but
+there was no query, no parser, no quote. This brick models the actual mechanism.
+
+A query is a character string tokenized the way a database does it: a quote `'`
+toggles in/out of a string literal, so the string splits into alternating
+**structural** segments (the command) and **data** segments (literal contents).
+The *skeleton* — the structural segments — is the executed command; **injection
+is untrusted data changing the skeleton.**
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| tokenizer lemmas | `segs_qfree`, `segs_append_q` | choice-free | a quote-free run is one segment; a quote-free prefix splits cleanly |
+| **parameterization is immune** | `param_immune`, `param_noninterference` | **none** | the executed structure is independent of the untrusted value — injection-freedom *by construction* (the value is never re-tokenized) |
+| parameterization is correct | `param_correct` | `propext` | for a benign (quote-free) value it computes the intended structure — not cheating |
+| **concatenation is injectable** | `concat_injectable`, `concat_leaks` | **none** | with the same template, a benign value and an injection payload `' R` give different skeletons — SQL injection (`' OR …`) as a theorem |
+| the fix as integrity NI | `param_sink_trusted` | **none** | the parameterized sink factors through the trusted template alone — T1's unique admissible 2-safety form, on a real query |
+
+This is the depth step: injection stops being an abstract 2-safety shape and
+becomes a concrete query with a real tokenizer, the real attack (quote-breaking),
+and the real industrial fix (prepared statements) **proved correct by
+construction** — connected back to T1's `taint_is_JNI` as the property it
+satisfies.
 
 ## §11 pre-mechanization checklist (framework doc)
 
