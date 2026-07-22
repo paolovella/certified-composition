@@ -316,11 +316,15 @@ Compose.lean` + `FlowBridge.lean`, both built, `no sorry`, axiom-audited):
   language too — `WOutNI_seq` (choice-free) composes certified looping components,
   with divergence threading through the boundary in lockstep (a clause the
   loop-free seam did not need), and `wleak_poisons_seam` proving the upstream
-  hypothesis load-bearing there as well. The ledger is now ported too (brick 9,
+  hypothesis load-bearing there as well. The ledger is ported too (brick 9,
   `WhileLedger.lean`: `WCondBoundary_seq` accumulates trusted bases over the
   looping seam, and `wledger_no_silent_discharge` witnesses an assumption that
-  guards the *termination* channel); only the Bridge reception over `WCmd`
-  remains follow-on.
+  guards the *termination* channel), and so is the **Bridge reception** (brick
+  10, `WhileBridge.lean`): the exact reception `Bridge.ofWComponent` is
+  axiom-free and composes by the generic `Bridge.comp`, and `wbridge_iff_sound`
+  shows termination-sensitive security *is* a contraction with the halting query
+  a first-class coordinate of the distance. The looping language now carries the
+  full discipline — soundness, seam, ledger, reception.
 
 Still conditional in exactly one honest place: *if* each component carries a
 certificate, composition preserves and accumulates it; generating per-component
@@ -520,7 +524,22 @@ partitions), not a general-purpose language frontend.
   dropping the assumption is a *halting* leak. Guard 1c extended, guard 1k added.
   Follow-on, named: the Bridge reception over `WCmd`. **Brick 9 complete.**
 
-### The security program, standing state (nine bricks)
+### Brick 10 ledger (the Bridge reception over loops)
+
+- `WhileBridge.lean` — the last unported piece, with real design content. The
+  looping boundary is *partial*, so the carrier lifts to `OStore := Option Store`
+  (`none` = diverged) and the distance gains a **halting query** `haltQ` — making
+  termination an observable *in the metric*. The exact reception
+  `Bridge.ofWComponent` is **axiom-free** and composes by the generic
+  `Bridge.comp` (`ofWComponent_comp_map`/`_cert`); the equivalence
+  `wbridge_iff_sound` proves termination-sensitive security = the `wNIBound`
+  contraction on halting inputs; and `wOutNI_contracts` lands every checked
+  looping component in the interface. Guard 1c extended, guard 1l added. Honest
+  scope: the security contraction is on halting input pairs; the diverged-upstream
+  (`none`) regime is covered only by the exact Bridge. **Brick 10 complete — the
+  looping language now has soundness, seam, ledger, and reception.**
+
+### The security program, standing state (ten bricks)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -536,12 +555,16 @@ halting-leak class is closed by construction (brick 7); and **the seam ported to
 loops** so certified looping components compose with divergence threading through
 the boundary (brick 8); and **the assumption ledger ported to loops** so a
 looping guarantee's trusted base accumulates under composition and its
-no-silent-discharge witness guards the halting channel (brick 9). What
+no-silent-discharge witness guards the halting channel (brick 9); and **the
+Bridge reception ported to loops** so termination-sensitive security is a
+contraction in the transport interface with halting a coordinate of the distance
+(brick 10) — the looping language now carries the full discipline. What
 "bulletproof" means is stated at proved strength, the flow-property classes are excluded *by
 type-checking* (store, clock, and termination — closed-or-declared), composition
 is certificate accumulation by the same law that composes contraction estimates,
 and every guarantee carries its trusted base as an automatic bill of materials.
 The honest edges are all named as theorems or deferrals: microarchitecture stays
 OUT-OF-MODEL, `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, memory-safety/authz stay CARRIED,
-the Bridge reception is not yet ported to the looping language, and
+declassified termination and richer language features (heap, strings) remain
+model-growth follow-ons, and
 the spec/model/TCB gaps of §0 are unmovable by construction.

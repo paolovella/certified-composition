@@ -147,7 +147,11 @@ whether it halts), which a termination-sensitive checker closes (`wsecTy_sound`)
 with the loop-free fragment embedding faithfully (`wexec_embed_eq`) — the model
 grew rather than forked. And the seam composes looping components too
 (`WOutNI_seq`), with divergence threading through the boundary in lockstep — the
-composition differentiator now covers unbounded iteration.
+composition differentiator now covers unbounded iteration. And looping components
+land in the transport interface itself (`Bridge.ofWComponent`,
+`wbridge_iff_sound`), with a **halting query** making termination a first-class
+coordinate of the distance — so termination-sensitive security is literally a
+contraction, in the same `GradedAction` as Lipschitz and Dobrushin.
 
 ## Scope — what is *not* claimed
 

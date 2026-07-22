@@ -34,6 +34,7 @@ lake build          # builds all four layers
 | `ConfTyping/WhileImp.lean` | brick 7 / `VULN-COVERAGE.md` row 13 | loops: a fuel-indexed semantics, the termination channel, termination-sensitive soundness, and the faithful embedding of the loop-free fragment |
 | `ConfTyping/WhileCompose.lean` | brick 8 / `VULN-COVERAGE.md` rows 12–13 | the seam over loops: certified looping components compose, divergence threading through the boundary in lockstep |
 | `ConfTyping/WhileLedger.lean` | brick 9 / `VULN-COVERAGE.md` rows 11–13 | the assumption ledger over loops: conditional termination-sensitive certificates whose no-silent-discharge witness guards the halting channel |
+| `ConfTyping/WhileBridge.lean` | brick 10 / `VULN-COVERAGE.md` rows 12–13 | the Bridge reception over loops: looping components land in the transport interface with termination a first-class coordinate of the distance |
 
 ## Result map
 
@@ -479,9 +480,27 @@ changes from `BoundaryNI` to the termination-sensitive `WOutNI`).
 | checker-generated | `WCondBoundary_of_check_assuming` | choice-free | check under a declared trust assumption about an untrusted input |
 | **no silent discharge — termination form** | `wledger_no_silent_discharge` (`wcx_cond`, `wcx_not_unconditional`) | standard 3 | `while x skip` guarded by an untrusted `x`: termination-safe *assuming* `x` is Low, but if `x` is High the loop's *halting* depends on the secret — the ledger entry guards the **termination channel itself**, the sharpest form of the discipline |
 
-Follow-on, named: only the Bridge reception remains unported to `WCmd` (its
-query-distance metric needs a termination coordinate); tracked in
-`VULN-COVERAGE.md`.
+## The Bridge reception over loops (`WhileBridge.lean`)
+
+Brick 10, the last unported piece — and the one with genuine design content.
+A looping component's boundary is a *partial* map (it may diverge), so the
+transport carrier lifts from `Store` to `OStore := Option Store` (`none` =
+diverged), and the query distance gains a **halting query** `haltQ` that observes
+whether a run terminated. Termination becomes an observable *in the metric*.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| the halting coordinate | `haltQ`, `haltQ_wlow` | choice-free | the query that only loops have — "did it terminate?" — is a Low observable, so divergence is visible in the distance |
+| **the exact reception** | `Bridge.ofWComponent`, `ofWComponent_comp_map`, `ofWComponent_comp_cert` | **none** | any looping component is a Bridge at any fuel, definitionally, and composes by the generic `Bridge.comp` |
+| **the reception equivalence** | `wbridge_iff_sound` | classical | on halting inputs, the `wNIBound` contraction holds **iff** the component is store-and-halting noninterferent — the halting query makes "iff" mean *termination-sensitive* |
+| checked ⟹ contracts | `WOutNI_imp_haltNI`, `wOutNI_contracts` | choice-free / classical | a `WOutNI` component (brick 7/8, from the checker) contracts in the interface at every fuel |
+
+Honest scope: the security contraction is stated on *halting* input pairs
+(`some σ, some σ'`); a diverged-upstream input (`none`) is a distinct regime not
+bounded by the downstream's input Low-atoms, so it is not folded into a single
+leak-bound Bridge — the exact Bridge covers all inputs, the leak-bound
+equivalence covers the halting ones. **With this the looping language has the
+full discipline: soundness, seam, ledger, and reception.**
 
 ## §11 pre-mechanization checklist (framework doc)
 
