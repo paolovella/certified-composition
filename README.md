@@ -178,6 +178,10 @@ class: **path traversal** (CWE-22) — the `../../etc/passwd` attack proved
 High/Low to an arbitrary **security label lattice**: noninterference holds for any
 lattice and any observer level (`latSecTy_ni`), with a diamond-lattice witness of
 two mutually-incomparable secret compartments that the binary model cannot express.
+And **pointer aliasing** is handled: exact-address tracking rules out
+use-after-free through an alias (`acheck_safe`) — `alloc p; copy q p; free p;
+access q` is caught (`alias_uaf_rejected`), dropping the no-copy restriction that
+kept brick 12's `free` sound.
 
 ## Scope — what is *not* claimed
 

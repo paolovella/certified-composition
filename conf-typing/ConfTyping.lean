@@ -27,3 +27,4 @@ import ConfTyping.QueryProgram
 import ConfTyping.DbInjection
 import ConfTyping.PathTraversal
 import ConfTyping.LatticeFlow
+import ConfTyping.AliasSafe

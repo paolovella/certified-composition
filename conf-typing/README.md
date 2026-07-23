@@ -43,6 +43,7 @@ lake build          # builds all four layers
 | `ConfTyping/DbInjection.lean` | brick 16 / `VULN-COVERAGE.md` row 3 | stored / second-order injection: per-cell taint over a persistent store; the per-request shortcut proved unsound |
 | `ConfTyping/PathTraversal.lean` | brick 17 / `VULN-COVERAGE.md` row 14 | path traversal (CWE-22): the `..` attack and the leaf-name fix, proved — the injection method generalized to a second class |
 | `ConfTyping/LatticeFlow.lean` | brick 18 / `VULN-COVERAGE.md` row 1 | a security label lattice: noninterference for an arbitrary lattice + observer, with a non-binary (diamond) witness |
+| `ConfTyping/AliasSafe.lean` | brick 19 / `VULN-COVERAGE.md` row 6 | pointer aliasing: exact-address tracking rules out use-after-free through an alias — dropping brick 12's no-copy linearity |
 
 ## Result map
 
@@ -695,6 +696,32 @@ Binary High/Low is the two-point instance of `latSecTy_ni`; the diamond witness
 shows the generalization is real — two compartments each secret to the other,
 which needs two incomparable labels that do not exist in `Bool`. This is the
 deepest single generalization of the confidentiality core.
+
+## Pointer aliasing (`AliasSafe.lean`) — use-after-free through an alias
+
+Brick 19, the hard memory extension. Brick 12's `free` was sound only under
+**linearity**: tracked pointers held distinct addresses and copying was *banned*,
+so freeing one could not dangle another. Real code copies pointers (`q = p`),
+and then `free p` dangles `q`. Ruling out the resulting use-after-free needs an
+alias analysis — which linearity dodged by forbidding the copy.
+
+The insight that makes it tractable *and precise*: in a loop-free program the
+allocation addresses are **statically determined** (the k-th `alloc` returns
+address `k`), so the checker tracks the *exact* address each pointer holds — a
+must-alias analysis. `copy x y` gives `x` the same tracked address as `y`;
+`free x` marks that address freed; an access through *any* variable holding a
+freed address is rejected.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **aliasing-sound safety** | `acheck_safe` | choice-free | a checked program never accesses a freed or unallocated cell *through any alias* — the invariant ties the checker's tracked addresses exactly to the runtime store |
+| certified by `decide` | `asafe_of_check`, `alias_ok_runs` | choice-free | |
+| **the witness brick 12 could not state** | `alias_uaf_errors`, `alias_uaf_rejected` | standard 3 / choice-free | `alloc p; copy q p; free p; access q` dangles `q` through the alias — errors at runtime *and* is rejected (exact aliasing catches it) |
+| **copying is allowed** | `alias_ok_accepted` | choice-free | unlike linearity: `alloc p; copy q p; access q; free p` (use before free) is accepted and runs |
+
+The advance over brick 12: `copy` is a first-class operation, and freeing a cell
+invalidates *every* alias of it — the use-after-free-through-an-alias that
+linearity could not even express is caught, precisely, for straight-line code.
 
 ## §11 pre-mechanization checklist (framework doc)
 
