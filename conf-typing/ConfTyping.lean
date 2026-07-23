@@ -29,3 +29,4 @@ import ConfTyping.PathTraversal
 import ConfTyping.LatticeFlow
 import ConfTyping.AliasSafe
 import ConfTyping.HeapLoop
+import ConfTyping.ParseSource

@@ -45,6 +45,7 @@ lake build          # builds all four layers
 | `ConfTyping/LatticeFlow.lean` | brick 18 / `VULN-COVERAGE.md` row 1 | a security label lattice: noninterference for an arbitrary lattice + observer, with a non-binary (diamond) witness |
 | `ConfTyping/AliasSafe.lean` | brick 19 / `VULN-COVERAGE.md` row 6 | pointer aliasing: exact-address tracking rules out use-after-free through an alias — dropping brick 12's no-copy linearity |
 | `ConfTyping/HeapLoop.lean` | brick 20 / `VULN-COVERAGE.md` rows 6, 13 | heap safety under loops: a fixed-point checker (loop invariant), sound by fuel induction — brick 11's heap meets brick 7's loops |
+| `ConfTyping/ParseSource.lean` | brick 21 / `VULN-COVERAGE.md` row 3 | a real parser: recursive descent + round-trip correctness, so the injection guarantee attaches to source *text* not a hand-built AST |
 
 ## Result map
 
@@ -748,6 +749,30 @@ set `V` (because the checker's fixed-point rule returns `V`) — so the loop
 invariant holds after any number of iterations. Honest limit: a high-water-mark
 heap (no `free` under loops — combining `free`/aliasing with loops would need a
 may-alias abstraction, a further brick).
+
+## A real parser (`ParseSource.lean`) — from source text to a checked guarantee
+
+Brick 21, a different kind of step: every prior brick analyzed a *hand-built*
+AST; a real tool analyzes *source text*. A recursive-descent **parser** takes a
+token stream (concrete syntax) and produces the AST, with the classic
+parser-correctness theorem — parsing the printed form of any program recovers it
+exactly. Composed with the taint checker's soundness, the injection guarantee
+finally attaches to written source, not to a term the prover constructed.
+
+The surface language is the injection/taint one: `input x`, `const x`,
+`cat x y z`, `emit x`, `;`-separated.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **parser correctness** | `parse_print` | choice-free | `parse (printS c) = some c` — the parser is a left inverse of the printer (round trip), by induction on the AST with `parseAtom_print` and a fuel bound |
+| checker soundness | `scheck_ni` | choice-free | the taint checker's two-run noninterference (emitted output independent of untrusted input) |
+| **end to end, on text** | `source_injection_free` | choice-free | *if a token stream parses and the checker accepts it, the emitted output is a function of the trusted program alone* — the security claim attaches to `parse toks`, not a hand-built AST |
+| real-source witnesses | `unsafe_parses`/`unsafe_src_rejected`, `safe_parses`/`safe_src_injection_free` | choice-free | an injectable source token stream parses and is rejected; a safe one parses, is accepted, and is proved injection-free |
+
+This is the bridge the whole security program was missing: a claim about *source
+text*. Honest limit: the concrete syntax is a token list (no character lexer),
+the grammar is small (fixed-arity atoms, `;`-sequencing) — a real recursive-descent
+parser with a proved round trip, not a full language front-end.
 
 ## §11 pre-mechanization checklist (framework doc)
 

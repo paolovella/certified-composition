@@ -184,7 +184,10 @@ access q` is caught (`alias_uaf_rejected`), dropping the no-copy restriction tha
 kept brick 12's `free` sound. And memory safety extends to **loops**: when
 allocation addresses stop being static under `while`, a fixed-point (loop-invariant)
 checker keeps it sound (`hlcheck_safe`, by fuel induction) — brick 11's heap meets
-brick 7's loops.
+brick 7's loops. Finally, the injection guarantee attaches to **source text**: a
+recursive-descent parser with a proved round-trip theorem (`parse_print`) chains
+through the checker to an end-to-end result (`source_injection_free`) — a security
+claim about parsed source, not a hand-built AST.
 
 ## Scope — what is *not* claimed
 
