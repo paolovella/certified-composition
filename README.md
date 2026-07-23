@@ -174,7 +174,10 @@ catches what the per-request shortcut misses (`dbcheck_ni`, the shortcut proved
 unsound). The same "make a channel real" method then generalizes to a second
 class: **path traversal** (CWE-22) — the `../../etc/passwd` attack proved
 (`traversal_escapes`) and the leaf-name API proved safe by construction
-(`openLeaf_contained`).
+(`openLeaf_contained`). And the confidentiality core is generalized past binary
+High/Low to an arbitrary **security label lattice**: noninterference holds for any
+lattice and any observer level (`latSecTy_ni`), with a diamond-lattice witness of
+two mutually-incomparable secret compartments that the binary model cannot express.
 
 ## Scope — what is *not* claimed
 

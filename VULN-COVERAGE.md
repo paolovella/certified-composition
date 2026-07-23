@@ -128,7 +128,14 @@ labeled heap — the observable is the store *and* the Low heap region, and
 Low variable. This is the unification point with the memory-safety sub-project
 (rows 6, 11–12): confidentiality and memory safety as two independent, composable
 invariants of one heap machine. Witness `heap_leak`/`leak_rejected`: a Low load of
-a High cell leaks and is rejected.
+a High cell leaks and is rejected. **Generalized past binary** (brick 18,
+`LatticeFlow.lean`): the whole confidentiality core rests on a binary
+`Partition : String → Bool` — the two-point lattice. `latSecTy_ni` proves
+noninterference over an *arbitrary* security lattice for *every* observer level
+(the classic Denning model); the diamond lattice `⊥ < a, b < ⊤`
+(`dmdLat`) and the cross-compartment witness (`crosscompartment_leaks` /
+`_untypable`) exhibit two mutually-incomparable secret compartments — a guarantee
+the binary model cannot even state. Binary High/Low is the two-point instance.
 
 ### 3.2 Timing side channels — IN-WITH-MODEL, generated [proved]
 
@@ -699,7 +706,19 @@ partitions), not a general-purpose language frontend.
   Honest limit: abstract step-list, not a real OS path parser. **Brick 17
   complete.**
 
-### The security program, standing state (seventeen bricks, fourteen classes)
+### Brick 18 ledger (a security label lattice — past binary High/Low)
+
+- `LatticeFlow.lean` — generalizes the foundational abstraction from binary
+  `Partition` to an arbitrary `SecLat`. `latSecTy_ni` (standard axioms):
+  noninterference for any lattice and any observer level (Denning); `latConfine`
+  (propext) the confinement lemma; `dmdLat` the diamond lattice (not a chain);
+  and the cross-compartment witness (`crosscompartment_untypable`/`_leaks`,
+  propext) — two mutually-incomparable secret compartments, unstatable in the
+  binary model. Binary High/Low = the two-point instance. Guard 1c extended,
+  guard 1t added. **Brick 18 complete — the deepest single generalization of the
+  confidentiality core.**
+
+### The security program, standing state (eighteen bricks, fourteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -734,12 +753,15 @@ caught** so per-cell taint over a persistent store rejects second-order injectio
 and the per-request shortcut is proved unsound (brick 16); and **the method
 generalized** so path traversal (CWE-22) is made real with the same
 attack/safe-by-construction shape, showing "make a channel real" is not
-injection-specific (brick 17). What "bulletproof" means is stated at proved
-strength, the flow-property classes are excluded *by type-checking* (store, clock,
-termination, and heap — closed, declared, or non-leaking), memory safety
-(including use-after-free and double-free) is generated for the heap model,
-injection is proved on a real query and caught in a running program (first- and
-second-order) by a sound taint checker, path traversal is closed by the same
+injection-specific (brick 17); and **the confidentiality core generalized past
+binary** so noninterference holds over an arbitrary security lattice with
+mutually-incomparable compartments, not just High/Low (brick 18). What
+"bulletproof" means is stated at proved strength, the flow-property classes are
+excluded *by type-checking* (store, clock, termination, and heap — closed,
+declared, or non-leaking), noninterference holds over an arbitrary label lattice,
+memory safety (including use-after-free and double-free) is generated for the heap
+model, injection is proved on a real query and caught in a running program (first-
+and second-order) by a sound taint checker, path traversal is closed by the same
 data-not-structure discipline, composition is certificate accumulation by the same
 law that composes contraction estimates, and every guarantee carries its trusted
 base as an automatic bill of materials. The honest edges are all named

@@ -42,6 +42,7 @@ lake build          # builds all four layers
 | `ConfTyping/QueryProgram.lean` | brick 15 / `VULN-COVERAGE.md` row 3 | injection in a running program: a taint-flow checker over a string-manipulating language, proved sound (accepted programs are injection-free) |
 | `ConfTyping/DbInjection.lean` | brick 16 / `VULN-COVERAGE.md` row 3 | stored / second-order injection: per-cell taint over a persistent store; the per-request shortcut proved unsound |
 | `ConfTyping/PathTraversal.lean` | brick 17 / `VULN-COVERAGE.md` row 14 | path traversal (CWE-22): the `..` attack and the leaf-name fix, proved — the injection method generalized to a second class |
+| `ConfTyping/LatticeFlow.lean` | brick 18 / `VULN-COVERAGE.md` row 1 | a security label lattice: noninterference for an arbitrary lattice + observer, with a non-binary (diamond) witness |
 
 ## Result map
 
@@ -673,6 +674,27 @@ Same pattern as parameterized queries: keep the untrusted value in a data
 position (a leaf), never a structural one (a `..`), and containment is a theorem.
 This is breadth of the *depth method* — a second real, named vulnerability class
 made real, reusing the injection line's structure.
+
+## A security label lattice (`LatticeFlow.lean`) — past binary High/Low
+
+Brick 18 generalizes the *foundational* abstraction. Every confidentiality brick
+(1–13) rests on a binary `Partition : String → Bool` — the two-point lattice. The
+classic Denning generalization is an arbitrary **security lattice**: levels
+ordered by "may flow to", with a join, and noninterference stated *for every
+observer level* `ℓ`. This matters because binary cannot express *mutually
+incomparable* compartments; a lattice can.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **lattice noninterference** | `latSecTy_ni` | standard 3 | for any lattice `𝓛` and observer `ℓ`, a typed program maps states agreeing below `ℓ` to states agreeing below `ℓ` — information at a level `⋢ ℓ` never reaches an `ℓ`-observer |
+| confinement | `latConfine` | `propext` | a command whose context is not below `ℓ` leaves the `ℓ`-observable state unchanged |
+| the diamond lattice | `dmdLat` | `propext` | `⊥ < a, b < ⊤` with `a`, `b` incomparable — a lattice that is not a chain, impossible in `Bool` |
+| **the non-binary witness** | `crosscompartment_untypable`, `crosscompartment_leaks` | `propext` | a flow from compartment `a` to a compartment-`b` observer is untypable *and* really leaks — a guarantee the binary High/Low model cannot even state |
+
+Binary High/Low is the two-point instance of `latSecTy_ni`; the diamond witness
+shows the generalization is real — two compartments each secret to the other,
+which needs two incomparable labels that do not exist in `Bool`. This is the
+deepest single generalization of the confidentiality core.
 
 ## §11 pre-mechanization checklist (framework doc)
 

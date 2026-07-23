@@ -61,7 +61,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             concat_injectable param_immune param_correct param_noninterference \
             qcheck_ni injection_free_of_check unsafe_rejected unsafe_leaks \
             dbcheck_ni naive_accepts_stored sound_rejects_stored stored_injection_leaks \
-            traversal_escapes flat_contained openLeaf_contained pathCheck_sound; do
+            traversal_escapes flat_contained openLeaf_contained pathCheck_sound \
+            latSecTy_ni latConfine dmdLat crosscompartment_untypable crosscompartment_leaks; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -274,6 +275,18 @@ if grep -q "PathTraversal.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.PathTraversal" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: PathTraversal.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1t. The label-lattice (brick 18) theorems must be in the build.
+if grep -q "LatticeFlow.lean" VULN-COVERAGE.md; then
+  for thm in "theorem latSecTy_ni" "theorem crosscompartment_leaks" "theorem crosscompartment_untypable"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/LatticeFlow.lean 2>/dev/null; then
+      echo "DRIFT: label lattice cited but '$thm' is missing from LatticeFlow.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.LatticeFlow" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: LatticeFlow.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 
