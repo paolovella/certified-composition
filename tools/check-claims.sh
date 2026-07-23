@@ -63,7 +63,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             dbcheck_ni naive_accepts_stored sound_rejects_stored stored_injection_leaks \
             traversal_escapes flat_contained openLeaf_contained pathCheck_sound \
             latSecTy_ni latConfine dmdLat crosscompartment_untypable crosscompartment_leaks \
-            acheck_safe alias_uaf_errors alias_uaf_rejected alias_ok_accepted; do
+            acheck_safe alias_uaf_errors alias_uaf_rejected alias_ok_accepted \
+            hlcheck_safe loopalloc_safe loop_wild_errors loop_wild_rejected; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -300,6 +301,18 @@ if grep -q "AliasSafe.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.AliasSafe" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: AliasSafe.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1v. The heap-loop (brick 20) theorems must be in the build.
+if grep -q "HeapLoop.lean" VULN-COVERAGE.md; then
+  for thm in "theorem hlcheck_safe" "theorem loop_wild_errors" "theorem loop_wild_rejected"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/HeapLoop.lean 2>/dev/null; then
+      echo "DRIFT: heap loops cited but '$thm' is missing from HeapLoop.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.HeapLoop" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: HeapLoop.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

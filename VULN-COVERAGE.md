@@ -289,8 +289,15 @@ freed, and an access through *any* alias of a freed address is rejected.
 `acheck_safe` (choice-free) is the soundness; `alias_uaf_errors`/`alias_uaf_rejected`
 witness `alloc p; copy q p; free p; access q` — a use-after-free *through the alias
 `q`*, which brick 12 could not even express — caught, while `copy` is now allowed
-(`alias_ok_accepted`). Follow-on: heap loops (aliasing + `while`), and
-weaker-precision aliasing for non-straight-line code.
+(`alias_ok_accepted`). **Heap safety under loops** (brick 20, `HeapLoop.lean`):
+combining brick 11's heap with brick 7's fuel-indexed loops (`HRes = to | err |
+ok`). Under `while`, allocation addresses are no longer static, so exact tracking
+gives way to a **fixed-point** discipline: the loop body must preserve the
+valid-pointer set (`V ⊆ hlcheck V c`). `hlcheck_safe` (fuel induction — the
+`while` case reuses the smaller-fuel IH for body and continuation) proves a checked
+program never memory-errors at any fuel; `loop_wild_errors`/`_rejected` witness a
+loop accessing an unallocated pointer. Follow-on: `free`/aliasing *under* loops (a
+may-alias abstraction).
 
 ### 3.7 Authz — CARRIED [classified]; cross-tenant isolation — IN, generated [proved]
 
@@ -741,7 +748,20 @@ partitions), not a general-purpose language frontend.
   precise for straight-line code; loops would need weaker may-alias. **Brick 19
   complete.**
 
-### The security program, standing state (nineteen bricks, fourteen classes)
+### Brick 20 ledger (heap safety under loops — the fixed-point checker)
+
+- `HeapLoop.lean` — the last hard structural direction: brick 11's heap meets
+  brick 7's fuel-indexed loops. Under `while` the allocation addresses aren't
+  static, so exact tracking is replaced by a loop-invariant **fixed point**: the
+  body must preserve the valid-pointer set (`V ⊆ hlcheck V c`). `hlcheck_safe`
+  (fuel induction, the `while` case reusing the smaller-fuel IH for body and
+  continuation, carrying the invariant across iterations) — a checked program
+  never memory-errors at any fuel; `loopalloc_safe` (a loop allocating fresh
+  cells is safe), `loop_wild_errors`/`_rejected` (an unallocated access caught).
+  Guard 1c extended, guard 1v added. Honest limit: high-water-mark heap (no `free`
+  under loops yet). **Brick 20 complete.**
+
+### The security program, standing state (twenty bricks, fourteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -780,18 +800,20 @@ injection-specific (brick 17); and **the confidentiality core generalized past
 binary** so noninterference holds over an arbitrary security lattice with
 mutually-incomparable compartments, not just High/Low (brick 18); and **pointer
 aliasing handled** so use-after-free through an alias is caught by exact-address
-tracking, dropping brick 12's no-copy restriction (brick 19). What "bulletproof"
-means is stated at proved strength, the flow-property classes are excluded *by
-type-checking* (store, clock, termination, and heap — closed, declared, or
-non-leaking), noninterference holds over an arbitrary label lattice, memory safety
-(including use-after-free through aliases and double-free) is generated for the
-heap model, injection is proved on a real query and caught in a running program
-(first- and second-order) by a sound taint checker, path traversal is closed by
-the same data-not-structure discipline, composition is certificate accumulation by
-the same law that composes contraction estimates, and every guarantee carries its
-trusted base as an automatic bill of materials. The honest edges are all named as
-theorems or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
-OUT-NONCOMPOSABLE, authz stays CARRIED, heap-loops (aliasing under `while`) is a
-memory-safety follow-on, a full SQL grammar (beyond one quote-delimited literal)
-and other richer language features remain depth follow-ons, and the spec/model/TCB
-gaps of §0 are unmovable by construction.
+tracking, dropping brick 12's no-copy restriction (brick 19); and **heap safety
+under loops** so a fixed-point (loop-invariant) checker keeps memory safety sound
+when allocation addresses stop being static (brick 20). What "bulletproof" means is
+stated at proved strength, the flow-property classes are excluded *by type-checking*
+(store, clock, termination, and heap — closed, declared, or non-leaking),
+noninterference holds over an arbitrary label lattice, memory safety (including
+use-after-free through aliases, double-free, and wild access under loops) is
+generated for the heap model, injection is proved on a real query and caught in a
+running program (first- and second-order) by a sound taint checker, path traversal
+is closed by the same data-not-structure discipline, composition is certificate
+accumulation by the same law that composes contraction estimates, and every
+guarantee carries its trusted base as an automatic bill of materials. The honest
+edges are all named as theorems or deferrals: microarchitecture stays OUT-OF-MODEL,
+`(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz stays CARRIED, `free`/aliasing *under*
+loops (a may-alias abstraction) is a memory-safety follow-on, a full SQL grammar
+(beyond one quote-delimited literal) and other richer language features remain depth
+follow-ons, and the spec/model/TCB gaps of §0 are unmovable by construction.

@@ -181,7 +181,10 @@ two mutually-incomparable secret compartments that the binary model cannot expre
 And **pointer aliasing** is handled: exact-address tracking rules out
 use-after-free through an alias (`acheck_safe`) — `alloc p; copy q p; free p;
 access q` is caught (`alias_uaf_rejected`), dropping the no-copy restriction that
-kept brick 12's `free` sound.
+kept brick 12's `free` sound. And memory safety extends to **loops**: when
+allocation addresses stop being static under `while`, a fixed-point (loop-invariant)
+checker keeps it sound (`hlcheck_safe`, by fuel induction) — brick 11's heap meets
+brick 7's loops.
 
 ## Scope — what is *not* claimed
 

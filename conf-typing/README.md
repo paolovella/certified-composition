@@ -44,6 +44,7 @@ lake build          # builds all four layers
 | `ConfTyping/PathTraversal.lean` | brick 17 / `VULN-COVERAGE.md` row 14 | path traversal (CWE-22): the `..` attack and the leaf-name fix, proved — the injection method generalized to a second class |
 | `ConfTyping/LatticeFlow.lean` | brick 18 / `VULN-COVERAGE.md` row 1 | a security label lattice: noninterference for an arbitrary lattice + observer, with a non-binary (diamond) witness |
 | `ConfTyping/AliasSafe.lean` | brick 19 / `VULN-COVERAGE.md` row 6 | pointer aliasing: exact-address tracking rules out use-after-free through an alias — dropping brick 12's no-copy linearity |
+| `ConfTyping/HeapLoop.lean` | brick 20 / `VULN-COVERAGE.md` rows 6, 13 | heap safety under loops: a fixed-point checker (loop invariant), sound by fuel induction — brick 11's heap meets brick 7's loops |
 
 ## Result map
 
@@ -722,6 +723,31 @@ freed address is rejected.
 The advance over brick 12: `copy` is a first-class operation, and freeing a cell
 invalidates *every* alias of it — the use-after-free-through-an-alias that
 linearity could not even express is caught, precisely, for straight-line code.
+
+## Heap safety under loops (`HeapLoop.lean`) — the fixed-point checker
+
+Brick 20, the last hard structural direction: combining a heap with loops. Brick
+19's memory safety was precise because allocation addresses are static in
+*straight-line* code; a `while` allocates a runtime-variable number of cells, so
+no static tracking survives. The discipline that does survive is a **loop
+invariant**: the set of valid-pointer variables must be a *fixed point* of the
+loop body. This combines brick 11's heap (high-water mark, wild access = error)
+with brick 7's fuel semantics (`HRes = to | err | ok`; `to` = fuel-out/divergence,
+`err` = memory error).
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **soundness by fuel induction** | `hlcheck_safe` | standard 3 | a checked program never returns `err` at any fuel (it may `to`), and every `ok` result preserves the invariant; the `while` case reuses the smaller-fuel IH for the body *and* the loop continuation, carrying the loop invariant across iterations |
+| the fixed-point rule | `hlcheck` (`.loop` case) | — | `while e c` checks the body from `V` and requires `V ⊆ hlcheck V c` (the body preserves the tracked set), returning `V` |
+| certified by `decide` | `safe_of_check`, `loopalloc_safe` | standard 3 | a loop that allocates and accesses fresh cells is accepted and never errors, at any fuel |
+| **teeth** | `loop_wild_errors`, `loop_wild_rejected` | choice-free | a loop accessing an unallocated pointer errors and is rejected |
+
+The technical crux is the `while` case: fuel induction with the loop continuation
+applying the fuel-`k` IH to the *same* `while` command, at the *same* invariant
+set `V` (because the checker's fixed-point rule returns `V`) — so the loop
+invariant holds after any number of iterations. Honest limit: a high-water-mark
+heap (no `free` under loops — combining `free`/aliasing with loops would need a
+may-alias abstraction, a further brick).
 
 ## §11 pre-mechanization checklist (framework doc)
 
