@@ -187,7 +187,9 @@ checker keeps it sound (`hlcheck_safe`, by fuel induction) — brick 11's heap m
 brick 7's loops. Finally, the injection guarantee attaches to **source text**: a
 recursive-descent parser with a proved round-trip theorem (`parse_print`) chains
 through the checker to an end-to-end result (`source_injection_free`) — a security
-claim about parsed source, not a hand-built AST.
+claim about parsed source, not a hand-built AST — and a **lexer** (`lex_print`)
+takes it down to a character string, so the whole chain string → lex → parse →
+check → theorem is machine-checked.
 
 ## Scope — what is *not* claimed
 

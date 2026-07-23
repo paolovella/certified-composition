@@ -225,8 +225,14 @@ stream to the AST, so the injection guarantee attaches to *written source* —
 `source_injection_free`: if a token stream parses and the taint checker accepts
 it, the emitted output is a function of the trusted program alone. Witnesses
 (`unsafe_parses`/`unsafe_src_rejected`, `safe_parses`/`safe_src_injection_free`)
-run the whole pipeline on real source token streams. Honest limit: a token-list
-concrete syntax (no character lexer), a small fixed-arity grammar.
+run the whole pipeline on real source token streams. **Down to characters** (brick
+22, `LexSource.lean`): a **lexer** with its own round-trip correctness (`lex_print`:
+`lex (toks.map printCh) = toks`, skipping whitespace) completes the front-end, so
+the full chain **string → lex → parse → check → theorem** is machine-checked.
+`source_string_injection_free` attaches the guarantee to source *characters*;
+witnesses (`unsafe_chars_parse`/`_rejected`, `safe_chars_*`) run the whole pipeline
+on a character string like `i0;t210;e2`. Honest limit: a one-char-per-token
+alphabet, not a production tokenizer.
 
 **Stored / second-order injection** (brick 16, `DbInjection.lean`): the sharpest
 missed class. Untrusted data written to the database in one request, read back in
@@ -782,7 +788,18 @@ partitions), not a general-purpose language frontend.
   Guard 1c extended, guard 1w added. Honest limit: token-list concrete syntax (no
   character lexer), small grammar. **Brick 21 complete.**
 
-### The security program, standing state (twenty-one bricks, fourteen classes)
+### Brick 22 ledger (a lexer — the pipeline reaches characters)
+
+- `LexSource.lean` — completes the front-end: characters → tokens. `lex_print`
+  (propext) the lexer round trip, `lex_skip_space`/`spaced_lexes_same` (whitespace
+  skipped), and `source_string_injection_free` (choice-free) attaching the
+  guarantee to a character source through the full `lex`/`parse`/`scheck`
+  pipeline. Witnesses run the whole chain on a character string. With brick 21 the
+  chain string → lex → parse → check → theorem is machine-checked. Guard 1c
+  extended, guard 1x added. Honest limit: one-char-per-token alphabet. **Brick 22
+  complete.**
+
+### The security program, standing state (twenty-two bricks, fourteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -826,16 +843,18 @@ under loops** so a fixed-point (loop-invariant) checker keeps memory safety soun
 when allocation addresses stop being static (brick 20); and **a real parser** so
 the injection guarantee attaches to source *text* — a recursive-descent parser
 with a proved round trip, chained through the checker to an end-to-end source-level
-theorem (brick 21). What "bulletproof" means is stated at proved strength, the
-flow-property classes are excluded *by type-checking* (store, clock, termination,
-and heap — closed, declared, or non-leaking), noninterference holds over an
-arbitrary label lattice, memory safety (including use-after-free through aliases,
-double-free, and wild access under loops) is generated for the heap model,
-injection is proved on a real query, caught in a running program (first- and
-second-order) by a sound taint checker, and attached to parsed source text, path
-traversal is closed by the same data-not-structure discipline, composition is
-certificate accumulation by the same law that composes contraction estimates, and
-every guarantee carries its trusted base as an automatic bill of materials. The honest
+theorem (brick 21); and **a lexer** so the front-end reaches characters — the full
+chain string → lex → parse → check → theorem is machine-checked (brick 22). What
+"bulletproof" means is stated at proved strength, the flow-property classes are
+excluded *by type-checking* (store, clock, termination, and heap — closed,
+declared, or non-leaking), noninterference holds over an arbitrary label lattice,
+memory safety (including use-after-free through aliases, double-free, and wild
+access under loops) is generated for the heap model, injection is proved on a real
+query, caught in a running program (first- and second-order) by a sound taint
+checker, and attached to a parsed and lexed character source, path traversal is
+closed by the same data-not-structure discipline, composition is certificate
+accumulation by the same law that composes contraction estimates, and every
+guarantee carries its trusted base as an automatic bill of materials. The honest
 edges are all named as theorems or deferrals: microarchitecture stays OUT-OF-MODEL,
 `(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz stays CARRIED, `free`/aliasing *under*
 loops (a may-alias abstraction) is a memory-safety follow-on, a full SQL grammar

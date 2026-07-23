@@ -46,6 +46,7 @@ lake build          # builds all four layers
 | `ConfTyping/AliasSafe.lean` | brick 19 / `VULN-COVERAGE.md` row 6 | pointer aliasing: exact-address tracking rules out use-after-free through an alias — dropping brick 12's no-copy linearity |
 | `ConfTyping/HeapLoop.lean` | brick 20 / `VULN-COVERAGE.md` rows 6, 13 | heap safety under loops: a fixed-point checker (loop invariant), sound by fuel induction — brick 11's heap meets brick 7's loops |
 | `ConfTyping/ParseSource.lean` | brick 21 / `VULN-COVERAGE.md` row 3 | a real parser: recursive descent + round-trip correctness, so the injection guarantee attaches to source *text* not a hand-built AST |
+| `ConfTyping/LexSource.lean` | brick 22 / `VULN-COVERAGE.md` row 3 | a lexer: characters → tokens with round-trip correctness — the full string → lex → parse → check → theorem pipeline |
 
 ## Result map
 
@@ -773,6 +774,27 @@ This is the bridge the whole security program was missing: a claim about *source
 text*. Honest limit: the concrete syntax is a token list (no character lexer),
 the grammar is small (fixed-arity atoms, `;`-sequencing) — a real recursive-descent
 parser with a proved round trip, not a full language front-end.
+
+## A lexer (`LexSource.lean`) — the source pipeline reaches characters
+
+Brick 22 completes the front-end. Brick 21's parser starts from *tokens*; a real
+front-end starts from a *character string*. The lexer adds the missing layer —
+characters → tokens — with its own round-trip correctness, chaining
+lexer + parser + checker into an end-to-end guarantee about an actual character
+source.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **lexer correctness** | `lex_print` | `propext` | `lex (toks.map printCh) = toks` — the lexer is a left inverse of the per-token printer (round trip) |
+| whitespace | `lex_skip_space`, `spaced_lexes_same` | propext / **none** | spaces are skipped; the spaced and unspaced sources lex identically |
+| **end to end, on characters** | `source_string_injection_free` | choice-free | a character source that lexes, parses, and checks is injection-free — the claim attaches to source *characters*, through `lex`/`parse`/`scheck` |
+| real-character witnesses | `unsafe_chars_parse`/`unsafe_chars_rejected`, `safe_chars_*` | choice-free | `i0;t210;e2` lexes+parses to an injectable program and is rejected; `i0;c2;e2` is accepted and proved injection-free |
+
+Together with brick 21 the whole chain **string → lex → parse → check → theorem**
+is machine-checked, so the security claim attaches to source characters. Honest
+limit: a small one-char-per-token alphabet (keywords `i c t e ;`, digit ids,
+skipped spaces) — a clean lexer with a proved round trip, not a production
+tokenizer.
 
 ## §11 pre-mechanization checklist (framework doc)
 
