@@ -189,7 +189,10 @@ recursive-descent parser with a proved round-trip theorem (`parse_print`) chains
 through the checker to an end-to-end result (`source_injection_free`) — a security
 claim about parsed source, not a hand-built AST — and a **lexer** (`lex_print`)
 takes it down to a character string, so the whole chain string → lex → parse →
-check → theorem is machine-checked.
+check → theorem is machine-checked. Finally, the last hard memory combination:
+**free under loops** (`flsafe`) — `free` and unbounded iteration coexist soundly
+via linearity carried as a loop invariant, with the fixed-point rule catching the
+cross-iteration double-free.
 
 ## Scope — what is *not* claimed
 

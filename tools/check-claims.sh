@@ -66,7 +66,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             acheck_safe alias_uaf_errors alias_uaf_rejected alias_ok_accepted \
             hlcheck_safe loopalloc_safe loop_wild_errors loop_wild_rejected \
             parse_print scheck_ni source_injection_free unsafe_src_rejected \
-            lex_print source_string_injection_free unsafe_chars_parse unsafe_chars_rejected; do
+            lex_print source_string_injection_free unsafe_chars_parse unsafe_chars_rejected \
+            flsafe allocfree_loop_safe usefree_loop_rejected doublefree_loop_rejected; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -339,6 +340,18 @@ if grep -q "LexSource.lean" VULN-COVERAGE.md; then
   done
   if ! grep -q "import ConfTyping.LexSource" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: LexSource.lean not imported by the ConfTyping root"; fail=1
+  fi
+fi
+
+# 1y. The free-under-loops (brick 23) theorems must be in the build.
+if grep -q "FreeLoop.lean" VULN-COVERAGE.md; then
+  for thm in "theorem flsafe" "theorem usefree_loop_rejected" "theorem doublefree_loop_rejected"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/FreeLoop.lean 2>/dev/null; then
+      echo "DRIFT: free-under-loops cited but '$thm' is missing from FreeLoop.lean"; fail=1
+    fi
+  done
+  if ! grep -q "import ConfTyping.FreeLoop" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: FreeLoop.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
 

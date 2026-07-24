@@ -312,8 +312,17 @@ gives way to a **fixed-point** discipline: the loop body must preserve the
 valid-pointer set (`V ⊆ hlcheck V c`). `hlcheck_safe` (fuel induction — the
 `while` case reuses the smaller-fuel IH for body and continuation) proves a checked
 program never memory-errors at any fuel; `loop_wild_errors`/`_rejected` witness a
-loop accessing an unallocated pointer. Follow-on: `free`/aliasing *under* loops (a
-may-alias abstraction).
+loop accessing an unallocated pointer. **Free under loops** (brick 23,
+`FreeLoop.lean`): the last hard combination — brick 12's `free`-with-linearity
+meets brick 20's fixed-point loops. Under loops the exact addresses of brick 19
+are gone, so `free` soundness rests on linearity (distinct addresses), carried as
+a loop invariant through fuel induction (`flsafe`, four-clause invariant). The
+realistic `alloc; use; free` loop is safe (`allocfree_loop_safe`); use-after-free
+in the body is caught (`usefree_loop_errors`/`_rejected`); and — the interlock —
+the fixed-point rule catches the **double-free across iterations**
+(`doublefree_loop_rejected`): freeing a loop-invariant pointer shrinks the tracked
+set, so the body can't preserve it. Follow-on: aliasing (`copy`) *under* loops
+needs a may-alias abstraction.
 
 ### 3.7 Authz — CARRIED [classified]; cross-tenant isolation — IN, generated [proved]
 
@@ -799,7 +808,20 @@ partitions), not a general-purpose language frontend.
   extended, guard 1x added. Honest limit: one-char-per-token alphabet. **Brick 22
   complete.**
 
-### The security program, standing state (twenty-two bricks, fourteen classes)
+### Brick 23 ledger (free under loops — the last hard combination)
+
+- `FreeLoop.lean` — the two memory disciplines that never met: brick 12's
+  `free`-with-linearity and brick 20's fixed-point loops. `flsafe` (fuel
+  induction, four-clause linearity invariant) — a checked program never hits a
+  use-after-free/double-free/wild access at any fuel. `allocfree_loop_safe` (the
+  `alloc; use; free` loop), `usefree_loop_errors`/`_rejected` (UAF in body), and
+  the interlock `doublefree_loop_rejected` — the fixed-point rule catches the
+  cross-iteration double-free that free introduces under loops. Guard 1c
+  extended, guard 1y added. Honest limit: linearity forbids pointer copying
+  (aliasing-under-loops needs may-alias). **Brick 23 complete — every hard
+  combination landed.**
+
+### The security program, standing state (twenty-three bricks, fourteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -844,19 +866,22 @@ when allocation addresses stop being static (brick 20); and **a real parser** so
 the injection guarantee attaches to source *text* — a recursive-descent parser
 with a proved round trip, chained through the checker to an end-to-end source-level
 theorem (brick 21); and **a lexer** so the front-end reaches characters — the full
-chain string → lex → parse → check → theorem is machine-checked (brick 22). What
-"bulletproof" means is stated at proved strength, the flow-property classes are
-excluded *by type-checking* (store, clock, termination, and heap — closed,
-declared, or non-leaking), noninterference holds over an arbitrary label lattice,
-memory safety (including use-after-free through aliases, double-free, and wild
-access under loops) is generated for the heap model, injection is proved on a real
-query, caught in a running program (first- and second-order) by a sound taint
-checker, and attached to a parsed and lexed character source, path traversal is
-closed by the same data-not-structure discipline, composition is certificate
-accumulation by the same law that composes contraction estimates, and every
-guarantee carries its trusted base as an automatic bill of materials. The honest
-edges are all named as theorems or deferrals: microarchitecture stays OUT-OF-MODEL,
-`(ε,δ)`-DP stays OUT-NONCOMPOSABLE, authz stays CARRIED, `free`/aliasing *under*
-loops (a may-alias abstraction) is a memory-safety follow-on, a full SQL grammar
-(beyond one quote-delimited literal) and other richer language features remain depth
-follow-ons, and the spec/model/TCB gaps of §0 are unmovable by construction.
+chain string → lex → parse → check → theorem is machine-checked (brick 22); and
+**free under loops** so `free` and unbounded iteration coexist soundly via
+linearity carried as a loop invariant, with the fixed-point rule catching the
+cross-iteration double-free (brick 23). What "bulletproof" means is stated at
+proved strength, the flow-property classes are excluded *by type-checking* (store,
+clock, termination, and heap — closed, declared, or non-leaking), noninterference
+holds over an arbitrary label lattice, memory safety (including use-after-free
+through aliases, double-free, wild access under loops, and free under loops) is
+generated for the heap model, injection is proved on a real query, caught in a
+running program (first- and second-order) by a sound taint checker, and attached to
+a parsed and lexed character source, path traversal is closed by the same
+data-not-structure discipline, composition is certificate accumulation by the same
+law that composes contraction estimates, and every guarantee carries its trusted
+base as an automatic bill of materials. The honest edges are all named as theorems
+or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
+OUT-NONCOMPOSABLE, authz stays CARRIED, aliasing (`copy`) *under* loops (a may-alias
+abstraction) is a memory-safety follow-on, a full SQL grammar (beyond one
+quote-delimited literal) and other richer language features remain depth follow-ons,
+and the spec/model/TCB gaps of §0 are unmovable by construction.

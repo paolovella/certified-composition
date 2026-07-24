@@ -47,6 +47,7 @@ lake build          # builds all four layers
 | `ConfTyping/HeapLoop.lean` | brick 20 / `VULN-COVERAGE.md` rows 6, 13 | heap safety under loops: a fixed-point checker (loop invariant), sound by fuel induction — brick 11's heap meets brick 7's loops |
 | `ConfTyping/ParseSource.lean` | brick 21 / `VULN-COVERAGE.md` row 3 | a real parser: recursive descent + round-trip correctness, so the injection guarantee attaches to source *text* not a hand-built AST |
 | `ConfTyping/LexSource.lean` | brick 22 / `VULN-COVERAGE.md` row 3 | a lexer: characters → tokens with round-trip correctness — the full string → lex → parse → check → theorem pipeline |
+| `ConfTyping/FreeLoop.lean` | brick 23 / `VULN-COVERAGE.md` row 6 | free under loops: linearity (brick 12) carried as a loop invariant through fuel induction (brick 20) — the last hard combination |
 
 ## Result map
 
@@ -795,6 +796,29 @@ is machine-checked, so the security claim attaches to source characters. Honest
 limit: a small one-char-per-token alphabet (keywords `i c t e ;`, digit ids,
 skipped spaces) — a clean lexer with a proved round trip, not a production
 tokenizer.
+
+## Free under loops (`FreeLoop.lean`) — the last hard combination
+
+Brick 23 combines the two memory disciplines that never met: brick 12's
+`free`-with-linearity and brick 20's fuel-indexed fixed-point loops. A `while`
+whose body may `alloc` *and* `free` cells each iteration. Under loops the exact
+addresses of brick 19 are gone, so `free` soundness rests entirely on brick 12's
+**linearity** (distinct addresses ⟹ freeing one can't dangle another) — carried
+now as a *loop invariant* through fuel induction.
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **soundness** | `flsafe` | standard 3 | fuel induction with a four-clause invariant (tracked ⟹ live, in-bounds, pairwise-distinct; freed ⟹ once-allocated); a checked program never hits a use-after-free, double-free, or wild access at any fuel |
+| the `alloc; use; free` loop | `allocfree_loop_safe` | standard 3 | the realistic pattern — a loop that allocates a fresh cell, uses it, and frees it each iteration — is accepted and never errors |
+| **use-after-free in the body** | `usefree_loop_errors`, `usefree_loop_rejected` | choice-free | `alloc; free; access` inside the loop errors and is rejected |
+| **double-free across iterations** | `doublefree_loop_rejected` | choice-free | freeing an *invariant* pointer each iteration double-frees — the fixed-point rule rejects it (the body can't preserve the tracked set), exactly the cross-iteration double-free |
+
+The `doublefree_loop_rejected` witness is where the two disciplines interlock:
+the fixed-point rule (brick 20) is *precisely* what catches the double-free that
+free (brick 12) introduces under loops — freeing a loop-invariant pointer means
+the body shrinks the tracked set, so `V ⊆ flcheck V body` fails. Honest limit:
+linearity forbids pointer *copying* — combining this with brick 19's aliasing
+under loops would need a may-alias abstraction (a further brick).
 
 ## §11 pre-mechanization checklist (framework doc)
 
