@@ -37,3 +37,4 @@ import ConfTyping.QueryGrammar
 import ConfTyping.CmdInjection
 import ConfTyping.AliasLoop
 import ConfTyping.DecimalId
+import ConfTyping.LogInjection

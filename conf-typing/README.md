@@ -53,6 +53,7 @@ lake build          # builds all four layers
 | `ConfTyping/QueryGrammar.lean` | brick 26 / `VULN-COVERAGE.md` row 3 | a fuller query grammar: parameterization proved injection-safe over a template with `n` literal slots |
 | `ConfTyping/CmdInjection.lean` | brick 27 / `VULN-COVERAGE.md` row 3 | a second real sink: OS command injection (CWE-78) by the same data-not-structure discipline |
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
+| `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 
 ## Result map
 
@@ -883,6 +884,17 @@ digit characters and folds it (`spanDigits` + `ofDigits`); `lexD_printD` re-prov
 the lexer round trip over the decimal alphabet, and `decimal_source_injection_free`
 re-derives injection-freedom through the same `parse`/`scheck` pipeline. Witnesses
 use genuine multi-digit ids (`12`, `45`), read as single numbers, not digit runs.
+
+## Log injection (`LogInjection.lean`) — a third real sink (CWE-117)
+
+Brick 29 adds a fourth made-real channel (after SQL injection, path traversal, and
+command injection) with a fourth metacharacter: the **record separator** (a
+newline). A log splits into records on newlines; the executed structure is the even
+(structural) records. `field_correct`/`field_immune` show structured logging
+(`log.info(event, field=value)`) keeps the executed structure a function of the
+trusted preamble alone, while `log_concat_injectable` shows a newline inside a
+concatenated field forges a record (`log.write(preamble+"\n"+field)`). Log injection
+joins SQL injection, path traversal, and command injection under one discipline.
 
 ## §11 pre-mechanization checklist (framework doc)
 

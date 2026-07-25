@@ -202,7 +202,9 @@ scanner with a proved longest-match round trip; **a fuller query grammar**
 injection (CWE-78) closed by the same data-not-structure discipline as SQL
 injection and path traversal; and **decimal identifiers** (`ofDigits_toDigits`) —
 a verified mathlib-free decimal codec so the lexer reads real multi-digit numbers,
-closing brick 25's last residual.
+closing brick 25's last residual; and **log injection** (`field_correct`) — a
+fourth made-real sink (CWE-117), the newline record-separator, with structured
+logging immune by construction.
 
 ## Scope — what is *not* claimed
 

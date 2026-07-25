@@ -893,7 +893,19 @@ partitions), not a general-purpose language frontend.
   `12`, `45`, read as single numbers, not digit-by-digit). Brick 25's residual is
   closed. **Brick 28 complete.**
 
-### The security program, standing state (twenty-eight bricks, fifteen classes)
+### Brick 29 ledger (a third real sink — log injection / log forging, CWE-117)
+
+- `LogInjection.lean` — the fourth made-real channel (after SQL injection, path
+  traversal, command injection), with a fourth metacharacter: the **record
+  separator** (a newline). A log splits into records on newlines; the executed
+  structure is the even (structural) records. `field_correct`/`field_immune` —
+  structured logging (`log.info(event, field=value)`) keeps the executed structure
+  a function of the trusted preamble alone; `log_concat_injectable` — a newline
+  inside a concatenated field forges a record (`log.write(preamble+"\n"+field)`).
+  Integrity NI with a real log sink, adding a class to the "more sink classes"
+  axis. **Brick 29 complete — log injection joins the made-real channels.**
+
+### The security program, standing state (twenty-nine bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -959,8 +971,8 @@ generated for the heap model, injection is proved on a real query (single- and
 multi-literal), caught in a
 running program (first- and second-order) by a sound taint checker, and attached to
 a parsed and lexed character source over a multi-character alphabet with real
-decimal identifiers (a verified codec), path traversal
-and OS command injection are closed by the same
+decimal identifiers (a verified codec), path traversal,
+OS command injection, and log injection are closed by the same
 data-not-structure discipline, composition is certificate accumulation by the same
 law that composes contraction estimates, and every guarantee carries its trusted
 base as an automatic bill of materials. The honest edges are all named as theorems
