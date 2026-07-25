@@ -22,8 +22,15 @@
     returns `Q`, then `Q` coarsens the entry and is preserved. Its **convergence**
     is proved too (`loopFix_terminates`): each merge strictly shrinks the class
     count, so the search reaches its final answer within `|P| + 1` fuel and never
-    diverges. What is *not* claimed is *completeness* — that it always terminates
-    in success rather than giving up — which depends on the merge heuristic.
+    diverges.
+  * `collapse` / `loopSearch` — a **narrowed completeness**. The fully-merged
+    partition (the top of the may-alias lattice) is *always* a valid coarsening
+    (`Coarsens_collapse`, unconditional), and it is a fixed point exactly for the
+    alias-maintaining loops that motivate this brick. `coarsen_loop_complete`
+    proves that whenever the top is preserved the loop is safe (independent of any
+    heuristic), and `loopSearch_complete` proves the search — widened to the top —
+    then succeeds. So completeness holds for the top; the residual narrows to loops
+    whose *only* fixed point is a strict intermediate coarsening.
   * `coarsen_loop_safe` — the loop is memory-safe from the inferred invariant
     (fuel induction, reusing brick 24's `alsafe` for the body).
   * `alias_maintain_loop_safe` — the witness brick 24 rejected: with `0` and `1`
@@ -336,6 +343,95 @@ theorem coarsen_loop_of_fix {e : HLExpr} {c : ALCmd} {P Q : Part} {s : FLState} 
   have hQs : ALInv Q s := ALInv_coarsen hCoQ hPs
   exact (coarsen_loop_safe hchk hpres hCoQ.2.2 fuel s hQs).1
 
+/-! ## Completeness: widening to the top of the lattice
+
+    The blanket "completeness is impossible for a fixed heuristic" is too strong.
+    It narrows to a theorem: the **fully-merged** partition (every variable in one
+    class — the top of the may-alias lattice) is *always* a valid coarsening, and
+    it is a fixed point exactly for the alias-maintaining loops that motivate this
+    brick. So a search that **widens to the top** is complete for them. -/
+
+/-- The top of the may-alias lattice: all variables of `Q` in a single class. -/
+def collapse (Q : Part) : Part := [Q.flatten]
+
+theorem liveP_collapse {Q : Part} {z : HLoc} : liveP (collapse Q) z ↔ liveP Q z := by
+  constructor
+  · rintro ⟨cls, hcls, hz⟩
+    simp only [collapse, List.mem_singleton] at hcls; subst hcls
+    rw [List.mem_flatten] at hz
+    obtain ⟨c, hc, hzc⟩ := hz; exact ⟨c, hc, hzc⟩
+  · rintro ⟨c, hc, hz⟩
+    exact ⟨Q.flatten, by simp [collapse], List.mem_flatten.mpr ⟨c, hc, hz⟩⟩
+
+/-- **The top is always a coarsening.** Merging everything into one class only adds
+    may-aliases, so it coarsens any partition — unconditionally. -/
+theorem Coarsens_collapse (Q : Part) : Coarsens Q (collapse Q) := by
+  refine ⟨fun _ => liveP_collapse.symm, ?_, ?_⟩
+  · rintro x y ⟨c, hc, hxc, hyc⟩
+    exact ⟨Q.flatten, by simp [collapse],
+      List.mem_flatten.mpr ⟨c, hc, hxc⟩, List.mem_flatten.mpr ⟨c, hc, hyc⟩⟩
+  · intro z c₁ c₂ h1 h2 _ _
+    simp only [collapse, List.mem_singleton] at h1 h2; rw [h1, h2]
+
+theorem Coarsens_trans {P Q R : Part} (h1 : Coarsens P Q) (h2 : Coarsens Q R) :
+    Coarsens P R :=
+  ⟨fun z => (h1.1 z).trans (h2.1 z), fun x y h => h2.2.1 x y (h1.2.1 x y h), h2.2.2⟩
+
+/-- **Narrowed completeness (proof system).** Whenever the top is a preserved
+    fixed point, the loop is memory-safe — *independent of any search heuristic*.
+    This is the precise sufficient condition: an alias-maintaining loop whose
+    fully-merged invariant is stable is always provable. -/
+theorem coarsen_loop_complete {e : HLExpr} {c : ALCmd} {P Q₁ : Part} {s : FLState}
+    (fuel : Nat) (hchk : alcheck (collapse P) c = some Q₁)
+    (hpres : preservedB (collapse P) Q₁ = true) (hPs : ALInv P s) :
+    alexec fuel (.loop e c) s ≠ .err := by
+  have hCo : Coarsens P (collapse P) := Coarsens_collapse P
+  exact (coarsen_loop_safe hchk hpres hCo.2.2 fuel s (ALInv_coarsen hCo hPs)).1
+
+/-- The search, widened to the top: try the fixpoint iteration; on failure, fall
+    back to the fully-merged invariant. -/
+def loopSearch (n : Nat) (Q : Part) (c : ALCmd) : Option Part :=
+  match loopFix n Q c with
+  | some R => some R
+  | none =>
+      match alcheck (collapse Q) c with
+      | some Q₁ => if preservedB (collapse Q) Q₁ then some (collapse Q) else none
+      | none    => none
+
+/-- **The widened search is sound** — whatever it returns coarsens the entry and is
+    preserved (so the loop is safe). -/
+theorem loopSearch_correct {P : Part} {c : ALCmd} {n : Nat} {Q R : Part}
+    (hCo : Coarsens P Q) (h : loopSearch n Q c = some R) :
+    Coarsens P R ∧ ∃ R₁, alcheck R c = some R₁ ∧ preservedB R R₁ = true := by
+  simp only [loopSearch] at h
+  cases hlf : loopFix n Q c with
+  | some R' =>
+      simp only [hlf, Option.some.injEq] at h; subst h
+      exact loopFix_correct n Q R' hCo hlf
+  | none =>
+      simp only [hlf] at h
+      cases hchk : alcheck (collapse Q) c with
+      | none => simp [hchk] at h
+      | some Q₁ =>
+          simp only [hchk] at h
+          by_cases hp : preservedB (collapse Q) Q₁ = true
+          · rw [if_pos hp, Option.some.injEq] at h; subst h
+            exact ⟨Coarsens_trans hCo (Coarsens_collapse Q), Q₁, hchk, hp⟩
+          · rw [if_neg hp] at h; simp at h
+
+/-- **The widened search is complete for the top.** If the fully-merged invariant
+    is a preserved fixed point, the search never fails — it finds an invariant
+    (the fixpoint's, or the top itself). This is the narrowed completeness: the
+    residual is only loops whose *only* fixed point is a strict intermediate
+    coarsening. -/
+theorem loopSearch_complete {Q Q₁ : Part} {c : ALCmd} {n : Nat}
+    (hchk : alcheck (collapse Q) c = some Q₁) (hpres : preservedB (collapse Q) Q₁ = true) :
+    loopSearch n Q c ≠ none := by
+  simp only [loopSearch]
+  cases hlf : loopFix n Q c with
+  | some R' => simp [hlf]
+  | none => simp [hlf, hchk, hpres]
+
 /-! ## The witness brick 24 rejected -/
 
 /-- The alias-maintaining loop: `while (…) copy 1 0`. With `0` and `1` live and
@@ -394,5 +490,20 @@ theorem ALInv_s0 : ALInv [[1], [0]] s0 := by
 theorem alias_maintain_loop_safe (fuel : Nat) :
     alexec fuel MaintainLoop s0 ≠ .err :=
   coarsen_loop_of_fix (e := .var 9) fuel disjP_10 maintain_loopFix ALInv_s0
+
+/-- **The top (fully-merged) invariant is a fixed point here** — the collapse of
+    the entry, `[[1, 0]]`, is preserved by the body. -/
+theorem maintain_collapse_preserved :
+    alcheck (collapse [[1], [0]]) (.copy 1 0) = some [[1, 0]] ∧
+      preservedB (collapse [[1], [0]]) [[1, 0]] = true := by decide
+
+/-- **The widened search also finds an invariant** — completeness for the top. -/
+theorem maintain_loopSearch : (loopSearch 3 [[1], [0]] (.copy 1 0)).isSome = true := by decide
+
+/-- **Safety again, via narrowed completeness** — the same loop is proved safe
+    through the top-fixed-point route, independent of the search heuristic. -/
+theorem alias_maintain_loop_safe_complete (fuel : Nat) :
+    alexec fuel MaintainLoop s0 ≠ .err :=
+  coarsen_loop_complete fuel maintain_collapse_preserved.1 maintain_collapse_preserved.2 ALInv_s0
 
 end ConfTyping

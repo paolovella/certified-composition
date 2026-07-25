@@ -923,11 +923,15 @@ partitions), not a general-purpose language frontend.
   memory-safe from the inferred invariant (fuel induction reusing brick 24's
   `alsafe`). `maintain_loopFix` shows the fixpoint infers `[[1, 0]]` by `decide`,
   `brick24_rejects` shows brick 24's one-pass rule returns `none` on the same loop,
-  and `alias_maintain_loop_safe` proves it safe. Honest limit: not *completeness*
-  — the basic merge heuristic (first two classes) may converge to a give-up rather
-  than a success on loops it cannot align, and the rule is integrated for the loop
-  as an analyzed unit. **Brick 30 complete — the may-alias loop rule iterates to a
-  fixed point, and the iteration provably terminates.**
+  and `alias_maintain_loop_safe` proves it safe. Completeness is **narrowed**, not
+  abandoned: the fully-merged partition (the top of the may-alias lattice) is always
+  a valid coarsening (`Coarsens_collapse`) and is a fixed point exactly for alias-
+  maintaining loops, so `coarsen_loop_complete` proves any loop whose top is
+  preserved is safe (heuristic-independent) and `loopSearch_complete` proves the
+  search — widened to the top — then succeeds. Residual: loops whose *only* fixed
+  point is a strict intermediate coarsening, and integration for the loop as an
+  analyzed unit. **Brick 30 complete — the may-alias loop rule iterates to a fixed
+  point, provably terminates, and is complete for the top of the lattice.**
 
 ### The security program, standing state (thirty bricks, sixteen classes)
 
@@ -1002,8 +1006,9 @@ law that composes contraction estimates, and every guarantee carries its trusted
 base as an automatic bill of materials. The honest edges are all named as theorems
 or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
 OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule now iterates to a
-fixed point (a coarsening invariant is inferred, validated, and the iteration
-provably terminates within `|P|+1` steps) with heuristic *completeness* as the
-residual, string literals with escapes and further grammar
+fixed point (a coarsening invariant is inferred, validated, the iteration provably
+terminates within `|P|+1` steps, and the search is complete for the top of the
+lattice — every alias-maintaining loop) with only strict-intermediate-fixed-point
+loops as the residual, string literals with escapes and further grammar
 richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

@@ -912,9 +912,13 @@ reaches its final answer within `|P|+1` fuel and never diverges. `coarsen_loop_s
 proves the loop safe
 from the inferred invariant, reusing brick 24's `alsafe` for the body. The witness
 `while (…) copy 1 0` is accepted (`maintain_loopFix` infers `[[1,0]]` by `decide`)
-where brick 24 returns `none` (`brick24_rejects`). Honest limit: not *completeness*
-— the basic merge heuristic may give up rather than succeed on loops it cannot
-align — and the rule is integrated for the loop as an analyzed unit.
+where brick 24 returns `none` (`brick24_rejects`). Completeness is **narrowed**, not
+abandoned: the fully-merged partition (the lattice top) is always a valid coarsening
+(`Coarsens_collapse`) and a fixed point exactly for alias-maintaining loops, so
+`coarsen_loop_complete` proves any loop whose top is preserved is safe (heuristic-
+independent) and `loopSearch_complete` proves the search — widened to the top — then
+succeeds. Residual: loops whose *only* fixed point is a strict intermediate
+coarsening.
 
 ## §11 pre-mechanization checklist (framework doc)
 

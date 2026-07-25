@@ -206,8 +206,9 @@ closing brick 25's last residual; and **log injection** (`field_correct`) — a
 fourth made-real sink (CWE-117), the newline record-separator, with structured
 logging immune by construction; and **fixpoint may-alias** (`ALInv_coarsen`) — the
 may-alias loop analysis now infers a coarsening invariant by iterating to a fixed
-point (with the iteration proved to terminate, `loopFix_terminates`), accepting
-alias-maintaining loops the one-pass rule rejected.
+point (the iteration proved to terminate, `loopFix_terminates`, and complete for the
+lattice top, `loopSearch_complete`), accepting alias-maintaining loops the one-pass
+rule rejected.
 
 ## Scope — what is *not* claimed
 
