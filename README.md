@@ -200,7 +200,9 @@ scanner with a proved longest-match round trip; **a fuller query grammar**
 (`param_correct_N`) — parameterization proved injection-safe over a template with
 `n` literal slots; and **a second real sink** (`argv_correct`) — OS command
 injection (CWE-78) closed by the same data-not-structure discipline as SQL
-injection and path traversal.
+injection and path traversal; and **decimal identifiers** (`ofDigits_toDigits`) —
+a verified mathlib-free decimal codec so the lexer reads real multi-digit numbers,
+closing brick 25's last residual.
 
 ## Scope — what is *not* claimed
 

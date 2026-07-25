@@ -70,7 +70,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             flsafe allocfree_loop_safe usefree_loop_rejected doublefree_loop_rejected \
             alsafe alias_free_loop_safe alias_uaf_loop_rejected doublefree_aliasloop_rejected \
             lexR_printReal rich_source_injection_free param_correct_N concat_injectable_N \
-            argv_correct cmd_concat_injectable; do
+            argv_correct cmd_concat_injectable \
+            ofDigits_toDigits lexD_printD decimal_source_injection_free unsafe_decimal_rejected; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -366,7 +367,14 @@ if grep -q "AliasLoop.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection; do
+if grep -q "DecimalId.lean" VULN-COVERAGE.md; then
+  for thm in "theorem ofDigits_toDigits" "theorem lexD_printD" "theorem decimal_source_injection_free"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/DecimalId.lean 2>/dev/null; then
+      echo "DRIFT: decimal identifiers cited but '$thm' is missing from DecimalId.lean"; fail=1
+    fi
+  done
+fi
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

@@ -879,7 +879,21 @@ partitions), not a general-purpose language frontend.
   follow-ons. **Brick 27 complete — command injection joins SQL and path
   traversal as a made-real channel.**
 
-### The security program, standing state (twenty-seven bricks, fifteen classes)
+### Brick 28 ledger (decimal identifiers — the codec brick 25 deferred)
+
+- `DecimalId.lean` — brick 25's named residual: identifier values were a run
+  length, not decimal. This brick adds a **verified decimal codec** — `toDigits`
+  (well-founded on `n / 10`) and `ofDigits` (a base-10 fold), with the round trip
+  `ofDigits_toDigits` (`ofDigits (toDigits n) = n`) proved by the definition's own
+  induction principle — and a maximal-munch scanner that reads a run of decimal
+  digit characters and folds it (`spanDigits` + `ofDigits`). `lexD_printD`
+  re-proves the lexer round trip over the decimal alphabet, and
+  `decimal_source_injection_free` re-derives injection-freedom through the same
+  `parse`/`scheck` pipeline over a multi-digit-identifier source (witness ids
+  `12`, `45`, read as single numbers, not digit-by-digit). Brick 25's residual is
+  closed. **Brick 28 complete.**
+
+### The security program, standing state (twenty-eight bricks, fifteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -944,7 +958,8 @@ aliasing via `copy` under loops) is
 generated for the heap model, injection is proved on a real query (single- and
 multi-literal), caught in a
 running program (first- and second-order) by a sound taint checker, and attached to
-a parsed and lexed character source over a multi-character alphabet, path traversal
+a parsed and lexed character source over a multi-character alphabet with real
+decimal identifiers (a verified codec), path traversal
 and OS command injection are closed by the same
 data-not-structure discipline, composition is certificate accumulation by the same
 law that composes contraction estimates, and every guarantee carries its trusted
@@ -952,5 +967,5 @@ base as an automatic bill of materials. The honest edges are all named as theore
 or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
 OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule is one-pass (a
 surviving alias across the back-edge is rejected, not iterated to a fixed point),
-decimal identifier values and further grammar richness remain depth follow-ons,
+string literals with escapes and further grammar richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

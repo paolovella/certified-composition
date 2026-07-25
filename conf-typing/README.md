@@ -52,6 +52,7 @@ lake build          # builds all four layers
 | `ConfTyping/LexReal.lean` | brick 25 / `VULN-COVERAGE.md` row 3 | a richer alphabet: multi-character keywords and digit-run identifiers under a maximal-munch scanner with a proved round trip |
 | `ConfTyping/QueryGrammar.lean` | brick 26 / `VULN-COVERAGE.md` row 3 | a fuller query grammar: parameterization proved injection-safe over a template with `n` literal slots |
 | `ConfTyping/CmdInjection.lean` | brick 27 / `VULN-COVERAGE.md` row 3 | a second real sink: OS command injection (CWE-78) by the same data-not-structure discipline |
+| `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 
 ## Result map
 
@@ -870,6 +871,18 @@ a different metacharacter: a command string splits into an argv vector on the
 while `cmd_concat_injectable` shows a separator inside a concatenated value injects
 structure (`system("prog "+v)`). Command injection joins SQL injection and path
 traversal as a made-real channel.
+
+## Decimal identifiers (`DecimalId.lean`) — the codec brick 25 deferred
+
+Brick 28 closes brick 25's one named residual: identifier *values* were read as a
+run length, not decimal. The core is a **verified mathlib-free decimal codec** —
+`toDigits` (well-founded on `n / 10`) and `ofDigits` (a base-10 fold) — with the
+round trip `ofDigits_toDigits` (`ofDigits (toDigits n) = n`) proved by the
+definition's own induction principle. The scanner reads a maximal run of decimal
+digit characters and folds it (`spanDigits` + `ofDigits`); `lexD_printD` re-proves
+the lexer round trip over the decimal alphabet, and `decimal_source_injection_free`
+re-derives injection-freedom through the same `parse`/`scheck` pipeline. Witnesses
+use genuine multi-digit ids (`12`, `45`), read as single numbers, not digit runs.
 
 ## §11 pre-mechanization checklist (framework doc)
 
