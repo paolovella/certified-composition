@@ -72,7 +72,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             lexR_printReal rich_source_injection_free param_correct_N concat_injectable_N \
             argv_correct cmd_concat_injectable \
             ofDigits_toDigits lexD_printD decimal_source_injection_free unsafe_decimal_rejected \
-            field_correct log_concat_injectable log_concat_leaks; do
+            field_correct log_concat_injectable log_concat_leaks \
+            ALInv_coarsen loopFix_correct coarsen_loop_safe alias_maintain_loop_safe brick24_rejects; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -375,7 +376,14 @@ if grep -q "DecimalId.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection; do
+if grep -q "AliasFix.lean" VULN-COVERAGE.md; then
+  for thm in "theorem ALInv_coarsen" "theorem loopFix_correct" "theorem coarsen_loop_safe" "theorem alias_maintain_loop_safe"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/AliasFix.lean 2>/dev/null; then
+      echo "DRIFT: fixpoint may-alias cited but '$thm' is missing from AliasFix.lean"; fail=1
+    fi
+  done
+fi
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

@@ -38,3 +38,4 @@ import ConfTyping.CmdInjection
 import ConfTyping.AliasLoop
 import ConfTyping.DecimalId
 import ConfTyping.LogInjection
+import ConfTyping.AliasFix

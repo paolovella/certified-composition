@@ -905,7 +905,28 @@ partitions), not a general-purpose language frontend.
   Integrity NI with a real log sink, adding a class to the "more sink classes"
   axis. **Brick 29 complete — log injection joins the made-real channels.**
 
-### The security program, standing state (twenty-nine bricks, sixteen classes)
+### Brick 30 ledger (fixpoint may-alias — closing brick 24's one-pass loop rule)
+
+- `AliasFix.lean` — the hard follow-on brick 24 named: its loop rule is *one-pass*,
+  so an alias-maintaining loop (`while (…) copy 1 0`, two pointers live on entry)
+  is rejected because one body pass merges the entry classes. This brick infers a
+  **coarsening invariant** by iterating the body transfer to a fixed point.
+  `ALInv_coarsen` (axiom-free) is the semantic heart: merging classes only weakens
+  the may-alias over-approximation, so `ALInv P → ALInv Q` for any coarsening `Q`.
+  `mergeOne` + `ALInv_of_setSub` give order-insensitive (set-equality) class
+  comparison. `loopFix` iterates, merging classes until a preserved fixed point;
+  `loopFix_correct` proves its **partial correctness** — whatever it returns
+  coarsens the entry and is preserved (convergence itself is not asserted; the
+  certificate is validated, not the search). `coarsen_loop_safe` proves the loop
+  memory-safe from the inferred invariant (fuel induction reusing brick 24's
+  `alsafe`). `maintain_loopFix` shows the fixpoint infers `[[1, 0]]` by `decide`,
+  `brick24_rejects` shows brick 24's one-pass rule returns `none` on the same loop,
+  and `alias_maintain_loop_safe` proves it safe. Honest limit: the merge heuristic
+  is basic (first two classes) and the rule is integrated for the loop as an
+  analyzed unit. **Brick 30 complete — the may-alias loop rule iterates to a fixed
+  point.**
+
+### The security program, standing state (thirty bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -977,7 +998,8 @@ data-not-structure discipline, composition is certificate accumulation by the sa
 law that composes contraction estimates, and every guarantee carries its trusted
 base as an automatic bill of materials. The honest edges are all named as theorems
 or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
-OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule is one-pass (a
-surviving alias across the back-edge is rejected, not iterated to a fixed point),
-string literals with escapes and further grammar richness remain depth follow-ons,
+OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule now iterates to a
+fixed point (a coarsening invariant is inferred and validated) with a basic merge
+heuristic as the residual, string literals with escapes and further grammar
+richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

@@ -54,6 +54,7 @@ lake build          # builds all four layers
 | `ConfTyping/CmdInjection.lean` | brick 27 / `VULN-COVERAGE.md` row 3 | a second real sink: OS command injection (CWE-78) by the same data-not-structure discipline |
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
+| `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
 
 ## Result map
 
@@ -895,6 +896,22 @@ newline). A log splits into records on newlines; the executed structure is the e
 trusted preamble alone, while `log_concat_injectable` shows a newline inside a
 concatenated field forges a record (`log.write(preamble+"\n"+field)`). Log injection
 joins SQL injection, path traversal, and command injection under one discipline.
+
+## Fixpoint may-alias (`AliasFix.lean`) — closing brick 24's one-pass loop rule
+
+Brick 30 closes brick 24's named residual: its loop rule was *one-pass*, rejecting
+alias-maintaining loops (`while (…) copy 1 0` with two live pointers) because one
+body pass merges the entry classes. This brick infers a **coarsening invariant** by
+iterating the body transfer to a fixed point. The semantic heart is `ALInv_coarsen`
+(axiom-free): merging classes only weakens the may-alias over-approximation, so
+`ALInv P → ALInv Q` for any coarsening `Q`. `loopFix` iterates, merging classes
+until a preserved fixed point, and `loopFix_correct` proves its partial correctness
+(whatever it returns coarsens the entry and is preserved — convergence is not
+asserted, the certificate is validated). `coarsen_loop_safe` proves the loop safe
+from the inferred invariant, reusing brick 24's `alsafe` for the body. The witness
+`while (…) copy 1 0` is accepted (`maintain_loopFix` infers `[[1,0]]` by `decide`)
+where brick 24 returns `none` (`brick24_rejects`). Honest limit: the merge heuristic
+is basic and the rule is integrated for the loop as an analyzed unit.
 
 ## §11 pre-mechanization checklist (framework doc)
 
