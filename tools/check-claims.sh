@@ -67,7 +67,10 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             hlcheck_safe loopalloc_safe loop_wild_errors loop_wild_rejected \
             parse_print scheck_ni source_injection_free unsafe_src_rejected \
             lex_print source_string_injection_free unsafe_chars_parse unsafe_chars_rejected \
-            flsafe allocfree_loop_safe usefree_loop_rejected doublefree_loop_rejected; do
+            flsafe allocfree_loop_safe usefree_loop_rejected doublefree_loop_rejected \
+            alsafe alias_free_loop_safe alias_uaf_loop_rejected doublefree_aliasloop_rejected \
+            lexR_printReal rich_source_injection_free param_correct_N concat_injectable_N \
+            argv_correct cmd_concat_injectable; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
@@ -354,6 +357,21 @@ if grep -q "FreeLoop.lean" VULN-COVERAGE.md; then
     echo "DRIFT: FreeLoop.lean not imported by the ConfTyping root"; fail=1
   fi
 fi
+
+# 1z. The four "what's left" depth bricks (24-27) must be in the build.
+if grep -q "AliasLoop.lean" VULN-COVERAGE.md; then
+  for thm in "theorem alsafe" "theorem alias_free_loop_safe" "theorem doublefree_aliasloop_rejected"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/AliasLoop.lean 2>/dev/null; then
+      echo "DRIFT: may-alias-under-loops cited but '$thm' is missing from AliasLoop.lean"; fail=1
+    fi
+  done
+fi
+for mod in AliasLoop LexReal QueryGrammar CmdInjection; do
+  if grep -q "$mod.lean" VULN-COVERAGE.md && \
+     ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
+    echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
+  fi
+done
 
 # 2. Every transport-kernel Lean module must be mentioned in its README.
 for f in transport-kernel/TransportKernel/*.lean; do

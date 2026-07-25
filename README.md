@@ -192,7 +192,15 @@ takes it down to a character string, so the whole chain string → lex → parse
 check → theorem is machine-checked. Finally, the last hard memory combination:
 **free under loops** (`flsafe`) — `free` and unbounded iteration coexist soundly
 via linearity carried as a loop invariant, with the fixed-point rule catching the
-cross-iteration double-free.
+cross-iteration double-free. The named depth follow-ons then land: **may-alias
+under loops** (`alsafe`) — a may-alias partition makes pointer `copy` + `free` +
+loops sound, the aliasing case linearity forbade; **a richer alphabet**
+(`rich_source_injection_free`) — multi-character lexemes under a maximal-munch
+scanner with a proved longest-match round trip; **a fuller query grammar**
+(`param_correct_N`) — parameterization proved injection-safe over a template with
+`n` literal slots; and **a second real sink** (`argv_correct`) — OS command
+injection (CWE-78) closed by the same data-not-structure discipline as SQL
+injection and path traversal.
 
 ## Scope — what is *not* claimed
 

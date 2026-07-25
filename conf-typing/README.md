@@ -48,6 +48,10 @@ lake build          # builds all four layers
 | `ConfTyping/ParseSource.lean` | brick 21 / `VULN-COVERAGE.md` row 3 | a real parser: recursive descent + round-trip correctness, so the injection guarantee attaches to source *text* not a hand-built AST |
 | `ConfTyping/LexSource.lean` | brick 22 / `VULN-COVERAGE.md` row 3 | a lexer: characters → tokens with round-trip correctness — the full string → lex → parse → check → theorem pipeline |
 | `ConfTyping/FreeLoop.lean` | brick 23 / `VULN-COVERAGE.md` row 6 | free under loops: linearity (brick 12) carried as a loop invariant through fuel induction (brick 20) — the last hard combination |
+| `ConfTyping/AliasLoop.lean` | brick 24 / `VULN-COVERAGE.md` row 6 | may-alias under loops: a may-alias partition makes `copy` + `free` + loops sound — the depth follow-on brick 23 named |
+| `ConfTyping/LexReal.lean` | brick 25 / `VULN-COVERAGE.md` row 3 | a richer alphabet: multi-character keywords and digit-run identifiers under a maximal-munch scanner with a proved round trip |
+| `ConfTyping/QueryGrammar.lean` | brick 26 / `VULN-COVERAGE.md` row 3 | a fuller query grammar: parameterization proved injection-safe over a template with `n` literal slots |
+| `ConfTyping/CmdInjection.lean` | brick 27 / `VULN-COVERAGE.md` row 3 | a second real sink: OS command injection (CWE-78) by the same data-not-structure discipline |
 
 ## Result map
 
@@ -819,6 +823,53 @@ free (brick 12) introduces under loops — freeing a loop-invariant pointer mean
 the body shrinks the tracked set, so `V ⊆ flcheck V body` fails. Honest limit:
 linearity forbids pointer *copying* — combining this with brick 19's aliasing
 under loops would need a may-alias abstraction (a further brick).
+
+## May-alias under loops (`AliasLoop.lean`) — the depth follow-on brick 23 named
+
+Brick 24 lands the aliasing/free/loop intersection brick 23 deferred. Brick 19's
+exact-address tracking dies under loops, so the checker abstracts the heap by a
+**may-alias partition** of the live pointer variables (`List (List Var)` — no
+addresses, no allocation counter, which could never be a loop fixed point).
+
+| result | Lean | axioms | content |
+|---|---|---|---|
+| **soundness** | `alsafe` | standard 3 | fuel induction with a four-clause invariant whose core is the may-alias over-approximation *different class ⟹ different address*; `alloc` opens a fresh singleton class, `copy x y` puts `x` in `y`'s class, `free x` drops `x`'s whole class, the loop rule is the one-pass fixed point |
+| **copy under loops, safe** | `alias_free_loop_safe` | standard 3 | the witness brick 23 could not state — a loop that allocates, *copies* (aliases), uses the alias, and frees — is accepted and never errors; linearity forbade the copy |
+| **use-after-free via alias** | `alias_uaf_loop_rejected` | choice-free | free-then-access through the alias is a use-after-free, rejected |
+| **double-free across iterations** | `doublefree_aliasloop_rejected` | choice-free | freeing an invariant pointer drops its class, so the body can't preserve the entry partition — rejected by the fixed point |
+
+`free x` drops `x`'s *whole class*, killing every alias at once — sound because
+any actual alias of `x` is in `x`'s class. Honest limit: the loop rule is
+one-pass (a surviving alias across the back-edge is rejected, not iterated to a
+fixed point).
+
+## A richer alphabet (`LexReal.lean`) — multi-character tokens and maximal munch
+
+Brick 25 closes brick 22's one-character-per-token limit: real two-letter keywords,
+digit-run identifiers, whitespace separators, and a **maximal-munch** scanner.
+The round trip (`lexR_printReal`) is re-proved against a printer that is no longer
+injective on characters, and the same `parse`/`scheck` pipeline runs on top, so
+`rich_source_injection_free` re-derives injection-freedom over the richer source.
+Honest limit: identifier values are read as a run length, not yet decimal.
+
+## A fuller query grammar (`QueryGrammar.lean`) — beyond one literal
+
+Brick 26 generalizes brick 14's single-literal tokenizer argument to a template
+with `n` literal slots parameterized by a value *vector*. `param_correct_N` (the
+skeleton of the concatenated query equals the `n+1` structural pieces),
+`param_immune_N` (skeleton independent of every value), and `concat_injectable_N`
+(a quote in an arbitrary slot displaces the structure) — the same
+data-not-structure discipline, now n-ary.
+
+## A second real sink (`CmdInjection.lean`) — OS command injection (CWE-78)
+
+Brick 27 re-runs brick 14/17's "make a channel real" method for a third sink with
+a different metacharacter: a command string splits into an argv vector on the
+**argument separator**, and `argv_correct`/`argv_immune` show argv-binding
+(`execv(prog,[v])`) keeps the executed structure a function of the program alone,
+while `cmd_concat_injectable` shows a separator inside a concatenated value injects
+structure (`system("prog "+v)`). Command injection joins SQL injection and path
+traversal as a made-real channel.
 
 ## §11 pre-mechanization checklist (framework doc)
 

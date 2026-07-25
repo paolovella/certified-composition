@@ -821,7 +821,65 @@ partitions), not a general-purpose language frontend.
   (aliasing-under-loops needs may-alias). **Brick 23 complete — every hard
   combination landed.**
 
-### The security program, standing state (twenty-three bricks, fourteen classes)
+### Brick 24 ledger (may-alias under loops — the depth follow-on brick 23 named)
+
+- `AliasLoop.lean` — the aliasing/free/loop intersection brick 23 deferred by
+  name. Brick 19's exact-address tracking dies under loops, so the checker
+  abstracts the heap by a **may-alias partition** of the live pointer variables
+  (a `List (List Var)` — no addresses, no allocation counter that could never be
+  a loop fixed point). `alsafe` (fuel induction, four-clause invariant whose core
+  is the may-alias over-approximation *different class ⟹ different address*) — a
+  checked program never hits a use-after-free/double-free/wild access at any
+  fuel. `alloc` opens a fresh singleton class, `copy x y` puts `x` in `y`'s
+  class, `free x` drops `x`'s **whole class** (killing every alias at once),
+  `access x` needs `x` classed; the loop rule is the one-pass fixed point (the
+  body must preserve every entry class). `alias_free_loop_safe` — the witness
+  brick 23 could not state: a loop that allocates, **copies**, uses the alias,
+  and frees is accepted and safe (linearity forbade the copy).
+  `alias_uaf_loop_rejected` (free-then-access an alias) and
+  `doublefree_aliasloop_rejected` (invariant-pointer free) are the interlocks.
+  Honest limit: the loop rule is one-pass (a surviving alias across the back-edge
+  is rejected, not iterated to a fixed point). **Brick 24 complete — the last
+  memory-safety follow-on landed.**
+
+### Brick 25 ledger (a richer alphabet — multi-character tokens, maximal munch)
+
+- `LexReal.lean` — brick 22's honest limit was one character per token. This
+  brick makes lexemes multi-character: real two-letter keywords, identifiers as
+  digit *runs*, whitespace separators, and a **maximal-munch** scanner, with the
+  round trip (`lexR_printReal`) re-proved against a printer that is no longer
+  injective on characters (the separators and run lengths carry the boundaries).
+  The security claim survives the richer surface: the same `parse`/`scheck`
+  pipeline runs on top, so `rich_source_injection_free` re-derives injection-
+  freedom over a real, whitespace-delimited character source. Honest limit:
+  identifier values are read as a run length, not yet decimal. **Brick 25
+  complete.**
+
+### Brick 26 ledger (a fuller query grammar — beyond one literal)
+
+- `QueryGrammar.lean` — brick 14 made injection real on the smallest grammar
+  (one quote-delimited literal). This brick generalizes the tokenizer argument to
+  a template with **`n` literal slots** parameterized by a value *vector*.
+  `param_correct_N` (skeleton of the concatenated query equals the `n+1`
+  structural pieces, proved by induction over the interleaving with brick 14's
+  `segs_append_q`) and `param_immune_N` (skeleton independent of every value);
+  `concat_injectable_N` — a quote in an arbitrary slot displaces the structure.
+  Same data-not-structure discipline, now n-ary. **Brick 26 complete.**
+
+### Brick 27 ledger (a second real sink — OS command injection, CWE-78)
+
+- `CmdInjection.lean` — brick 17 showed "make a channel real" is not injection-
+  specific by re-running it for path traversal; this adds a third real sink with
+  a different metacharacter. A command string splits into an argv vector on the
+  **argument separator**; the executed structure is the even (structural) argv
+  positions. `argv_correct`/`argv_immune` — argv-binding (`execv(prog,[v])`) keeps
+  the executed structure a function of the program alone; `cmd_concat_injectable`
+  — a separator inside a concatenated value injects structure (`system("prog "+v)`).
+  Integrity NI with a real command sink, closing one of the "more sink classes"
+  follow-ons. **Brick 27 complete — command injection joins SQL and path
+  traversal as a made-real channel.**
+
+### The security program, standing state (twenty-seven bricks, fifteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -869,19 +927,30 @@ theorem (brick 21); and **a lexer** so the front-end reaches characters — the 
 chain string → lex → parse → check → theorem is machine-checked (brick 22); and
 **free under loops** so `free` and unbounded iteration coexist soundly via
 linearity carried as a loop invariant, with the fixed-point rule catching the
-cross-iteration double-free (brick 23). What "bulletproof" means is stated at
+cross-iteration double-free (brick 23); and **may-alias under loops** so `copy`
+and `free` and unbounded iteration coexist soundly via a may-alias partition, the
+depth follow-on brick 23 named (brick 24); and **a richer alphabet** so lexemes
+span several characters under a maximal-munch scanner with a proved longest-match
+round trip (brick 25); and **a fuller query grammar** so parameterization is
+proved injection-safe over a template with `n` literal slots (brick 26); and **a
+second real sink** so OS command injection (CWE-78) joins SQL injection and path
+traversal as a made-real channel by the same data-not-structure discipline (brick
+27). What "bulletproof" means is stated at
 proved strength, the flow-property classes are excluded *by type-checking* (store,
 clock, termination, and heap — closed, declared, or non-leaking), noninterference
 holds over an arbitrary label lattice, memory safety (including use-after-free
-through aliases, double-free, wild access under loops, and free under loops) is
-generated for the heap model, injection is proved on a real query, caught in a
+through aliases, double-free, wild access under loops, free under loops, and
+aliasing via `copy` under loops) is
+generated for the heap model, injection is proved on a real query (single- and
+multi-literal), caught in a
 running program (first- and second-order) by a sound taint checker, and attached to
-a parsed and lexed character source, path traversal is closed by the same
+a parsed and lexed character source over a multi-character alphabet, path traversal
+and OS command injection are closed by the same
 data-not-structure discipline, composition is certificate accumulation by the same
 law that composes contraction estimates, and every guarantee carries its trusted
 base as an automatic bill of materials. The honest edges are all named as theorems
 or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
-OUT-NONCOMPOSABLE, authz stays CARRIED, aliasing (`copy`) *under* loops (a may-alias
-abstraction) is a memory-safety follow-on, a full SQL grammar (beyond one
-quote-delimited literal) and other richer language features remain depth follow-ons,
+OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule is one-pass (a
+surviving alias across the back-edge is rejected, not iterated to a fixed point),
+decimal identifier values and further grammar richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

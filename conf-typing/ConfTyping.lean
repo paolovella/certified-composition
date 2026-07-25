@@ -32,3 +32,7 @@ import ConfTyping.HeapLoop
 import ConfTyping.ParseSource
 import ConfTyping.LexSource
 import ConfTyping.FreeLoop
+import ConfTyping.LexReal
+import ConfTyping.QueryGrammar
+import ConfTyping.CmdInjection
+import ConfTyping.AliasLoop
