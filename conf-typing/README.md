@@ -905,13 +905,16 @@ body pass merges the entry classes. This brick infers a **coarsening invariant**
 iterating the body transfer to a fixed point. The semantic heart is `ALInv_coarsen`
 (axiom-free): merging classes only weakens the may-alias over-approximation, so
 `ALInv P → ALInv Q` for any coarsening `Q`. `loopFix` iterates, merging classes
-until a preserved fixed point, and `loopFix_correct` proves its partial correctness
-(whatever it returns coarsens the entry and is preserved — convergence is not
-asserted, the certificate is validated). `coarsen_loop_safe` proves the loop safe
+until a preserved fixed point, `loopFix_correct` proves its partial correctness
+(whatever it returns coarsens the entry and is preserved), and `loopFix_terminates`
+proves convergence — each merge strictly shrinks the class count, so the search
+reaches its final answer within `|P|+1` fuel and never diverges. `coarsen_loop_safe`
+proves the loop safe
 from the inferred invariant, reusing brick 24's `alsafe` for the body. The witness
 `while (…) copy 1 0` is accepted (`maintain_loopFix` infers `[[1,0]]` by `decide`)
-where brick 24 returns `none` (`brick24_rejects`). Honest limit: the merge heuristic
-is basic and the rule is integrated for the loop as an analyzed unit.
+where brick 24 returns `none` (`brick24_rejects`). Honest limit: not *completeness*
+— the basic merge heuristic may give up rather than succeed on loops it cannot
+align — and the rule is integrated for the loop as an analyzed unit.
 
 ## §11 pre-mechanization checklist (framework doc)
 

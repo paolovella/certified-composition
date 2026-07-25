@@ -18,9 +18,12 @@
     insensitive), which a fixed point needs (the checker rebuilds classes in a
     different order each pass).
   * `loopFix` — iterate the body transfer, merging classes until the candidate is
-    preserved. Its **partial correctness** is proved: if `loopFix` returns `Q`,
-    then `Q` coarsens the entry and is preserved by the body. Convergence itself
-    is *not* proved — the certificate is validated, not the search.
+    preserved. Its **partial correctness** is proved (`loopFix_correct`): if it
+    returns `Q`, then `Q` coarsens the entry and is preserved. Its **convergence**
+    is proved too (`loopFix_terminates`): each merge strictly shrinks the class
+    count, so the search reaches its final answer within `|P| + 1` fuel and never
+    diverges. What is *not* claimed is *completeness* — that it always terminates
+    in success rather than giving up — which depends on the merge heuristic.
   * `coarsen_loop_safe` — the loop is memory-safe from the inferred invariant
     (fuel induction, reusing brick 24's `alsafe` for the body).
   * `alias_maintain_loop_safe` — the witness brick 24 rejected: with `0` and `1`
@@ -222,6 +225,77 @@ theorem loopFix_correct {P : Part} {c : ALCmd} :
                 simp only [hfm] at h
                 obtain ⟨ha, hb⟩ := findMerge_mem hfm
                 exact ih (mergeOne a b Q) R (Coarsens_mergeOne hCo ha hb) h
+
+/-! ## Convergence: the search always terminates -/
+
+theorem findMerge_eq {Q : Part} {a b : List HLoc} (h : findMerge Q = some (a, b)) :
+    ∃ rest, Q = a :: b :: rest := by
+  cases Q with
+  | nil => simp [findMerge] at h
+  | cons c cs => cases cs with
+    | nil => simp [findMerge] at h
+    | cons d ds =>
+        simp only [findMerge, Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl⟩ := h
+        exact ⟨ds, rfl⟩
+
+/-- **Each merge step strictly shrinks the partition.** `mergeOne` on the first
+    two classes removes both and adds one, so the class count drops — the
+    termination measure of the fixpoint iteration. -/
+theorem findMerge_mergeOne_length {Q : Part} {a b : List HLoc}
+    (h : findMerge Q = some (a, b)) : (mergeOne a b Q).length < Q.length := by
+  obtain ⟨rest, rfl⟩ := findMerge_eq h
+  have hfil : (a :: b :: rest).filter (fun x => decide (x ≠ a) && decide (x ≠ b))
+      = rest.filter (fun x => decide (x ≠ a) && decide (x ≠ b)) := by
+    simp [List.filter_cons]
+  simp only [mergeOne, hfil, List.length_cons]
+  have hle := List.length_filter_le (fun x => decide (x ≠ a) && decide (x ≠ b)) rest
+  omega
+
+/-- **Convergence of the fixpoint search.** The outcome of `loopFix` is fixed once
+    the fuel reaches the entry class count plus one: every extra step is either a
+    class-count-reducing merge (at most `|Q|` of them) or a terminal decision, so
+    the search never diverges. Proved by induction on a bound of the class count,
+    using the strict `mergeOne` decrease. -/
+theorem loopFix_converges (c : ALCmd) :
+    ∀ (n : Nat) (Q : Part), Q.length ≤ n →
+      ∀ f g, Q.length + 1 ≤ f → Q.length + 1 ≤ g → loopFix f Q c = loopFix g Q c := by
+  intro n
+  induction n with
+  | zero =>
+      intro Q hQ f g hf hg
+      have hQe : Q = [] := by cases Q with | nil => rfl | cons => simp at hQ
+      subst hQe
+      obtain ⟨f', rfl⟩ : ∃ f', f = f' + 1 := ⟨f - 1, by omega⟩
+      obtain ⟨g', rfl⟩ : ∃ g', g = g' + 1 := ⟨g - 1, by omega⟩
+      simp only [loopFix]
+      cases alcheck [] c with
+      | none => rfl
+      | some Q₁ => simp [preservedB]
+  | succ n ih =>
+      intro Q hQ f g hf hg
+      obtain ⟨f', rfl⟩ : ∃ f', f = f' + 1 := ⟨f - 1, by omega⟩
+      obtain ⟨g', rfl⟩ : ∃ g', g = g' + 1 := ⟨g - 1, by omega⟩
+      simp only [loopFix]
+      cases hchk : alcheck Q c with
+      | none => rfl
+      | some Q₁ =>
+          by_cases hp : preservedB Q Q₁ = true
+          · simp [hp]
+          · simp only [if_neg hp]
+            cases hfm : findMerge Q with
+            | none => rfl
+            | some ab =>
+                obtain ⟨a, b⟩ := ab
+                simp only [hfm]
+                have hlt : (mergeOne a b Q).length < Q.length := findMerge_mergeOne_length hfm
+                exact ih (mergeOne a b Q) (by omega) f' g' (by omega) (by omega)
+
+/-- **The search reaches its final answer within `|Q| + 1` fuel** — more fuel never
+    changes the result, so the fixpoint iteration always terminates. -/
+theorem loopFix_terminates (Q : Part) (c : ALCmd) {f : Nat} (hf : Q.length + 1 ≤ f) :
+    loopFix f Q c = loopFix (Q.length + 1) Q c :=
+  loopFix_converges c Q.length Q (Nat.le_refl _) f (Q.length + 1) hf (Nat.le_refl _)
 
 /-! ## The loop is sound from the inferred invariant -/
 

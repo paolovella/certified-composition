@@ -73,7 +73,8 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             argv_correct cmd_concat_injectable \
             ofDigits_toDigits lexD_printD decimal_source_injection_free unsafe_decimal_rejected \
             field_correct log_concat_injectable log_concat_leaks \
-            ALInv_coarsen loopFix_correct coarsen_loop_safe alias_maintain_loop_safe brick24_rejects; do
+            ALInv_coarsen loopFix_correct coarsen_loop_safe alias_maintain_loop_safe brick24_rejects \
+            loopFix_terminates findMerge_mergeOne_length; do
   if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
