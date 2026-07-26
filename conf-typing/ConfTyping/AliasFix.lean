@@ -46,10 +46,13 @@
     infers `[[0,1]]`) and never errors; `brick24_rejects` shows brick 24's
     one-pass rule returns `none` on the same loop.
 
-  Honest limit carried forward: the merge heuristic is basic (merge the first two
-  classes when not yet preserved); a precise join (merge exactly the classes the
-  body unified) is a precision follow-on, and the rule is integrated for the loop
-  as an analyzed unit.
+  The merge is **body-guided** (`findMerge2`): when the candidate is not yet
+  preserved, it merges the two classes the body's transfer *unified* — the genuine
+  join step — which lands on strict-intermediate fixed points the blind first-two
+  heuristic misses (`weak_accepted` / `weak_prog_safe` — the loop that pinned the
+  residual, now accepted and proved safe end to end). Residual: loops with no
+  coarsening fixed point reachable by iterated body-guided merging — a narrow class
+  for this language.
 -/
 import ConfTyping.AliasLoop
 
@@ -552,6 +555,37 @@ theorem coarsen_loop_safe_gen {e : HLExpr} {c : ALCmd} {Q Q₁ : Part}
           exact (ih s₁ (bodyPres s₁ ho₁)).2 s' ho₂
         · rw [FLRes.ok.injEq] at hs; subst hs; exact hQs
 
+/-- Two classes share a `Q₁`-superclass — i.e. the body's transfer `Q₁` put them
+    into one class. -/
+def shareSuper (Q₁ : Part) (a b : List HLoc) : Bool := Q₁.any (fun d => subOf a d && subOf b d)
+
+/-- **Body-guided merge.** Pick two entry classes that the body's transfer `Q₁`
+    unified — a genuine join step — rather than the first two blindly. This is
+    what closes the "wrong pair" weakness: it merges exactly the classes the loop
+    aliased, converging on the intermediate fixed point. -/
+def findMerge2 : Part → Part → Option (List HLoc × List HLoc)
+  | [],        _  => none
+  | a :: rest, Q₁ =>
+      match rest.find? (fun b => decide (b ≠ a) && shareSuper Q₁ a b) with
+      | some b => some (a, b)
+      | none   => findMerge2 rest Q₁
+
+theorem findMerge2_mem {Q Q₁ : Part} {a b : List HLoc}
+    (h : findMerge2 Q Q₁ = some (a, b)) : a ∈ Q ∧ b ∈ Q := by
+  induction Q with
+  | nil => simp [findMerge2] at h
+  | cons c rest ih =>
+      simp only [findMerge2] at h
+      cases hf : rest.find? (fun b => decide (b ≠ c) && shareSuper Q₁ c b) with
+      | some b' =>
+          rw [hf] at h; simp only [Option.some.injEq, Prod.mk.injEq] at h
+          obtain ⟨rfl, rfl⟩ := h
+          exact ⟨by simp, List.mem_cons_of_mem c (List.mem_of_find?_eq_some hf)⟩
+      | none =>
+          rw [hf] at h
+          obtain ⟨ha, hb⟩ := ih h
+          exact ⟨List.mem_cons_of_mem c ha, List.mem_cons_of_mem c hb⟩
+
 mutual
 /-- The integrated checker: leaves and `seq` as before; a loop runs the fixpoint
     search whose body is checked by `alcheck2` itself (so nested loops get the
@@ -580,7 +614,7 @@ def loopFix2 (f : Nat) (Q : Part) (cmd : ALCmd) : Option Part :=
       match alcheck2 Q cmd with
       | some Q₁ =>
           if preservedB Q Q₁ then some Q
-          else match findMerge Q with
+          else match findMerge2 Q Q₁ with
                | some (a, b) => loopFix2 f (mergeOne a b Q) cmd
                | none        => none
       | none => none
@@ -605,12 +639,12 @@ theorem loopFix2_correct {P : Part} {c : ALCmd} :
           · rw [if_pos hpres, Option.some.injEq] at h; subst h
             exact ⟨hCo, Q₁, hchk, hpres⟩
           · rw [if_neg hpres] at h
-            cases hfm : findMerge Q with
+            cases hfm : findMerge2 Q Q₁ with
             | none => simp [hfm] at h
             | some ab =>
                 obtain ⟨a, b⟩ := ab
                 simp only [hfm] at h
-                obtain ⟨ha, hb⟩ := findMerge_mem hfm
+                obtain ⟨ha, hb⟩ := findMerge2_mem hfm
                 exact ih (mergeOne a b Q) R (Coarsens_mergeOne hCo ha hb) h
 
 /-- The loop case of `alcheck2` yields a preserved coarsening invariant. -/
@@ -727,5 +761,60 @@ theorem nested_checks : alcheck2 [] NestedProg = some [[1, 0]] := by
 theorem nested_prog_safe (fuel : Nat) (σ₀ : HLoc → Int) :
     alexec fuel NestedProg (σ₀, 0, []) ≠ .err :=
   alsafe2_of_check fuel σ₀ nested_checks
+
+/-! ## The residual weakness — located, then closed
+
+    The residual was one precise class: loops whose *only* fixed point is a **strict
+    intermediate** coarsening — neither the entry nor the lattice top. Here is the
+    witness, and the body-guided merge closing it.
+
+    `while (…) ( copy 2 0 ; alloc 1 )` from three separate pointers `[[0],[1],[2]]`:
+    the body aliases `0` and `2` (so the *entry* is not preserved) and re-allocates
+    `1` each iteration (so the *top* `[[0,1,2]]` is not preserved either — the live
+    set churns). Its unique fixed point is `[[0,2],[1]]`, a strict intermediate. The
+    blind first-two heuristic would merge `0,1` (the wrong pair) and miss it — but
+    `findMerge2` merges the classes the body's transfer **unified**, namely `0` and
+    `2`, and lands on the fixed point directly. -/
+
+def WeakBody : ALCmd := .seq (.copy 2 0) (.alloc 1)
+def WeakLoop : ALCmd := .loop (.var 9) WeakBody
+def entry3 : Part := [[0], [1], [2]]
+def weakInv : Part := [[0, 2], [1]]
+
+/-- **The body-guided merge picks the right pair** — `[0]` and `[2]`, which the
+    body's transfer put into a common class — where the blind heuristic (`findMerge`)
+    would have merged `[0]` and `[1]`. -/
+theorem body_guided_right :
+    findMerge2 entry3 [[1], [0, 2]] = some ([0], [2]) ∧ findMerge entry3 = some ([0], [1]) := by
+  decide
+
+/-- **The checker now accepts the loop**, inferring the strict-intermediate fixed
+    point `[[0,2],[1]]` the blind heuristic missed. -/
+theorem weak_accepted : alcheck2 entry3 WeakLoop = some weakInv := by
+  simp only [WeakLoop, WeakBody, entry3, weakInv, alcheck2, loopFix2, copyImg, purge, preservedB,
+    clsInB, sameElemsB, subOf, findMerge2, shareSuper, mergeOne, collapse, Option.bind, List.length,
+    List.any, List.all, List.filter, List.map, List.flatten, List.find?]
+  decide
+
+/-- The witness as a whole program from the empty partition: allocate `0, 1, 2`,
+    then the loop that used to defeat the checker. -/
+def WeakProg : ALCmd :=
+  .seq (.alloc 0) (.seq (.alloc 1) (.seq (.alloc 2) WeakLoop))
+
+/-- **The whole program checks** — the body-guided merge infers the
+    strict-intermediate invariant, so the program the blind heuristic would have
+    rejected is now accepted. -/
+theorem weak_prog_checks : alcheck2 [] WeakProg = some [[2, 0], [1]] := by
+  simp only [WeakProg, WeakLoop, WeakBody, alcheck2, loopFix2, copyImg, purge, preservedB,
+    clsInB, sameElemsB, subOf, findMerge2, shareSuper, mergeOne, collapse, Option.bind, List.length,
+    List.any, List.all, List.filter, List.map, List.flatten, List.find?]
+  decide
+
+/-- **And the whole program is memory-safe** at any fuel — the strict-intermediate
+    weakness is closed: the checker infers the right invariant and the soundness
+    theorem certifies it, end to end. -/
+theorem weak_prog_safe (fuel : Nat) (σ₀ : HLoc → Int) :
+    alexec fuel WeakProg (σ₀, 0, []) ≠ .err :=
+  alsafe2_of_check fuel σ₀ weak_prog_checks
 
 end ConfTyping

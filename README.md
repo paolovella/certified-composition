@@ -210,7 +210,10 @@ point (the iteration proved to terminate, `loopFix_terminates`, and complete for
 lattice top, `loopSearch_complete`), folded into a full recursive checker
 (`alsafe2`) — mutually recursive with the fixpoint iterator, so a whole program
 containing such a loop, nested to any depth, is proved safe end to end (`prog_safe`,
-`nested_prog_safe`), accepting alias-maintaining loops the one-pass rule rejected.
+`nested_prog_safe`), with a body-guided merge (`findMerge2`) that unifies the classes
+the loop actually aliased — reaching the strict-intermediate fixed points a blind
+heuristic misses (`weak_prog_safe`) — accepting alias-maintaining loops the one-pass
+rule rejected.
 
 ## Scope — what is *not* claimed
 

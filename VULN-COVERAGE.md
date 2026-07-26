@@ -937,10 +937,15 @@ partitions), not a general-purpose language frontend.
   `(sizeOf body, which-function, iteration-fuel)`; soundness is structural induction
   on the command). `prog_safe` proves `alloc 0; alloc 1; while (…) copy 1 0` safe and
   `nested_prog_safe` proves `… while (…) ( while (…) copy 1 0 )` — a loop nested
-  inside another loop's body — safe end to end. Residual: loops whose *only* fixed
-  point is a strict intermediate coarsening. **Brick 30 complete — the may-alias loop
-  rule iterates to a fixed point, provably terminates, is complete for the top of the
-  lattice, and composes into whole programs with loops nested to any depth.**
+  inside another loop's body — safe end to end. The merge is **body-guided**
+  (`findMerge2`): it merges the two classes the body's transfer *unified* — the
+  genuine join — landing on strict-intermediate fixed points the blind first-two
+  heuristic missed. `weak_accepted` / `weak_prog_safe` are the witness that pinned
+  the residual, now accepted and proved safe end to end. Residual: loops with no
+  coarsening fixed point reachable by iterated body-guided merging — a narrow class.
+  **Brick 30 complete — the may-alias loop rule iterates to a fixed point, provably
+  terminates, is complete for the top of the lattice, composes into whole programs
+  with loops nested to any depth, and merges the classes the body actually aliased.**
 
 ### The security program, standing state (thirty bricks, sixteen classes)
 
@@ -1019,7 +1024,8 @@ fixed point (a coarsening invariant is inferred, validated, the iteration provab
 terminates within `|P|+1` steps, the search is complete for the top of the
 lattice — every alias-maintaining loop — and the rule composes into whole programs
 through a full recursive checker mutually recursive with the fixpoint iterator, so
-loops nest to any depth) with only strict-intermediate-fixed-point loops as the
-residual, string literals with escapes and
+loops nest to any depth, and merges the classes the loop body actually aliased so
+strict-intermediate fixed points are reached) with only loops that have no
+body-guided-reachable fixed point as the residual, string literals with escapes and
 further grammar richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

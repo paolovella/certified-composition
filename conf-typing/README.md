@@ -925,8 +925,11 @@ isolation — and the checker is **mutually recursive** with the fixpoint iterat
 nested loops get the fixpoint at arbitrary depth (`nested_prog_safe` proves
 `… while (…) ( while (…) copy 1 0 )` safe). The mutual definition terminates on
 `(sizeOf body, which-function, iteration-fuel)`; soundness is structural induction on
-the command. Residual: loops whose *only* fixed point is a strict intermediate
-coarsening.
+the command. The merge is **body-guided** (`findMerge2`): it merges the two classes
+the body's transfer unified — the genuine join — landing on strict-intermediate fixed
+points the blind first-two heuristic missed (`weak_accepted`/`weak_prog_safe`: the
+loop that pinned the residual, now accepted and proved safe end to end). Residual:
+loops with no coarsening fixed point reachable by iterated body-guided merging.
 
 ## §11 pre-mechanization checklist (framework doc)
 
