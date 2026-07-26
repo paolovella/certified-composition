@@ -928,10 +928,15 @@ partitions), not a general-purpose language frontend.
   a valid coarsening (`Coarsens_collapse`) and is a fixed point exactly for alias-
   maintaining loops, so `coarsen_loop_complete` proves any loop whose top is
   preserved is safe (heuristic-independent) and `loopSearch_complete` proves the
-  search — widened to the top — then succeeds. Residual: loops whose *only* fixed
-  point is a strict intermediate coarsening, and integration for the loop as an
-  analyzed unit. **Brick 30 complete — the may-alias loop rule iterates to a fixed
-  point, provably terminates, and is complete for the top of the lattice.**
+  search — widened to the top — then succeeds. And the **result is uncaged**:
+  `alcheck2` / `alsafe2` fold the coarsening loop rule into a full recursive checker,
+  so a loop composed into a real program (`seq`, code before and after) is checked
+  and proved safe end to end — `prog_safe` proves the whole program
+  `alloc 0; alloc 1; while (…) copy 1 0` safe, not the loop in isolation. Residual:
+  loops whose *only* fixed point is a strict intermediate coarsening, and loops
+  nested inside another loop's body (checked by brick 24's one-pass rule). **Brick 30
+  complete — the may-alias loop rule iterates to a fixed point, provably terminates,
+  is complete for the top of the lattice, and composes into whole programs.**
 
 ### The security program, standing state (thirty bricks, sixteen classes)
 
@@ -1007,8 +1012,9 @@ base as an automatic bill of materials. The honest edges are all named as theore
 or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
 OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule now iterates to a
 fixed point (a coarsening invariant is inferred, validated, the iteration provably
-terminates within `|P|+1` steps, and the search is complete for the top of the
-lattice — every alias-maintaining loop) with only strict-intermediate-fixed-point
-loops as the residual, string literals with escapes and further grammar
-richness remain depth follow-ons,
+terminates within `|P|+1` steps, the search is complete for the top of the
+lattice — every alias-maintaining loop — and the rule composes into whole programs
+through a full recursive checker) with only strict-intermediate-fixed-point loops
+and loops nested in loop bodies as the residual, string literals with escapes and
+further grammar richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

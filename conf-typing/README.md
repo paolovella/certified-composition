@@ -917,8 +917,12 @@ abandoned: the fully-merged partition (the lattice top) is always a valid coarse
 (`Coarsens_collapse`) and a fixed point exactly for alias-maintaining loops, so
 `coarsen_loop_complete` proves any loop whose top is preserved is safe (heuristic-
 independent) and `loopSearch_complete` proves the search — widened to the top — then
-succeeds. Residual: loops whose *only* fixed point is a strict intermediate
-coarsening.
+succeeds. Finally the **result is uncaged**: `alcheck2`/`alsafe2` fold the coarsening
+loop rule into a full recursive checker, so a loop composed into a real program
+(`seq`, code before and after) is checked and proved safe end to end — `prog_safe`
+proves the whole program `alloc 0; alloc 1; while (…) copy 1 0` safe, not the loop in
+isolation. Residual: loops whose *only* fixed point is a strict intermediate
+coarsening, and loops nested inside another loop's body.
 
 ## §11 pre-mechanization checklist (framework doc)
 
