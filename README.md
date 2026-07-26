@@ -208,8 +208,9 @@ logging immune by construction; and **fixpoint may-alias** (`ALInv_coarsen`) —
 may-alias loop analysis now infers a coarsening invariant by iterating to a fixed
 point (the iteration proved to terminate, `loopFix_terminates`, and complete for the
 lattice top, `loopSearch_complete`), folded into a full recursive checker
-(`alsafe2`) so a whole program containing such a loop is proved safe end to end
-(`prog_safe`), accepting alias-maintaining loops the one-pass rule rejected.
+(`alsafe2`) — mutually recursive with the fixpoint iterator, so a whole program
+containing such a loop, nested to any depth, is proved safe end to end (`prog_safe`,
+`nested_prog_safe`), accepting alias-maintaining loops the one-pass rule rejected.
 
 ## Scope — what is *not* claimed
 

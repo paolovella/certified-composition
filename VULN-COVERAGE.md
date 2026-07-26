@@ -931,12 +931,16 @@ partitions), not a general-purpose language frontend.
   search — widened to the top — then succeeds. And the **result is uncaged**:
   `alcheck2` / `alsafe2` fold the coarsening loop rule into a full recursive checker,
   so a loop composed into a real program (`seq`, code before and after) is checked
-  and proved safe end to end — `prog_safe` proves the whole program
-  `alloc 0; alloc 1; while (…) copy 1 0` safe, not the loop in isolation. Residual:
-  loops whose *only* fixed point is a strict intermediate coarsening, and loops
-  nested inside another loop's body (checked by brick 24's one-pass rule). **Brick 30
-  complete — the may-alias loop rule iterates to a fixed point, provably terminates,
-  is complete for the top of the lattice, and composes into whole programs.**
+  and proved safe end to end — and the checker is **mutually recursive** with the
+  fixpoint iterator, so a loop's body is checked by the same fixpoint checker: nested
+  loops get the fixpoint at arbitrary depth (the mutual definition terminates on
+  `(sizeOf body, which-function, iteration-fuel)`; soundness is structural induction
+  on the command). `prog_safe` proves `alloc 0; alloc 1; while (…) copy 1 0` safe and
+  `nested_prog_safe` proves `… while (…) ( while (…) copy 1 0 )` — a loop nested
+  inside another loop's body — safe end to end. Residual: loops whose *only* fixed
+  point is a strict intermediate coarsening. **Brick 30 complete — the may-alias loop
+  rule iterates to a fixed point, provably terminates, is complete for the top of the
+  lattice, and composes into whole programs with loops nested to any depth.**
 
 ### The security program, standing state (thirty bricks, sixteen classes)
 
@@ -1014,7 +1018,8 @@ OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule now iterates to 
 fixed point (a coarsening invariant is inferred, validated, the iteration provably
 terminates within `|P|+1` steps, the search is complete for the top of the
 lattice — every alias-maintaining loop — and the rule composes into whole programs
-through a full recursive checker) with only strict-intermediate-fixed-point loops
-and loops nested in loop bodies as the residual, string literals with escapes and
+through a full recursive checker mutually recursive with the fixpoint iterator, so
+loops nest to any depth) with only strict-intermediate-fixed-point loops as the
+residual, string literals with escapes and
 further grammar richness remain depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

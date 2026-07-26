@@ -921,8 +921,12 @@ succeeds. Finally the **result is uncaged**: `alcheck2`/`alsafe2` fold the coars
 loop rule into a full recursive checker, so a loop composed into a real program
 (`seq`, code before and after) is checked and proved safe end to end — `prog_safe`
 proves the whole program `alloc 0; alloc 1; while (…) copy 1 0` safe, not the loop in
-isolation. Residual: loops whose *only* fixed point is a strict intermediate
-coarsening, and loops nested inside another loop's body.
+isolation — and the checker is **mutually recursive** with the fixpoint iterator, so
+nested loops get the fixpoint at arbitrary depth (`nested_prog_safe` proves
+`… while (…) ( while (…) copy 1 0 )` safe). The mutual definition terminates on
+`(sizeOf body, which-function, iteration-fuel)`; soundness is structural induction on
+the command. Residual: loops whose *only* fixed point is a strict intermediate
+coarsening.
 
 ## §11 pre-mechanization checklist (framework doc)
 

@@ -34,10 +34,13 @@
   * `coarsen_loop_safe` — the loop is memory-safe from the inferred invariant
     (fuel induction, reusing brick 24's `alsafe` for the body).
   * `alcheck2` / `alsafe2` — the **result uncaged**: the coarsening loop rule folded
-    into a full recursive checker, so a loop composed into a real program (`seq`,
-    code before and after) is checked and proved safe end to end
-    (`prog_safe`). Leaves delegate to brick 24's `alsafe`; the loop case uses the
-    coarsening invariant.
+    into a full recursive checker, **mutually recursive** with the fixpoint iterator
+    so a loop's body is checked by the same fixpoint checker — nested loops get the
+    fixpoint at arbitrary depth. A loop composed into a real program (`seq`, code
+    before/after) *and* a loop nested inside another loop's body are both checked
+    and proved safe end to end (`prog_safe`, `nested_prog_safe`). The mutual
+    definition terminates on `(sizeOf body, which-function, iteration-fuel)`;
+    soundness is structural induction on the command (the body is a subterm).
   * `alias_maintain_loop_safe` — the witness brick 24 rejected: with `0` and `1`
     live and distinct on entry, `while (…) copy 1 0` is accepted (the fixpoint
     infers `[[0,1]]`) and never errors; `brick24_rejects` shows brick 24's
@@ -515,36 +518,145 @@ theorem alias_maintain_loop_safe_complete (fuel : Nat) :
 
     `coarsen_loop_safe` proves a loop safe *in isolation*. To make the **result** —
     not just the loop — a whole-program analysis, we fold the coarsening-invariant
-    loop rule into a full recursive checker `alcheck2`, and prove its soundness
-    `alsafe2` by reusing brick 24's `alsafe` for the leaf commands and
-    `coarsen_loop_safe` for loops. Now a loop composed into a real program — code
-    before and after it, sequenced by `seq` — is checked and proved safe end to
-    end. Honest limit: a loop nested *inside another loop's body* is checked by
-    brick 24's one-pass rule (the body is delegated to `alcheck`); loops reachable
-    through `seq` get the fixpoint. -/
+    loop rule into a full recursive checker `alcheck2`, **mutually recursive** with
+    the fixpoint iterator `loopFix2` so a loop's body is checked by the very same
+    fixpoint checker — nested loops get the fixpoint too, at arbitrary depth. The
+    definition terminates on the lexicographic measure `(sizeOf body, which-
+    function, iteration-fuel)`: the body is a strict subterm, and each iteration
+    burns iteration-fuel. Soundness `alsafe2` is then plain **structural induction
+    on the command** (the loop body is a subterm, so its IH is in hand). -/
 
-def alcheck2 : Part → ALCmd → Option Part
-  | P, .alloc x   => some ([x] :: purge x P)
-  | P, .copy x y  => some (copyImg x y P)
-  | P, .access x  => if P.any (fun cls => decide (x ∈ cls)) then some P else none
-  | P, .free x    =>
+/-- `coarsen_loop_safe` generalized over the body's soundness — so the loop case can
+    be justified by *any* sound body checker, including `alcheck2` itself. -/
+theorem coarsen_loop_safe_gen {e : HLExpr} {c : ALCmd} {Q Q₁ : Part}
+    (hbody : ∀ (k : Nat) (s : FLState), ALInv Q s →
+      alexec k c s ≠ .err ∧ (∀ s', alexec k c s = .ok s' → ALInv Q₁ s'))
+    (hpres : preservedB Q Q₁ = true) (hdj : disjP Q) :
+    ∀ (fuel : Nat) (s : FLState), ALInv Q s →
+      alexec fuel (.loop e c) s ≠ .err ∧ (∀ s', alexec fuel (.loop e c) s = .ok s' → ALInv Q s') := by
+  intro fuel
+  induction fuel with
+  | zero => intro s _; exact ⟨by simp [alexec], by intro s' h; simp [alexec] at h⟩
+  | succ k ih =>
+      intro s hQs
+      obtain ⟨σ, n, F⟩ := s
+      have bodyPres : ∀ s₁, alexec k c (σ, n, F) = .ok s₁ → ALInv Q s₁ := fun s₁ hs₁ =>
+        ALInv_of_setSub hpres hdj ((hbody k (σ, n, F) hQs).2 s₁ hs₁)
+      refine ⟨?_, ?_⟩
+      · simp only [alexec]; split
+        · exact flbind_ne_err (hbody k (σ, n, F) hQs).1
+            (fun s₁ hs₁ => (ih s₁ (bodyPres s₁ hs₁)).1)
+        · simp [FLRes.bind]
+      · intro s' hs; simp only [alexec] at hs; split at hs
+        · obtain ⟨s₁, ho₁, ho₂⟩ := flbind_ok hs
+          exact (ih s₁ (bodyPres s₁ ho₁)).2 s' ho₂
+        · rw [FLRes.ok.injEq] at hs; subst hs; exact hQs
+
+mutual
+/-- The integrated checker: leaves and `seq` as before; a loop runs the fixpoint
+    search whose body is checked by `alcheck2` itself (so nested loops get the
+    fixpoint), widening to the top on failure. -/
+def alcheck2 (P : Part) (cmd : ALCmd) : Option Part :=
+  match cmd with
+  | .alloc x   => some ([x] :: purge x P)
+  | .copy x y  => some (copyImg x y P)
+  | .access x  => if P.any (fun cls => decide (x ∈ cls)) then some P else none
+  | .free x    =>
       if P.any (fun cls => decide (x ∈ cls)) then some (P.filter (fun cls => decide (x ∉ cls))) else none
-  | P, .seq c₁ c₂ => (alcheck2 P c₁).bind (fun P₁ => alcheck2 P₁ c₂)
-  | P, .loop _ c  => loopSearch (P.length + 1) P c
+  | .seq c₁ c₂ => (alcheck2 P c₁).bind (fun P₁ => alcheck2 P₁ c₂)
+  | .loop _ c  =>
+      match loopFix2 (P.length + 1) P c with
+      | some R => some R
+      | none =>
+          match alcheck2 (collapse P) c with
+          | some Q₁ => if preservedB (collapse P) Q₁ then some (collapse P) else none
+          | none    => none
+termination_by (sizeOf cmd, 0, 0)
+/-- The fixpoint iterator, now checking the body with `alcheck2`. -/
+def loopFix2 (f : Nat) (Q : Part) (cmd : ALCmd) : Option Part :=
+  match f with
+  | 0 => none
+  | f+1 =>
+      match alcheck2 Q cmd with
+      | some Q₁ =>
+          if preservedB Q Q₁ then some Q
+          else match findMerge Q with
+               | some (a, b) => loopFix2 f (mergeOne a b Q) cmd
+               | none        => none
+      | none => none
+termination_by (sizeOf cmd, 1, f)
+end
 
-/-- **Whole-program soundness.** A program accepted by the integrated checker never
-    hits a use-after-free / double-free / wild access, at any fuel — the fixpoint
-    loop rule now composes through `seq` into full programs. Leaves delegate to
-    brick 24's `alsafe`; the loop case uses the coarsening invariant. -/
+/-- **Partial correctness of the integrated fixpoint iterator** — as `loopFix_correct`,
+    but the body is checked by `alcheck2`. -/
+theorem loopFix2_correct {P : Part} {c : ALCmd} :
+    ∀ (f : Nat) (Q R : Part), Coarsens P Q → loopFix2 f Q c = some R →
+      Coarsens P R ∧ ∃ R₁, alcheck2 R c = some R₁ ∧ preservedB R R₁ = true := by
+  intro f
+  induction f with
+  | zero => intro Q R _ h; simp [loopFix2] at h
+  | succ k ih =>
+      intro Q R hCo h
+      cases hchk : alcheck2 Q c with
+      | none => simp [loopFix2, hchk] at h
+      | some Q₁ =>
+          simp only [loopFix2, hchk] at h
+          by_cases hpres : preservedB Q Q₁ = true
+          · rw [if_pos hpres, Option.some.injEq] at h; subst h
+            exact ⟨hCo, Q₁, hchk, hpres⟩
+          · rw [if_neg hpres] at h
+            cases hfm : findMerge Q with
+            | none => simp [hfm] at h
+            | some ab =>
+                obtain ⟨a, b⟩ := ab
+                simp only [hfm] at h
+                obtain ⟨ha, hb⟩ := findMerge_mem hfm
+                exact ih (mergeOne a b Q) R (Coarsens_mergeOne hCo ha hb) h
+
+/-- The loop case of `alcheck2` yields a preserved coarsening invariant. -/
+theorem alcheck2_loop_correct {P P' : Part} {e : HLExpr} {c : ALCmd}
+    (hdj : disjP P) (h : alcheck2 P (.loop e c) = some P') :
+    Coarsens P P' ∧ ∃ Q₁, alcheck2 P' c = some Q₁ ∧ preservedB P' Q₁ = true := by
+  have hCoPP : Coarsens P P := ⟨fun _ => Iff.rfl, fun _ _ h => h, hdj⟩
+  simp only [alcheck2] at h
+  cases hlf : loopFix2 (P.length + 1) P c with
+  | some R =>
+      simp only [hlf, Option.some.injEq] at h; subst h
+      exact loopFix2_correct (P.length + 1) P R hCoPP hlf
+  | none =>
+      simp only [hlf] at h
+      cases hchk : alcheck2 (collapse P) c with
+      | none => simp [hchk] at h
+      | some Q₁ =>
+          simp only [hchk] at h
+          by_cases hp : preservedB (collapse P) Q₁ = true
+          · rw [if_pos hp, Option.some.injEq] at h; subst h
+            exact ⟨Coarsens_collapse P, Q₁, hchk, hp⟩
+          · rw [if_neg hp] at h; simp at h
+
+/-- **Whole-program soundness, nested loops and all.** A program accepted by the
+    integrated checker never hits a use-after-free / double-free / wild access, at
+    any fuel — the fixpoint loop rule composes through `seq` *and* through loop
+    bodies. Proved by structural induction on the command: leaves delegate to
+    brick 24's `alsafe`; `seq` threads the partition; a loop uses the coarsening
+    invariant with the **body's own IH** as its soundness witness. -/
 theorem alsafe2 : ∀ (c : ALCmd) (fuel : Nat) (P P' : Part) (s : FLState),
     alcheck2 P c = some P' → ALInv P s →
       alexec fuel c s ≠ .err ∧ (∀ s', alexec fuel c s = .ok s' → ALInv P' s') := by
   intro c
   induction c with
-  | alloc x => intro fuel P P' s hchk hinv; exact alsafe fuel (.alloc x) P P' s hchk hinv
-  | copy x y => intro fuel P P' s hchk hinv; exact alsafe fuel (.copy x y) P P' s hchk hinv
-  | access x => intro fuel P P' s hchk hinv; exact alsafe fuel (.access x) P P' s hchk hinv
-  | free x => intro fuel P P' s hchk hinv; exact alsafe fuel (.free x) P P' s hchk hinv
+  | alloc x => intro fuel P P' s hchk hinv
+               simp only [alcheck2] at hchk
+               exact alsafe fuel (.alloc x) P P' s (by simp only [alcheck]; exact hchk) hinv
+  | copy x y => intro fuel P P' s hchk hinv
+                simp only [alcheck2] at hchk
+                exact alsafe fuel (.copy x y) P P' s (by simp only [alcheck]; exact hchk) hinv
+  | access x => intro fuel P P' s hchk hinv
+                simp only [alcheck2] at hchk
+                exact alsafe fuel (.access x) P P' s (by simp only [alcheck]; exact hchk) hinv
+  | free x => intro fuel P P' s hchk hinv
+              simp only [alcheck2] at hchk
+              exact alsafe fuel (.free x) P P' s (by simp only [alcheck]; exact hchk) hinv
   | seq c₁ c₂ ih₁ ih₂ =>
       intro fuel P P' s hchk hinv
       cases fuel with
@@ -560,13 +672,14 @@ theorem alsafe2 : ∀ (c : ALCmd) (fuel : Nat) (P P' : Part) (s : FLState),
               intro s' hs
               obtain ⟨s₁, ho₁, ho₂⟩ := flbind_ok hs
               exact (ih₂ k P₁ P' s₁ hchk (o₁ s₁ ho₁)).2 s' ho₂
-  | loop e c _ =>
+  | loop e cb ihc =>
       intro fuel P P' s hchk hinv
-      simp only [alcheck2] at hchk
       obtain ⟨σ, n, F⟩ := s
-      have hCoP : Coarsens P P := ⟨fun _ => Iff.rfl, fun _ _ h => h, hinv.2.2.2⟩
-      obtain ⟨hCoP', Q₁, hchkb, hpres⟩ := loopSearch_correct hCoP hchk
-      exact coarsen_loop_safe hchkb hpres hCoP'.2.2 fuel (σ, n, F) (ALInv_coarsen hCoP' hinv)
+      obtain ⟨hCoP', Q₁, hchkb, hpres⟩ := alcheck2_loop_correct hinv.2.2.2 hchk
+      have hbody : ∀ (k : Nat) (t : FLState), ALInv P' t →
+          alexec k cb t ≠ .err ∧ (∀ t', alexec k cb t = .ok t' → ALInv Q₁ t') :=
+        fun k t ht => ihc k P' Q₁ t hchkb ht
+      exact coarsen_loop_safe_gen hbody hpres hCoP'.2.2 fuel (σ, n, F) (ALInv_coarsen hCoP' hinv)
 
 /-- **Certified whole-program-safe by `decide`.** -/
 theorem alsafe2_of_check {c : ALCmd} {P' : Part} (fuel : Nat) (σ₀ : HLoc → Int)
@@ -579,20 +692,40 @@ theorem alsafe2_of_check {c : ALCmd} {P' : Part} (fuel : Nat) (σ₀ : HLoc → 
     · intro z c₁ c₂ h1 _ _ _; cases h1
   exact (alsafe2 c fuel [] P' (σ₀, 0, []) h hinv0).1
 
-/-! ## The result, uncaged: a whole program with the loop inside it -/
+/-! ## The result, uncaged: whole programs, loops nested in loops -/
 
 /-- `alloc 0; alloc 1; while (…) copy 1 0` — the alias-maintaining loop brick 24
-    rejected, now sitting inside a real program with allocation before it. -/
+    rejected, now inside a real program with allocation before it. -/
 def Prog : ALCmd :=
   .seq (.alloc 0) (.seq (.alloc 1) (.loop (.var 9) (.copy 1 0)))
 
-/-- **The whole program checks** — the integrated checker threads the partition
-    through the allocations and infers the loop's coarsening invariant `[[1, 0]]`. -/
-theorem prog_checks : alcheck2 [] Prog = some [[1, 0]] := by decide
+theorem prog_checks : alcheck2 [] Prog = some [[1, 0]] := by
+  simp only [Prog, alcheck2, loopFix2, copyImg, purge, preservedB, clsInB, sameElemsB,
+    subOf, findMerge, mergeOne, collapse, Option.bind, List.length, List.any, List.all,
+    List.filter, List.map, List.flatten]
+  decide
 
-/-- **And the whole program is memory-safe** at any fuel — not the loop in
-    isolation, but a program containing it, checked end to end. -/
+/-- **The whole program is memory-safe** at any fuel — a program containing the
+    loop, checked end to end. -/
 theorem prog_safe (fuel : Nat) (σ₀ : HLoc → Int) : alexec fuel Prog (σ₀, 0, []) ≠ .err :=
   alsafe2_of_check fuel σ₀ prog_checks
+
+/-- `alloc 0; alloc 1; while (…) ( while (…) copy 1 0 )` — the alias-maintaining loop
+    **nested inside another loop's body**. The inner loop is checked by `alcheck2`
+    (the fixpoint), so it too infers `[[1, 0]]`. -/
+def NestedProg : ALCmd :=
+  .seq (.alloc 0) (.seq (.alloc 1) (.loop (.var 9) (.loop (.var 8) (.copy 1 0))))
+
+theorem nested_checks : alcheck2 [] NestedProg = some [[1, 0]] := by
+  simp only [NestedProg, alcheck2, loopFix2, copyImg, purge, preservedB, clsInB, sameElemsB,
+    subOf, findMerge, mergeOne, collapse, Option.bind, List.length, List.any, List.all,
+    List.filter, List.map, List.flatten]
+  decide
+
+/-- **And the nested-loop program is memory-safe** at any fuel — the fixpoint rule
+    reaches inside a loop body, not just top-level loops. -/
+theorem nested_prog_safe (fuel : Nat) (σ₀ : HLoc → Int) :
+    alexec fuel NestedProg (σ₀, 0, []) ≠ .err :=
+  alsafe2_of_check fuel σ₀ nested_checks
 
 end ConfTyping
