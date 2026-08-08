@@ -220,7 +220,14 @@ faithful to it, the unescaped-escape-character bug is proved injectable
 is injectable against the *other* dialect's tokenizer
 (`escaping_is_convention_relative`), so escaping carries a load-bearing assumption
 that lands in brick 4's ledger (`escaping_no_silent_discharge`) while
-parameterization needs the empty one (`escaping_reducible_parameterization_in`).
+parameterization needs the empty one (`escaping_reducible_parameterization_in`);
+and **races / TOCTOU** (`racefree_all_schedules`) — the last wholly-unmodelled
+common class, closed by building the map's named extension: a demonic-scheduling
+small-step machine where the check-then-act withdrawal really does go negative
+(`toctou_interleaving_unsafe`) while every *sequential* schedule of it is safe
+(`sequential_model_misses_races` — the model gap as a theorem), the atomic fix is
+proved safe under every interleaving, and the decidable race-freedom check reduces
+the concurrent obligation to a sequential one per critical section.
 
 ## Scope — what is *not* claimed
 

@@ -396,7 +396,16 @@ if grep -q "QueryEscape.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape; do
+if grep -q "Race.lean" VULN-COVERAGE.md; then
+  for thm in "theorem toctou_interleaving_unsafe" "theorem sequential_model_misses_races" \
+             "theorem atomic_all_schedules_safe" "theorem racefree_all_schedules" \
+             "theorem bad_atom_not_preserving"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/Race.lean 2>/dev/null; then
+      echo "DRIFT: races/TOCTOU cited but '$thm' is missing from Race.lean"; fail=1
+    fi
+  done
+fi
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

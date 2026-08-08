@@ -29,7 +29,12 @@ Three gaps are irreducible and are *named*, not hidden:
   instrumented IMP semantics carries store, cost, and branch-trace outcomes
   (`Outcome := Store × Nat × List Bool`), so timing is inside; microarchitectural
   state is not. The recipe for growing coverage is the timing instance itself:
-  put the channel in the semantics, then the same NI machinery applies.
+  put the channel in the semantics, then the same NI machinery applies — and
+  brick 32 runs that recipe a second time, adding a scheduling channel (a
+  demonic-scheduling small-step machine) that moves races/TOCTOU into the model.
+  `sequential_model_misses_races` is this gap's own witness: a program provably
+  safe under every sequential schedule and unsafe under an interleaving, so a
+  proof in a too-small model is true and beside the point.
 - **Spec gap.** A proved release bound (`ReleasesAtMost`) is relative to the
   *declared* release `φ`; a wrong policy is proved-correct wrongness. The framework
   makes the declaration explicit and falsifiable (`result_full_not_bounded_by_bit`)
@@ -102,7 +107,7 @@ verdict is proved semantically but per-component by hand.
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
 | 6 | memory safety (CWE-119/416) | safety of a richer (heap) semantics | — | IN-WITH-MODEL (generated); CARRIED cross-language | [proved] |
 | 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN (generated) | [classified] / [proved] |
-| 8 | races / TOCTOU (CWE-362/367) | 1-safety over interleavings | — | OUT-OF-MODEL | [classified] |
+| 8 | races / TOCTOU (CWE-362/367) | safety over *all* interleavings, demonic scheduling | — | IN-WITH-MODEL (generated) | [proved] |
 | 9 | speculative execution (Spectre-class) | 2-safety over microarchitectural model | 1* | OUT-OF-MODEL | [classified] |
 | 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER (mechanized) | [proved] |
@@ -384,14 +389,61 @@ the checker *and* proved non-isolated (`leaky_rejected`, `leaky_not_isolated`). 
 [proved] and generated. Authz-in-general stays CARRIED (π's correctness is the
 spec gap, not a theorem).
 
-### 3.8 Races / TOCTOU — OUT-OF-MODEL [classified]
+### 3.8 Races / TOCTOU — IN-WITH-MODEL, generated [proved]
 
-The current semantics is sequential and deterministic, and determinism is
-load-bearing: `conform_refl` (the gate's reflexivity) discharges through Sem-Det.
-Adding interleavings is therefore not an add-on — it revisits the conformance
-relation itself. Named extension: a nondeterministic small-step semantics with
-demonic scheduling, `≅` rebuilt over trace sets. Until then this class is excluded
-from the claim, explicitly.
+Held OUT-OF-MODEL from brick 1 to brick 31, with a named extension: *a
+nondeterministic small-step semantics with demonic scheduling*. Brick 32
+(`Race.lean`) builds it, by §0's recipe — put the channel in the semantics, then
+the same machinery applies.
+
+The machine is fine-grained on purpose, because fine grain *is* the phenomenon: a
+thread is a list of instructions, each one indivisible, over a shared store with
+thread-private registers. A **schedule** is a list of thread indices, so the
+nondeterminism is a data parameter — "under some interleaving" is an existential a
+witness discharges by `decide`, and "under every interleaving" quantifies over all
+index lists: unfair, repetitive and adversarial ones included, which is the
+strongest form a safety claim can take.
+
+- **The race [proved, axiom-free].** Two threads run the textbook check-then-act
+  withdrawal (`load` balance, `guard` it covers 60, `decsh` debit 60) against a
+  balance of 100. `toctou_interleaving_unsafe`: under the schedule
+  `[0,0,1,1,0,1]` the balance ends at **−20** — both threads read 100, both pass
+  the guard, both debit. CWE-367 as a theorem, on a machine where check and act
+  are separate steps because they are separate steps.
+- **Why the class was out of model, exactly [proved, axiom-free].**
+  `sequential_model_misses_races`: every *sequential* schedule of the same program
+  is safe (the second thread's guard sees the debited balance and abandons), and
+  one interleaving is not. So a proof in the sequential semantics is true — of a
+  machine the program does not run on. What row 8 recorded as a caveat is now a
+  theorem, and it is the sharpest statement in the map of what "relative to the
+  semantic model `M`" in §0 actually costs.
+- **The fix, by construction [proved].** Wrapping the critical section in an
+  `atom` makes it one scheduling step. `atomic_all_schedules_safe`: the invariant
+  holds under **every** schedule — proved by induction over the interleaving, not
+  sampled.
+- **Generated.** `racefree` is a decidable syntactic check — no bare shared write
+  outside a critical section — with `racy_rejected`/`atomic_accepted` by `decide`.
+  Its soundness `racefree_all_schedules` is the brick's centrepiece because it is
+  a **reduction**: for a checked pool, "the invariant survives every interleaving"
+  follows from "each critical section preserves the invariant" — an ordinary
+  sequential obligation in which no schedule appears (`racefree_poolPreserves`
+  proves the syntactic half: a step that does not write shared state provably
+  cannot break a shared-state invariant). Concurrency verification collapses to
+  per-section sequential verification, gated by a Boolean.
+  `race_rejected_atomic_safe` bundles attack and defense.
+
+Honest limits, and they are real. This is **safety** under demonic scheduling:
+fairness, liveness and deadlock are not modeled, and an `atom` is an idealized
+critical section, not a lock-acquisition protocol. The memory model is
+sequentially consistent — no store buffers, no reordering. And the check *reduces*
+the obligation rather than discharging it: `bad_atom_not_preserving` +
+`bad_atom_accepted` witness an atomic-but-wrong critical section that the checker
+accepts and that breaks the invariant, so the per-section proof is a genuine
+residual, visible and unautomated. Also unchanged: determinism remains
+load-bearing for the *confidentiality* gate (`conform_refl` discharges through
+Sem-Det), so this brick adds a concurrent safety channel beside that development
+rather than rebuilding `≅` over trace sets — the 2-safety-over-interleavings
+question (secure information flow under scheduling) stays open.
 
 ### 3.9 Speculative execution — OUT-OF-MODEL [classified]
 
@@ -1024,7 +1076,41 @@ partitions), not a general-purpose language frontend.
   REDUCIBLE with a load-bearing, ledgered assumption; parameterization stays IN
   with an empty trusted base, and the distance between them is a theorem.**
 
-### The security program, standing state (thirty-one bricks, sixteen classes)
+### Brick 32 ledger (races and TOCTOU — the class the map called OUT-OF-MODEL)
+
+- `Race.lean` — row 8's named extension, built: a nondeterministic small-step
+  semantics with demonic scheduling. Threads are lists of indivisible
+  instructions over a shared store with private registers; a schedule is a list
+  of thread indices, so nondeterminism is *data* — `∃ interleaving` is decidable
+  on a witness and `∀ interleaving` ranges over every index list (unfair,
+  repetitive, adversarial). `toctou_interleaving_unsafe` (axiom-free) drives the
+  balance to −20 with two concurrent 60-withdrawals from 100: both read, both
+  pass the guard, both debit — CWE-367 as a theorem.
+  `sequential_model_misses_races` (axiom-free) is the honest half: both
+  *sequential* schedules of the same program are safe, so the sequential proof is
+  true of a different machine — the §0 model gap made concrete rather than
+  asserted. The fix is an `atom` (the critical section as one scheduling step),
+  and `atomic_all_schedules_safe` proves the invariant under **every** schedule by
+  induction over the interleaving. `racefree` is the decidable rule — no bare
+  shared write outside a critical section — with `racy_rejected`/`atomic_accepted`
+  by `decide`, and `racefree_all_schedules` its soundness: a **reduction** from
+  the concurrent obligation to a sequential one per critical section
+  (`racefree_poolPreserves` supplies the syntactic half — a step that does not
+  write shared state cannot break a shared-state invariant;
+  `poolPreserves_step`/`rrun_preserves` carry it across the schedule).
+  `race_rejected_atomic_safe` bundles attack and defense. No `sorry`, no
+  `Classical.choice`; every attack witness axiom-free. Honest limits stated as
+  such: safety only (no fairness, liveness or deadlock), `atom` is an idealized
+  critical section rather than a lock protocol, the memory model is sequentially
+  consistent, the per-section obligation is a real residual
+  (`bad_atom_not_preserving` + `bad_atom_accepted`: atomic-but-wrong is accepted
+  and unsafe), and 2-safety *over* interleavings — information flow under
+  scheduling — stays open, since determinism is still load-bearing for the
+  confidentiality gate. **Brick 32 complete — the last wholly-unmodelled common
+  class enters the model, with the attack, the by-construction fix, and a
+  decidable check whose soundness reduces concurrency to sequential reasoning.**
+
+### The security program, standing state (thirty-two bricks, seventeen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -1109,5 +1195,11 @@ literals with escapes are in the tokenizer, complete escaping is proved sound an
 faithful, the unescaped-escape-character bug and the escaper/tokenizer convention
 mismatch are proved injectable, and the distance from escaping to parameterization
 is exactly one load-bearing ledger entry (brick 31) — further grammar richness and
-the remaining dialect quirks stay depth follow-ons,
+the remaining dialect quirks stay depth follow-ons, **races and TOCTOU are no
+longer OUT-OF-MODEL** — a demonic-scheduling small-step semantics carries the
+check-then-act attack (`toctou_interleaving_unsafe`, a negative balance), the
+atomic fix proved safe under every interleaving, and a decidable race-freedom
+check whose soundness *reduces* the concurrent obligation to a sequential one per
+critical section (brick 32), with fairness, liveness, deadlock, weak memory and
+information-flow-under-scheduling named as what is still outside,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

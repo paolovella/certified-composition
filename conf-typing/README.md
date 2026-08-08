@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Race.lean` | brick 32 / `VULN-COVERAGE.md` row 8 | races and TOCTOU: a demonic-scheduling small-step machine — the attack (`toctou_interleaving_unsafe`), the atomic fix safe under every interleaving, and a decidable check that reduces the concurrent obligation to a sequential one |
 | `ConfTyping/QueryEscape.lean` | brick 31 / `VULN-COVERAGE.md` row 3 | string literals with escapes: complete escaping proved sound and faithful, the unescaped-escape bug and the escaper/tokenizer convention mismatch proved injectable — escaping is a ledger entry (`escaping_no_silent_discharge`), parameterization is not |
 
 ## Result map
@@ -969,6 +970,45 @@ tokenizer, and `escaping_reducible_parameterization_in` states the verdict as on
 theorem: the distance between "escape your inputs" and "use prepared statements" is
 exactly one load-bearing ledger entry. Honest limit: two conventions modeled, and
 the no-go is exhibited on that pair rather than proved for all escapers.
+
+## Races and TOCTOU (`Race.lean`) — the class the map called OUT-OF-MODEL
+
+Brick 32 builds row 8's named extension: a nondeterministic small-step semantics
+with demonic scheduling. Threads are lists of indivisible instructions over a
+shared store with private registers, and a **schedule is a list of thread
+indices** — so nondeterminism is data. "Under some interleaving" is an existential
+a witness discharges by `decide`; "under every interleaving" ranges over all index
+lists, unfair and repetitive ones included.
+
+The fine grain is the phenomenon. Two threads run the textbook check-then-act
+withdrawal — `load` the balance, `guard` that it covers 60, `decsh` debit 60 —
+against a balance of 100. `toctou_interleaving_unsafe` (axiom-free): under
+`[0,0,1,1,0,1]` the balance ends at **−20**, because both threads read 100 and
+both pass the guard before either debits. `sequential_model_misses_races`
+(axiom-free) is the other half, and the more interesting one: *both* sequential
+schedules of the same program are safe, so a proof in the sequential semantics is
+true of a machine the program does not run on. That is §0's model gap as a
+theorem rather than a caveat.
+
+The fix is an `atom` — the critical section as one scheduling step — and
+`atomic_all_schedules_safe` proves the invariant under **every** schedule, by
+induction over the interleaving rather than by sampling. It is generated:
+`racefree` is a decidable rule (no bare shared write outside a critical section),
+`racy_rejected`/`atomic_accepted` decide it, and `racefree_all_schedules` is the
+soundness theorem — a **reduction**, and the point of the brick. For a checked
+pool, "the invariant survives every interleaving" follows from "each critical
+section preserves the invariant", an ordinary sequential obligation in which no
+schedule appears; `racefree_poolPreserves` supplies the syntactic half (a step
+that does not write shared state cannot break a shared-state invariant) and
+`poolPreserves_step`/`rrun_preserves` carry it across the schedule.
+
+Honest limits, all real: safety only — no fairness, liveness or deadlock; `atom`
+is an idealized critical section, not a lock protocol; the memory model is
+sequentially consistent; the per-section obligation is a genuine residual
+(`bad_atom_not_preserving` and `bad_atom_accepted` witness an atomic-but-wrong
+section that the checker accepts and that breaks the invariant); and
+2-safety *over* interleavings — information flow under scheduling — stays open,
+since determinism is still load-bearing for the confidentiality gate.
 
 ## §11 pre-mechanization checklist (framework doc)
 
