@@ -149,6 +149,23 @@ on any cofinal set of levels. *Warning:* the running sup `H_γ` of the dipped fa
 **not** satisfy `H_γ =* e_γ` in general (dips can hide whole columns below an
 ω-cofinality level); the honest-column extraction is the correct route.
 
+**Theorem B⁻ (the downward dual) [proved, notes §53].** Put
+`D⁻(μ, γ) := {ξ < μ : e_μ(ξ) < e_γ(ξ)}`. If there are finite `X_μ ⊆ μ` with
+`V_γ := ⋃_{μ<γ}(D⁻(μ,γ) \ X_μ)` finite for every γ, then **`e` is trivial** (converse as
+in Theorem A). *Proof.* Call γ *ξ-honest* if `γ > ξ` and `ξ ∉ X_γ ∪ V_γ`. Values are
+**non-increasing** along honest levels (an increase at `ξ` between honest `μ < γ` puts
+`ξ ∈ D⁻(μ,γ) \ X_μ ⊆ V_γ`). The set of `ξ` whose honest levels are bounded is finite: if
+`H_ξ ⊆ δ_ξ` then `ξ ∈ X_γ ∪ V_γ` for all `γ > δ_ξ`, so `{ξ : δ_ξ < γ}` sits inside the
+finite `X_γ ∪ V_γ`, and an increasing ω₁-chain of finite sets has eventually constant
+cardinality, hence finite union. Off that finite set the honest values are a
+non-increasing ω-sequence along an unbounded set, hence eventually constant at some
+`E(ξ)`; taking `δ*` above `γ` and above the countably many stabilization stages,
+`E(ξ) = e_{δ*}(ξ)` for all `ξ < γ` outside one finite set, and `e_{δ*}↾γ =* e_γ`. ∎
+This is **strictly easier** than Theorem B — decreasing ℕ-values stabilize for free,
+where Theorem B needed witness-concentration for unbounded columns — and it relativizes
+to cofinal level sets the same way. It is the form matched to one-sided deviation
+geometries (for `ρ₃`, (M1): all downward defect lies at or below the full lower trace).
+
 **Corollary (Question 1′, the level-factored case) [proved].** A *level-factored*
 schedule (`γ(x) = g(ℓ(x))`, `X(x) = Y_{ℓ(x)}`) for the identity pressure map, evaluated
 on the probe elements `(α, min(e_α, s_u↾α)) ⊑ u`, induces a uniformizing dip system on
@@ -254,7 +271,7 @@ A negative answer to Question 1 with a ZFC witness would (via the argued arrows)
 `Φ` in ZFC for that sequence; a positive answer makes `Φ(e) ⟺ e trivial` plausible; an
 independence answer to Question 3(a)/4 would place `Φ` at the independence boundary.
 
-## 4. Toolbox — short lemmas [A–E, H, I, I′ proved (ZFC); G value-category scope, notes §49]
+## 4. Toolbox — short lemmas [A–E, H, I, I′ proved (ZFC); B⁻ proved, notes §53; G value-category scope, notes §49]
 
 **Lemma A (chain-continuation).** For `μ ≤ δ ≤ γ`:
 `D⁺(μ, γ) \ D⁺(μ, δ) ⊆ D⁺(δ, γ)`.
@@ -283,7 +300,13 @@ Then `E` trivializes `e`. ∎
 `TransportCalculus.lean` (`reps_implies_trivial`, axioms: `propext, Classical.choice,
 Quot.sound`, no `sorry`) — over an abstract index carrying exactly the three properties
 of ω₁ the proof uses (least witnesses, σ-directedness, countable segments), with "finite"
-rendered as "covered by a list". The boundary is also machine-checked:
+rendered as "covered by a list". *And now unconditionally:*
+`omega1_finiteToOne_not_trivial` (notes §53) machine-checks **a coherent sequence on ω₁
+with finite-to-one rows is nontrivial** — the classical engine behind Handbook 1.16(a) ⟹
+`T(ρ₁)` Aronszajn — so `omega1_finiteToOne_no_reps` gives *no monotone representative
+system* with no nontriviality hypothesis imported: what remains cited is only the
+positive, computation-checkable existence of a coherent finite-to-one sequence
+(Handbook 1.16(a)+(b)), not a negative existential. The boundary is also machine-checked:
 `omega_concentration_fails` shows step (2) fails at index ℕ, which lacks σ-directedness
 (`nat_not_sigma_directed`) — the regularity hypothesis is load-bearing.
 *Update:* the theorem is now also instantiated at **actual ω₁** — mathlib's `ω₁.ToType`
@@ -485,7 +508,27 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   chase the cheap region forever (N2). And **(Q-T) is bracketed from one side** (Theorem O):
   Con(CH + `T(ρ₃)` special) via BMR specialization — size-ℵ₁ ccc, CH survives, the tree is
   level-absolute — so the Theorem-J-contrapositive CH-kill needs strictly more than CH and a
-  non-Souslin non-specialness mechanism that does not yet exist.)*
+  non-Souslin non-specialness mechanism that does not yet exist.)* *(Advanced, notes §53 —
+  one more subproblem settled and the residue narrowed. **(Q-thr) is answered: θ(ρ₃) is
+  NONTRIVIAL in ZFC** (Theorem P) — (T2)+(T3) alone suffice, by the classical engine that
+  makes ρ₁ nontrivial (Handbook 1.16(a)); §52 had missed it by asking only about
+  *implications between* θ's and ρ₃'s nontriviality, where the direct argument needs
+  neither. Consequence: `T(θ)` is a coherent **Aronszajn** tree in ZFC (Handbook 3.11), so
+  §52's descent lands on a genuine object rather than a degenerate one. **Theorem B⁻**
+  (§4 above) is the downward dual of Theorem B — easier, and matched to (M1)'s one-sided
+  pruning. Together they give **Theorem Q: the dense failure mode of (Q-rows-lim) is
+  impossible in ZFC** — if the *full* family of limit rows below β were jointly absorbed
+  cofinally often, `X_λ := ∅` would be a downward dip system for θ on a cofinal level set,
+  trivializing θ against Theorem P. So any (Q-rows-lim) counterexample is **sparse**: for
+  each β only a thin infinite subfamily, never all rows below β on a cofinal set of levels
+  — the CH-adversary's block accumulation cannot be uniform, it must select, and the
+  selection is the ω₁-obstruction again. Also new: **(Q-T-θ)** — is `T(θ)` special? — the
+  one-level-down twin of (Q-T), with the record that Handbook 1.17 *asserts* `T(ρ₁)`
+  special **without proof**, so no analogue may be cited. And a filed resource
+  (Handbook 3.12–3.13, unopened until §53): ρ₃ is *nowhere dense*, `ω₁ = ⋃ₙ (Λ+n)` with
+  each `Λ+n` orthogonal to ρ₃ — a free ZFC σ-decomposition of the **index** having exactly
+  the shape fiber-specialness wants of the **fiber order**; the gap between them is the
+  dips.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via

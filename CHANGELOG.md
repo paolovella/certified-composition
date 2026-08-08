@@ -277,6 +277,29 @@ landed.
   ρ₂ =ᶜ nuance, coherent-tree citations at Lemma D, and a verified
   related-work section. Phase-4 pitch drafted in the notes.
 
+- **§53 — (Q-thr) falls; Theorem B has a downward dual; the dense failure
+  mode of the residual dies.** Source round 4 (Handbook 1.16 verbatim — the
+  finite-to-one + coherence pair for ρ₁; 1.17 read and recorded as *asserting*
+  `T(ρ₁)` special **without proof**, so no analogue may be cited; 3.11's
+  nontriviality definition and "coherent + nontrivial ⟹ `T(a)` Aronszajn"; the
+  previously-unopened 3.12–3.13, ρ₃ nowhere dense with `ω₁ = ⋃ₙ (Λ+n)` each
+  orthogonal to ρ₃ — a free ZFC σ-decomposition of the *index* shaped exactly
+  like what fiber-specialness wants of the *fiber order*). **Theorem P: θ(ρ₃)
+  is nontrivial in ZFC** — (T2)+(T3) alone, by the classical engine that makes
+  ρ₁ nontrivial; §52 had missed it by asking only about implications between
+  θ's and ρ₃'s nontriviality, where the direct argument needs neither. So §52's
+  descent lands on a coherent **Aronszajn** tree `T(θ)`, not a degenerate
+  object. **Theorem B⁻**: downward dip systems (`D⁻(μ,γ) := {ξ < μ : e_μ(ξ) <
+  e_γ(ξ)}`) also force triviality — strictly easier than Theorem B (decreasing
+  ℕ-values stabilize; no witness-concentration), and the form matched to (M1)'s
+  one-sided pruning. **Theorem Q**: combining them, the *dense* failure mode of
+  (Q-rows-lim) is impossible in ZFC — joint absorption of the full family of
+  limit rows below β, cofinally often, would be a downward dip system for θ and
+  trivialize it. Any counterexample is **sparse**; the CH-adversary must select
+  rather than absorb uniformly. New named open: **(Q-T-θ)**, is `T(θ)` special.
+  Machine-checked alongside: `omega1_finiteToOne_not_trivial` /
+  `omega1_finiteToOne_no_reps` (see transport-kernel Tier 5).
+
 ## transport-kernel — mathlib instances
 
 - **Tier 1** — mathlib olean cache stood up (the infra that gates importing
@@ -357,6 +380,24 @@ landed.
   first machine-checked theorem about coherent sequences on ω₁. The
   mathlib-free engine and its mathlib model are verified separately and
   compose. Axiom-clean.
+- **Tier 5b — the obstruction made unconditional (`omega1_finiteToOne_not_trivial`).**
+  `nontrivial_coherent_no_reps` was conditional on an imported negative
+  existential — "Todorcevic's walk families are nontrivial" — whose proof is
+  precisely the classical finite-to-one argument. That argument is now
+  machine-checked at ω₁: `FiniteToOne C := ∀ w n, {u | u < w ∧ C.e w u ≤
+  n}.Finite` is Handbook Lemma 1.16(a) verbatim, and
+  `omega1_finiteToOne_not_trivial` proves **coherent + finite-to-one rows ⟹
+  nontrivial**, via `countable_of_segments_finite` (a segment-finite set of
+  countable ordinals is countable because `u ↦ |S ∩ Iio u|` is strictly
+  monotone into `ℕ` — order type ≤ ω with no enumeration constructed) and
+  `bounded_of_countable` (regularity of ℵ₁, reusing the existing σ-directedness
+  instance). Composite: `omega1_finiteToOne_no_reps` — a coherent finite-to-one
+  sequence on ω₁ admits **no** monotone representative system, with no cited
+  nontriviality. What remains cited is only the positive,
+  computation-checkable existence of such a sequence (Handbook 1.16(a)+(b) for
+  ρ₁); the Lean statement is an implication, so non-vacuity still rests on
+  that. Axiom-clean (standard three), no `sorry`. Set-theoretic side: notes §53
+  (Theorem P).
 
 ## Consolidation
 

@@ -2983,3 +2983,141 @@ Consequences for the dichotomy:
   convention verbatim; Lemma 1.6 as the factoring engine; JIMJ Lemma 1.9 read (specialness
   a hypothesis there — no hidden dichotomy); resource-2 citations relocated to Handbook
   1.15–1.17; all new walk formulas machine-sampled on a randomized (d)-sequence.
+
+## 53. (Q-thr) falls (answer: NONTRIVIAL) — the finite-to-one engine applies directly; Theorem B has a downward dual; and the dense failure mode of (Q-rows-lim) is killed in ZFC
+
+§52 left three open: **(Q-thr)** (is θ(ρ₃) nontrivial?), **(Q-rows-lim)**, and **(Q-T)**.
+One of them was never as hard as it looked. §52 framed (Q-thr) as a question about the
+*relation* between θ's nontriviality and ρ₃'s — "neither implication is visible" — and
+that framing hid the fact that θ's nontriviality needs no relation to ρ₃ at all: it
+follows from (T2) and (T3) alone, by the same three-line argument that makes ρ₁
+nontrivial in ZFC. Settling it turns §52's descent from "the game descends to θ" into
+"the game descends to a *genuine coherent Aronszajn object*", and — via a downward dual
+of Theorem B proved below — kills the natural failure mode of (Q-rows-lim).
+
+**Source round 4 [verified, verbatim].** From `coherent.pdf` (Handbook ch. 1), read
+first-hand this session:
+- **1.16 Lemma**, verbatim: "For all α < β < ω1 and n < ω, (a) {ξ ≤ α : ρ1(ξ, α) ≤ n} is
+  finite, (b) {ξ ≤ α : ρ1(ξ, α) ≠ ρ1(ξ, β)} is finite." Both with full proofs (induction
+  on order-type-ω subsets). This is the finite-to-one + coherence pair for ρ₁.
+- **1.17 Remark**, verbatim: "the sequence (ρ1)α : α → ω (α < ω1) of finite-to-one
+  functions is coherent in the sense that (ρ1)α =∗ (ρ1)β↾α whenever α ≤ β. … The
+  corresponding tree T(ρ1) = {t : α → ω : α < ω1 and t =∗ (ρ1)α} is a homogeneous,
+  special Aronszajn tree". **Specialness is asserted, not proved, in this source** —
+  §51's "resource 2" reading stands, and the engine behind it is not exhibited. Record
+  this: 1.17 cannot be *cited as a proof* for any analogue.
+- **3.11 Definition** (the coherence/nontriviality vocabulary), verbatim: "We say that a
+  is nontrivial if there is no h : ω1 → ω such that h↾α =∗ aα for all α < ω1"; and the
+  sentence after: "T(a) … is such an Aronszajn tree whenever a : [ω1]2 → ω is coherent
+  and nontrivial." So **coherent + nontrivial ⟹ T(a) Aronszajn** is on the record.
+- **3.8 Lemma**, re-verified verbatim: "(1) Bα =∗ Bβ ∩ α for α < β; (2) (Λ + n) ∩ Bβ is
+  finite for all n < ω and β < ω1; (3) {λ + n : n < ω} ⊆∗ Bβ whenever λ + ω ≤ β." §52's
+  T1/T2 rest on (3)/(2) exactly as claimed.
+- **New resource (3.12–3.13), unopened until now.** ρ₃ is *nowhere dense* in the
+  Handbook's sense, "for the simple reason that ω1 can be covered by countably many sets
+  Λ+n (n < ω) that are orthogonal to ρ3" — i.e. **the index ω₁ has a canonical countable
+  decomposition into sets meeting every row of ρ₃ finitely.** This is a σ-decomposition
+  of the *index*, not of the fiber order `D(ρ₃)`, so it is not fiber-specialness (§50)
+  and does not settle the crux — but it is the exact shape of the object the crux asks
+  for, one level down, and it is free in ZFC. Filed as a resource; the gap between it and
+  fiber-specialness is precisely the dips.
+
+**Theorem P ((Q-thr) is answered: θ(ρ₃) is NONTRIVIAL) [proved, ZFC].** There is no
+`Θ : Λ → ω` with `Θ↾dom(thr_β) =* thr_β` for all β.
+*Proof.* Suppose there were. Fix `n < ω` and put `S_n := {λ ∈ Λ : Θ(λ) ≤ n}`. For every
+β, `S_n ∩ dom(thr_β) ⊆ {λ ∈ dom(thr_β) : thr_β(λ) ≤ n} ∪ {λ : Θ(λ) ≠ thr_β(λ)}`: the
+first set is finite by **(T2)** (finite-to-one, §52 — itself Lemma 3.8(2)), the second by
+the assumed trivialization. So `S_n` meets every `dom(thr_β)` finitely; since the
+`dom(thr_β)` exhaust Λ, every proper initial segment of `S_n` is finite, so `S_n` has
+order type ≤ ω and is countable. Then `Λ = ⋃_{n<ω} S_n` is countable — false. ∎
+*Remarks.* (i) The argument uses only **(T2) + (T3)**; it is the classical engine —
+verbatim the reason ρ₁ is nontrivial, from 1.16(a) — and needs no walk geometry and no
+contact with ρ₃'s own nontriviality. §52 missed it by asking the harder question
+(*implications between* θ's and ρ₃'s nontriviality) instead of the direct one. General
+form, worth stating once: **a coherent sequence on ω₁ with finite-to-one rows is
+nontrivial.** (ii) Consequence, by Handbook 3.11: `T(θ)` is a **coherent Aronszajn tree
+in ZFC**. So §52's descent is not a descent into a degenerate object — had θ been
+trivial, Theorem N's game would have collapsed and the reduction would have been vacuous.
+(iii) *Not* claimed: that `T(θ)` is special. That would be the exact analogue of 1.17,
+whose proof this source does not contain (above), so it is **[open]**, filed as
+**(Q-T-θ)** — and note it is the same shape as (Q-T) one level down, the program's
+self-similarity again.
+
+**Theorem B⁻ (downward dip systems also force triviality) [proved, ZFC].** For coherent
+`e` put `D⁻(μ, γ) := {ξ < μ : e_μ(ξ) < e_γ(ξ)}`. If there are finite `X_μ ⊆ μ` with
+`V_γ := ⋃_{μ<γ}(D⁻(μ,γ) \ X_μ)` finite for every γ, then `e` is trivial. (Converse as in
+Theorem A: `X_μ := {ξ : e_μ(ξ) ≠ E(ξ)}`.)
+*Proof.* Call γ *ξ-honest* if `γ > ξ` and `ξ ∉ X_γ ∪ V_γ`.
+(1) **Values are non-increasing along honest levels.** If `ξ < μ < γ` with μ, γ both
+ξ-honest and `e_μ(ξ) < e_γ(ξ)`, then `ξ ∈ D⁻(μ,γ) \ X_μ ⊆ V_γ`, contradicting γ's
+honesty. (2) **Only finitely many ξ have a bounded honest set.** If `H_ξ := {γ : γ
+ξ-honest}` is bounded by `δ_ξ`, then `ξ ∈ X_γ ∪ V_γ` for every `γ > δ_ξ`; so for each γ
+the set `{ξ : δ_ξ < γ}` is inside the finite `X_γ ∪ V_γ`. These finite sets increase with
+γ, and a non-decreasing ω-sequence-of-cardinalities along ω₁ is eventually constant, so
+their union `B := {ξ : H_ξ bounded}` is **finite**. (3) For `ξ ∉ B`, the honest values
+`e_γ(ξ)` (γ ∈ H_ξ, unbounded) are non-increasing in ω by (1), hence **eventually
+constant**; call the value `E(ξ)`, attained above some `σ(ξ)`. Set `E := 0` on B.
+(4) Fix γ. Take `δ* > sup{σ(ξ) : ξ < γ}` (a countable sup) with `δ* > γ`. For every
+`ξ < γ` outside the finite set `B ∪ X_{δ*} ∪ V_{δ*}`, δ* is ξ-honest and above σ(ξ), so
+`E(ξ) = e_{δ*}(ξ)`; and `e_{δ*}↾γ =* e_γ` by coherence. Hence `E↾γ =* e_γ`. ∎
+*Why it is worth having.* It is **strictly easier** than Theorem B — step (3) is free
+(decreasing ℕ-values stabilize), where Theorem B needed the witness-concentration
+argument for unbounded columns. And it is the theorem **matched to ρ₃'s geometry**:
+(M1) says all of `D⁻(α,β)` lives at or below the full trace `λ_F(α,β)`, so the downward
+side is exactly the side ρ₃'s pruning formula controls. The proof relativizes to a
+cofinal set of levels, as Theorem B's does.
+
+**Theorem Q (the dense failure mode of (Q-rows-lim) is impossible) [proved, ZFC].**
+Say (Q-rows-lim) *fails densely* if there is a cofinal `C ⊆ ω₁` such that for every
+`β ∈ C` there is a finite `F_β` with `⋃_{λ ∈ Λ∩β}(B_λ \ B_β) ⊆ F_β` — i.e. the failure is
+witnessed by the **full** family of limit rows below β, cofinally often. This is
+impossible.
+*Proof.* Fix `β ∈ C`. Put `Λ_{F_β} := {μ ∈ Λ : F_β ∩ [μ, μ+ω) ≠ ∅}`, finite. By
+**Theorem N**, if `λ < β` is a limit and μ is a fan with `μ+ω ≤ λ` and
+`thr_λ(μ) < thr_β(μ)`, then `D⁺(λ,β)` meets `[μ, μ+ω)`; since that deviation lies in
+`F_β`, `μ ∈ Λ_{F_β}`. So `{μ : thr_λ(μ) < thr_β(μ)} ⊆ Λ_{F_β}` for **every** `λ < β` —
+that is, with `X_λ := ∅`, `V_β = ⋃_{λ<β} D⁻_θ(λ,β) ⊆ Λ_{F_β}` is finite. Cofinally in
+ω₁ this is a downward dip system for θ on the cofinal level set C, so **Theorem B⁻**
+(relativized) makes θ trivial — contradicting **Theorem P**. ∎
+*What it does and does not settle.* (Q-rows-lim) quantifies over *some* infinite
+`I ⊆ Λ∩β`, so its failure only supplies a countable I, and a countable I is not a dip
+system. Theorem Q therefore does not resolve (Q-rows-lim); it **removes its natural
+shape**. Any counterexample must be *sparse*: for each β only a thin infinite subfamily
+can be jointly absorbed, never the full family below β on a cofinal set of levels. In the
+CH-adversary's terms (§50), the block-accumulation game cannot be won by a uniform
+absorption over all limit rows — the adversary must select, and the selection is itself
+the ω₁-obstruction the whole program keeps meeting. Combined with N2's front-loading
+criterion, the surviving target is narrow and quantitative.
+
+**Machine-checked this session (`transport-kernel/TransportKernel/OmegaOneCoherent.lean`).**
+Theorem P's engine is now formal at actual ω₁, in the general form:
+`omega1_finiteToOne_not_trivial` — *a coherent sequence on ω₁ with finite-to-one rows is
+nontrivial* — with `FiniteToOne C := ∀ w n, {u | u < w ∧ C.e w u ≤ n}.Finite` (Handbook
+1.16(a) verbatim), proved via `countable_of_segments_finite` (the map
+`u ↦ |S ∩ Iio u|` is strictly monotone, so a segment-finite set is countable — order type
+≤ ω without building an enumeration) and `bounded_of_countable` (regularity of ℵ₁, reusing
+the existing σ-directedness instance). Composed with the existing reps theorem:
+`omega1_finiteToOne_no_reps` — **a coherent finite-to-one sequence on ω₁ admits no
+monotone representative system**. No `sorry`; standard three axioms.
+*The point for the trusted base.* `nontrivial_coherent_no_reps` was conditional on an
+imported negative existential ("Todorcevic's walks are nontrivial"), whose proof is
+exactly the argument now formalized. What remains cited is only the *positive*,
+construction-checkable fact that a coherent finite-to-one sequence exists (Handbook
+1.16(a)+(b) for ρ₁ — two induction computations on walks). The obstruction is no longer
+conditional on a cited nontriviality theorem. (Honest scope: the Lean statement is an
+implication; ρ₁ itself is not formalized, so non-vacuity still rests on 1.16.)
+
+**Status after §53.**
+- **(Q-thr): resolved, NONTRIVIAL** (Theorem P, ZFC), machine-checked in general form.
+  §52's descent lands on a coherent Aronszajn tree `T(θ)`, not a degenerate object.
+- **New tool: Theorem B⁻**, the downward dual of Theorem B — easier, and matched to the
+  one-sided pruning (M1) that governs ρ₃.
+- **(Q-rows-lim): narrowed, not resolved** (Theorem Q) — the dense/uniform failure mode
+  is impossible in ZFC; only sparse failures survive. Open.
+- **(Q-T): open** as in §52; **(Q-T-θ)** (is `T(θ)` special?) added as its one-level-down
+  twin, with the record that 1.17 asserts specialness for `T(ρ₁)` **without proof**, so
+  no analogue can be cited.
+- Verified base extended: 1.16 and 1.17 read verbatim (1.17's specialness unproved in
+  source), 3.11's nontriviality definition and the coherent+nontrivial ⟹ Aronszajn
+  sentence, and the new 3.12–3.13 resource (ρ₃ nowhere dense; ω₁ = ⋃ₙ (Λ+n) with each
+  Λ+n orthogonal to ρ₃).

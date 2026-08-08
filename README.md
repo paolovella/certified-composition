@@ -60,11 +60,15 @@ The same accountancy appears at every level:
   regularity hypothesis is load-bearing (`omega_concentration_fails`);
 - the **research line** the frontier opened, in prose at graded rigor:
   [`NOTES-coherent-escapee.md`](transport-calculus/NOTES-coherent-escapee.md)
-  (fifty-two sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
+  (fifty-three sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
   order, the no-go for kill templates, forcing-locality, Theorem B —
-  uniformizing dip systems ⟺ trivial — the reduction of the whole question
+  uniformizing dip systems ⟺ trivial — and its downward dual Theorem B⁻,
+  the reduction of the whole question
   to one game invariant, the game's Φ-completeness, the ◊-side kill of
-  "everything schedules" (Theorem C), and the two-sided independence
+  "everything schedules" (Theorem C), the descent of the crux to a
+  threshold sequence θ(ρ₃) whose nontriviality is now settled in ZFC
+  (Theorem P) — killing the dense failure mode of the residual question
+  (Theorem Q) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):
@@ -102,7 +106,11 @@ The same accountancy appears at every level:
   trivial — and its contrapositive for nontrivial sequences. To our knowledge
   the first machine-checked theorem about coherent sequences on ω₁. The
   mathlib-free engine and its mathlib model are verified separately and
-  compose.
+  compose. **Now unconditional**: `omega1_finiteToOne_not_trivial` machine-checks
+  the classical ZFC engine — a coherent sequence on ω₁ with *finite-to-one rows*
+  (Todorcevic's Handbook 1.16(a) for ρ₁, verbatim) is nontrivial — so
+  `omega1_finiteToOne_no_reps` needs no imported nontriviality theorem; what
+  stays cited is only the positive existence of such a sequence.
 
 ## The security claim (the original goal)
 

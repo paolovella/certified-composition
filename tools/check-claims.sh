@@ -24,6 +24,19 @@ for name in DobrushinMeasureReceive tvDist_toMeasure QuantumDobrushinReceive \
   fi
 done
 
+# 1b′. Set-theory results cited in the notes/problem statement that are machine-checked
+#      must still exist in the Lean sources — the rigor grades depend on it.
+for name in omega1_finiteToOne_not_trivial omega1_finiteToOne_no_reps \
+            countable_of_segments_finite bounded_of_countable; do
+  if ! grep -q "$name" transport-kernel/TransportKernel/OmegaOneCoherent.lean 2>/dev/null; then
+    echo "DRIFT: $name cited as machine-checked but missing from OmegaOneCoherent.lean"; fail=1
+  fi
+  if ! grep -qr "$name" transport-calculus/PROBLEM-dip-schedulability.md \
+         transport-calculus/NOTES-coherent-escapee.md transport-kernel/README.md 2>/dev/null; then
+    echo "DRIFT: $name proved in Lean but cited nowhere in the set-theory write-up"; fail=1
+  fi
+done
+
 # 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
 #     the map's verdicts are only as good as their citations.
 for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \

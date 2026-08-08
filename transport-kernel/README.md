@@ -230,6 +230,22 @@ constructible there. This file builds the model from mathlib and instantiates:
   (e.g. Todorcevic's walk families, witnessing `H¹(ω₁; ℤ) ≠ 0`) admits no monotone
   representative system. To our knowledge the first machine-checked theorem about
   coherent sequences on ω₁. Axioms: `propext, Classical.choice, Quot.sound`; no `sorry`.
+- **`omega1_finiteToOne_not_trivial`** (notes §53) — *a coherent sequence on ω₁ with
+  **finite-to-one rows** is nontrivial*. `FiniteToOne C := ∀ w n, {u | u < w ∧
+  C.e w u ≤ n}.Finite` is Todorcevic's Handbook Lemma 1.16(a) for `ρ₁` verbatim, and
+  this is the classical ZFC engine behind "`T(ρ₁)` is Aronszajn" (Handbook 1.17),
+  machine-checked: `countable_of_segments_finite` (a segment-finite set of countable
+  ordinals is countable, because `u ↦ |S ∩ Iio u|` is strictly monotone into `ℕ` — order
+  type `≤ ω` with no enumeration built) plus `bounded_of_countable` (regularity of ℵ₁,
+  reusing the σ-directedness instance).
+- **`omega1_finiteToOne_no_reps`** — the composite, and the point of the addition: *a
+  coherent finite-to-one sequence on ω₁ admits no monotone representative system*, with
+  **no nontriviality hypothesis imported**. `nontrivial_coherent_no_reps` was conditional
+  on a cited negative existential (Todorcevic's walks are nontrivial) whose proof is
+  exactly the argument now formalized; what remains cited is only the positive,
+  computation-checkable existence of a coherent finite-to-one sequence (Handbook
+  1.16(a)+(b)). Honest scope: the Lean statement is an implication — `ρ₁` itself is not
+  formalized, so non-vacuity still rests on 1.16.
 
 The dependency structure is the point: the four-step *combinatorial engine* is verified
 in a mathlib-free package (`TransportCalculus`, required by path), and mathlib
