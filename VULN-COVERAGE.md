@@ -97,7 +97,7 @@ verdict is proved semantically but per-component by hand.
 |---|---|---|---|---|---|
 | 1 | direct confidentiality leaks (CWE-200) | 2-safety (NI) | 1 | IN (generated) | [proved] |
 | 2 | timing side channels (CWE-208) | 2-safety over instrumented semantics | 1 | IN-WITH-MODEL (generated) | [proved] |
-| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI on a real query skeleton; blacklist = value predicate | 1 / — | IN as flow (generated, real query); OUT-INADMISSIBLE as blacklist | [proved: T1, T2, + real] |
+| 3 | injection: SQLi/XSS/command (CWE-89/79/78) | taint = integrity NI on a real query skeleton; blacklist = value predicate; escaping = escaper/tokenizer agreement | 1 / — | IN as flow (generated, real query); OUT-INADMISSIBLE as blacklist; REDUCIBLE as escaping (ledgered) | [proved: T1, T2, + real, + escape] |
 | 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN (generated) | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
 | 6 | memory safety (CWE-119/416) | safety of a richer (heap) semantics | — | IN-WITH-MODEL (generated); CARRIED cross-language | [proved] |
@@ -245,6 +245,50 @@ and rejects it (`sound_rejects_stored`), with `dbcheck_ni` (choice-free) proving
 acceptance means injection-free across the persistence boundary. The moral as a
 theorem: injection-freedom does not survive persistence unless taint does — the
 framework catches a class real analyzers routinely miss.
+
+**Escaping is a ledger entry; parameterization is a theorem** (brick 31,
+`QueryEscape.lean`). Bricks 14/26 tokenized without an escape mechanism, so the
+only safe value was a quote-free one — and every real database disagrees. Adding
+escapes to the model separates the industry's two answers by a theorem each. The
+escape-aware tokenizer `segsE` (backslash convention) is a **conservative
+extension**: it agrees with brick 14's `segs` on every backslash-free string
+(`segsT_noBS`, `skeletonE_eq_skeleton`), so bricks 14 and 26 re-derive inside it
+(`param_correct_esc`, `concat_injectable_esc`). Then:
+
+- **Complete escaping works, and is faithful.** `segsE_buildEsc` proves the
+  escaped query tokenizes to exactly `[pre, v, suf]` for **every** value `v` —
+  no hypothesis at all, brick 14's quote-freeness restriction lifted — hence
+  `esc_immune` (integrity NI: the skeleton is constant) and `esc_faithful` (the
+  value delivered is `v` unchanged, so safety is not bought by corrupting data).
+- **The classic bug is located, not merely exhibited.** `escBad` escapes the
+  quote but not the escape character; `escBad_injectable` (axiom-free) is the
+  real attack — a payload `\'` whose backslash eats the escaper's backslash, so
+  the quote arrives unescaped and breaks out — and `escBad_noBS_ok` proves the
+  same escaper *is* sound on backslash-free values. The defect is exactly the
+  unhandled escape character, in both directions.
+- **The point: escaping's soundness is a property of the escaper/tokenizer
+  *pair*.** Against the SQL-standard doubled-quote tokenizer `segsD`, the
+  backslash escaper is injectable (`esc_mismatch_injectable`); against the
+  backslash tokenizer, the doubling escaper is injectable
+  (`escDouble_mismatch_injectable`) — while each is sound for its own convention
+  (`esc_skeleton`, `escDouble_skeleton`). `escaping_is_convention_relative`
+  bundles all four: "the value is escaped" is not a security property.
+- **So it is a LEDGER/REDUCIBLE verdict, mechanized against brick 4.**
+  `esc_cond_immune` gives the conditional certificate for *every* sink tokenizer
+  relative to the one-entry ledger "the sink uses the backslash convention"
+  (`Sat [T = segsE]`, brick 4's `Sat`), and `esc_not_unconditional` shows the
+  unconditional certificate is false at a sink that does not. Together:
+  `escaping_no_silent_discharge` — the injection-channel instance of
+  `ledger_no_silent_discharge`. Parameterization, by contrast, needs the
+  **empty** ledger (`param_immune_no_ledger`), because no value ever reaches the
+  tokenizer. `escaping_reducible_parameterization_in` is the verdict as one
+  theorem: the gap between "escape your inputs" and "use prepared statements" is
+  exactly one load-bearing ledger entry, and it cannot be discharged by
+  inspecting the application.
+
+Honest limit: two escape conventions are modeled (backslash and doubled-quote),
+not the full matrix of dialect quirks, and the no-go is exhibited on that pair
+rather than proved for all escapers.
 
 ### 3.4 Improper declassification — IN, generated [proved]
 
@@ -947,7 +991,40 @@ partitions), not a general-purpose language frontend.
   terminates, is complete for the top of the lattice, composes into whole programs
   with loops nested to any depth, and merges the classes the body actually aliased.**
 
-### The security program, standing state (thirty bricks, sixteen classes)
+### Brick 31 ledger (string literals with escapes — escaping is a ledger entry)
+
+- `QueryEscape.lean` — the last named depth follow-on on the injection axis, and
+  the one where the real CVEs live: not "they forgot to escape" but "they escaped
+  against the wrong convention". Escapes enter the model as a three-state scanner
+  over brick 14's own alphabet (the backslash is the character at code 92), and
+  `segsT_noBS`/`skeletonE_eq_skeleton` prove it a **conservative extension** —
+  identical to brick 14's tokenizer on backslash-free strings, so bricks 14 and 26
+  re-derive inside it (`param_correct_esc`, `concat_injectable_esc`). `segsT_esc`
+  is the heart: scanning a completely-escaped value inside a literal consumes
+  exactly that value and stays inside, with **no hypothesis on the value** — so
+  `segsE_buildEsc` gives `[pre, v, suf]` for every `v`, lifting brick 14's
+  quote-freeness restriction, and yields `esc_immune` (integrity NI) and
+  `esc_faithful` (the delivered value is `v`, uncorrupted). The classic bug is
+  bracketed on both sides: `escBad_injectable` (axiom-free) is the `\'` attack on
+  an escaper that misses the escape character, `escBad_noBS_ok` proves that same
+  escaper sound on backslash-free values. The brick's point is the pair of
+  mismatches — `esc_mismatch_injectable` (backslash escaper, doubled-quote sink)
+  and `escDouble_mismatch_injectable` (doubling escaper, backslash sink), both
+  axiom-free, against `escDouble_skeleton`'s soundness for its own convention,
+  bundled as `escaping_is_convention_relative`. That makes escaping
+  assumption-shaped, so it is mechanized against **brick 4's ledger**:
+  `esc_cond_immune` (conditional on `Sat [T = segsE]`, for every tokenizer),
+  `esc_not_unconditional` (false at a mismatched sink), and
+  `escaping_no_silent_discharge` — `ledger_no_silent_discharge` on the injection
+  channel. `param_immune_no_ledger` puts parameterization at the empty ledger, and
+  `escaping_reducible_parameterization_in` states the verdict as one theorem. No
+  `sorry`, no `Classical.choice` anywhere in the module; every attack witness is
+  axiom-free. Honest limit: two conventions modeled, and the no-go is exhibited on
+  that pair rather than proved for all escapers. **Brick 31 complete — escaping is
+  REDUCIBLE with a load-bearing, ledgered assumption; parameterization stays IN
+  with an empty trusted base, and the distance between them is a theorem.**
+
+### The security program, standing state (thirty-one bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -1026,6 +1103,11 @@ lattice — every alias-maintaining loop — and the rule composes into whole pr
 through a full recursive checker mutually recursive with the fixpoint iterator, so
 loops nest to any depth, and merges the classes the loop body actually aliased so
 strict-intermediate fixed points are reached) with only loops that have no
-body-guided-reachable fixed point as the residual, string literals with escapes and
-further grammar richness remain depth follow-ons,
+body-guided-reachable fixed point as the residual, **escaping is now REDUCIBLE
+with its assumption in the ledger** rather than an unmodelled gap — string
+literals with escapes are in the tokenizer, complete escaping is proved sound and
+faithful, the unescaped-escape-character bug and the escaper/tokenizer convention
+mismatch are proved injectable, and the distance from escaping to parameterization
+is exactly one load-bearing ledger entry (brick 31) — further grammar richness and
+the remaining dialect quirks stay depth follow-ons,
 and the spec/model/TCB gaps of §0 are unmovable by construction.

@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/QueryEscape.lean` | brick 31 / `VULN-COVERAGE.md` row 3 | string literals with escapes: complete escaping proved sound and faithful, the unescaped-escape bug and the escaper/tokenizer convention mismatch proved injectable — escaping is a ledger entry (`escaping_no_silent_discharge`), parameterization is not |
 
 ## Result map
 
@@ -930,6 +931,44 @@ the body's transfer unified — the genuine join — landing on strict-intermedi
 points the blind first-two heuristic missed (`weak_accepted`/`weak_prog_safe`: the
 loop that pinned the residual, now accepted and proved safe end to end). Residual:
 loops with no coarsening fixed point reachable by iterated body-guided merging.
+
+## String literals with escapes (`QueryEscape.lean`) — escaping is a ledger entry
+
+Brick 31 takes the last named depth follow-on on the injection axis. Bricks 14 and
+26 tokenized without an escape mechanism, so the only safe value was a quote-free
+one — and every real database disagrees. Escapes enter the model as a three-state
+scanner over brick 14's own alphabet (the backslash is the character at code 92),
+and `segsT_noBS`/`skeletonE_eq_skeleton` prove it a **conservative extension**:
+identical to brick 14's tokenizer on backslash-free strings, so bricks 14 and 26
+re-derive inside it (`param_correct_esc`, `concat_injectable_esc`).
+
+`segsT_esc` is the heart — scanning a completely-escaped value inside a literal
+consumes exactly that value and stays inside, with *no hypothesis on the value* —
+so `segsE_buildEsc` gives `[pre, v, suf]` for every `v`, lifting brick 14's
+quote-freeness restriction. Hence `esc_immune` (integrity NI: the executed skeleton
+is constant) and `esc_faithful` (the value delivered is `v` unchanged — safety is
+not bought by corrupting data). The classic bug is bracketed on both sides:
+`escBad_injectable` (axiom-free) is the `\'` attack on an escaper that misses the
+escape character, and `escBad_noBS_ok` proves that same escaper sound on
+backslash-free values.
+
+The point of the brick is the pair of mismatches. Against the SQL-standard
+doubled-quote tokenizer the backslash escaper is injectable
+(`esc_mismatch_injectable`); against the backslash tokenizer the doubling escaper is
+injectable (`escDouble_mismatch_injectable`) — while each is sound for its own
+convention (`esc_skeleton`, `escDouble_skeleton`), all four bundled as
+`escaping_is_convention_relative`. So "the value is escaped" is not a security
+property of the value or of the escaper; it is a property of the pair, i.e. an
+**assumption** — and brick 4's ledger already handles those. `esc_cond_immune` gives
+the conditional certificate for every sink tokenizer relative to the one-entry
+ledger `Sat [T = segsE]`; `esc_not_unconditional` shows the unconditional one is
+false at a mismatched sink; `escaping_no_silent_discharge` is
+`ledger_no_silent_discharge` on the injection channel. Parameterization needs the
+**empty** ledger (`param_immune_no_ledger`) because no value ever reaches the
+tokenizer, and `escaping_reducible_parameterization_in` states the verdict as one
+theorem: the distance between "escape your inputs" and "use prepared statements" is
+exactly one load-bearing ledger entry. Honest limit: two conventions modeled, and
+the no-go is exhibited on that pair rather than proved for all escapers.
 
 ## §11 pre-mechanization checklist (framework doc)
 

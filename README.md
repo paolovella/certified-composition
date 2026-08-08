@@ -213,7 +213,14 @@ containing such a loop, nested to any depth, is proved safe end to end (`prog_sa
 `nested_prog_safe`), with a body-guided merge (`findMerge2`) that unifies the classes
 the loop actually aliased — reaching the strict-intermediate fixed points a blind
 heuristic misses (`weak_prog_safe`) — accepting alias-maintaining loops the one-pass
-rule rejected.
+rule rejected; and **string literals with escapes** (`segsE_buildEsc`) — the last
+injection-axis follow-on: complete escaping is proved sound for every value and
+faithful to it, the unescaped-escape-character bug is proved injectable
+(`escBad_injectable`) and located (`escBad_noBS_ok`), and — the point — each escaper
+is injectable against the *other* dialect's tokenizer
+(`escaping_is_convention_relative`), so escaping carries a load-bearing assumption
+that lands in brick 4's ledger (`escaping_no_silent_discharge`) while
+parameterization needs the empty one (`escaping_reducible_parameterization_in`).
 
 ## Scope — what is *not* claimed
 

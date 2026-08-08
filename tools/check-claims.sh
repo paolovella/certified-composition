@@ -387,7 +387,16 @@ if grep -q "AliasFix.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix; do
+if grep -q "QueryEscape.lean" VULN-COVERAGE.md; then
+  for thm in "theorem skeletonE_eq_skeleton" "theorem segsE_buildEsc" "theorem escBad_injectable" \
+             "theorem esc_mismatch_injectable" "theorem escaping_no_silent_discharge" \
+             "theorem escaping_reducible_parameterization_in"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/QueryEscape.lean 2>/dev/null; then
+      echo "DRIFT: query escaping cited but '$thm' is missing from QueryEscape.lean"; fail=1
+    fi
+  done
+fi
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
