@@ -3140,3 +3140,119 @@ implication; ρ₁ itself is not formalized, so non-vacuity still rests on 1.16.
   source), 3.11's nontriviality definition and the coherent+nontrivial ⟹ Aronszajn
   sentence, and the new 3.12–3.13 resource (ρ₃ nowhere dense; ω₁ = ⋃ₙ (Λ+n) with each
   Λ+n orthogonal to ρ₃).
+
+## 54. Going at the central question: the trace formula made explicit, Theorem V (fans above the trace are β-expensive), the thr_β-transfer route closed as vacuous, and (Q-rows-lim) reduced to limits of limits
+
+The central open problem is `ρ₃` under CH, which §50 reduced to **is `D(ρ₃)` fiber-special?**
+and §51–§53 reduced further to **(Q-rows-lim)** plus the gate **(Q-T)**. This session went
+at (Q-rows-lim) directly. Outcome: one route closed as *vacuous* (worth recording — it is
+the natural one), one new ZFC theorem constraining where deviations can live, an explicit
+formula for the dial N2 left implicit, and a second reduction of (Q-rows-lim)'s index set.
+The question itself remains **open**.
+
+All walk-level formulas below are re-verified numerically by `tools/walk-check.py`
+(randomized (a),(c),(d),(e)-conforming C-sequences over ordinals below `ω²·3`, so that
+limits *of limits* genuinely exist — §52's model, which stopped below `ω·25`, had none):
+trace formula 972 instances, Theorem V 3108, M(3) 36065, Theorem S every limit, all pass.
+
+**The trace formula [proved + numerically checked].** Unfolding Handbook **1.4**
+(`F(α,β) = F(α, min(C_β\α)) ∪ ⋃_{ξ∈C_β∩α} F(ξ,α)`, `F(γ,γ) = {γ}`) along the walk gives
+`F(λ,β) = {λ} ∪ ⋃_i ⋃_{ξ ∈ C_{β_i} ∩ λ} F(ξ,λ)` over the walk's stops `β = β_0 > … > λ`,
+and `max F(ξ,λ) = ξ`, so
+> **`λ_F(λ,β) = max_i max(C_{β_i} ∩ λ)`** — the largest ladder point below `λ` occurring in
+> the ladder of *any* stop of the walk `β → λ`.
+Two riders. (i) The weights are `|C_{β_i} ∩ λ|`, so `ρ₁(λ,β) = max_i |C_{β_i} ∩ λ|`: the
+trace is the max of the *positions*, the bar is the max of the *sizes*. (ii) Under
+normalization (d) those are the same data — if `max(C_{β_i} ∩ λ) = ν + r + 1` (ν limit),
+that element occupies place `r`, so `|C_{β_i} ∩ λ| = r+1` exactly. So N2's two dials are
+one object read two ways, and the front-loading question is: *can the stop achieving the
+largest position fail to achieve the largest size?* — i.e. can a stop jump over a fan with
+a high place but a low landing?
+
+**Theorem V (fans above the trace are β-expensive) [proved + numerically checked].** Let
+`μ` be a fan with `μ + ω ≤ λ < β`, let `W := ρ₁(λ,β) ≥ 1`, and suppose
+`λ_F(λ,β) < μ`. Then `ρ₃(μ+n, β) = 0` for **every** `n ≤ W`; hence
+`thr_β(μ) ≥ W + 1`.
+*Proof.* Every `ξ = μ+n` lies in `(λ_F(λ,β), λ)`, so M(3) applies: `ρ₃(ξ,β) = 1` iff
+`ρ₃(ξ,λ) = 1` and `ρ₁(ξ,λ) ≥ W`. If `ρ₃(ξ,λ) = 0` we are done. If `ρ₃(ξ,λ) = 1` then
+`ρ₁(ξ,λ)` *is* the last weight of the walk `λ → ξ`, and arrival rigidity under (c)+(d)
+makes that `n−1` (arrival at `μ+n = μ+(n−1)+1`, intrinsically at place `n−1`) or `0`
+(arrival off `C_{ξ+1} = {ξ}`). For `n ≤ W` both are `< W`, so M(3) prunes. ∎
+(`W ≥ 1` is needed and sharp: at `W = 0` the statement fails, and the numeric run flagged
+exactly those instances before the hypothesis was added.)
+
+**Corollary V1 (front-loading past the β-cheap region is automatic) [proved].** For every
+`k` and every limit `λ < β` with `ρ₁(λ,β) ≥ k`: every fan `μ` with `μ+ω ≤ λ` and
+`thr_β(μ) ≤ k` satisfies `μ ≤ λ_F(λ,β)`. So the trace *always* dominates the β-cheap
+fans below its level — no hypothesis, no C-sequence condition.
+
+**The thr_β-transfer route is VACUOUS — recorded so it is not retried.** The natural
+attack on (Q-rows-lim) is to replace N1/N2's dependence on `thr_α` (α's *own* thresholds,
+which move with α) by the single fixed `thr_β`. Routing N1's second case through M1 does
+give a clean statement — *if `λ_F(λ,β) < μ`, `μ+ω ≤ λ`, and `W ≥ max(3, thr_β(μ)+2)`, then
+`μ + (W−2) ∈ B_λ \ B_β`* — and it was worth writing down, because it is **empty**:
+Theorem V says `thr_β(μ) ≥ W+1` for exactly those `μ`, so the hypothesis
+`thr_β(μ) ≤ W−2` is never met. (The numeric run found 0 firing instances out of ~6600
+candidate `(β,λ,μ)` triples, which is what prompted looking for Theorem V.) **Consequence
+for the record: N2's open content is genuinely about `thr_α`, and cannot be transferred to
+`thr_β`.** V1 is the exact reason — the β-side front-loading N2 asks about is free, so the
+question lives entirely on the α-side.
+
+**Corollary V2 (the leak inequality) [proved].** Applying Theorem V inside `λ`: for a fan
+`μ` and any limit `ν` with `μ+ω ≤ ν < λ` and `λ_F(ν,λ) < μ`, `thr_λ(μ) ≥ ρ₁(ν,λ)+1`. Since
+N1 needs `thr_λ(μ) ≤ ρ₁(λ,β)` to produce a leak at `μ`, a leak requires
+> `sup{ ρ₁(ν,λ) : μ+ω ≤ ν < λ, λ_F(ν,λ) < μ } < ρ₁(λ,β)`
+— the *inner* walks (down from λ) must be cheaper than the *outer* one (down from β). This
+is the surviving quantitative form of N2, now with both sides walk-computable.
+
+**Theorem S (fan-completion riding) [proved + numerically checked].** *Under the extra
+normalization* **(e)** `C_{δ+ω} = {δ+n+1 : n < ω}` for every limit `δ`:
+`B_{δ+ω} = B_δ ∪ [δ, δ+ω)`.
+*Proof.* For `ξ = δ+j` (`j ≥ 1`) the walk is the single step off `δ+j = δ+(j−1)+1 ∈
+C_{δ+ω}`, so last = max and `ρ₃ = 1`. For `ξ ≤ δ` the walk steps to `δ+1` (weight
+`|C_{δ+ω} ∩ ξ| = 0`), then to `δ` by (a) (weight 0), then walks `δ → ξ`; prepending `⟨0,0⟩`
+changes neither the last entry nor the maximum, so `ρ₃(ξ, δ+ω) = ρ₃(ξ,δ)` for `ξ < δ` and
+`ρ₃(δ, δ+ω) = 1`. ∎ This is **Lemma I one level up** — where successors ride their fans,
+fan-tops ride their whole fan.
+*Why (e) is needed, exactly:* without it, write `N_δ := |C_{δ+ω} ∩ δ|`; then the walk
+`δ+ω → δ` reads `⟨N_δ, 0, …, 0⟩`, so **`ρ₃(δ, δ+ω) = 1` iff `N_δ = 0`**. (d) forces only
+the *tail* of `C_{δ+ω}` into the fan, not its head. (e) is the harmless completion — it is
+the standard "ladders of `δ+ω` live in the fan of `δ`" choice, and §51 already noted the
+C-sequence is ours to choose.
+
+**Theorem T (the ω-successor limit rows are strongly unbounded) [proved].** Under (e), for
+every `β` and every infinite `I₀ ⊆ {δ ∈ Λ : δ+ω ≤ β}`, the set
+`⋃_{δ∈I₀} (B_{δ+ω} \ B_β)` is infinite.
+*Proof.* `δ ∈ B_{δ+ω}` by Theorem S. By Lemma 3.8(2) at `n = 0`, `Λ ∩ B_β` is finite, so
+`δ ∉ B_β` for all but finitely many `δ ∈ I₀`; each such `δ` is a point of
+`B_{δ+ω} \ B_β`, and distinct `δ` are distinct points. ∎
+
+**Theorem U ((Q-rows-lim) reduces to limits of limits) [proved].** Every `λ ∈ Λ` is either
+a limit of limits or of the form `δ+ω` with `δ ∈ Λ ∪ {0}` (if `sup(Λ ∩ λ) = δ < λ` then
+`(δ,λ)` has no limits, forcing `λ = δ+ω`). By Theorem T an infinite family drawn from the
+second kind is always strongly unbounded, so a (Q-rows-lim) counterexample family may be
+assumed to consist of **limits of limits**. Exactly parallel to Lemma I′ one level up —
+and note the same trade: Theorem T costs the crux nothing, it only removes the cheap part
+of the index.
+
+**Methodological caveat, recorded because it nearly produced a false verdict.** The
+numeric model *cannot* probe (Q-rows-lim) itself. A direct probe over the model reports
+that most limit rows are fully absorbed (`B_λ ⊆ B_β` for ~2/3 of rows, and greedy families
+of 14 rows out of 17 with a union of size ≤ 4) — which reads as strong evidence that
+(Q-rows-lim) **fails**. It is an artefact: truncation destroys Lemma 3.8(2)'s finiteness
+(the model has ~17 limits below each β, so "`Λ ∩ B_β` is finite" imposes nothing), and
+3.8(2) is precisely Theorem T's engine. **Numeric checks over the truncated model are
+sound for identities and formulas and worthless for finiteness phenomena.** §52's uses
+were of the first kind; this is the boundary.
+
+**Status after §54.**
+- **(Q-rows-lim): still open**, index set reduced to limits of limits (Theorem U) on top of
+  §53's Theorem Q (no dense failures), with the surviving criterion now the walk-computable
+  inequality V2 and the explicit trace formula behind it.
+- **New ZFC facts**: the trace formula and its (d)-rider; Theorem V and Corollaries V1, V2;
+  Theorems S, T, U.
+- **Route closed**: the `thr_β`-transfer of N1/N2 is vacuous (Theorem V) — N2's content is
+  irreducibly on the `thr_α` side.
+- **(Q-T), (Q-T-θ), and the central question — is `ρ₃` strongly dip-schedulable under CH —
+  remain open.** Nothing here decides them; what changed is that the residual is smaller
+  and, for the first time, entirely written in walk-computable quantities.

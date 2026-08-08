@@ -300,6 +300,34 @@ landed.
   Machine-checked alongside: `omega1_finiteToOne_not_trivial` /
   `omega1_finiteToOne_no_reps` (see transport-kernel Tier 5).
 
+- **§54 — going at the central question: the dial made explicit, one route
+  closed as vacuous, the index set halved.** Unfolding Handbook 1.4 gives the
+  **trace formula** `λ_F(λ,β) = max_i max(C_{β_i} ∩ λ)` over the walk's stops,
+  against `ρ₁(λ,β) = max_i |C_{β_i} ∩ λ|` — under (d) the same data read as
+  position vs place, so N2's two dials are one object. **Theorem V**: a fan
+  above the trace is β-expensive — `ρ₃(μ+n,β) = 0` for every `n ≤ ρ₁(λ,β)`,
+  hence `thr_β(μ) ≥ ρ₁(λ,β)+1` (M(3) plus arrival rigidity; `W ≥ 1` is sharp).
+  **Corollary V1**: front-loading past the β-cheap region is automatic. **So the
+  natural attack — transferring N1/N2 from the moving `thr_α` to the fixed
+  `thr_β` — is VACUOUS**, its hypothesis contradicting V; recorded as a closed
+  route, with **Corollary V2** the surviving walk-computable criterion (a leak
+  needs the inner walks cheaper than the outer one). Under the harmless extra
+  normalization (e) `C_{δ+ω} = {δ+n+1}`: **Theorem S** `B_{δ+ω} = B_δ ∪
+  [δ,δ+ω)` — Lemma I one level up, fan-tops ride their whole fan (and without
+  (e), `ρ₃(δ,δ+ω)=1` iff `|C_{δ+ω} ∩ δ| = 0`, so (e) is exactly what is needed)
+  — whence **Theorem T** (those rows are strongly unbounded, by 3.8(2) at n=0)
+  and **Theorem U**: **(Q-rows-lim) reduces to limits of limits**, parallel to
+  Lemma I′ one level up. New `tools/walk-check.py` re-verifies every walk
+  formula on randomized (a),(c),(d),(e)-conforming C-sequences below `ω²·3` —
+  the first model in this program with limits *of* limits (§52's stopped below
+  `ω·25`): trace formula 972 instances, Theorem V 3108, M(3) 36065, all pass.
+  Recorded methodological caveat: a direct numeric probe of (Q-rows-lim) reports
+  that most limit rows are absorbed — **an artefact**, since truncation destroys
+  the 3.8(2) finiteness that is Theorem T's engine; numeric checks over the
+  model are sound for identities and worthless for finiteness phenomena. **The
+  central question — is `ρ₃` strongly dip-schedulable under CH — is not
+  decided.**
+
 ## transport-kernel — mathlib instances
 
 - **Tier 1** — mathlib olean cache stood up (the infra that gates importing

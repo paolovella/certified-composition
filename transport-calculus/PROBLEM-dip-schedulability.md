@@ -537,6 +537,26 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   each `Λ+n` orthogonal to ρ₃ — a free ZFC σ-decomposition of the **index** having exactly
   the shape fiber-specialness wants of the **fiber order**; the gap between them is the
   dips.)*
+  *(Advanced, notes §54 — the residual narrowed again, and one natural route closed.
+  **Theorem V**: a fan `μ` lying above the trace `λ_F(λ,β)` (with `μ+ω ≤ λ < β`,
+  `W := ρ₁(λ,β) ≥ 1`) has `ρ₃(μ+n,β) = 0` for every `n ≤ W`, so `thr_β(μ) ≥ W+1` —
+  M(3) plus arrival rigidity. **Corollary V1**: front-loading past the *β*-cheap region is
+  therefore automatic, no C-sequence hypothesis needed. **Consequently the natural attack
+  — transferring N1/N2 from `thr_α` to the single fixed `thr_β` — is VACUOUS**, its
+  hypothesis contradicting V; N2's open content is irreducibly on the `thr_α` side, and
+  **Corollary V2** is its surviving walk-computable form: a leak at `μ` needs
+  `sup{ρ₁(ν,λ) : μ+ω ≤ ν < λ, λ_F(ν,λ) < μ} < ρ₁(λ,β)` — inner walks cheaper than the
+  outer one. The dial itself is now explicit: unfolding Handbook 1.4 gives
+  **`λ_F(λ,β) = max_i max(C_{β_i} ∩ λ)`** over the walk's stops, against
+  `ρ₁(λ,β) = max_i |C_{β_i} ∩ λ|`, and under (d) these are the same data (place = size),
+  so front-loading asks whether a stop can jump a fan with a high place but a low landing.
+  Finally, under the harmless extra normalization **(e)** `C_{δ+ω} = {δ+n+1}`,
+  **Theorem S** `B_{δ+ω} = B_δ ∪ [δ,δ+ω)` (Lemma I one level up — fan-tops ride their whole
+  fan; without (e), `ρ₃(δ,δ+ω)=1` iff `|C_{δ+ω} ∩ δ| = 0`), whence **Theorem T** (those rows
+  are strongly unbounded, by 3.8(2) at n=0) and **Theorem U**: **(Q-rows-lim) reduces to
+  limits of limits**, parallel to Lemma I′ one level up. All walk formulas re-verified by
+  `tools/walk-check.py` over randomized C-sequences below ω²·3. The central question is
+  **not** decided.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via

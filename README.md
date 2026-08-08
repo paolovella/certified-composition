@@ -60,7 +60,7 @@ The same accountancy appears at every level:
   regularity hypothesis is load-bearing (`omega_concentration_fails`);
 - the **research line** the frontier opened, in prose at graded rigor:
   [`NOTES-coherent-escapee.md`](transport-calculus/NOTES-coherent-escapee.md)
-  (fifty-three sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
+  (fifty-four sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
   order, the no-go for kill templates, forcing-locality, Theorem B —
   uniformizing dip systems ⟺ trivial — and its downward dual Theorem B⁻,
   the reduction of the whole question
@@ -68,7 +68,9 @@ The same accountancy appears at every level:
   "everything schedules" (Theorem C), the descent of the crux to a
   threshold sequence θ(ρ₃) whose nontriviality is now settled in ZFC
   (Theorem P) — killing the dense failure mode of the residual question
-  (Theorem Q) — and the two-sided independence
+  (Theorem Q), the explicit trace formula and Theorem V — which closes the
+  natural `thr_β`-transfer route as vacuous and reduces the residual to
+  limits of limits — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):
