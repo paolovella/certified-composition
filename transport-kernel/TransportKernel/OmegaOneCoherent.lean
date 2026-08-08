@@ -22,6 +22,7 @@
   (`nontrivial_coherent_no_reps`). To our knowledge this is the first machine-checked
   theorem about coherent sequences on ω₁.
 -/
+import Mathlib.Data.Nat.Lattice
 import Mathlib.Data.Set.Card
 import Mathlib.Data.Set.Countable
 import Mathlib.SetTheory.Cardinal.Regular
@@ -298,5 +299,224 @@ theorem omega1_finiteToOne_no_reps
     (C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne)
     (hf : FiniteToOne C) : IsEmpty (TransportCalculus.Reps C) :=
   nontrivial_coherent_no_reps C (omega1_finiteToOne_not_trivial C hf)
+
+/-! ## Theorem B⁻: downward dip systems force triviality
+
+    The dip theorems of the set-theoretic notes (§53) were careful-prose only. This
+    section machine-checks the downward one — the first formal dip theorem in the
+    program, and the one Theorem Q (the kill of the dense failure mode of
+    `(Q-rows-lim)`) rests on.
+
+    A *downward dip system* for a coherent sequence is a finite correction `X μ` at each
+    level such that at every top `γ` the total leftover — every coordinate where some
+    lower row sits strictly *below* `e_γ` and escapes its own correction — is still
+    finite. The theorem says such a system exists only for trivial sequences.
+
+    The proof: call `γ` **honest at ξ** when it is above ξ and neither corrects nor leaks
+    there. Honest values are non-increasing in the level (`honest_antitone`), so — ℕ being
+    well-ordered — each coordinate with unboundedly many honest levels stabilizes, and
+    the coordinates without them are finite (`bad_finite`, by concentrating countably many
+    bounds at one level: regularity of ℵ₁ again). The stabilized values trivialize. -/
+
+namespace DownDip
+
+/-- The **downward defect**: coordinates below `μ` where row `μ` sits strictly below
+    row `γ`. (The notes' `D⁻(μ,γ)`; the dual of the `D⁺` Theorem B runs on.) -/
+def DownDefect (C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne)
+    (μ γ : OmegaOne) : Set OmegaOne :=
+  {ξ | ξ < μ ∧ C.e μ ξ < C.e γ ξ}
+
+end DownDip
+
+/-- A **downward dip system**: finite per-level corrections whose leftover, unioned over
+    *all* lower levels, is still finite at every top. -/
+structure DownDip (C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne) where
+  X : OmegaOne → Set OmegaOne
+  X_finite : ∀ μ, (X μ).Finite
+  leftover_finite : ∀ γ : OmegaOne,
+    {ξ : OmegaOne | ∃ μ, μ < γ ∧ ξ ∈ DownDip.DownDefect C μ γ ∧ ξ ∉ X μ}.Finite
+
+namespace DownDip
+
+/-- The leftover at a top level. -/
+def V {C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne}
+    (D : DownDip C) (γ : OmegaOne) : Set OmegaOne :=
+  {ξ : OmegaOne | ∃ μ, μ < γ ∧ ξ ∈ DownDefect C μ γ ∧ ξ ∉ D.X μ}
+
+theorem V_finite {C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne}
+    (D : DownDip C) (γ : OmegaOne) : (D.V γ).Finite := D.leftover_finite γ
+
+/-- `γ` is **honest at `ξ`** when it lies above `ξ` and neither corrects nor leaks
+    there — so its value at `ξ` is one the system takes responsibility for. -/
+def Honest {C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne}
+    (D : DownDip C) (ξ γ : OmegaOne) : Prop := ξ < γ ∧ ξ ∉ D.X γ ∧ ξ ∉ D.V γ
+
+variable {C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne}
+
+/-- **Honest values are non-increasing in the level.** An increase between two honest
+    levels would be a downward defect escaping the lower level's own correction, hence a
+    leak at the upper one — which honesty forbids. -/
+theorem honest_antitone (D : DownDip C) {ξ μ γ : OmegaOne}
+    (hμ : D.Honest ξ μ) (hγ : D.Honest ξ γ) (hlt : μ < γ) : C.e γ ξ ≤ C.e μ ξ := by
+  by_contra hcon
+  exact hγ.2.2 ⟨μ, hlt, ⟨hμ.1, not_le.mp hcon⟩, hμ.2.1⟩
+
+/-- The coordinates whose honest levels are bounded — the ones the system eventually
+    stops vouching for. -/
+def Bad (D : DownDip C) : Set OmegaOne := {ξ : OmegaOne | ∃ δ, ∀ γ, D.Honest ξ γ → γ ≤ δ}
+
+/-- **Only finitely many coordinates go permanently unvouched.** If infinitely many did,
+    regularity of ℵ₁ would concentrate their bounds — and themselves — below one level;
+    above that level none of them is honest, so all of them sit in one level's finite
+    correction-plus-leftover. -/
+theorem bad_finite (D : DownDip C) : D.Bad.Finite := by
+  by_contra hinf
+  rw [Set.not_finite] at hinf
+  have g := hinf.natEmbedding
+  choose δ hδ using fun n : Nat => (g n).2
+  obtain ⟨a, ha⟩ := sigmaDirected_omegaOne δ
+  obtain ⟨b, hb⟩ := sigmaDirected_omegaOne (fun n => ((g n : ↥D.Bad) : OmegaOne))
+  obtain ⟨c, hc⟩ := sigmaDirected_omegaOne (fun n => if n = 0 then a else b)
+  have hac : a ≤ c := by have := hc 0; simpa using this
+  have hbc : b ≤ c := by have := hc 1; simpa using this
+  obtain ⟨top, htop⟩ := unbounded_omegaOne c
+  have hctop : c < top := not_le.mp htop
+  have hmem : ∀ n : Nat, ((g n : ↥D.Bad) : OmegaOne) ∈ D.X top ∪ D.V top := by
+    intro n
+    have hlt : ((g n : ↥D.Bad) : OmegaOne) < top :=
+      lt_of_le_of_lt (le_trans (hb n) hbc) hctop
+    by_cases hx : ((g n : ↥D.Bad) : OmegaOne) ∈ D.X top
+    · exact Or.inl hx
+    · by_cases hv : ((g n : ↥D.Bad) : OmegaOne) ∈ D.V top
+      · exact Or.inr hv
+      · exact absurd (le_trans (le_trans (hδ n top ⟨hlt, hx, hv⟩) (ha n)) hac)
+          (not_le.mpr hctop)
+  have hinj : Function.Injective (fun n : Nat => ((g n : ↥D.Bad) : OmegaOne)) :=
+    fun m n hmn => g.injective (Subtype.ext hmn)
+  exact ((D.X_finite top).union (D.V_finite top)).not_infinite
+    (Set.infinite_of_injective_forall_mem hinj hmem)
+
+/-- For a vouched coordinate the honest levels are unbounded. -/
+theorem honest_unbounded (D : DownDip C) {ξ : OmegaOne} (h : ξ ∉ D.Bad) (δ : OmegaOne) :
+    ∃ γ, D.Honest ξ γ ∧ ¬ γ ≤ δ := by
+  by_contra hcon
+  refine h ⟨δ, fun γ hγ => ?_⟩
+  by_contra hle
+  exact hcon ⟨γ, hγ, hle⟩
+
+theorem exists_honest (D : DownDip C) {ξ : OmegaOne} (h : ξ ∉ D.Bad) :
+    ∃ γ, D.Honest ξ γ :=
+  let ⟨γ, hγ, _⟩ := D.honest_unbounded h ξ; ⟨γ, hγ⟩
+
+/-- The stabilized honest value: the least value any honest level gives the coordinate.
+    (Junk `0` at unvouched coordinates — they are finite, so they wash out.) -/
+noncomputable def Eval (D : DownDip C) (ξ : OmegaOne) : Nat :=
+  sInf {n : Nat | ∃ γ, D.Honest ξ γ ∧ C.e γ ξ = n}
+
+theorem eval_mem (D : DownDip C) {ξ : OmegaOne} (h : ξ ∉ D.Bad) :
+    ∃ γ, D.Honest ξ γ ∧ C.e γ ξ = D.Eval ξ := by
+  obtain ⟨γ, hγ⟩ := D.exists_honest h
+  have hne : {n : Nat | ∃ γ, D.Honest ξ γ ∧ C.e γ ξ = n}.Nonempty :=
+    ⟨C.e γ ξ, γ, hγ, rfl⟩
+  exact Nat.sInf_mem hne
+
+theorem eval_le (D : DownDip C) {ξ γ : OmegaOne} (hγ : D.Honest ξ γ) :
+    D.Eval ξ ≤ C.e γ ξ :=
+  Nat.sInf_le ⟨γ, hγ, rfl⟩
+
+/-- A level attaining the stabilized value. -/
+noncomputable def att (D : DownDip C) {ξ : OmegaOne} (h : ξ ∉ D.Bad) : OmegaOne :=
+  Classical.choose (D.eval_mem h)
+
+theorem att_spec (D : DownDip C) {ξ : OmegaOne} (h : ξ ∉ D.Bad) :
+    D.Honest ξ (D.att h) ∧ C.e (D.att h) ξ = D.Eval ξ :=
+  Classical.choose_spec (D.eval_mem h)
+
+/-- **Stabilization.** At or above the attaining level every honest level gives the
+    stabilized value: `≤` by antitonicity, `≥` by leastness. -/
+theorem eval_eq_of_honest (D : DownDip C) {ξ γ : OmegaOne} (h : ξ ∉ D.Bad)
+    (hγ : D.Honest ξ γ) (hge : D.att h ≤ γ) : C.e γ ξ = D.Eval ξ := by
+  rcases eq_or_lt_of_le hge with heq | hlt
+  · rw [← heq]; exact (D.att_spec h).2
+  · exact le_antisymm
+      (le_trans (D.honest_antitone (D.att_spec h).1 hγ hlt) (le_of_eq (D.att_spec h).2))
+      (D.eval_le hγ)
+
+end DownDip
+
+/-- **Theorem B⁻, machine-checked.** A coherent sequence on ω₁ admitting a downward dip
+    system is trivial. The dual of the notes' Theorem B — and strictly easier, because a
+    non-increasing ℕ-valued family stabilizes for free, where the upward theorem needs a
+    witness-concentration argument for unbounded columns. -/
+theorem omega1_downDip_trivial
+    (C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne)
+    (D : DownDip C) : C.Trivial := by
+  classical
+  refine ⟨D.Eval, fun w => ?_⟩
+  rw [finiteP_iff_finite]
+  obtain ⟨enum, henum⟩ := countableSegments_omegaOne w
+  obtain ⟨s, hs⟩ := sigmaDirected_omegaOne
+    (fun n => if h : enum n ∉ D.Bad then D.att h else enum n)
+  obtain ⟨p, hp⟩ := sigmaDirected_omegaOne (fun n => if n = 0 then s else w)
+  have hsp : s ≤ p := by have := hp 0; simpa using this
+  have hwp : w ≤ p := by have := hp 1; simpa using this
+  obtain ⟨δ, hδ⟩ := unbounded_omegaOne p
+  have hpδ : p < δ := not_le.mp hδ
+  have hwδ : w < δ := lt_of_le_of_lt hwp hpδ
+  have hcoh : {u : OmegaOne | wellIndexOmegaOne.lt u δ ∧ wellIndexOmegaOne.lt u w ∧
+      C.e δ u ≠ C.e w u}.Finite := (finiteP_iff_finite _).mp (C.coh δ w)
+  refine Set.Finite.subset
+    (((D.bad_finite.union (D.X_finite δ)).union (D.V_finite δ)).union hcoh) ?_
+  rintro u ⟨hlt, hne⟩
+  by_contra hout
+  simp only [Set.mem_union, not_or] at hout
+  obtain ⟨⟨⟨hbad, hX⟩, hV⟩, hcohu⟩ := hout
+  have hltδ : u < δ := lt_trans (wi_lt_iff.mp hlt) hwδ
+  have hhon : D.Honest u δ := ⟨hltδ, hX, hV⟩
+  obtain ⟨n, hn⟩ := henum u (le_of_lt (wi_lt_iff.mp hlt))
+  have hatt : D.att hbad ≤ δ := by
+    have hsn : D.att hbad ≤ s := by
+      have h0 := hs n
+      rw [hn] at h0
+      rwa [dif_pos hbad] at h0
+    exact le_trans (le_trans hsn hsp) (le_of_lt hpδ)
+  have h1 : C.e δ u = D.Eval u := D.eval_eq_of_honest hbad hhon hatt
+  have h2 : C.e δ u = C.e w u := by
+    by_contra hd
+    exact hcohu ⟨wi_lt_iff.mpr hltδ, hlt, hd⟩
+  exact hne (h1 ▸ h2)
+
+/-- The converse (Theorem A's dip, downward): a trivialization *is* a downward dip
+    system — correct each level where it departs from the global row, and every
+    surviving downward defect at a top is a departure of the global row *there*. -/
+noncomputable def DownDip.ofTrivial
+    {C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne}
+    (h : C.Trivial) : DownDip C := by
+  classical
+  set E := Classical.choose h with hEdef
+  have hE := Classical.choose_spec h
+  refine
+    { X := fun μ => {ξ : OmegaOne | ξ < μ ∧ C.e μ ξ ≠ E ξ}
+      X_finite := fun μ => ?_
+      leftover_finite := fun γ => ?_ }
+  · refine Set.Finite.subset ((finiteP_iff_finite _).mp (hE μ)) ?_
+    rintro ξ ⟨hlt, hne⟩
+    exact ⟨wi_lt_iff.mpr hlt, fun hEq => hne hEq.symm⟩
+  · refine Set.Finite.subset ((finiteP_iff_finite _).mp (hE γ)) ?_
+    rintro ξ ⟨μ, hμγ, ⟨hξμ, hval⟩, hxout⟩
+    have heq : C.e μ ξ = E ξ := by
+      by_contra hd
+      exact hxout ⟨hξμ, hd⟩
+    have hlt2 : E ξ < C.e γ ξ := heq ▸ hval
+    exact ⟨wi_lt_iff.mpr (lt_trans hξμ hμγ), Nat.ne_of_lt hlt2⟩
+
+/-- **Theorem B⁻ as an equivalence.** A coherent sequence on ω₁ admits a downward dip
+    system **iff** it is trivial. (The `←` direction also settles non-vacuity: the
+    structure is inhabited exactly on the trivial sequences, so the theorem is not
+    quantifying over nothing.) -/
+theorem omega1_downDip_iff_trivial
+    (C : TransportCalculus.CoherentSeq OmegaOne wellIndexOmegaOne) :
+    Nonempty (DownDip C) ↔ C.Trivial :=
+  ⟨fun ⟨D⟩ => omega1_downDip_trivial C D, fun h => ⟨DownDip.ofTrivial h⟩⟩
 
 end TransportKernel

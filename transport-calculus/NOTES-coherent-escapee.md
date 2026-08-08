@@ -3090,7 +3090,24 @@ the ω₁-obstruction the whole program keeps meeting. Combined with N2's front-
 criterion, the surviving target is narrow and quantitative.
 
 **Machine-checked this session (`transport-kernel/TransportKernel/OmegaOneCoherent.lean`).**
-Theorem P's engine is now formal at actual ω₁, in the general form:
+**Theorem B⁻ is formal**: `omega1_downDip_trivial`, with the structure `DownDip C`
+(finite `X μ`, leftover finite at every top) transcribed directly from the statement
+above, and `omega1_downDip_iff_trivial` — *a coherent sequence on ω₁ admits a downward
+dip system **iff** it is trivial* — the converse supplied by `DownDip.ofTrivial`, which
+also settles non-vacuity (the structure is inhabited exactly on the trivial sequences).
+The formal proof follows the prose step for step: `honest_antitone` (values
+non-increasing along honest levels), `bad_finite` (only finitely many coordinates go
+permanently unvouched — by concentrating countably many bounds at one level, regularity
+of ℵ₁ again), `eval_eq_of_honest` (stabilization: `≤` by antitonicity, `≥` by leastness
+of `sInf`), then the four-finite-sets assembly. **This is the program's first
+machine-checked dip theorem**, and it matters here because **Theorem Q depends on it** —
+the kill of (Q-rows-lim)'s dense failure mode now rests on a formal theorem plus Theorem
+P, not on two fresh prose arguments. *Asymmetry, stated:* the *upward* Theorem B remains
+careful-prose only. Its witness-concentration step for unbounded columns is exactly what
+B⁻ does not need, and it is the harder half; the Corollary to Question 1′
+(level-factored ⟹ trivial) still rests on it unformalized.
+
+Theorem P's engine is also formal at actual ω₁, in the general form:
 `omega1_finiteToOne_not_trivial` — *a coherent sequence on ω₁ with finite-to-one rows is
 nontrivial* — with `FiniteToOne C := ∀ w n, {u | u < w ∧ C.e w u ≤ n}.Finite` (Handbook
 1.16(a) verbatim), proved via `countable_of_segments_finite` (the map
@@ -3110,8 +3127,10 @@ implication; ρ₁ itself is not formalized, so non-vacuity still rests on 1.16.
 **Status after §53.**
 - **(Q-thr): resolved, NONTRIVIAL** (Theorem P, ZFC), machine-checked in general form.
   §52's descent lands on a coherent Aronszajn tree `T(θ)`, not a degenerate object.
-- **New tool: Theorem B⁻**, the downward dual of Theorem B — easier, and matched to the
-  one-sided pruning (M1) that governs ρ₃.
+- **New tool: Theorem B⁻**, the downward dual of Theorem B — easier, matched to the
+  one-sided pruning (M1) that governs ρ₃, and **machine-checked** as an equivalence
+  (`omega1_downDip_iff_trivial`): the program's first formal dip theorem. The upward
+  Theorem B stays careful-prose.
 - **(Q-rows-lim): narrowed, not resolved** (Theorem Q) — the dense/uniform failure mode
   is impossible in ZFC; only sparse failures survive. Open.
 - **(Q-T): open** as in §52; **(Q-T-θ)** (is `T(θ)` special?) added as its one-level-down

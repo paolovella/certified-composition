@@ -110,7 +110,10 @@ The same accountancy appears at every level:
   the classical ZFC engine — a coherent sequence on ω₁ with *finite-to-one rows*
   (Todorcevic's Handbook 1.16(a) for ρ₁, verbatim) is nontrivial — so
   `omega1_finiteToOne_no_reps` needs no imported nontriviality theorem; what
-  stays cited is only the positive existence of such a sequence.
+  stays cited is only the positive existence of such a sequence. And
+  `omega1_downDip_iff_trivial` machine-checks **Theorem B⁻** — a coherent sequence
+  on ω₁ admits a *downward dip system* iff it is trivial — the program's first
+  formal dip theorem, and the one Theorem Q rests on.
 
 ## The security claim (the original goal)
 

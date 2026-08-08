@@ -27,7 +27,8 @@ done
 # 1b′. Set-theory results cited in the notes/problem statement that are machine-checked
 #      must still exist in the Lean sources — the rigor grades depend on it.
 for name in omega1_finiteToOne_not_trivial omega1_finiteToOne_no_reps \
-            countable_of_segments_finite bounded_of_countable; do
+            countable_of_segments_finite bounded_of_countable \
+            omega1_downDip_trivial omega1_downDip_iff_trivial; do
   if ! grep -q "$name" transport-kernel/TransportKernel/OmegaOneCoherent.lean 2>/dev/null; then
     echo "DRIFT: $name cited as machine-checked but missing from OmegaOneCoherent.lean"; fail=1
   fi

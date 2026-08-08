@@ -398,6 +398,20 @@ landed.
   ρ₁); the Lean statement is an implication, so non-vacuity still rests on
   that. Axiom-clean (standard three), no `sorry`. Set-theoretic side: notes §53
   (Theorem P).
+- **Tier 5c — Theorem B⁻ machine-checked (`omega1_downDip_iff_trivial`).** The
+  program's first formal *dip* theorem: `DownDip C` bundles finite per-level
+  corrections whose leftover is finite at every top, and the equivalence says
+  such a system exists **iff** the sequence is trivial. Substantive direction
+  `omega1_downDip_trivial` follows the §53 prose step for step —
+  `honest_antitone`, `bad_finite` (regularity of ℵ₁ concentrating countably many
+  bounds), `eval_eq_of_honest` (stabilization by `sInf` leastness plus
+  antitonicity) — with `DownDip.ofTrivial` the converse, which also settles
+  non-vacuity. This matters because notes §53's **Theorem Q** (the kill of
+  (Q-rows-lim)'s dense failure mode) depends on B⁻: that kill now rests on a
+  formal theorem plus Theorem P rather than two fresh prose arguments. The
+  *upward* Theorem B stays careful-prose — its witness-concentration step for
+  unbounded columns is exactly the part the downward dual avoids. Axiom-clean,
+  no `sorry`.
 
 ## Consolidation
 

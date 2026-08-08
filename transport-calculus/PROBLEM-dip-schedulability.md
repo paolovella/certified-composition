@@ -149,7 +149,7 @@ on any cofinal set of levels. *Warning:* the running sup `H_γ` of the dipped fa
 **not** satisfy `H_γ =* e_γ` in general (dips can hide whole columns below an
 ω-cofinality level); the honest-column extraction is the correct route.
 
-**Theorem B⁻ (the downward dual) [proved, notes §53].** Put
+**Theorem B⁻ (the downward dual) [proved; machine-checked, notes §53].** Put
 `D⁻(μ, γ) := {ξ < μ : e_μ(ξ) < e_γ(ξ)}`. If there are finite `X_μ ⊆ μ` with
 `V_γ := ⋃_{μ<γ}(D⁻(μ,γ) \ X_μ)` finite for every γ, then **`e` is trivial** (converse as
 in Theorem A). *Proof.* Call γ *ξ-honest* if `γ > ξ` and `ξ ∉ X_γ ∪ V_γ`. Values are
@@ -165,6 +165,14 @@ This is **strictly easier** than Theorem B — decreasing ℕ-values stabilize f
 where Theorem B needed witness-concentration for unbounded columns — and it relativizes
 to cofinal level sets the same way. It is the form matched to one-sided deviation
 geometries (for `ρ₃`, (M1): all downward defect lies at or below the full lower trace).
+*Machine-checked* at actual ω₁ as an **equivalence**: `omega1_downDip_iff_trivial` (with
+`omega1_downDip_trivial` the substantive direction and `DownDip.ofTrivial` the converse,
+which also settles non-vacuity) in
+`transport-kernel/TransportKernel/OmegaOneCoherent.lean`; axioms `propext,
+Classical.choice, Quot.sound`, no `sorry`. **The first formal dip theorem here** — note
+the asymmetry: the *upward* Theorem B, which the Question-1′ corollary below rests on,
+is still careful-prose, its witness-concentration step being precisely the part B⁻
+avoids.
 
 **Corollary (Question 1′, the level-factored case) [proved].** A *level-factored*
 schedule (`γ(x) = g(ℓ(x))`, `X(x) = Y_{ℓ(x)}`) for the identity pressure map, evaluated
@@ -271,7 +279,7 @@ A negative answer to Question 1 with a ZFC witness would (via the argued arrows)
 `Φ` in ZFC for that sequence; a positive answer makes `Φ(e) ⟺ e trivial` plausible; an
 independence answer to Question 3(a)/4 would place `Φ` at the independence boundary.
 
-## 4. Toolbox — short lemmas [A–E, H, I, I′ proved (ZFC); B⁻ proved, notes §53; G value-category scope, notes §49]
+## 4. Toolbox — short lemmas [A–E, H, I, I′ proved (ZFC); B⁻ proved *and machine-checked*, notes §53; G value-category scope, notes §49]
 
 **Lemma A (chain-continuation).** For `μ ≤ δ ≤ γ`:
 `D⁺(μ, γ) \ D⁺(μ, δ) ⊆ D⁺(δ, γ)`.

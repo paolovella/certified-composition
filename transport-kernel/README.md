@@ -246,6 +246,19 @@ constructible there. This file builds the model from mathlib and instantiates:
   computation-checkable existence of a coherent finite-to-one sequence (Handbook
   1.16(a)+(b)). Honest scope: the Lean statement is an implication — `ρ₁` itself is not
   formalized, so non-vacuity still rests on 1.16.
+- **`omega1_downDip_iff_trivial`** (notes §53, **Theorem B⁻**) — *a coherent sequence on
+  ω₁ admits a **downward dip system** iff it is trivial*. `DownDip C` bundles finite
+  per-level corrections `X μ` whose leftover — every coordinate where some lower row
+  sits strictly *below* `e_γ` and escapes its own correction — is still finite at every
+  top `γ`. Substantive direction `omega1_downDip_trivial`: `honest_antitone` (values
+  non-increasing along levels that neither correct nor leak), `bad_finite` (only finitely
+  many coordinates lose their honest levels — concentrate countably many bounds at one
+  level, regularity of ℵ₁ again), `eval_eq_of_honest` (stabilization, `≤` by antitonicity
+  and `≥` by leastness of `sInf`), then a four-finite-sets assembly. Converse
+  `DownDip.ofTrivial`, which also settles non-vacuity. **The program's first formal dip
+  theorem**, and the one Theorem Q (§53) rests on. The *upward* Theorem B — whose
+  witness-concentration step for unbounded columns is exactly what the downward dual
+  avoids — remains careful-prose.
 
 The dependency structure is the point: the four-step *combinatorial engine* is verified
 in a mathlib-free package (`TransportCalculus`, required by path), and mathlib
