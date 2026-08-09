@@ -61,6 +61,23 @@ lake build          # builds all four layers
 | `ConfTyping/Race.lean` | brick 32 / `VULN-COVERAGE.md` row 8 | races and TOCTOU: a demonic-scheduling small-step machine — the attack (`toctou_interleaving_unsafe`), the atomic fix safe under every interleaving, and a decidable check that reduces the concurrent obligation to a sequential one |
 | `ConfTyping/QueryEscape.lean` | brick 31 / `VULN-COVERAGE.md` row 3 | string literals with escapes: complete escaping proved sound and faithful, the unescaped-escape bug and the escaper/tokenizer convention mismatch proved injectable — escaping is a ledger entry (`escaping_no_silent_discharge`), parameterization is not |
 
+## House rules learned the hard way
+
+Three, each of which cost real time before being written down.
+
+1. **This package is mathlib-free — define list/finite helpers locally.** Guessing which
+   core lemma exists under which name (`List.mem_of_mem_filter`, `List.of_mem_filter`,
+   `List.mem_of_elem_eq_true`) failed repeatedly. Brick 35 defines `memStr`/`interStr`
+   and proves their two properties in nine lines; that is cheaper than one wrong guess.
+2. **Per-module builds do not catch namespace collisions.** All ~1050 top-level
+   declarations live in one flat `ConfTyping` namespace. `lake build ConfTyping.Foo`
+   succeeds and `lake build` then fails at root import with "environment already
+   contains …". `tools/check-claims.sh` guard 1aa now names both sites instead.
+3. **A guard is not live until it has failed on purpose.** `tools/guard-selftest.sh`
+   breaks the repo one way per guard family and asserts each fires. It exists because a
+   guard was once spliced by an edit that silently did nothing, and its negative tests
+   passed vacuously. Run it after touching `check-claims.sh`.
+
 ## Result map
 
 | Lean name | Paper claim |

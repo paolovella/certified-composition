@@ -78,6 +78,21 @@ elif ! grep -q "bricks, $numeral classes)" VULN-COVERAGE.md; then
   echo "DRIFT: the §2½ convention gives $total classes (rows=$rows + extras=$extras) but the standing-state heading does not say '$numeral classes'"; fail=1
 fi
 
+# 1aa. No two top-level declarations in the flat `ConfTyping` namespace may share a
+#     name. The build does catch this — but only at root-import time, with a cryptic
+#     "environment already contains ..." after a per-module build has already
+#     succeeded. Catching it here names both sites.
+dups=$(grep -hoE '^(theorem|lemma|def|abbrev|structure|inductive) [A-Za-z_][^ :({[]*' \
+         conf-typing/ConfTyping/*.lean 2>/dev/null \
+       | awk '{print $2}' | sort | uniq -d)
+if [ -n "$dups" ]; then
+  for d in $dups; do
+    where=$(grep -lE "^(theorem|lemma|def|abbrev|structure|inductive) $d\b" \
+              conf-typing/ConfTyping/*.lean | tr '\n' ' ')
+    echo "DRIFT: duplicate top-level name '$d' in the flat ConfTyping namespace: $where"; fail=1
+  done
+fi
+
 # 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
 #     the map's verdicts are only as good as their citations.
 for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \
