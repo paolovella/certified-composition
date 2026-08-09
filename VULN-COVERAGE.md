@@ -134,7 +134,7 @@ the one claim it could not independently verify. Restored to sixteen.)*
 | 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN (generated) | [classified] / [proved] |
 | 8 | races / TOCTOU (CWE-362/367) | safety over *all* interleavings, demonic scheduling | — | IN-WITH-MODEL (generated) | [proved] |
 | 9 | speculative execution (Spectre-class) | trace-safety over a transient-execution model, demonic misprediction | 1* | IN-WITH-MODEL (generated) | [proved] |
-| 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
+| 10 | resource exhaustion / DoS (CWE-400) | uniform cost budget over the instrumented semantics | — | IN-WITH-MODEL (generated) on the bounded fragment; REDUCIBLE in general | [proved] |
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER (mechanized) | [proved] |
 | 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
 | 13 | termination / progress leaks (CWE-385-adjacent) | 2-safety over a fuel-indexed semantics with loops | 1 | IN-WITH-MODEL (generated) | [proved] |
@@ -519,14 +519,46 @@ necessary*: `benign_rejected` with `benign_transient_is_constant` exhibits a bod
 rejects whose transient trace is provably constant, so lifting the rule to "no
 address-dependent load before the fence" is a named follow-on, not a soundness gap.
 
-### 3.10 Resource exhaustion — REDUCIBLE [classified]
+### 3.10 Resource exhaustion — IN-WITH-MODEL (generated) on the bounded fragment; REDUCIBLE in general [proved]
 
-The cost counter is already in the outcome, so "cost ≤ f(input)" is a safety-shaped
-quantitative bound — a *graded certificate* in the transport sense (a monotone bound
-on the distance/cost effect: `Bridge.ofModulus` territory), and bounds compose by
-accumulation. Liveness-shaped availability ("eventually responds") is not expressible
-and not claimed. Generation (amortized cost analysis) is external; the reduction of
-the class to certificates over the instrumented model is the claim.
+Brick 34 (`CostBound.lean`) proves what brick 1 asserted, and corrects the one part of
+the assertion that does not hold.
+
+The property is **uniformity**. `CostAtMost c k` says that *whatever* the input and
+*whatever* the fuel, a halting run of `c` costs at most `k`. Algorithmic-complexity DoS
+is exactly the failure of uniformity — a bound exists per input but not across inputs —
+so the quantifier order is the whole definition.
+
+- **Accumulation is a `GradedAction` [proved].** `costGA : GradedAction Nat Nat`, grade
+  composition `+`, action `+`, order `≤` — the three fields `Bridge.comp` consumes,
+  checked. `cost_seq` is the law and `cost_seq_is_mul` states it as `costGA.mul` on the
+  nose. "Bounds compose by accumulation" is now a theorem in the repo's own algebra,
+  alongside `cost_skip`, `cost_assign`, `cost_ite`.
+- **The attack [proved].** `spinU_cost_lb` shows the canonical countdown's cost grows
+  with its counter, so `dos_unbounded`: a loop whose trip count is read from untrusted
+  input satisfies `CostAtMost` for **no** `k`. Note what it costs the rest of the map
+  nothing to miss: the victim is memory-safe, injection-free and noninterferent, and
+  every earlier brick certifies it.
+- **The fix, generated [proved].** `costCheck` computes budgets for the loop-free
+  fragment (`costCheck_sound`), and `budget_cost` restores uniformity for a countdown
+  whose counter is initialised from a **constant** and whose body never touches it
+  (`noAssign_preserves`) — a bounded work unit, the real mitigation.
+  `dos_unbounded_budget_bounded` is the pair.
+
+**Correction of record.** The brick-1 text called this "a *graded certificate* in the
+transport sense (a monotone bound on the distance/cost effect: `Bridge.ofModulus`
+territory)". The `GradedAction` half is right and is now proved. The `Bridge` half is
+**wrong**: a `Bridge` certifies a *binary* quantity — `dist (map x) (map y) ≤ act cert
+(dist x y)` — whereas a cost budget is **unary**, a bound on one run, not a modulus
+relating two. What transfers is the accumulation algebra; what does not transfer is the
+contraction. (Cost *sensitivity* — how much an input change can change the cost — would
+be binary and Bridge-shaped, and is a different, unproved property.)
+
+Honest limits. `CostAtMost` bounds halting runs: availability ("eventually responds") is
+liveness-shaped, still not expressible and still not claimed. The loop rule covers the
+canonical countdown; general ranking-function analysis remains external, exactly as
+brick 1 said — hence "REDUCIBLE in general" stays in the verdict. And cost is the
+instrumented step count, not wall clock, so §0's model gap applies unchanged.
 
 ### 3.11 Crypto misuse — LEDGER, mechanized [proved]
 
@@ -1206,7 +1238,36 @@ partitions), not a general-purpose language frontend.
   last OUT-OF-MODEL row enters the model, and the map now has no class whose channel
   is simply absent from every semantics in the repo.**
 
-### The security program, standing state (thirty-three bricks, sixteen classes)
+### Brick 34 ledger (resource exhaustion — the cost bound as a graded certificate)
+
+- `CostBound.lean` — row 10's [classified] reduction, proved, and one clause of it
+  corrected. `CostAtMost c k` quantifies over **all inputs and all fuel**, so DoS is the
+  failure of uniformity rather than the absence of a bound. `costGA : GradedAction Nat
+  Nat` (mul `+`, act `+`, le `≤`) is a checked instance of the interface's own
+  accumulation algebra, and `cost_seq`/`cost_seq_is_mul` prove budgets add — the first
+  time a *security* row lands directly in the transport calculus's algebra rather than
+  beside it. `costCheck` + `costCheck_sound` generate budgets for the loop-free
+  fragment. `noAssign_preserves`, `countdown_turn` and `countdown_cost` give the loop
+  bound `1 + v·(kc+3)` in the counter's initial value `v` — a bound that exists per
+  input and *grows with it*, which is precisely the DoS surface. `spinU_cost_lb` (an
+  induction with fuel supplied by `wexec_mono_le`) turns that into `dos_unbounded`:
+  **no** uniform budget exists for a loop counting down untrusted input — and the
+  victim is memory-safe, injection-free and noninterferent, so every earlier brick
+  certifies it. `budget_cost` restores uniformity when the counter is initialised from a
+  constant, `fixed_bounded` instantiates it at 402, and
+  `dos_unbounded_budget_bounded` is the attack/fix pair. Numbers checked against the
+  model: cost 16 at counter 5 and 31 at counter 10, matching `1 + 3v`; `costCheck`
+  returns `none` on the victim and `some 2` on a loop-free program. No `sorry`,
+  choice-free. **Correction of record:** brick 1's "`Bridge.ofModulus` territory" is
+  wrong — a `Bridge` certifies a binary quantity and a cost budget is unary; the
+  `GradedAction` transfers, the contraction does not. Honest limits: halting runs only
+  (availability is liveness-shaped and still not claimed), the canonical countdown only
+  (general ranking analysis stays external, so the verdict keeps "REDUCIBLE in
+  general"), and instrumented steps rather than wall clock. **Brick 34 complete — the
+  last [classified]-only reducible row is proved, and the security program's
+  quantitative side now composes by the same law as the contraction estimates.**
+
+### The security program, standing state (thirty-four bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new

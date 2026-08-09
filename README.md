@@ -240,7 +240,11 @@ is injectable against the *other* dialect's tokenizer
 (`escaping_is_convention_relative`), so escaping carries a load-bearing assumption
 that lands in brick 4's ledger (`escaping_no_silent_discharge`) while
 parameterization needs the empty one (`escaping_reducible_parameterization_in`);
-and **speculative execution** (`spec_inert`) — brick 33 closes the
+and **resource exhaustion** (`cost_seq_is_mul`, `dos_unbounded`) — brick 34
+proves row 10's reduction: a uniform cost budget whose accumulation is a
+`GradedAction`, so a security row lands in the transport calculus's own algebra;
+algorithmic-complexity DoS is proved to admit *no* uniform budget, and a
+constant-initialised budget restores one; and **speculative execution** (`spec_inert`) — brick 33 closes the
 **last** OUT-OF-MODEL row by running the same recipe a third time: a
 transient-execution machine where Spectre-v1 really does leak the secret as a
 touched address (`spectre_leaks`) while the architectural machine sees nothing at

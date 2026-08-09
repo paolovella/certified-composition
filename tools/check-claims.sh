@@ -459,6 +459,14 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+if grep -q "CostBound.lean" VULN-COVERAGE.md; then
+  for thm in "theorem cost_seq" "theorem cost_seq_is_mul" "theorem costCheck_sound" \
+             "theorem countdown_cost" "theorem dos_unbounded" "theorem budget_cost"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/CostBound.lean 2>/dev/null; then
+      echo "DRIFT: resource exhaustion cited but '$thm' is missing from CostBound.lean"; fail=1
+    fi
+  done
+fi
 if grep -q "Speculate.lean" VULN-COVERAGE.md; then
   for thm in "theorem spectre_leaks" "theorem arch_indistinguishable" \
              "theorem speculative_model_misses_it" "theorem specCheck_sound" \
@@ -469,7 +477,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

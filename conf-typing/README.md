@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/CostBound.lean` | brick 34 / `VULN-COVERAGE.md` row 10 | resource exhaustion: a uniform cost budget, accumulation as a `GradedAction` (`cost_seq_is_mul`), algorithmic-complexity DoS proved (`dos_unbounded`), and uniformity restored by a constant-initialised budget (`budget_cost`) |
 | `ConfTyping/Speculate.lean` | brick 33 / `VULN-COVERAGE.md` row 9 | speculative execution: a transient-execution machine with demonic misprediction — Spectre-v1 as a theorem (`spectre_leaks`), architecturally invisible (`arch_indistinguishable`), and a fence check whose soundness makes speculation observationally inert (`spec_inert`) |
 | `ConfTyping/Race.lean` | brick 32 / `VULN-COVERAGE.md` row 8 | races and TOCTOU: a demonic-scheduling small-step machine — the attack (`toctou_interleaving_unsafe`), the atomic fix safe under every interleaving, and a decidable check that reduces the concurrent obligation to a sequential one |
 | `ConfTyping/QueryEscape.lean` | brick 31 / `VULN-COVERAGE.md` row 3 | string literals with escapes: complete escaping proved sound and faithful, the unescaped-escape bug and the escaper/tokenizer convention mismatch proved injectable — escaping is a ledger entry (`escaping_no_silent_discharge`), parameterization is not |
@@ -1047,6 +1048,35 @@ forwarding), rollback is perfect, and nested speculation is excluded **by the sy
 check is sufficient but not necessary: `benign_rejected` with
 `benign_transient_is_constant` exhibits a rejected body whose transient trace is provably
 constant, so the refinement is a follow-on, not a soundness gap.
+
+## Resource exhaustion (`CostBound.lean`) — the cost bound as a graded certificate
+
+Brick 34 proves row 10's [classified] reduction and corrects one clause of it. The
+property is **uniformity**: `CostAtMost c k` quantifies over *all* inputs and *all* fuel,
+so algorithmic-complexity DoS is the failure of uniformity, not the absence of a bound.
+
+`costGA : GradedAction Nat Nat` — grade composition `+`, action `+`, order `≤` — is a
+checked instance of the interface's own accumulation algebra, and `cost_seq` /
+`cost_seq_is_mul` prove budgets add as `costGA.mul`. This is the first time a *security*
+row lands directly in the transport calculus's algebra rather than beside it.
+`costCheck` + `costCheck_sound` generate budgets for the loop-free fragment.
+
+`countdown_cost` bounds the canonical countdown by `1 + v·(kc+3)` in the counter's
+initial value — a bound that exists per input and grows with it, which is the DoS
+surface. `spinU_cost_lb` turns that into `dos_unbounded`: **no** uniform budget exists
+for a loop counting down untrusted input. Worth noting what this catches that nothing
+else does — the victim is memory-safe, injection-free and noninterferent, so every
+earlier brick certifies it. `budget_cost` restores uniformity when the counter is
+initialised from a constant, and `dos_unbounded_budget_bounded` is the pair.
+
+**Correction of record.** Brick 1 called this "`Bridge.ofModulus` territory". The
+`GradedAction` half is right and now proved; the `Bridge` half is wrong — a `Bridge`
+certifies a *binary* quantity (`dist (map x) (map y) ≤ act cert (dist x y)`) and a cost
+budget is *unary*. The accumulation transfers; the contraction does not.
+
+Honest limits: halting runs only (availability is liveness-shaped and still not
+claimed), the canonical countdown only (general ranking analysis stays external, so the
+verdict keeps "REDUCIBLE in general"), and instrumented steps rather than wall clock.
 
 ## §11 pre-mechanization checklist (framework doc)
 

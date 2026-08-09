@@ -47,6 +47,29 @@ landed.
   §2½ convention a verdict change is not a new class, which is the convention
   doing its job on its first use.
 
+- **Brick 34 — resource exhaustion, the cost bound as a graded certificate
+  (`CostBound.lean`).** Row 10's [classified] reduction, proved — and one clause
+  of it corrected. `CostAtMost c k` quantifies over **all inputs and all fuel**,
+  so algorithmic-complexity DoS is the failure of *uniformity*, not the absence
+  of a bound. `costGA : GradedAction Nat Nat` (mul `+`, act `+`, le `≤`) is a
+  checked instance of the interface's own accumulation algebra, and `cost_seq` /
+  `cost_seq_is_mul` prove budgets add as `costGA.mul` — **the first time a
+  security row lands directly in the transport calculus's algebra rather than
+  beside it**. `costCheck`/`costCheck_sound` generate budgets for the loop-free
+  fragment; `countdown_cost` bounds the canonical countdown by `1 + v·(kc+3)` in
+  its counter's initial value, a bound that exists per input and grows with it —
+  the DoS surface — and `spinU_cost_lb` turns that into **`dos_unbounded`**: no
+  uniform budget exists for a loop counting down untrusted input. What it catches
+  that nothing else does: the victim is memory-safe, injection-free and
+  noninterferent, so every earlier brick certifies it. `budget_cost` restores
+  uniformity from a constant-initialised counter. **Correction of record:** brick
+  1's "`Bridge.ofModulus` territory" is wrong — a `Bridge` certifies a *binary*
+  quantity and a cost budget is *unary*; the `GradedAction` transfers, the
+  contraction does not. Limits kept: halting runs only (availability is
+  liveness-shaped, still not claimed), the canonical countdown only (so the
+  verdict keeps "REDUCIBLE in general"), instrumented steps not wall clock. Class
+  count stays sixteen by the §2½ convention.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
