@@ -240,6 +240,12 @@ is injectable against the *other* dialect's tokenizer
 (`escaping_is_convention_relative`), so escaping carries a load-bearing assumption
 that lands in brick 4's ledger (`escaping_no_silent_discharge`) while
 parameterization needs the empty one (`escaping_reducible_parameterization_in`);
+and **speculative execution** (`spec_inert`) — brick 33 closes the
+**last** OUT-OF-MODEL row by running the same recipe a third time: a
+transient-execution machine where Spectre-v1 really does leak the secret as a
+touched address (`spectre_leaks`) while the architectural machine sees nothing at
+all (`arch_indistinguishable`), and a fence check whose soundness makes
+speculation *observationally inert*, so every architectural guarantee transfers;
 and **races / TOCTOU** (`racefree_all_schedules`) — the last wholly-unmodelled
 common class, closed by building the map's named extension: a demonic-scheduling
 small-step machine where the check-then-act withdrawal really does go negative

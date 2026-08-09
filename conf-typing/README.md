@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Speculate.lean` | brick 33 / `VULN-COVERAGE.md` row 9 | speculative execution: a transient-execution machine with demonic misprediction — Spectre-v1 as a theorem (`spectre_leaks`), architecturally invisible (`arch_indistinguishable`), and a fence check whose soundness makes speculation observationally inert (`spec_inert`) |
 | `ConfTyping/Race.lean` | brick 32 / `VULN-COVERAGE.md` row 8 | races and TOCTOU: a demonic-scheduling small-step machine — the attack (`toctou_interleaving_unsafe`), the atomic fix safe under every interleaving, and a decidable check that reduces the concurrent obligation to a sequential one |
 | `ConfTyping/QueryEscape.lean` | brick 31 / `VULN-COVERAGE.md` row 3 | string literals with escapes: complete escaping proved sound and faithful, the unescaped-escape bug and the escaper/tokenizer convention mismatch proved injectable — escaping is a ledger entry (`escaping_no_silent_discharge`), parameterization is not |
 
@@ -1009,6 +1010,43 @@ sequentially consistent; the per-section obligation is a genuine residual
 section that the checker accepts and that breaks the invariant); and
 2-safety *over* interleavings — information flow under scheduling — stays open,
 since determinism is still load-bearing for the confidentiality gate.
+
+## Speculative execution (`Speculate.lean`) — the last OUT-OF-MODEL row
+
+Brick 33 runs §0's recipe a third time, after timing (brick 2) and scheduling (brick 32).
+The machine splits state: an **architectural** part that rolls back, and a
+**microarchitectural** address trace that does not. A `brLt` branch may be mispredicted,
+running its body transiently for a window taken from a **misprediction schedule** — a data
+parameter, so `∃ misprediction` is decidable on a witness and `∀ misprediction` ranges over
+unbounded windows.
+
+The victim is the textbook gadget: `if i < 4 then (x := mem[i]; y := mem[x])`, where the
+second load's *address* is the first load's *value*. With `i` out of bounds the guard is
+false. `spectre_trace_is_the_secret` pins the traces at `[8,42]` and `[8,99]` for two
+memories differing only at the secret, so `spectre_leaks`; `leak_needs_window_two` shows
+the channel has depth — a one-instruction window leaks only the public index.
+
+`arch_indistinguishable` is the other half, and the point: architecturally nothing runs, so
+those two memories are *identical*. `speculative_model_misses_it` pairs them — the program
+is secure on the machine the earlier bricks describe and insecure on the machine it runs
+on. This is §0's model gap in its sharpest form, the architectural semantics not merely
+coarse but silent.
+
+The fix is a `fence`, and the soundness is strong: `specCheck_sound` proves the speculative
+registers *and* trace **equal** the architectural ones under every schedule
+(`spec_inert`), so speculation is observationally inert and `arch_ni_transfers` carries any
+architectural noninterference over verbatim. That is what makes the row compose with the
+rest of the map. `victim_rejected`/`fixed_accepted` decide the check;
+`fixed_secret_independent` closes it end to end.
+
+Honest limits: the microarchitectural state is an address trace — no cache-line
+granularity, eviction, timing or contention — so what is excluded is the address-visible
+channel, not every physical side channel. Only v1 (no indirect branches, no store-to-load
+forwarding), rollback is perfect, and nested speculation is excluded **by the syntax**
+(branch bodies are a separate instruction type) rather than dropped by the semantics. The
+check is sufficient but not necessary: `benign_rejected` with
+`benign_transient_is_constant` exhibits a rejected body whose transient trace is provably
+constant, so the refinement is a follow-on, not a soundness gap.
 
 ## §11 pre-mechanization checklist (framework doc)
 

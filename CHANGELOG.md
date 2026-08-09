@@ -22,6 +22,31 @@ landed.
   admissible ⟺ closed upward under kernel coarsening, with the realizability /
   observation-cardinality condition pinned explicit.
 
+- **Brick 33 — speculative execution, the last OUT-OF-MODEL row
+  (`Speculate.lean`).** §0's recipe run a third time, after timing (brick 2) and
+  scheduling (brick 32). A transient-execution machine: architectural state that
+  rolls back, a microarchitectural **address trace** that does not, and a `brLt`
+  branch that may be mispredicted, running its body transiently for a window from
+  a **misprediction schedule** — a data parameter, so `∀ misprediction` ranges over
+  unbounded windows. `spectre_trace_is_the_secret` (axiom-free) pins the gadget's
+  traces at `[8,42]`/`[8,99]` for two memories differing only at the secret, so
+  `spectre_leaks`; `leak_needs_window_two` shows the channel has real depth.
+  `arch_indistinguishable` is the other half — architecturally the guard is false,
+  nothing runs, the two memories are *identical* — and
+  `speculative_model_misses_it` pairs them: §0's model gap in its sharpest form,
+  the architectural semantics not merely coarse but **silent**. The fix is a
+  `fence`, with the strong soundness `specCheck_sound`/`spec_inert`: on a checked
+  program the speculative registers *and* trace equal the architectural ones under
+  every schedule, so speculation is observationally inert and `arch_ni_transfers`
+  carries any architectural noninterference over verbatim — which is what makes
+  the row compose. Limits kept explicit: address-trace granularity only; v1 alone;
+  perfect rollback; nested speculation excluded **by the syntax** (branch bodies
+  are a separate instruction type) rather than dropped by the semantics; and the
+  check sufficient-not-necessary, witnessed by `benign_rejected` +
+  `benign_transient_is_constant`. Note the class count stays **sixteen**: by the
+  §2½ convention a verdict change is not a new class, which is the convention
+  doing its job on its first use.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

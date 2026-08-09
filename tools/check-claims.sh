@@ -459,7 +459,17 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race; do
+if grep -q "Speculate.lean" VULN-COVERAGE.md; then
+  for thm in "theorem spectre_leaks" "theorem arch_indistinguishable" \
+             "theorem speculative_model_misses_it" "theorem specCheck_sound" \
+             "theorem spec_inert" "theorem arch_ni_transfers" \
+             "theorem benign_transient_is_constant"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/Speculate.lean 2>/dev/null; then
+      echo "DRIFT: speculative execution cited but '$thm' is missing from Speculate.lean"; fail=1
+    fi
+  done
+fi
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

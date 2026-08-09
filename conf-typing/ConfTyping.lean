@@ -41,3 +41,4 @@ import ConfTyping.LogInjection
 import ConfTyping.AliasFix
 import ConfTyping.QueryEscape
 import ConfTyping.Race
+import ConfTyping.Speculate

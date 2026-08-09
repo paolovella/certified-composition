@@ -30,8 +30,9 @@ Three gaps are irreducible and are *named*, not hidden:
   (`Outcome := Store × Nat × List Bool`), so timing is inside; microarchitectural
   state is not. The recipe for growing coverage is the timing instance itself:
   put the channel in the semantics, then the same NI machinery applies — and
-  brick 32 runs that recipe a second time, adding a scheduling channel (a
-  demonic-scheduling small-step machine) that moves races/TOCTOU into the model.
+  bricks 32 and 33 run that recipe a second and third time, adding a scheduling
+  channel (a demonic-scheduling small-step machine, races/TOCTOU) and a
+  transient-execution channel (demonic misprediction, Spectre-class).
   `sequential_model_misses_races` is this gap's own witness: a program provably
   safe under every sequential schedule and unsafe under an interleaving, so a
   proof in a too-small model is true and beside the point.
@@ -132,7 +133,7 @@ the one claim it could not independently verify. Restored to sixteen.)*
 | 6 | memory safety (CWE-119/416) | safety of a richer (heap) semantics | — | IN-WITH-MODEL (generated); CARRIED cross-language | [proved] |
 | 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN (generated) | [classified] / [proved] |
 | 8 | races / TOCTOU (CWE-362/367) | safety over *all* interleavings, demonic scheduling | — | IN-WITH-MODEL (generated) | [proved] |
-| 9 | speculative execution (Spectre-class) | 2-safety over microarchitectural model | 1* | OUT-OF-MODEL | [classified] |
+| 9 | speculative execution (Spectre-class) | trace-safety over a transient-execution model, demonic misprediction | 1* | IN-WITH-MODEL (generated) | [proved] |
 | 10 | resource exhaustion / DoS (CWE-400) | quantitative safety bound | — | REDUCIBLE (graded certificate) | [classified] |
 | 11 | crypto misuse (CWE-327) | assumption-shaped; leakage side is #2 | — | LEDGER (mechanized) | [proved] |
 | 12 | composition seams / supply chain | certificate loss at boundaries | — | IN-BY-DESIGN | [proved, end-to-end] |
@@ -469,13 +470,54 @@ Sem-Det), so this brick adds a concurrent safety channel beside that development
 rather than rebuilding `≅` over trace sets — the 2-safety-over-interleavings
 question (secure information flow under scheduling) stays open.
 
-### 3.9 Speculative execution — OUT-OF-MODEL [classified]
+### 3.9 Speculative execution — IN-WITH-MODEL, generated [proved]
 
-The channel is microarchitectural state; the property shape is timing-NI over a
-speculative semantics (region 1 *in principle* — hence the asterisk in the table).
-The recipe of #2 applies but the model is research-scale (speculation, caches,
-predictors). The map's role is to keep the claim honest: nothing in this repo
-excludes Spectre, and no verdict pretends otherwise.
+Held OUT-OF-MODEL from brick 1 to brick 32, with the honest note that "nothing in this
+repo excludes Spectre, and no verdict pretends otherwise" and the caveat that the model
+is research-scale. Brick 33 (`Speculate.lean`) runs §0's recipe a third time — after
+timing (brick 2) and scheduling (brick 32) — at the scale that caveat allows: not a
+microarchitecture, but a genuine transient-execution machine carrying the one channel
+that matters, with the bounds-check bypass on it.
+
+The machine splits state in two: an **architectural** part that rolls back, and a
+**microarchitectural** trace of touched addresses that does not. A `brLt` branch may be
+mispredicted, running its body transiently for a bounded window; the registers are
+discarded, the addresses are not. That asymmetry is the whole of Spectre. A
+**misprediction schedule** is a list of window budgets, so speculation is a data
+parameter exactly as the interleaving was in brick 32.
+
+- **The attack [proved, axiom-free].** The victim `if i < 4 then (x := mem[i]; y :=
+  mem[x])` is the textbook gadget: the second load's *address* is the first load's
+  *value*. With `i` out of bounds the guard is false, yet a mispredicting schedule runs
+  the body anyway — `spectre_trace_is_the_secret` pins the traces at `[8,42]` and
+  `[8,99]` for two memories differing only at the secret, so `spectre_leaks`. The
+  channel has measurable depth: `leak_needs_window_two` shows a one-instruction window
+  leaks only the public index, and the secret needs the second load.
+- **Why the class was out of model, exactly [proved, axiom-free].**
+  `arch_indistinguishable`: architecturally the guard is false, nothing runs, and the
+  two memories give *identical* traces. `speculative_model_misses_it` is the pair — the
+  program is secure on the machine the earlier bricks describe and insecure on the
+  machine it runs on. Third instance of §0's model gap made concrete, and the sharpest,
+  since here the architectural semantics is not merely coarse but *silent*.
+- **The fix, generated and composable [proved].** `specCheck` is a decidable rule:
+  every branch body begins with a `fence`. Its soundness is the strong form —
+  `specCheck_sound`/`spec_inert`: on a checked program the speculative registers *and*
+  trace **equal** the architectural ones, under **every** schedule. So speculation is
+  observationally inert, and `arch_ni_transfers` carries any architectural
+  noninterference over verbatim — which is what makes this row compose with the rest of
+  the map rather than sit beside it. `victim_rejected`/`fixed_accepted` decide the
+  check; `fixed_secret_independent` is the end-to-end statement.
+
+Honest limits, and they are substantial. The microarchitectural state is an *address
+trace*: cache-line granularity, eviction, timing and contention are not modelled, so
+what is excluded is the address-visible channel, not every physical side channel. Only
+conditional-branch misprediction (v1) is modelled — no indirect branches (v2), no
+store-to-load forwarding (v4) — and rollback is perfect. Nested speculation is excluded
+**by the syntax** (branch bodies are a separate instruction type with no branch in it)
+rather than silently dropped by the semantics. And the check is *sufficient, not
+necessary*: `benign_rejected` with `benign_transient_is_constant` exhibits a body it
+rejects whose transient trace is provably constant, so lifting the rule to "no
+address-dependent load before the fence" is a named follow-on, not a soundness gap.
 
 ### 3.10 Resource exhaustion — REDUCIBLE [classified]
 
@@ -1134,7 +1176,37 @@ partitions), not a general-purpose language frontend.
   class enters the model, with the attack, the by-construction fix, and a
   decidable check whose soundness reduces concurrency to sequential reasoning.**
 
-### The security program, standing state (thirty-two bricks, sixteen classes)
+### Brick 33 ledger (speculative execution — the last OUT-OF-MODEL row)
+
+- `Speculate.lean` — row 9's named extension, at the scale its caveat allowed. A
+  transient-execution machine: architectural state that rolls back, a
+  microarchitectural **address trace** that does not, and a `brLt` branch that may be
+  mispredicted, running its body transiently for a window drawn from a **misprediction
+  schedule** (a data parameter, as the interleaving was in brick 32; `∀ schedule`
+  ranges over unbounded windows). `spectre_trace_is_the_secret` (axiom-free) pins the
+  gadget's traces at `[8,42]`/`[8,99]` for two memories differing only at the secret,
+  so `spectre_leaks`; `leak_needs_window_two` shows the channel has real depth — a
+  one-instruction window leaks only the public index. `arch_indistinguishable`
+  (axiom-free) is the other half: architecturally the guard is false and nothing runs,
+  so the two memories are *identical*, and `speculative_model_misses_it` is the pair —
+  §0's model gap in its sharpest form yet, the architectural semantics not merely
+  coarse but silent. The fix is a `fence`, and the soundness is the strong form:
+  `specCheck_sound`/`spec_inert` prove the speculative registers **and** trace equal
+  the architectural ones under every schedule, so speculation is observationally inert
+  and `arch_ni_transfers` carries any architectural noninterference over verbatim —
+  the property that makes the row compose rather than sit beside the map.
+  `victim_rejected`/`fixed_accepted` decide the check; `fixed_secret_independent`
+  closes it end to end. No `sorry`, choice-free (`propext` at most), every attack
+  witness axiom-free. Honest limits kept in the file and in §3.9: address-trace
+  granularity only; v1 alone (no v2, no v4); perfect rollback; nested speculation
+  excluded **by the syntax** rather than dropped by the semantics; and the check is
+  sufficient but not necessary — `benign_rejected` with `benign_transient_is_constant`
+  exhibits a rejected body whose transient trace is provably constant, making the
+  refinement a named follow-on rather than a soundness gap. **Brick 33 complete — the
+  last OUT-OF-MODEL row enters the model, and the map now has no class whose channel
+  is simply absent from every semantics in the repo.**
+
+### The security program, standing state (thirty-three bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
@@ -1205,8 +1277,9 @@ OS command injection, and log injection are closed by the same
 data-not-structure discipline, composition is certificate accumulation by the same
 law that composes contraction estimates, and every guarantee carries its trusted
 base as an automatic bill of materials. The honest edges are all named as theorems
-or deferrals: microarchitecture stays OUT-OF-MODEL, `(ε,δ)`-DP stays
-OUT-NONCOMPOSABLE, authz stays CARRIED, the may-alias loop rule now iterates to a
+or deferrals: `(ε,δ)`-DP stays
+OUT-NONCOMPOSABLE, authz stays CARRIED, the speculative channel is modelled only at
+address-trace granularity and only for v1 (brick 33), the may-alias loop rule now iterates to a
 fixed point (a coarsening invariant is inferred, validated, the iteration provably
 terminates within `|P|+1` steps, the search is complete for the top of the
 lattice — every alias-maintaining loop — and the rule composes into whole programs
