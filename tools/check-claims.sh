@@ -53,6 +53,31 @@ if [ -n "$maxsec" ]; then
   done
 fi
 
+# 1b4. The class count in the standing-state heading must equal the documented convention
+#      (VULN-COVERAGE §2½): one per numbered row of the §3 map, plus one per CLASS-EXTRA.
+#      The full audit flagged this number as unverifiable because the convention was
+#      undocumented; it is documented now, so it is checkable now.
+rows=$(awk '/^\| # \| class/,/^$/' VULN-COVERAGE.md | grep -c '^| [0-9]')
+extras=$(grep -c '^- CLASS-EXTRA:' VULN-COVERAGE.md)
+total=$((rows + extras))
+numeral=""
+case $total in
+  12) numeral=twelve;;
+  13) numeral=thirteen;;
+  14) numeral=fourteen;;
+  15) numeral=fifteen;;
+  16) numeral=sixteen;;
+  17) numeral=seventeen;;
+  18) numeral=eighteen;;
+  19) numeral=nineteen;;
+  20) numeral=twenty;;
+esac
+if [ -z "$numeral" ]; then
+  echo "DRIFT: class count $total (rows=$rows extras=$extras) is outside this guard's numeral table"; fail=1
+elif ! grep -q "bricks, $numeral classes)" VULN-COVERAGE.md; then
+  echo "DRIFT: the §2½ convention gives $total classes (rows=$rows + extras=$extras) but the standing-state heading does not say '$numeral classes'"; fail=1
+fi
+
 # 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
 #     the map's verdicts are only as good as their citations.
 for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \

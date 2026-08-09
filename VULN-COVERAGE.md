@@ -96,6 +96,30 @@ concrete component earns its verdict by `decide`, and the certificate flows thro
 the seam theorems and Bridge reception untouched. Without the annotation, an IN
 verdict is proved semantically but per-component by hand.
 
+## 2½. How classes are counted
+
+The standing-state heading below carries a class count, so the convention is stated here
+rather than left to be reverse-engineered. **A class is counted once for each numbered row
+of the §3 map, plus once for each made-real sink class that is carried *inside* an existing
+row rather than given a row of its own.** The extras, exhaustively:
+
+- CLASS-EXTRA: **OS command injection** (CWE-78) — made real in brick 27, carried in row 3.
+- CLASS-EXTRA: **log injection / log forging** (CWE-117) — brick 29, carried in row 3.
+
+So the count is `|rows| + |extras|`, currently `14 + 2 = 16`, and `tools/check-claims.sh`
+enforces the arithmetic against the spelled-out numeral in the heading.
+
+Two things the convention deliberately does **not** do. It does not count *verdict changes*:
+a row moving from OUT-OF-MODEL to IN (as row 8 did in brick 32) improves coverage without
+adding a class, and the count is an inventory of the map, not a score. And it does not count
+sub-formulations within a row (row 3's blacklist-versus-flow split, row 5's f-DP-versus-(ε,δ)
+split), which are *verdicts about one class*, not classes.
+
+*(Correction of record: brick 32 raised this number to "seventeen" on the reasoning that
+races/TOCTOU had entered the model. That was wrong — races is row 8 and was always counted;
+what brick 32 changed was its verdict. Caught by the full audit, which flagged the number as
+the one claim it could not independently verify. Restored to sixteen.)*
+
 ## 3. The map
 
 | # | class (CWE anchor) | semantic form | region | verdict | grade |
@@ -1110,7 +1134,7 @@ partitions), not a general-purpose language frontend.
   class enters the model, with the attack, the by-construction fix, and a
   decidable check whose soundness reduces concurrency to sequential reasoning.**
 
-### The security program, standing state (thirty-two bricks, seventeen classes)
+### The security program, standing state (thirty-two bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new
