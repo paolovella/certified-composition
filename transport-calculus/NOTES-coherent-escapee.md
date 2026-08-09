@@ -3256,3 +3256,123 @@ were of the first kind; this is the boundary.
 - **(Q-T), (Q-T-θ), and the central question — is `ρ₃` strongly dip-schedulable under CH —
   remain open.** Nothing here decides them; what changed is that the residual is smaller
   and, for the first time, entirely written in walk-computable quantities.
+
+## 55. Other angles: an audit of the frames — and two of them move. Special ⟹ Lipschitz for coherent trees (so `T(ρ₁)` was a ZFC-Lipschitz resource all along, correcting §46), and the PID landscape mapped (PID cannot supply the gate, but PID-on-the-fiber-order is a CH-compatible route MA cannot take)
+
+§50–§54 all sit inside **one** frame: attack (Q-rows-lim) by walk combinatorics over the
+fixed witness `ρ₃`. §54 narrowed that frame and closed a route inside it. This section
+steps outside and audits the frames themselves. Two move.
+
+**Source round 5 [verified, verbatim]** — Todorcevic, *Lipschitz maps on trees*
+(`l-map2.pdf`), read first-hand:
+- **1.1 Definition**: "A Lipschitz tree is any **Aronszajn** tree T with the property that
+  every level-preserving map from an uncountable subset of T into T is Lipschitz on an
+  uncountable subset of its domain."
+- **1.4 Lemma**: "Every uncountable subset of a Lipschitz tree T contains an uncountable
+  antichain." (Unmarked — ZFC.)
+- **1.8 Definition**: coherent tree = representable as functions `α → ω` pairwise
+  differing finitely — so `T(ρ₁)` and `T(ρ₃)` both qualify.
+- **1.10 Lemma**, verbatim: "A coherent tree T is Lipschitz **if and only if** every
+  uncountable subset of T contains an uncountable antichain." **Unmarked by (*)** — ZFC.
+  (1.6 and 1.7 *are* marked; 1.9, 1.10, 2.8, 2.9 are not.)
+- **Footnote 9**, verbatim: "A tree is special, if it can be covered by countably many
+  antichains."
+
+**Theorem W (special ⟹ Lipschitz, for coherent trees) [proved, ZFC].** Let `T` be a
+coherent Aronszajn tree that is special. Then `T` is Lipschitz.
+*Proof.* Write `T = ⋃_n A_n` with each `A_n` an antichain (fn 9). Any uncountable
+`X ⊆ T` satisfies `X = ⋃_n (X ∩ A_n)`, so some `X ∩ A_n` is uncountable — an uncountable
+antichain inside `X`. Now apply 1.10. ∎
+**Consequence: `T(ρ₁)` is a coherent, nontrivial, **ZFC-Lipschitz** tree** — coherent by
+Handbook 1.16(b), Aronszajn by 3.11 plus nontriviality (machine-checked, §53), special by
+1.17, hence Lipschitz by Theorem W.
+
+**Correction of record (§46).** §46 searched for "a coherent ZFC-Lipschitz tree" and
+concluded the resource is `ρ₃`, reached through *Lipschitz maps* Lemma 2.8 / Theorem 2.9,
+having ruled out `ρ₂` (Lipschitz + special in ZFC, but mod-finite coherence unestablished).
+`ρ₁` was never examined — and it qualifies by a two-line argument from lemmas already in
+the verified base. The ρ₂→ρ₃ refinement was not wrong; it was not necessary.
+
+**What the correction buys, and what it costs.**
+- *MA side, immediately:* §42–§47 reduce the ccc of the schedule forcing `P(e,μ)` to the
+  alignment statement `A(e)`, and derive `A(e)` from `T(e)` **Lipschitz** (Lemmas 1.3/1.4).
+  Nothing there is `ρ₃`-specific. So the MA-side conjecture now has **two** witnesses, and
+  `ρ₁` is the better-documented one.
+- *CH side, structurally:* Theorem J makes "`T(e)` special" a **necessary** gate for
+  fiber-specialness of `D(e)`. For `ρ₃` that gate is **(Q-T) — open**, and §52's Theorem O
+  only opens it *consistently*. For `ρ₁` the gate is **passed in ZFC** (1.17). So `ρ₃` may
+  simply be dead at the gate while `ρ₁` is not blocked there.
+- *The cost, stated plainly:* every tool of §50–§54 is `ρ₃`-specific — binary rows, Lemma
+  3.8's block-finiteness and fan-cofiniteness, the threshold sequence `θ`, the pruning
+  formula's interaction with them. **None of it transfers**; a `ρ₁` analysis starts from
+  the fiber order again. The switch trades a solved gate for an unbuilt apparatus.
+- *Grade caveat, inherited:* Handbook **1.17 asserts `T(ρ₁)` special without proof** (§53's
+  record). Theorem W is ZFC and airtight, but its input is a citation, so the whole `ρ₁`
+  line is graded **[proved from a cited, in-source-unproved assertion]**. Concrete task,
+  not research: locate or reconstruct a proof that `T(ρ₁)` is special. (The obvious
+  route — `t ↦ (|t⁻¹[0,n]|)_n` is strictly increasing along the tree order, since
+  `F_n(t) = F_n(t') ∩ α` and some `n` sees the new point — lands in `(ω^ω, ≤)`, not in a
+  countable set, so it gives `𝔠`-many antichains and not specialness. Something finer is
+  needed; 1.9's σ-centredness trick for finite partial functions is the likely ingredient.)
+
+**The PID landscape, mapped [verified].** From Kuzeljević–Todorcevic, *P-ideal dichotomy
+and a strong form of the Souslin hypothesis*, read first-hand: "PID is independent of the
+Continuum Hypothesis while it does imply the Souslin Hypothesis", and their theorem is
+that PID is consistent with an **almost Souslin** (hence non-special) Aronszajn tree. Three
+consequences for this program:
+1. **PID cannot supply the (Q-T) gate.** "PID ⟹ every Aronszajn tree is special" is
+   *false* — that is exactly what their paper refutes. So the gate cannot be bought with
+   an axiom of this kind; §52's Theorem O (a bespoke BMR specialization) remains the only
+   way to open it consistently with CH.
+2. **PID does give Lipschitz-ness cheaply.** PID ⟹ SH ⟹ every Aronszajn tree has an
+   uncountable antichain; applied to the downward closure of any uncountable subset, PID
+   ⟹ every coherent Aronszajn tree is Lipschitz (1.10). Not needed here — `ρ₁` and `ρ₃`
+   have it in ZFC — but it shows the Lipschitz hypothesis is cheap and the *special*
+   hypothesis is not.
+3. **The live route: PID on the fiber order.** Because **PID is consistent with CH** while
+   `MA_{ω₁}` is not, PID is the only forcing-axiom-shaped tool that can speak to the
+   central question *in the model class where it is posed*. Take `Z := D(e)` and let `I` be
+   the ideal generated by the down-sets `↓u`. Orthogonality to `I` is **exactly**
+   down-finiteness, so PID's alternative (2) *is* fiber-specialness, and alternative (1) is
+   an uncountable `X ⊆ D(e)` all of whose countable subsets sit (almost) inside a single
+   down-set — a maximal absorption failure, against which Lemma H (uncountable chains ⟹
+   trivial) and 3.8(2) are the natural weapons.
+   **Obstruction, identified:** for `I` to be a **P**-ideal one needs any countably many
+   down-sets to be `⊆*`-dominated by one — a mod-finite weakening of σ-directedness of
+   `D(e)`, and `D(e)` is *not* σ-directed (that failure is the absorption problem itself).
+   So the well-posed new question is
+   > **(Q-PID)** Is the down-set ideal of `D(e)` a P-ideal under the mod-finite reading —
+   > i.e. given `u_n (n<ω)`, is there `u` with `↓u_n \ ↓u` finite for every `n`?
+   `⊆*`-domination is strictly weaker than boundedness, so this is *not* the σ-directedness
+   that fails; it is open. A yes would give **Con(CH + `D(ρ₃)` fiber-special)** from
+   Con(CH + PID) — the consistency side of the central question, without MA.
+
+**A constraint worth having on the record.** In `D(e)`, for *any* `e`, a down-set meets a
+single level infinitely often: if `(α,A) ⊑ (β,C)` at all, then `A = B_α \ E` for any finite
+`E ⊇ B_α \ C`, and `E` may absorb any finite subset of the infinite set `B_α ∩ C`. So a
+fiber-special decomposition must split **every single level's fiber** across infinitely
+many pieces — no decomposition organised by level, or by any level-wise-finite invariant,
+can work. (This kills the natural first guesses, and it is why fiber-specialness is
+strictly stronger than tree specialness in a way Theorem J's converse cannot repair.)
+
+**The audit — frames, and where each stands.**
+| frame | status |
+|---|---|
+| direct combinatorics on schedules | walled (§9 template no-go, §15 ◊-kill) |
+| Tukey / cofinal type | too coarse, resolved (§36–§39) |
+| forcing: ccc of `P(e,μ)` ⟸ alignment ⟸ Lipschitz | **live**; now applies to `ρ₁` as well as `ρ₃` (Theorem W) |
+| transport/invariance between trees | retracted (§49) — value category ≠ tree category |
+| fiber-specialness + the tree gate | **live**; gate open for `ρ₃`, **passed in ZFC for `ρ₁`** |
+| descent to `θ` | live (§52–§53); `ρ₃`-specific |
+| walk combinatorics on (Q-rows-lim) | live but narrow (§54); one route closed as vacuous |
+| **witness substitution** (`ρ₁` for `ρ₃`) | **opened this section** — gate solved, apparatus unbuilt |
+| **PID on the fiber order** | **opened this section** — reduces to (Q-PID); CH-compatible |
+| build the witness by recursion under CH/◊ | **named, untried**: dual to Theorem C's kill; needs a level-by-level criterion, and Theorem G's finite-fan property is the candidate |
+| audit sufficiency of the crux | **named, untried**: §50 gives fiber-special ⟹ block game dies ⟹ `ρ₃` *"plausibly"* schedules. That "plausibly" is unaudited; if fiber-specialness is not sufficient, the crux is misidentified and §51–§54 have been narrowing the wrong statement |
+
+**Status after §55.** The central question is **not** decided. What changed: `ρ₃` is no
+longer the only canonical witness — `ρ₁` clears in ZFC the gate that is open for `ρ₃` —
+and there is now a CH-compatible axiomatic route (PID on the fiber order) reduced to a
+single question, (Q-PID). Two further frames are named with their first steps. The two
+most valuable next moves are cheap: **audit the sufficiency claim** in §50 (it is the load
+-bearing "plausibly" of the whole reduction), and **settle (Q-PID)**.
