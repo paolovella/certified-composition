@@ -38,6 +38,21 @@ for name in omega1_finiteToOne_not_trivial omega1_finiteToOne_no_reps \
   fi
 done
 
+# 1b''. The READMEs must keep pace with the research notes. Both the top-level README
+#      and the transport-calculus README must reference the highest-numbered notes
+#      section — this is the drift that a full audit found: the sub-README summarised the
+#      set-theory line as of section 52 while the notes had reached 57, still presenting a
+#      claim that a later section had refuted.
+maxsec=$(grep -oE '^## [0-9]+\.' transport-calculus/NOTES-coherent-escapee.md \
+         | grep -oE '[0-9]+' | sort -n | tail -1)
+if [ -n "$maxsec" ]; then
+  for f in README.md transport-calculus/README.md; do
+    if ! grep -q "§$maxsec" "$f"; then
+      echo "DRIFT: $f does not reference notes §$maxsec (the latest section)"; fail=1
+    fi
+  done
+fi
+
 # 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
 #     the map's verdicts are only as good as their citations.
 for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \

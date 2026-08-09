@@ -610,14 +610,14 @@ self-contained (no transport calculus needed): definitions, the game, the implic
 diagram `trivial ⟹ strong-schedulable ⟹ Φ ⟹ weak-schedulable` with rigor grading on
 every arrow, four numbered questions (the main one; the realizability/fractal gap; the
 ◊-sequence and walks instances; the MA/PFA consistency route with the schedule-forcing's
-ccc-ness as the crux), a toolbox of proved ZFC lemmas with proofs (A–I′: chain-continuation,
+ccc-ness as the crux), a toolbox of proved ZFC lemmas with proofs (A–I′ and B⁻: chain-continuation,
 single-target, representative systems ⟺ trivial, chain-freeness of the fiber order,
 uncountable chains, successor riding and collapse), the thinness remark explaining why
 naive ◊-attacks fail, and the two-sided independence program (its §5). Questions 1–4 are
 pure ω₁ combinatorics.
 
-**Since the handoff (notes §12–§52) — Φ-completeness, the ◊ kill, the MA program, and the
-ρ₃-under-CH crux.** The game is exactly the transport question: `Φ(e)` ⟺ every
+**Since the handoff (notes §12–§57) — Φ-completeness, the ◊ kill, the MA program, and the
+ρ₃-under-CH crux (now corrected).** The game is exactly the transport question: `Φ(e)` ⟺ every
 legally-induced pressure over `e` is schedulable (Theorem E, both directions). Under ◊ some
 nontrivial coherent sequence is **not** strongly schedulable (Theorem C) — so "every
 coherent sequence schedules" is not a ZFC theorem — but its lethal pressure is not weakly
@@ -636,8 +636,32 @@ other: successor rows ride their fans (`B_{γ+1} = B_γ ∪ {γ}`), so the canon
 **not** strongly unbounded (Q-rows: NO) — benignly, since fiber-specialness reduces to
 limit levels — where the absorption game equals a one-sided domination game for a canonical
 coherent finite-to-one **threshold sequence** θ(ρ₃) on fan-tops; and Con(CH + `T(ρ₃)`
-special) (Theorem O), so the CH-kill needs strictly more than CH. Sixteen verdict flips
-recorded, each forced by a proof or a refutation; both ρ₃ sources verified first-hand.
+special) (Theorem O), so the CH-kill needs strictly more than CH.
+
+**§53–§57 — and the crux itself corrected.** (Q-thr) fell: **θ(ρ₃) is nontrivial in ZFC**
+(Theorem P), by the classical finite-to-one engine, so the descent lands on a coherent
+Aronszajn tree rather than a degenerate object; **Theorem B⁻**, the downward dual of
+Theorem B, is proved *and machine-checked* (`omega1_downDip_iff_trivial`) — the program's
+first formal dip theorem — and with P it kills the dense failure mode of the residual
+question (Theorem Q). §54 made the dial explicit (`λ_F(λ,β) = max_i max(C_{β_i} ∩ λ)`),
+proved Theorem V, closed the natural `thr_β`-transfer route as **vacuous**, and reduced
+(Q-rows-lim) to limits of limits (Theorems S/T/U). §55 audited the *frames*: for coherent
+trees **special ⟹ Lipschitz** (Theorem W), so `T(ρ₁)` was a ZFC-Lipschitz resource all
+along — correcting §46's witness search — and `ρ₁` clears in ZFC the gate that is open for
+`ρ₃`; PID was mapped (consistent with CH, but cannot supply the gate; PID on the fiber
+order is a live CH-compatible route, reduced to (Q-PID)).
+
+**Then §56 corrected the reduction itself.** §50's step "fiber-special ⟹ the block game
+dies ⟹ `ρ₃` *plausibly* schedules" **does not hold**: written out as an explicit dip
+assignment, fiber-specialness makes the leftover finite *in every block class*, which is
+strictly weaker than the finiteness condition (i) demands. So **the crux is a conjunction**
+— (C1) fiber-specialness, all that §51–§54 narrowed, **and** (C2) block-spread control —
+and settling (Q-rows-lim) or (Q-T) affirmatively would *not* settle schedulability. §57
+localized (C2) to level-minima and proved **Theorem X**: no level function dominates the
+walk bars, so (Q-spread) needs per-element freedom — Question 1's own dichotomy, one level
+down, with the level-factored side refuted on both. Sixteen labelled verdict flips, plus
+two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
+proof or a refutation; all sources verified first-hand.
 
 **The reps theorem, machine-checked in shadow (`reps_implies_trivial`).** The
 set-theoretic hunt's four-step engine is now formalized: over an abstract index carrying

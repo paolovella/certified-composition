@@ -70,7 +70,13 @@ The same accountancy appears at every level:
   (Theorem P) — killing the dense failure mode of the residual question
   (Theorem Q), the explicit trace formula and Theorem V — which closes the
   natural `thr_β`-transfer route as vacuous and reduces the residual to
-  limits of limits — and the two-sided independence
+  limits of limits — the frame audit (§55: *special ⟹ Lipschitz* for coherent
+  trees, so `T(ρ₁)` clears in ZFC the gate that is open for `ρ₃`; and PID as a
+  CH-compatible route), **the correction of the reduction itself** (§56: the
+  crux is a *conjunction* — fiber-specialness controls the leftover only block
+  by block, so §51–§54 narrowed one conjunct), its residual (Q-spread)
+  localized to level-minima and its level-factored side refuted (§57,
+  Theorem X) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):
