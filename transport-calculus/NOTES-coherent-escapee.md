@@ -3376,3 +3376,100 @@ and there is now a CH-compatible axiomatic route (PID on the fiber order) reduce
 single question, (Q-PID). Two further frames are named with their first steps. The two
 most valuable next moves are cheap: **audit the sufficiency claim** in §50 (it is the load
 -bearing "plausibly" of the whole reduction), and **settle (Q-PID)**.
+
+## 56. Audit of §50's sufficiency claim: it does not hold as stated. Fiber-specialness controls the leftover *block by block*, not absolutely — the crux is a conjunction, and §51–§54 attacked one conjunct
+
+§55 flagged §50's "fiber-special ⟹ the block game dies ⟹ `ρ₃` **plausibly** schedules" as
+the load-bearing unaudited step of the whole reduction. Audited. **The step does not hold
+as stated.** The failure is locatable and quantifiable, it does not invalidate any theorem
+of §51–§54, and it yields a corrected target that is sharper than the old one. One of
+§50's hedges is discharged positively on the way.
+
+**What §50 actually asserts.** Finding 2: over `ρ₃`, rows are binary and (fact (a), Lemma
+3.8(2)) every row meets every block-class `Λ+k` finitely; hence infinitely many undipped
+drops *inside one block-class* form a **permanent leak** — no later floor absorbs them.
+Finding 3: the schedule's counter is a *diagonal ranking* — element `x` dips its exposure
+in blocks `k ≤ rank(x)` — and this blocks every accumulation iff the ranking has finite
+fibers on every down-set, i.e. iff `D(ρ₃)` is **fiber-special**.
+
+**Step 1 — make the strategy explicit.** Let `D(ρ₃) = ⋃_n R_n` be fiber-special and put
+`rank(x) := ` least `n` with `x ∈ R_n`, and
+`X(x) := supp(t_{γ(x)}) ∩ ⋃_{k ≤ rank(x)} (Λ+k)`. By fact (a) this is a finite union of
+finite sets, so `X(x)` is a legitimate finite dip set. ✔
+
+**Step 2 — what the strategy delivers [proved].** Fix `u` and let
+`L_u := ⋃_{x ⊑ u} (D⁺(γ(x),γ(u)) \ X(x))` be the leftover. Let `ξ ∈ L_u ∩ (Λ+k)` with
+witness `x`. Then `ξ ∈ supp(t_{γ(x)})` and `ξ ∉ X(x)`, which forces `k > rank(x)`. So all
+witnesses lie in `⋃_{n<k}(R_n ∩ ↓u)` — **finite**, by fiber-specialness — and each
+contributes `D⁺(γ(x),γ(u)) ∩ (Λ+k) ⊆ supp(t_{γ(x)}) ∩ (Λ+k)`, finite by fact (a). Hence
+> **`L_u ∩ (Λ+k)` is finite, for every `k`.**
+
+**Step 3 — the gap.** Condition (i) of the schedule game demands that **`L_u` be finite**,
+not that it be finite in each block. `L_u = ⋃_k (L_u ∩ (Λ+k))` is a countable union of
+finite sets and may be infinite, and *nothing in fiber-specialness bounds the number of
+block-classes `L_u` meets*. So what fiber-specialness buys is the **block-localized** form
+of (i), which is strictly weaker. **The implication "fiber-special ⟹ schedulable" is not
+established, and the diagonal strategy as described cannot establish it.**
+
+**Step 4 — the gap is not vacuous.** A leftover spread over infinitely many blocks,
+finitely in each, violates (i) at `u` outright. It is invisible to Finding 2's
+permanent-leak mechanism, which needs infinitely many points *in one* block-class to run.
+So Finding 2's implicit dichotomy — that accumulation is *the* kill mode — is incomplete:
+it identifies the **unabsorbable** mode and misses the **spread** mode, and (i) is a
+condition *at* `u`, so absorbability by later floors is irrelevant to it. The
+"only known mechanism dies" step is therefore an argument about the known attack, not
+about the property.
+
+**Step 5 — what is actually sufficient [proved].** Write
+- **(C1)** `D(e)` is fiber-special (per-block control — what §51–§54 studied), and
+- **(C2)** for every `u`, `{k : L_u ∩ (Λ+k) ≠ ∅}` is finite (block-spread control).
+
+Then **(C1) ∧ (C2) ⟹ condition (i)**, trivially. The corrected crux is this *conjunction*;
+§50 named the first conjunct and the whole of §51–§54 has been narrowing it.
+
+**Step 6 — locating (C2) in the walk [proved + numerically checked, 9432 instances].**
+> **Theorem A4.** For `α < β`, every drop `ξ = μ + n ∈ D⁺(α,β)` lying above `λ_F(α,β)`
+> satisfies `n ≤ ρ₁(α,β)`, **or** `ρ₁(ξ,α) = 0`.
+*Proof.* Above the trace, M(2) gives `ρ₃(ξ,α) = 1` and `ρ₁(ξ,α) < W := ρ₁(α,β)`. With
+`ρ₃(ξ,α) = 1` the value `ρ₁(ξ,α)` *is* the last weight of the walk `α → ξ`, and arrival
+rigidity under (c)+(d) makes it `n−1` or `0`. In the first case `n−1 < W`. ∎
+And `{ξ < α : ρ₁(ξ,α) = 0}` is **finite** (Handbook 1.16(a) at `n = 0`) and depends only on
+`α` — so it can be folded into the dips at no cost. Enlarging `X(x)` by
+`{ξ < γ(x) : ρ₁(ξ,γ(x)) = 0}`, the above-trace drops of `x` against any `u` live in blocks
+`≤ ρ₁(γ(x), γ(u))`. Therefore, above the trace,
+> **(C2) ⟺ for every `u`, all but finitely many `x ⊑ u` satisfy
+> `rank(x) ≥ ρ₁(γ(x), γ(u))`** — *the ranking must dominate the walk bars along every
+> down-set.*
+Both quantities diverge along every infinite family in `↓u`: the bars by M3, the rank by
+fiber-specialness. So the corrected crux is a **domination problem between two divergent
+quantities, uniform over all `u`** — named **(Q-spread)**. Note what it is: a monotone
+dominating selection, the program's recurring signature (Φ), met once more one level down.
+(The **below-trace** region is untouched by this analysis and remains the known recursive
+residue.)
+
+**Step 7 — a hedge discharged, positively [proved].** §50 qualified its conclusion "modulo
+the value-form bookkeeping". That qualification is unnecessary over `ρ₃`: for
+**binary-valued** `e`, condition (ii) is *equivalent* to condition (i). Indeed
+`S_u(ξ) = sup{e_{γ(x)}(ξ) : x ⊑ u, ξ < γ(x), ξ ∉ X(x)} ∈ {0,1}`, so (ii)'s finiteness half
+is automatic; and `S_u(ξ) > e_{γ(u)}(ξ)` says exactly that some `x ⊑ u` has
+`ξ ∈ D⁺(γ(x),γ(u)) \ X(x)`, so (ii)'s second half — that this happens off a finite set —
+*is* (i). Over binary rows the value form costs nothing.
+
+**Verdict.**
+- **§50's sufficiency step: NOT PROVED.** Fiber-specialness is sufficient against
+  single-block accumulation only; the spread mode is untouched and is equally fatal to (i).
+- **§51–§54 stand as mathematics, but their significance is corrected.** Theorem J, Theorem
+  Q, Theorems L/M/N/O/P/S/T/U/V and the (Q-rows-lim), (Q-T), (Q-thr) analyses are all
+  correct statements about fiber-specialness and its gate. What changes is what they would
+  buy: **settling (Q-rows-lim) or (Q-T) affirmatively would not settle schedulability** —
+  it would settle one conjunct of one counter-strategy. Four sessions of narrowing were
+  aimed at half the target.
+- **Corrected target: (C1) ∧ (C2)**, with (C2) reduced above the trace to the rank-vs-bar
+  domination condition (Q-spread). This is *sharper* than the old crux, not weaker: it is
+  quantitative, walk-computable, and it explains why fiber-specialness alone always felt
+  like it should be enough and never quite closed.
+- **Method note.** The gap was invisible for four sections because "finite in every block"
+  and "finite" read the same in prose. It surfaced only on writing the diagonal strategy
+  down as an explicit dip assignment and computing `L_u`. Worth generalizing: **every
+  "⟹ plausibly" in this program should be cashed out as an explicit construction before
+  the next section builds on it.**

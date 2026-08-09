@@ -578,6 +578,26 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   gives Con(CH + `D(ρ₃)` fiber-special) from Con(CH + PID). Also recorded: in `D(e)` a
   down-set meets each single level infinitely often, so no level-organised decomposition
   can be fiber-special. The central question remains open.)*
+  *(**Audited, notes §56 — and the reduction is corrected.** §50's step "fiber-special ⟹
+  the block game dies ⟹ `ρ₃` plausibly schedules" **does not hold as stated**. Writing the
+  diagonal ranking down as an explicit dip assignment
+  (`X(x) := supp(t_{γ(x)}) ∩ ⋃_{k ≤ rank(x)}(Λ+k)`, finite by 3.8(2)) and computing the
+  leftover gives: `L_u ∩ (Λ+k)` is finite **for every k** — the *block-localized* form of
+  condition (i), strictly weaker than (i), which demands `L_u` itself finite. A leftover
+  spread over infinitely many blocks, finitely in each, violates (i) and is invisible to
+  §50's permanent-leak mechanism (which needs infinitely many points in *one* block). So
+  the crux is a **conjunction**: **(C1)** fiber-specialness (per-block control — all that
+  §51–§54 narrowed) **and (C2)** block-spread control. **Theorem A4** (proved; 9432
+  instances checked) localizes (C2): an above-trace drop `ξ = μ+n ∈ D⁺(α,β)` has
+  `n ≤ ρ₁(α,β)` or `ρ₁(ξ,α) = 0`, and `{ξ<α : ρ₁(ξ,α)=0}` is finite by Handbook 1.16(a),
+  foldable into the dips — so above the trace **(C2) ⟺ for every `u`, all but finitely many
+  `x ⊑ u` have `rank(x) ≥ ρ₁(γ(x),γ(u))`**: the ranking must **dominate the walk bars**
+  along every down-set, both sides diverging (bars by M3, rank by fiber-specialness). Named
+  **(Q-spread)** — and note it is again a monotone dominating selection, the program's own
+  signature. Consequence for the record: settling (Q-rows-lim) or (Q-T) affirmatively would
+  **not** settle schedulability. Discharged on the way: for binary-valued `e` the value-form
+  (ii) is *equivalent* to the set-form (i), so §50's "modulo the value-form bookkeeping"
+  hedge costs nothing over `ρ₃`.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via

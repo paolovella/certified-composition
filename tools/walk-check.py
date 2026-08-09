@@ -152,6 +152,21 @@ def run(seed, verbose=False):
                     tested_V += 1
                     if rho3(C, mu + n, be) != 0:
                         fails.append(("V", be, lam, lamF, W, mu, n))
+    # --- Theorem A4 (notes sec-56): an above-trace drop of al against be sits in a
+    #     block <= rho_1(al,be), OR is one of the finitely many xi with rho_1(xi,al)=0.
+    #     This is what localizes the leftover's block-spread, the conjunct sec-50 missed.
+    tested_A4 = 0
+    for be in range(2, N, 7):
+        for al in range(1, be, 5):
+            tr = F(C, al, be, memo)
+            lamF = max([z for z in tr if z < al], default=-1)
+            W = rho1(C, al, be)
+            for xi in range(lamF + 1, al):
+                if rho3(C, xi, al) == 1 and rho3(C, xi, be) == 0:
+                    blk = dec(xi)[2]
+                    tested_A4 += 1
+                    if not (blk <= W or rho1(C, xi, al) == 0):
+                        fails.append(("A4", be, al, xi, blk, W))
     # --- M(3) pruning and M(1) one-sided pruning (sec-52), re-verified
     tested_M = 0
     for be in range(2, N, 13):
@@ -163,16 +178,16 @@ def run(seed, verbose=False):
                 tested_M += 1
                 if (rho3(C, xi, be) == 1) != (rho3(C, xi, al) == 1 and rho1(C, xi, al) >= W):
                     fails.append(("M3", al, be, xi))
-    return fails, tested_tf, tested_V, tested_M
+    return fails, tested_tf, tested_V, tested_M, tested_A4
 
 if __name__ == "__main__":
-    tot_tf = tot_V = tot_M = 0
+    tot_tf = tot_V = tot_M = tot_A4 = 0
     allfails = []
     for seed in range(12):
-        f, a1, a2, a3 = run(seed)
-        tot_tf += a1; tot_V += a2; tot_M += a3
+        f, a1, a2, a3, a4 = run(seed)
+        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4
         allfails += [(seed,) + tuple(x) for x in f[:4]]
-    print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} instances")
+    print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}")
     if allfails:
         print(f"FAILURES ({len(allfails)}):")
         for x in allfails[:12]: print("  ", x)

@@ -350,6 +350,31 @@ landed.
   recorded: a down-set of `D(e)` meets every single level infinitely often, so no
   level-organised decomposition can be fiber-special. Central question open.
 
+- **§56 — the sufficiency claim audited, and it fails.** §50's load-bearing
+  step, "fiber-special ⟹ the block game dies ⟹ `ρ₃` *plausibly* schedules",
+  **does not hold as stated**. Writing the diagonal ranking down as an explicit
+  dip assignment and computing the leftover `L_u` gives `L_u ∩ (Λ+k)` finite for
+  **every k** — the block-localized form of condition (i), strictly weaker than
+  (i), which demands `L_u` finite. A leftover spread over infinitely many blocks,
+  finitely in each, violates (i) and is invisible to §50's permanent-leak
+  mechanism (which needs infinitely many points in *one* block). So the crux is a
+  **conjunction**: (C1) fiber-specialness — all §51–§54 narrowed — **and** (C2)
+  block-spread control. **Theorem A4** (proved; 9432 instances in
+  `tools/walk-check.py`) localizes (C2): an above-trace drop `ξ = μ+n` of `α`
+  against `β` has `n ≤ ρ₁(α,β)` or `ρ₁(ξ,α) = 0`, and the latter set is finite by
+  Handbook 1.16(a) and foldable into the dips — so above the trace **(C2) ⟺ the
+  ranking dominates the walk bars along every down-set**, both sides divergent
+  (bars by M3, rank by fiber-specialness). Named **(Q-spread)**; it is once again
+  a monotone dominating selection, the program's own signature. **Consequence:
+  settling (Q-rows-lim) or (Q-T) affirmatively would not settle schedulability** —
+  §51–§54 remain correct mathematics aimed at half the target. Discharged
+  positively on the way: for binary-valued `e` the value-form (ii) is
+  *equivalent* to the set-form (i), so §50's "modulo the value-form bookkeeping"
+  hedge costs nothing over `ρ₃`. Method note recorded: the gap survived four
+  sections because "finite in every block" and "finite" read the same in prose —
+  every "⟹ plausibly" should be cashed out as an explicit construction before the
+  next section builds on it.
+
 ## transport-kernel — mathlib instances
 
 - **Tier 1** — mathlib olean cache stood up (the infra that gates importing
