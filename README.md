@@ -47,6 +47,10 @@ The same accountancy appears at every level:
 
 **`transport-calculus`** (mathlib-free; `Bridge.comp` axiom-free):
 - `GradedAction M D` and `Bridge.comp` — the interface and its composition law;
+- `GradedAction.prod` / `Bridge.pair` — **bundles**: several certificates carried
+  by one artifact, with `Bridge.pair_comp_cert` proving composition is
+  componentwise (no interaction term), witnessed by two different accumulation
+  laws advancing side by side (`bundle_accumulates_componentwise`);
 - the **qualitative frontier**, bracketed by theorems: complete-lattice /
   image-sup / bounded / directed-finite factorization; the `D3` escapee; the
   cofinal-ruler and countable-cofinality theorems; the transfinite selection

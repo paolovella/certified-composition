@@ -605,6 +605,19 @@ dip-schedulable(`e`)** (both directions argued), and the entire seven-session hu
 at one line: **is every dip-schedulable coherent sequence trivial?** — a self-contained
 uniformization invariant of coherent sequences, handed to set theory in final form.
 
+**Carrying several certificates at once: `GradedAction.prod` / `Bridge.pair`.** Five
+instance families inhabit the interface and the security program adds cost budgets, but
+each accumulates *one* kind of certificate — the interface could not say "this map is
+2-Lipschitz **and** costs at most 40 **and** mediates every access". The product supplies
+it, and the content is that the composition law does not change: `Bridge.pair_comp_cert`
+proves that composing a bundled bridge is componentwise composition, with no interaction
+term and no extra hypothesis, so carrying `n` guarantees costs `n` independent
+accumulations and nothing more. Non-vacuity is witnessed with two *different* laws on the
+same carrier — `bundle_accumulates_componentwise`: one composition advances an additive
+budget (`3 + 4 = 7`) and a worst-case bound (`max 5 2 = 5`) side by side. This is the
+foundation for making the security bricks compose; see the plan note in
+`../VULN-COVERAGE.md`.
+
 **The problem statement for set theorists: `PROBLEM-dip-schedulability.md`.** Fully
 self-contained (no transport calculus needed): definitions, the game, the implication
 diagram `trivial ⟹ strong-schedulable ⟹ Φ ⟹ weak-schedulable` with rigor grading on

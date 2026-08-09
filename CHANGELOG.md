@@ -469,6 +469,22 @@ landed.
   constant, which would make the whole section vacuous — an artefact, refuted in
   ZFC by Corollary X1, and caught only because the proof was already in hand.
 
+- **The bundle layer: `GradedAction.prod` / `Bridge.pair`.** Five instance
+  families inhabit the interface, and the security program added cost budgets —
+  but each accumulates *one* certificate, so the interface could not express
+  "this artifact is 2-Lipschitz **and** costs at most 40 **and** mediates every
+  access". The product supplies it, and the content is that the composition law
+  is unchanged: **`Bridge.pair_comp_cert`** proves composing a bundled bridge is
+  componentwise composition — no interaction term, no extra hypothesis — so
+  carrying `n` guarantees costs `n` independent accumulations and nothing more.
+  Non-vacuity is witnessed with two genuinely different monoids on one carrier
+  (`bundle_accumulates_componentwise`): a single composition advances an additive
+  budget `3 + 4 = 7` and a worst-case bound `max 5 2 = 5` side by side. Axioms:
+  `propext` (plus `Quot.sound` where `omega` is used); no `sorry`. **This is the
+  first stage of the composable-core work** — the security program is currently
+  16 separate toy languages with zero cross-brick composition, and this is the
+  algebra the unification needs.
+
 ## transport-kernel — mathlib instances
 
 - **Tier 1** — mathlib olean cache stood up (the infra that gates importing

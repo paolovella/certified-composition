@@ -93,6 +93,20 @@ if [ -n "$dups" ]; then
   done
 fi
 
+# 1ab. The bundle layer of the interface must exist and stay cited: it is the
+#       foundation the composable-core work builds on.
+for name in "GradedAction.prod" "Bridge.pair" "Bridge.pair_comp_cert" \
+            "bundle_accumulates_componentwise"; do
+  if ! grep -q "$name" transport-calculus/TransportCalculus.lean 2>/dev/null; then
+    echo "DRIFT: $name missing from TransportCalculus.lean"; fail=1
+  fi
+done
+for name in "GradedAction.prod" "Bridge.pair_comp_cert"; do
+  if ! grep -q "$name" transport-calculus/README.md README.md 2>/dev/null; then
+    echo "DRIFT: $name proved but cited in neither README"; fail=1
+  fi
+done
+
 # 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
 #     the map's verdicts are only as good as their citations.
 for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \

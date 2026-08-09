@@ -69,6 +69,124 @@ theorem Bridge.comp_cert {X M D : Type} {GA : GradedAction M D} {dist : X → X 
     (g f : Bridge X M D GA dist) :
     (g.comp f).cert = GA.mul g.cert f.cert := rfl
 
+/-! ## Carrying several certificates at once — the product action
+
+Five instance families now inhabit the interface (Lipschitz, Hölder, finite and
+measure-theoretic Dobrushin, quantum channels), and the security program adds cost
+budgets. Each accumulates *one* kind of certificate. But a real artifact wants a
+**bundle**: this map is 2-Lipschitz *and* costs at most 40 *and* mediates every
+access. Until now the interface could not say that.
+
+The product supplies it, and — this is the content — the composition law stays the
+same one: `Bridge.comp` on a product bridge is componentwise `Bridge.comp`, so
+accumulating a bundle is accumulating each certificate separately, with no new
+proof obligation and no interaction term. -/
+
+/-- The **product** of two graded actions: two certificates carried side by side,
+    ordered and acted on componentwise. -/
+def GradedAction.prod {M₁ D₁ M₂ D₂ : Type}
+    (GA₁ : GradedAction M₁ D₁) (GA₂ : GradedAction M₂ D₂) :
+    GradedAction (M₁ × M₂) (D₁ × D₂) where
+  mul m m'  := (GA₁.mul m.1 m'.1, GA₂.mul m.2 m'.2)
+  le  d d'  := GA₁.le d.1 d'.1 ∧ GA₂.le d.2 d'.2
+  act m d   := (GA₁.act m.1 d.1, GA₂.act m.2 d.2)
+  le_trans  := fun h₁ h₂ => ⟨GA₁.le_trans h₁.1 h₂.1, GA₂.le_trans h₁.2 h₂.2⟩
+  act_mul   := fun m₁ m₂ d => by
+    simp only [Prod.mk.injEq]
+    exact ⟨GA₁.act_mul m₁.1 m₂.1 d.1, GA₂.act_mul m₁.2 m₂.2 d.2⟩
+  act_mono  := by
+    intro m d d' h
+    exact ⟨GA₁.act_mono m.1 h.1, GA₂.act_mono m.2 h.2⟩
+
+/-- **Bundling.** Two bridges over the *same map* pair into one bridge in the product
+    action, whose certificate is the pair. The `hmap` hypothesis is the whole content
+    of "the same artifact carries both guarantees". -/
+def Bridge.pair {X M₁ D₁ M₂ D₂ : Type}
+    {GA₁ : GradedAction M₁ D₁} {GA₂ : GradedAction M₂ D₂}
+    {d₁ : X → X → D₁} {d₂ : X → X → D₂}
+    (b₁ : Bridge X M₁ D₁ GA₁ d₁) (b₂ : Bridge X M₂ D₂ GA₂ d₂)
+    (hmap : b₂.map = b₁.map) :
+    Bridge X (M₁ × M₂) (D₁ × D₂) (GA₁.prod GA₂) (fun x y => (d₁ x y, d₂ x y)) where
+  map       := b₁.map
+  cert      := (b₁.cert, b₂.cert)
+  contracts := fun x y => ⟨b₁.contracts x y, by
+    have := b₂.contracts x y; rwa [hmap] at this⟩
+
+theorem Bridge.pair_cert {X M₁ D₁ M₂ D₂ : Type}
+    {GA₁ : GradedAction M₁ D₁} {GA₂ : GradedAction M₂ D₂}
+    {d₁ : X → X → D₁} {d₂ : X → X → D₂}
+    (b₁ : Bridge X M₁ D₁ GA₁ d₁) (b₂ : Bridge X M₂ D₂ GA₂ d₂) (hmap : b₂.map = b₁.map) :
+    (b₁.pair b₂ hmap).cert = (b₁.cert, b₂.cert) := rfl
+
+/-- **Bundles accumulate componentwise.** Composing two paired bridges gives exactly
+    the pair of the composites' certificates: no interaction term, no extra
+    hypothesis. So carrying `n` guarantees through a composition costs `n` independent
+    accumulations and nothing more — which is what makes bundling usable at scale. -/
+theorem Bridge.pair_comp_cert {X M₁ D₁ M₂ D₂ : Type}
+    {GA₁ : GradedAction M₁ D₁} {GA₂ : GradedAction M₂ D₂}
+    {d₁ : X → X → D₁} {d₂ : X → X → D₂}
+    (g₁ f₁ : Bridge X M₁ D₁ GA₁ d₁) (g₂ f₂ : Bridge X M₂ D₂ GA₂ d₂)
+    (hg : g₂.map = g₁.map) (hf : f₂.map = f₁.map) :
+    ((g₁.pair g₂ hg).comp (f₁.pair f₂ hf)).cert
+      = ((g₁.comp f₁).cert, (g₂.comp f₂).cert) := rfl
+
+/-- And the bundled map is the bundled composite's map — the artifact is one artifact,
+    not two travelling together. -/
+theorem Bridge.pair_comp_map {X M₁ D₁ M₂ D₂ : Type}
+    {GA₁ : GradedAction M₁ D₁} {GA₂ : GradedAction M₂ D₂}
+    {d₁ : X → X → D₁} {d₂ : X → X → D₂}
+    (g₁ f₁ : Bridge X M₁ D₁ GA₁ d₁) (g₂ f₂ : Bridge X M₂ D₂ GA₂ d₂)
+    (hg : g₂.map = g₁.map) (hf : f₂.map = f₁.map) :
+    ((g₁.pair g₂ hg).comp (f₁.pair f₂ hf)).map = (g₁.comp f₁).map := rfl
+
+/-! ### Non-vacuity: a bundle whose two halves accumulate by different laws
+
+The product would be uninteresting if both components had to accumulate the same
+way. They do not — and this is the point of bundling. Below, one certificate is an
+additive budget (`+`) and the other a worst-case bound (`max`); a single
+`Bridge.comp` advances both, each by its own law. -/
+
+/-- Additive budgets: costs add along a composition. -/
+def addGA : GradedAction Nat Nat where
+  mul      := (· + ·)
+  le       := (· ≤ ·)
+  act      := (· + ·)
+  le_trans := fun h₁ h₂ => Nat.le_trans h₁ h₂
+  act_mul  := fun a b c => Nat.add_assoc a b c
+  act_mono := by intro m d d' h; omega
+
+/-- Worst-case bounds: accumulation is `max`, not `+` — a genuinely different
+    monoid on the same carrier. -/
+def maxGA : GradedAction Nat Nat where
+  mul      := max
+  le       := (· ≤ ·)
+  act      := max
+  le_trans := fun h₁ h₂ => Nat.le_trans h₁ h₂
+  act_mul  := fun a b c => Nat.max_assoc a b c
+  act_mono := by
+    intro m d d' h
+    exact Nat.max_le.mpr ⟨Nat.le_max_left m d', Nat.le_trans h (Nat.le_max_right m d')⟩
+
+def addBridge (k : Nat) : Bridge Nat Nat Nat addGA (fun x _ => x) where
+  map       := id
+  cert      := k
+  contracts := fun x _ => Nat.le_add_left x k
+
+def maxBridge (k : Nat) : Bridge Nat Nat Nat maxGA (fun x _ => x) where
+  map       := id
+  cert      := k
+  contracts := fun x _ => Nat.le_max_right k x
+
+/-- The bundle carries both certificates. -/
+theorem bundle_cert : ((addBridge 3).pair (maxBridge 5) rfl).cert = (3, 5) := rfl
+
+/-- **One composition, two accumulation laws.** The additive half adds (`3 + 4 = 7`),
+    the worst-case half takes a maximum (`max 5 2 = 5`), and neither knows about the
+    other. This is what `Bridge.pair_comp_cert` says, instantiated. -/
+theorem bundle_accumulates_componentwise :
+    (((addBridge 3).pair (maxBridge 5) rfl).comp
+     ((addBridge 4).pair (maxBridge 2) rfl)).cert = (7, 5) := rfl
+
 /-! ## The hunt for a non-associative accumulation witness — resolved negatively
 
 The proposed boundary "find a transport phenomenon whose accumulation is
