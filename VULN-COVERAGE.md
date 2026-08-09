@@ -1327,6 +1327,28 @@ partitions), not a general-purpose language frontend.
   already cost two build rounds. **Brick 35 complete — the map's last [classified] grade
   is gone; every row is now [proved], [argued] or an explicitly named deferral.**
 
+### The composable core (structural work, not a brick)
+
+A measured weakness of the brick method, recorded here because it bears on what the map's
+verdicts *jointly* mean. The bricks define **sixteen** distinct instruction types across
+thirty modules, and there is **zero** cross-brick composition: no module mentions two brick
+languages, and the only bridge is brick 7's `embed : Cmd → WCmd`. So each row's verdict
+holds of *its own* toy language, and no single program carries two of them at once — which
+is precisely where "composition accumulates certificates" most needs to hold.
+
+Two stages have landed. `GradedAction.prod` / `Bridge.pair_comp_cert` (transport-calculus)
+give the algebra: bundles accumulate componentwise, no interaction term, so carrying `n`
+guarantees costs `n` independent accumulations. `Unified.lean` gives the object: `UCmd` is
+`WCmd` plus `check`/`access`, with **`uexec_embed_eq`** proving the While development is a
+*fragment* of it — store, cost and branch trace exactly `wexec`'s, the new dimensions
+untouched — so brick results transfer (`ucost_of_cost`) rather than fork, and old programs
+satisfy the new dimensions vacuously (`uembed_mediated`).
+
+**Not yet done, and the map should not be read as if it were:** the checkers are not
+retargeted, so there is still no single program carrying noninterference *and* a budget
+*and* mediation. Until stage 1c lands, each row's verdict remains a statement about its own
+language, and their conjunction is not a theorem.
+
 ### The security program, standing state (thirty-five bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —

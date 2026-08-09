@@ -94,6 +94,25 @@ landed.
   is `[proved]`, `[argued]`, or an explicitly named deferral. Class count stays
   sixteen — a sub-formulation within a row is a verdict, not a class (§2½).
 
+- **Composable core, stage 1b — one language, and the embedding
+  (`Unified.lean`).** `UCmd` is `WCmd` plus `check`/`access`; the state gains
+  `auth`, `reads` and `dead`. A refused check aborts and every later step becomes
+  a no-op, so "nothing is read after a refusal" holds **definitionally** — checked
+  in the model: after a refusal the later `access` reads nothing *and* the later
+  assignment does not fire. The load-bearing theorem is **`uexec_embed_eq`**: on
+  the image of `uembed`, started live, the unified machine's store, cost and
+  branch trace are *exactly* `wexec`'s and the three new fields are untouched —
+  one equation, so the While development is a **fragment** of this one rather
+  than a parallel copy (brick 7's `wexec_embed_eq` standard, a level up). Two
+  transfers follow: `ucost_of_cost` — a brick-34 budget is a budget here, no
+  reproof — and `uembed_mediated` — a program with no `access` reads nothing, so
+  the new dimension cannot be violated by code that predates it. The dimensions
+  are live rather than decorative (`uVictim_not_mediated`, and the policy
+  genuinely decides). **Not** done: the checkers are not retargeted, so no single
+  program yet carries three certificates; that is stage 1c, and `VULN-COVERAGE`
+  now says so explicitly so the map is not read as if the rows' conjunction were
+  a theorem.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

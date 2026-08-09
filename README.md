@@ -267,6 +267,17 @@ small-step machine where the check-then-act withdrawal really does go negative
 proved safe under every interleaving, and the decidable race-freedom check reduces
 the concurrent obligation to a sequential one per critical section.
 
+### The composable core (in progress)
+
+The security program's bricks were, structurally, sixteen separate toy languages with no
+cross-brick composition — so no program could carry two guarantees at once, which is the
+one place the repo's own headline most needs to hold. Two stages have landed:
+`GradedAction.prod` / `Bridge.pair_comp_cert` (bundles accumulate componentwise, no
+interaction term) and `ConfTyping/Unified.lean` (`UCmd` = `WCmd` + `check`/`access`, with
+`uexec_embed_eq` proving the While development is a *fragment* of it, so brick results
+transfer — `ucost_of_cost` — instead of forking). Stage 1c retargets the checkers and
+proves one program carrying three composed certificates; it is not done.
+
 ## Scope — what is *not* claimed
 
 - The transport interface is **not** asserted to be the "correct general

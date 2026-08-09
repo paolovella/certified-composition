@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Unified.lean` | composable core, stage 1b | one language (`UCmd` = `WCmd` + `check`/`access`) carrying store, cost and authorization, with `uexec_embed_eq` proving the While development is a *fragment* of it, so brick results transfer (`ucost_of_cost`) instead of forking |
 | `ConfTyping/Mediation.lean` | brick 35 / `VULN-COVERAGE.md` row 7 | complete mediation: missing authorization proved bypassable on an unguarded path (`victim_not_mediated`), a flow-sensitive check proved sound on every path and policy (`medCheck_sound`), and policy correctness proved *not* program-decidable (`policy_correctness_not_witnessed`) |
 | `ConfTyping/CostBound.lean` | brick 34 / `VULN-COVERAGE.md` row 10 | resource exhaustion: a uniform cost budget, accumulation as a `GradedAction` (`cost_seq_is_mul`), algorithmic-complexity DoS proved (`dos_unbounded`), and uniformity restored by a constant-initialised budget (`budget_cost`) |
 | `ConfTyping/Speculate.lean` | brick 33 / `VULN-COVERAGE.md` row 9 | speculative execution: a transient-execution machine with demonic misprediction — Spectre-v1 as a theorem (`spectre_leaks`), architecturally invisible (`arch_indistinguishable`), and a fence check whose soundness makes speculation observationally inert (`spec_inert`) |
@@ -1125,6 +1126,38 @@ Honest limits: nesting is excluded by the syntax; the join intersects, so the ch
 sufficient not necessary; and the model has no *subject*, so "authorized for this
 principal" — IDOR, CWE-639 — is a named follow-on. `memStr` and `interStr` are defined and
 proved locally, the package being mathlib-free.
+
+## The composable core (`Unified.lean`) — stage 1b
+
+Measured weakness: the security program defines **sixteen** instruction types across thirty
+modules with **zero** cross-brick composition — no module mentions two brick languages, and
+the only bridge is brick 7's `embed : Cmd → WCmd`. Thirty-five bricks each prove "for *my*
+toy language this class is excluded", so no program carries two guarantees at once. That
+undercuts the repo's headline exactly where the goal needs it.
+
+Stage 1a (in `transport-calculus`) added the algebra: `GradedAction.prod` and
+`Bridge.pair_comp_cert` — bundles accumulate componentwise, no interaction term. This stage
+adds the object. `UCmd` is `WCmd` plus `check` and `access`; the state gains `auth`, `reads`
+and `dead`. A refused check aborts and every later step becomes a no-op, so "nothing is read
+after a refusal" holds *definitionally* — checked in the model: after a refusal the later
+`access` reads nothing **and** the later assignment does not fire.
+
+The load-bearing theorem is `uexec_embed_eq`: on the image of `uembed`, started live, the
+unified machine's store, cost and branch trace are **exactly** `wexec`'s, and `auth`,
+`reads`, `dead` are untouched — one equation. So the While development is a fragment of this
+one rather than a parallel copy, the standard brick 7 set with `wexec_embed_eq`, applied a
+level up. Two transfers follow at once: `ucost_of_cost` (a brick-34 budget is a budget here,
+no reproof) and `uembed_mediated` (a program with no `access` reads nothing, so the new
+dimension cannot be violated by code that predates it).
+
+The new dimensions are live rather than decorative: `uVictim_not_mediated` shows an
+unchecked read is expressible and fails mediation, while `uFixed_refused_reads_nothing` and
+`uFixed_permitted_reads` show the policy actually decides.
+
+Honest scope: this builds the object and the transfers. It does **not** yet re-derive the
+checkers on it — stage 1c retargets noninterference, cost and mediation onto `UCmd` and
+proves one program carrying all three composed certificates. The existing bricks are not
+superseded; they remain the record of what was proved, and the transfers make them reusable.
 
 ## §11 pre-mechanization checklist (framework doc)
 
