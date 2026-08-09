@@ -240,6 +240,11 @@ is injectable against the *other* dialect's tokenizer
 (`escaping_is_convention_relative`), so escaping carries a load-bearing assumption
 that lands in brick 4's ledger (`escaping_no_silent_discharge`) while
 parameterization needs the empty one (`escaping_reducible_parameterization_in`);
+and **complete mediation** (`medCheck_sound`) — brick 35 splits row 7's
+last `[classified]` grade in two: missing authorization is a decidable
+all-paths program property, generated and proved, while policy correctness is
+proved *not* to be program-decidable (`policy_correctness_not_witnessed`), so
+the CARRIED half is now demonstrated rather than asserted;
 and **resource exhaustion** (`cost_seq_is_mul`, `dos_unbounded`) — brick 34
 proves row 10's reduction: a uniform cost budget whose accumulation is a
 `GradedAction`, so a security row lands in the transport calculus's own algebra;

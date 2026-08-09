@@ -131,7 +131,7 @@ the one claim it could not independently verify. Restored to sixteen.)*
 | 4 | improper declassification / overshare | bounded release (2-safety rel. φ) | 1 | IN (generated) | [proved] |
 | 5 | privacy / differential privacy | hyperproperty (quantitative) | 3 | IN as f-DP invariant; OUT-NONCOMPOSABLE as (ε,δ) | [argued] / [proved in miniature] |
 | 6 | memory safety (CWE-119/416) | safety of a richer (heap) semantics | — | IN-WITH-MODEL (generated); CARRIED cross-language | [proved] |
-| 7 | authz bypass (CWE-285); cross-tenant isolation | 1-safety rel. policy; isolation is 2-safety | — / 1 | CARRIED; isolation IN (generated) | [classified] / [proved] |
+| 7 | authz bypass (CWE-285/306); cross-tenant isolation | complete mediation is a path property; isolation is 2-safety; policy correctness is spec-shaped | — / 1 | mediation IN (generated); isolation IN (generated); policy correctness CARRIED | [proved] |
 | 8 | races / TOCTOU (CWE-362/367) | safety over *all* interleavings, demonic scheduling | — | IN-WITH-MODEL (generated) | [proved] |
 | 9 | speculative execution (Spectre-class) | trace-safety over a transient-execution model, demonic misprediction | 1* | IN-WITH-MODEL (generated) | [proved] |
 | 10 | resource exhaustion / DoS (CWE-400) | uniform cost budget over the instrumented semantics | — | IN-WITH-MODEL (generated) on the bounded fragment; REDUCIBLE in general | [proved] |
@@ -413,6 +413,42 @@ the checker *and* proved non-isolated (`leaky_rejected`, `leaky_not_isolated`). 
 [argued] gap ("no mechanized instance") is closed; the isolation verdict is now
 [proved] and generated. Authz-in-general stays CARRIED (π's correctness is the
 spec gap, not a theorem).
+
+
+**Complete mediation, generated** (brick 35, `Mediation.lean`). The CARRIED verdict above
+is right about *policy correctness* and was silently swallowing a second, different
+property. CWE-285's actual defect — and CWE-306's — is almost never "the policy was
+wrong"; it is **missing mediation**: some path reaches the protected operation without
+passing the check. That is a property of the program, on every path, and it is decidable.
+Brick 35 separates them.
+
+The machine is small: `check r` consults the policy and *aborts* if refused, `access r`
+performs the protected read, and `branch` offers two routes with the path taken as a data
+parameter — the same demonic device as bricks 32 and 33, so "on some path" is decidable on
+a witness and "on every path" quantifies over all of them.
+
+- **The attack [proved, axiom-free].** `victimMed` checks on one branch and forgets on the
+  other. `med_victim_bypasses`: under the unguarded path and a policy that *denies* the
+  resource, the read happens anyway; `victim_not_mediated` turns that into the property
+  failure. Note the shape — the program *contains* a correct check, just not on every
+  route, and `victim_guarded_path_is_fine` confirms the other path aborts cleanly. This is
+  why mediation is a whole-program, all-paths property and not a local one.
+- **The fix, generated [proved].** `medCheck` is a decidable flow-sensitive analysis
+  carrying the authorized set and **intersecting** at joins. `medCheck_sound`: a checked
+  program reads only what the policy permits, on every path and under every policy. Its
+  invariant is three-part (everything authorized is permitted, everything read is
+  permitted, the static set under-approximates the dynamic one).
+- **The split, as a theorem.** `policy_correctness_not_witnessed` exhibits two policies
+  under which the *same* checked program is mediated and yet reads different things — so
+  no program analysis can prefer one. That is the CARRIED half, now demonstrated rather
+  than asserted, and `mediation_generated_policy_carried` states both halves together.
+
+Honest limits. Branch bodies are a separate instruction type, so nesting is excluded **by
+the syntax** rather than dropped by the semantics. The analysis intersects at joins, so it
+is sufficient, not necessary. And the model has no *subject*: this is "was the resource
+authorized", not "was it authorized *for this principal*" — binding subject to object is
+IDOR (CWE-639), a named follow-on. Two list operations (`memStr`, `interStr`) are defined
+and proved locally rather than imported, since the package is mathlib-free.
 
 ### 3.8 Races / TOCTOU — IN-WITH-MODEL, generated [proved]
 
@@ -1267,7 +1303,31 @@ partitions), not a general-purpose language frontend.
   last [classified]-only reducible row is proved, and the security program's
   quantitative side now composes by the same law as the contraction estimates.**
 
-### The security program, standing state (thirty-four bricks, sixteen classes)
+### Brick 35 ledger (complete mediation — the split row 7 was hiding)
+
+- `Mediation.lean` — row 7 carried the map's **last [classified] grade**, on the
+  reasoning that π's correctness "is not a theorem anywhere". True of policy
+  correctness; false of the thing CWE-285 and CWE-306 actually name. **Missing
+  mediation** — a path reaching the protected operation without the check — is a
+  program property, all-paths, decidable. `Mediated p` quantifies over every policy and
+  every path. `med_victim_bypasses` (axiom-free): the unguarded branch reads a resource
+  the policy denies, while `victim_guarded_path_is_fine` shows the other branch aborts
+  cleanly — the defect is the *route*, not the check. `medCheck` (flow-sensitive,
+  intersecting at joins) plus `medCheck_sound` generate the guarantee, on a three-part
+  invariant: everything authorized is permitted, everything read is permitted, and the
+  static set under-approximates the dynamic one. `policy_correctness_not_witnessed`
+  proves the other half is *not* program-decidable — two policies, same checked program,
+  both mediated, different reads — so `mediation_generated_policy_carried` states the
+  split as one theorem. No `sorry`, choice-free; witnesses checked against the model
+  (deny+unguarded reads `["db"]`, deny+guarded reads `[]`, the fix reads nothing under
+  deny on either path). Honest limits: nesting excluded by the syntax; the join is an
+  intersection so the check is sufficient not necessary; and there is no *subject* in the
+  model, so IDOR (CWE-639) is a named follow-on. `memStr`/`interStr` are defined and
+  proved locally — the package is mathlib-free and guessing at core lemma names had
+  already cost two build rounds. **Brick 35 complete — the map's last [classified] grade
+  is gone; every row is now [proved], [argued] or an explicitly named deferral.**
+
+### The security program, standing state (thirty-five bricks, sixteen classes)
 
 The original goal — a framework for coding inherently free of vulnerabilities —
 now has: a **map** with a proved boundary (13 classes, brick 1 + brick 7's new

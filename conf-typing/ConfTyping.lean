@@ -43,3 +43,4 @@ import ConfTyping.QueryEscape
 import ConfTyping.Race
 import ConfTyping.Speculate
 import ConfTyping.CostBound
+import ConfTyping.Mediation

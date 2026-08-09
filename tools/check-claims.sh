@@ -459,6 +459,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+if grep -q "Mediation.lean" VULN-COVERAGE.md; then
+  for thm in "theorem medCheck_sound" "theorem victim_not_mediated" \
+             "theorem fixed_mediated" "theorem policy_correctness_not_witnessed" \
+             "theorem mediation_generated_policy_carried"; do
+    if ! grep -q "$thm" conf-typing/ConfTyping/Mediation.lean 2>/dev/null; then
+      echo "DRIFT: complete mediation cited but '$thm' is missing from Mediation.lean"; fail=1
+    fi
+  done
+fi
 if grep -q "CostBound.lean" VULN-COVERAGE.md; then
   for thm in "theorem cost_seq" "theorem cost_seq_is_mul" "theorem costCheck_sound" \
              "theorem countdown_cost" "theorem dos_unbounded" "theorem budget_cost"; do
@@ -477,7 +486,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

@@ -70,6 +70,30 @@ landed.
   verdict keeps "REDUCIBLE in general"), instrumented steps not wall clock. Class
   count stays sixteen by the §2½ convention.
 
+- **Brick 35 — complete mediation, and the split row 7 was hiding
+  (`Mediation.lean`).** Row 7 carried the map's **last `[classified]` grade**, on
+  the reasoning that π's correctness "is not a theorem anywhere". True of policy
+  correctness — and it was swallowing a second, different property. CWE-285's
+  actual defect, and CWE-306's, is almost never "the policy was wrong"; it is
+  **missing mediation**: some path reaches the protected operation without the
+  check. That is a program property, all-paths, decidable. `med_victim_bypasses`
+  (axiom-free): the unguarded branch reads a resource the policy denies, while
+  `victim_guarded_path_is_fine` shows the other branch aborts cleanly — the
+  defect is the *route*, not the check. `medCheck` (flow-sensitive, intersecting
+  at joins) with `medCheck_sound` generates the guarantee on every path and under
+  every policy, via a three-part invariant.
+  `policy_correctness_not_witnessed` proves the other half is **not**
+  program-decidable — two policies, same checked program, both mediated,
+  different reads — so `mediation_generated_policy_carried` states the split as
+  one theorem and the CARRIED half is finally demonstrated rather than asserted.
+  Limits: nesting excluded by the syntax; the join intersects, so the check is
+  sufficient not necessary; no *subject* in the model, so IDOR (CWE-639) is a
+  named follow-on. `memStr`/`interStr` defined and proved locally — the package
+  is mathlib-free and guessing core lemma names had already cost two build
+  rounds. **With this the map has no `[classified]`-only grade left**: every row
+  is `[proved]`, `[argued]`, or an explicitly named deferral. Class count stays
+  sixteen — a sub-formulation within a row is a verdict, not a class (§2½).
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

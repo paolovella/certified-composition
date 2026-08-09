@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Mediation.lean` | brick 35 / `VULN-COVERAGE.md` row 7 | complete mediation: missing authorization proved bypassable on an unguarded path (`victim_not_mediated`), a flow-sensitive check proved sound on every path and policy (`medCheck_sound`), and policy correctness proved *not* program-decidable (`policy_correctness_not_witnessed`) |
 | `ConfTyping/CostBound.lean` | brick 34 / `VULN-COVERAGE.md` row 10 | resource exhaustion: a uniform cost budget, accumulation as a `GradedAction` (`cost_seq_is_mul`), algorithmic-complexity DoS proved (`dos_unbounded`), and uniformity restored by a constant-initialised budget (`budget_cost`) |
 | `ConfTyping/Speculate.lean` | brick 33 / `VULN-COVERAGE.md` row 9 | speculative execution: a transient-execution machine with demonic misprediction — Spectre-v1 as a theorem (`spectre_leaks`), architecturally invisible (`arch_indistinguishable`), and a fence check whose soundness makes speculation observationally inert (`spec_inert`) |
 | `ConfTyping/Race.lean` | brick 32 / `VULN-COVERAGE.md` row 8 | races and TOCTOU: a demonic-scheduling small-step machine — the attack (`toctou_interleaving_unsafe`), the atomic fix safe under every interleaving, and a decidable check that reduces the concurrent obligation to a sequential one |
@@ -1077,6 +1078,36 @@ budget is *unary*. The accumulation transfers; the contraction does not.
 Honest limits: halting runs only (availability is liveness-shaped and still not
 claimed), the canonical countdown only (general ranking analysis stays external, so the
 verdict keeps "REDUCIBLE in general"), and instrumented steps rather than wall clock.
+
+## Complete mediation (`Mediation.lean`) — the split row 7 was hiding
+
+Row 7 carried the map's last `[classified]` grade, on the reasoning that π's correctness
+"is not a theorem anywhere". That is true of *policy correctness* — and it was swallowing a
+second, different property. CWE-285's actual defect, and CWE-306's, is almost never "the
+policy was wrong"; it is **missing mediation**: some path reaches the protected operation
+without passing the check. That is a program property, on every path, and decidable.
+
+`check r` consults the policy and aborts if refused; `access r` is the protected read;
+`branch` offers two routes with the path as a data parameter — the demonic device of bricks
+32 and 33. `med_victim_bypasses`: on the unguarded branch, under a policy that *denies* the
+resource, the read happens anyway. `victim_guarded_path_is_fine` shows the other branch
+aborts cleanly, which is the point — the program *contains* a correct check, just not on
+every route, so mediation is a whole-program all-paths property.
+
+`medCheck` is a flow-sensitive analysis carrying the authorized set and intersecting at
+joins; `medCheck_sound` proves a checked program reads only what the policy permits, on
+every path and under every policy, via a three-part invariant (everything authorized is
+permitted, everything read is permitted, the static set under-approximates the dynamic one).
+
+`policy_correctness_not_witnessed` proves the *other* half is not program-decidable: two
+policies, the same checked program, both mediated, different reads. So
+`mediation_generated_policy_carried` states the split as one theorem — mediation generated,
+policy carried, and now the carrying is demonstrated rather than asserted.
+
+Honest limits: nesting is excluded by the syntax; the join intersects, so the check is
+sufficient not necessary; and the model has no *subject*, so "authorized for this
+principal" — IDOR, CWE-639 — is a named follow-on. `memStr` and `interStr` are defined and
+proved locally, the package being mathlib-free.
 
 ## §11 pre-mechanization checklist (framework doc)
 
