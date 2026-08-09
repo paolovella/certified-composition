@@ -3473,3 +3473,98 @@ is automatic; and `S_u(ξ) > e_{γ(u)}(ξ)` says exactly that some `x ⊑ u` has
   down as an explicit dip assignment and computing `L_u`. Worth generalizing: **every
   "⟹ plausibly" in this program should be cashed out as an explicit construction before
   the next section builds on it.**
+
+## 57. (Q-spread): localized to level-minima, and proved to require per-element freedom — Theorem X (no level function dominates the walk bars) is Question 1's own dichotomy, one level down
+
+§56 replaced the crux by the conjunction **(C1)** fiber-specialness ∧ **(C2)** block-spread
+control, and reduced (C2) above the trace to a domination condition — the ranking must
+beat the walk bars along every down-set. This section works (Q-spread). It does not fall,
+but it is localized, and its *shape* is now identified: it is provably not a level-wise
+problem, and the level-wise version is refuted outright.
+
+Throughout: `rank : D(e) → ω`, `bar(x,u) := ρ₁(γ(x), γ(u))`, and
+`BS(u) := {x ⊑ u : rank(x) < bar(x,u)}`, so **(C2) ⟺ `BS(u)` is finite for every `u`**.
+
+**Localization: (C2) is a condition on level-minima [proved].** Assume (C1). Then
+> **(C2) ⟺ for every `u`, only finitely many γ-values `α` are realized by elements of
+> `BS(u)`** ⟺ for every `u`, `m_u(α) := min{rank(x) : x ⊑ u, γ(x) = α} ≥ ρ₁(α, γ(u))` for
+> all but finitely many γ-values `α` realized in `↓u`.
+*Proof.* (⟹) trivial. (⟸) For each realized γ-value `α`, `bar(·,u)` is the *constant*
+`ρ₁(α,γ(u)) =: N_α` on `γ⁻¹(α)`, so `BS(u) ∩ γ⁻¹(α) ⊆ {x ⊑ u : rank(x) < N_α}`, finite by
+(C1). Finitely many such `α`, each contributing finitely, gives `BS(u)` finite. ∎
+So **(C1) does most of (C2) for free**: at each γ-level all but finitely many elements of
+`↓u` already outrank any fixed bar. The entire content of (C2) is the *minima*, level by
+level — the finitely many low-rank elements at each level, summed over levels.
+
+**Down-sets are level-full [proved].** For `u = (β,C)` and any `α < β`, the element
+`(α, B_α ∩ C)` is `⊑ u`: it is `=* B_α` because `B_α \ C ⊆ D⁺(α,β) ∪ (B_β \ C)` is finite,
+and it is `⊆ C` by construction. Dually, every `x = (α,A)` lies below some `u` at every
+level `β > α` (take `C := B_β ∪ A`, which is `=* B_β`). So the minima `m_u(α)` are defined
+on a genuinely full set of levels and the localization is not vacuous.
+
+**Theorem X (no level function dominates the walk bars) [proved, ZFC].** There is **no**
+`g : ω₁ → ω` such that for every `β < ω₁` the set `{α < β : g(α) < ρ₁(α,β)}` is finite.
+*Proof.* Suppose `g` were such. Fix `n` and put `S_n := {α : g(α) ≤ n}`. For any `β`, if
+`α ∈ S_n ∩ β` then either `ρ₁(α,β) ≤ n`, or `ρ₁(α,β) > n ≥ g(α)` and `α` lies in the
+exceptional set. So `S_n ∩ β ⊆ {α ≤ β : ρ₁(α,β) ≤ n} ∪ {α<β : g(α) < ρ₁(α,β)}`: the first
+is finite by Handbook **1.16(a)**, the second by hypothesis. Hence every initial segment of
+`S_n` is finite, so `S_n` has order type `≤ ω` and is bounded. Then `ω₁ = ⋃_n S_n` is a
+countable union of bounded sets — bounded, by regularity of `ℵ₁`. Contradiction. ∎
+*Note the engine:* finite-to-one rows + regularity — the **third** appearance, after `ρ₁`'s
+own nontriviality (Handbook 1.16(a)+1.17) and **Theorem P** (§53). It is the same three
+lines each time, and it is now doing work at three different levels of the program.
+
+**Corollary X1 (bar-divergence in the second argument is real) [proved].** Let
+`S := {α : sup_β ρ₁(α,β) = ∞}`. Then `S ∩ β` is infinite for all sufficiently large `β`.
+*Proof.* Otherwise `S ∩ β` is finite for every `β`; set `g(α) := sup_β ρ₁(α,β)` off `S` and
+`g := 0` on `S`. For every `β`, `{α<β : g(α) < ρ₁(α,β)} ⊆ S ∩ β` is finite — contradicting
+Theorem X. ∎
+
+**Corollary X2 ((Q-spread) requires per-element freedom) [proved].** By Theorem X, the
+domination required by (C2) **cannot** be delivered by any assignment depending only on the
+γ-level: no matter how the level function is chosen, some `β` has infinitely many `α < β`
+where it falls under the bar. So (C2) is satisfiable **only** through the `u`-dependence of
+the minima `m_u` — i.e. only if the per-element multiplicity inside each level (a down-set
+meets each level infinitely often, §55) can be exploited so that the *low-rank* elements at
+each level are the ones that happen not to lie below the `u`'s where the bar is high.
+> **This is Question 1's dichotomy verbatim, one level down.** Question 1's open content is
+> exactly *element-dependent versus level-factored* schedules (Corollary to Theorem B:
+> level-factored strong schedulability **implies triviality**). (Q-spread) now has the same
+> shape and the same resolved-negative level-factored side. Fourth appearance of the
+> program's self-similarity — and the first time it has been *proved* rather than observed.
+
+**A necessary condition on any (C2)-rank [proved].** `m_u` is antitone in `u` (`u ⊑ u′`
+gives `↓u ⊆ ↓u′`, so the minimum over the larger set is smaller). Take any `⊑`-increasing
+ω-chain `u_0 ⊑ u_1 ⊑ …` with γ-levels `β_n`, and let `F_n` be the finite exceptional set of
+levels at `u_n`. Fix a level `α` with `sup_n ρ₁(α,β_n) = ∞` and put `c_α := m_{u_0}(α) < ω`.
+For every `n` with `ρ₁(α,β_n) > c_α` we get `m_{u_n}(α) ≤ c_α < ρ₁(α,β_n)`, so `α ∈ F_n`.
+Hence such an `α` lies in **cofinitely many** `F_n`; if there are infinitely many such `α`
+(Corollary X1 supplies them in abundance), then `|F_n| → ∞`. So:
+> any rank satisfying (C2) has **exceptional sets growing without bound along every
+> ⊑-increasing ω-chain** — the domination is always achieved late, and later and later.
+This is checkable against any proposed construction, and it rules out every rank whose
+exceptional sets are uniformly bounded — in particular every "guard the first `k` blocks"
+scheme with `k` fixed along chains.
+
+**Numeric caveat, second occurrence — and it would have inverted the section.** Over the
+truncated model, `ρ₁(α, ·)` looks *eventually constant* in `β`: sampling `α` at four levels
+across two C-sequences gives 1–2 distinct values, constant on the whole tail. If that were
+true, `sup_β ρ₁(α,β) < ω` everywhere, `S = ∅`, the necessary condition above would be
+vacuous, and Theorem X would be false. It is a truncation artefact — the model has `≤ 3`
+limits-of-limits, so the walks that make the bar grow do not exist in it — and **Corollary
+X1 proves the opposite in ZFC**. Exactly the failure mode recorded in §54 and the method
+note of §56: *the model is sound for identities and unreliable for anything asymptotic.*
+Recorded a second time because this instance was not caught by suspicion but by having the
+proof already in hand.
+
+**Status after §57.**
+- **(Q-spread): open**, but localized to level-minima (the localization lemma) and shape-
+  identified: the level-factored side is **refuted in ZFC** (Theorem X), so all of its
+  content lies in per-element freedom — the same dichotomy as Question 1, whose
+  level-factored side is likewise refuted (Theorem B's corollary).
+- **New ZFC facts**: the localization lemma; level-fullness of down-sets; Theorem X;
+  Corollaries X1 and X2; the ω-chain necessary condition.
+- **What would settle it**: a construction exploiting within-level multiplicity, whose
+  exception sets grow along every ω-chain — or a proof that the multiplicity cannot be
+  organised coherently across overlapping down-sets, which is the same wall the program
+  has met at every level, now stated for the smallest object it has yet reached.

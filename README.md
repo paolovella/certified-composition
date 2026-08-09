@@ -60,7 +60,7 @@ The same accountancy appears at every level:
   regularity hypothesis is load-bearing (`omega_concentration_fails`);
 - the **research line** the frontier opened, in prose at graded rigor:
   [`NOTES-coherent-escapee.md`](transport-calculus/NOTES-coherent-escapee.md)
-  (fifty-six sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
+  (fifty-seven sections: reps ⟺ trivial in ZFC, chain-freeness of the fiber
   order, the no-go for kill templates, forcing-locality, Theorem B —
   uniformizing dip systems ⟺ trivial — and its downward dual Theorem B⁻,
   the reduction of the whole question

@@ -375,6 +375,28 @@ landed.
   every "⟹ plausibly" should be cashed out as an explicit construction before the
   next section builds on it.
 
+- **§57 — (Q-spread) localized, and its level-factored side refuted.**
+  Assuming (C1), **(C2) ⟺ the level-minima `m_u(α) := min{rank(x) : x ⊑ u,
+  γ(x)=α}` dominate `ρ₁(α,γ(u))` off finitely many levels, for every `u`** — at
+  each level all but finitely many elements of `↓u` already outrank any fixed
+  bar, so (C1) does most of (C2) for free and the whole content is the minima.
+  Down-sets are level-full (`(α, B_α ∩ C) ⊑ (β,C)`), so the reduction bites.
+  **Theorem X [ZFC]**: there is **no** `g : ω₁ → ω` with `{α<β : g(α) <
+  ρ₁(α,β)}` finite for every `β` — Handbook 1.16(a) plus regularity of ℵ₁, the
+  same three lines as `ρ₁`'s nontriviality and Theorem P, now in a third role.
+  **Corollary X2**: the domination (C2) requires cannot come from any *level*
+  function, so all of (Q-spread) lies in per-element freedom — **Question 1's own
+  dichotomy one level down**, with the level-factored side refuted on both sides
+  (Theorem B's corollary there, Theorem X here); first time the program's
+  self-similarity is proved rather than observed. **Corollary X1**:
+  `{α : sup_β ρ₁(α,β) = ∞}` is infinite below every large `β`, so the bars
+  diverge in the second argument too — whence a checkable **necessary condition**:
+  any (C2)-rank has exceptional sets growing without bound along every
+  ⊑-increasing ω-chain, which kills every fixed-`k` block-guarding scheme.
+  Second numeric caveat recorded: the truncated model shows `ρ₁(α,·)` eventually
+  constant, which would make the whole section vacuous — an artefact, refuted in
+  ZFC by Corollary X1, and caught only because the proof was already in hand.
+
 ## transport-kernel — mathlib instances
 
 - **Tier 1** — mathlib olean cache stood up (the infra that gates importing

@@ -598,6 +598,22 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   **not** settle schedulability. Discharged on the way: for binary-valued `e` the value-form
   (ii) is *equivalent* to the set-form (i), so §50's "modulo the value-form bookkeeping"
   hedge costs nothing over `ρ₃`.)*
+  *(**(Q-spread) worked, notes §57.** Localized: assuming (C1), **(C2) ⟺ for every `u` the
+  level-minima `m_u(α) := min{rank(x) : x ⊑ u, γ(x)=α}` dominate `ρ₁(α,γ(u))` off finitely
+  many levels** — because at each level all but finitely many elements of `↓u` already
+  outrank any fixed bar, by (C1). Down-sets are level-full (`(α, B_α ∩ C) ⊑ (β,C)` for every
+  `α<β`), so this is not vacuous. **Theorem X [ZFC]**: there is **no** `g : ω₁ → ω` with
+  `{α<β : g(α) < ρ₁(α,β)}` finite for every `β` — by Handbook 1.16(a) plus regularity, the
+  same three lines that give `ρ₁`'s nontriviality and Theorem P, now in their third role.
+  **Corollary X2**: the domination (C2) needs cannot come from any *level* function, so all
+  of (Q-spread)'s content lies in per-element freedom — **Question 1's own dichotomy, one
+  level down**, with the level-factored side refuted on both (Theorem B's corollary there,
+  Theorem X here). **Corollary X1**: `{α : sup_β ρ₁(α,β) = ∞}` is infinite below every large
+  `β`, so the bars really do diverge in the second argument; whence a checkable **necessary
+  condition** — any (C2)-rank has exceptional sets growing without bound along every
+  ⊑-increasing ω-chain, killing every fixed-`k` block-guarding scheme. Recorded: the
+  truncated model suggests `ρ₁(α,·)` is eventually constant, which would make all of this
+  vacuous; that is an artefact, and Corollary X1 refutes it in ZFC.)*
 - **`S` remains independent-shaped**: FALSE under ◊ (Theorem C, proved), TRUE under MA_{ω₁}
   (conjecture on the cited machinery).
 This is the terminus the scope question was load-bearing for: not "Q1 independent via
