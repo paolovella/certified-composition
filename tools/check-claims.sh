@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1f: what an aborted run does, and loops in the bundle.
+for thm in "theorem uexec_dead_unchanged" "theorem uexec_dead_loop_diverges" \
+           "theorem uexec_dead_cost" "theorem UCert.ofEmbedded" \
+           "theorem handlerBounded_numbers"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/BundleLoop.lean 2>/dev/null; then
+    echo "DRIFT: bounded loops are cited but '$thm' is missing from BundleLoop.lean"; fail=1
+  fi
+done
+
 # composable core stage 1e: the fourth accumulation law and the typed CARRIED half.
 for thm in "theorem UCertL.seq" "theorem handler_intended_reads" \
            "theorem handler_needs_the_policy_assumption" \
@@ -550,7 +559,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

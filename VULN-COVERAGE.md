@@ -1371,8 +1371,13 @@ so `WSecTy`'s discipline lifts unchanged (`usecTy_sound`), and
 program, composing by three different laws.
 
 **What is still not true, and the map should not be read as if it were.** Three of the
-map's properties, not sixteen. The bundle is **loop-free** (`ucheck` returns `none` at a
-`loop`, as brick 34's `costCheck` does). The NI result is *bought* by having no
+map's properties, not sixteen. The bundle now admits **bounded loops** (stage 1f,
+`BundleLoop.lean`): `UCert.ofEmbedded` takes any separately-certified While program,
+loops included, once three lemmas pin down an aborted run — the abort is *total*
+(`uexec_dead_unchanged`), a dead run inside a live loop never returns
+(`uexec_dead_loop_diverges`), so its cost is statically bounded (`uexec_dead_cost`).
+General loops are still out: the counter must be constant-initialised and the body
+check-free, and ranking-function analysis remains external. The NI result is *bought* by having no
 store-dependent resource selection: with `access (e)`, `reads` would be a genuine flow
 channel and the rules would need side conditions — `access_is_static_by_design` records
 this as a price, and it is the IDOR follow-on named in brick 35. So the remaining rows'

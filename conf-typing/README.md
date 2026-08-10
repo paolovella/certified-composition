@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/BundleLoop.lean` | composable core, stage 1f | bounded loops enter the bundle: three lemmas pin down what an aborted run does (`uexec_dead_unchanged`, `uexec_dead_loop_diverges`, `uexec_dead_cost`), so `UCert.ofEmbedded` admits any certified While program — loops included |
 | `ConfTyping/BundleLedger.lean` | composable core, stage 1e | the trusted base as a fourth bundle component, accumulating by `++` (`UCertL.seq`) — and row 7's CARRIED half turned from prose into a load-bearing ledger entry (`row7_carried_is_a_ledger_entry`) |
 | `ConfTyping/UnifiedNI.lean` | composable core, stage 1d | noninterference on `UCmd` (`usecTy_sound`) — the third certificate, so `handler_three_certificates` carries a budget, mediation and NI at once |
 | `ConfTyping/Bundle.lean` | composable core, stage 1c | one checker emitting a *bundle* (`ucheck`), one soundness theorem (`ucheck_sound`), and a worked handler carrying a cost budget **and** complete mediation at once (`handler_bundle_end_to_end`) |
@@ -1252,6 +1253,40 @@ That gap was a paragraph. Now:
 So CARRIED is no longer a caveat in prose. It is an entry in a ledger that appends under
 composition and cannot be silently discharged — the discipline the repo is named for,
 applied to its own bundle.
+
+## The composable core (`BundleLoop.lean`) — stage 1f, loops
+
+Every stage so far carried the same limit: `ucheck` returns `none` at a `loop`. That is
+brick 34's limit inherited, and brick 34 also showed the way out — a countdown whose
+counter is initialised from a constant has an input-independent budget.
+
+One obstacle had to be cleared first, and it is the interesting part. A bundle's budget
+must hold from **any** starting state, including an aborted one, or `UCert.seq` cannot
+compose: the first component may abort and hand a dead state to the second. So what does
+an aborted run do? Three lemmas settle it, and they are worth having anyway.
+`uexec_dead_unchanged`: from a dead state **no command changes the state at all** — the
+abort is total, not merely read-suppressing. `uexec_dead_loop_diverges`: a dead run inside
+a loop whose guard holds never returns, because the store is frozen so the guard can never
+become false. `uexec_dead_cost`: hence an aborted run's cost is bounded by a static
+`deadCost`, loops contributing 1 since the only terminating case is a guard already false.
+
+With those, `UCert.ofEmbedded` admits any separately-certified While program by splitting
+on live (where `uexec_embed_eq` hands the While development over wholesale) versus dead
+(where the three lemmas apply). `handlerBounded` is the payoff — authorize, read, then do
+at most five units of constant-budgeted work — still carrying its certificates, and
+`handlerBounded_contains_a_loop` confirms a `loop` really is in there.
+
+`handlerBounded_numbers` records an honest difference from stage 1c: the certified budget
+is 22 and the permitting run spends 19, so unlike the straight-line handler's *tight*
+bound this one over-approximates by 3 — the price of an analytic bound across a loop. The
+refused run costs 4 and shows the lemmas at work: the abort suppresses the counter's
+initialisation, so the guard is already false and the loop exits at once rather than
+spinning.
+
+Still outstanding: this admits loops *already certified as While programs*, so the counter
+must be constant-initialised and the body check-free. A loop containing a `check` can go
+dead mid-iteration, which the analysis covers only by divergence, not by a bound. General
+ranking-function analysis remains external, exactly as brick 34 said.
 
 ## §11 pre-mechanization checklist (framework doc)
 

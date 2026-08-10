@@ -288,9 +288,13 @@ mediation and noninterference**, composing by three different laws. Stage 1e the
 mechanism *scales*: a fourth component — the **trusted base**, accumulating by
 `++` — slotted in with a four-line lemma (`UCertL.seq`), and carried a real
 payload: row 7's CARRIED half stopped being prose and became a load-bearing
-ledger entry (`row7_carried_is_a_ledger_entry`). Still loop-free, and the NI
-result is bought by having no store-dependent resource selection
-(`access_is_static_by_design` records the price).
+ledger entry (`row7_carried_is_a_ledger_entry`). Stage 1f then removed the
+loop-free limit: three lemmas pin down what an aborted run does — the abort is
+*total*, and a dead run inside a live loop never returns — so `UCert.ofEmbedded`
+admits any certified While program, loops included, and `handlerBounded` does
+bounded work while keeping its certificates. The NI result is still bought by
+having no store-dependent resource selection (`access_is_static_by_design`
+records the price).
 
 ## Scope — what is *not* claimed
 

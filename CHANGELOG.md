@@ -182,6 +182,30 @@ landed.
   obligation with a type**, appending under composition and not silently
   dischargeable — the discipline the repo is named for, applied to its own bundle.
 
+- **Composable core, stage 1f — bounded loops enter the bundle
+  (`BundleLoop.lean`).** Every stage so far inherited brick 34's limit: `ucheck`
+  returns `none` at a `loop`. Removing it needed one obstacle cleared first, and
+  it is the interesting part — a bundle's budget must hold from **any** starting
+  state, including an aborted one, or `UCert.seq` cannot compose, since the first
+  component may abort and hand a dead state to the second. Three lemmas settle
+  what an aborted run does, and are worth having anyway:
+  **`uexec_dead_unchanged`** (from a dead state no command changes the state at
+  all — the abort is *total*, not merely read-suppressing),
+  **`uexec_dead_loop_diverges`** (a dead run inside a loop whose guard holds never
+  returns: the store is frozen, so the guard cannot become false and the fuel runs
+  out), and **`uexec_dead_cost`** (hence an aborted run's cost is statically
+  bounded, loops contributing 1). With those, **`UCert.ofEmbedded`** admits any
+  separately-certified While program — loops included — splitting on live (where
+  `uexec_embed_eq` hands the While development over wholesale) versus dead.
+  `handlerBounded` is the payoff, and `handlerBounded_numbers` is honest about the
+  difference from stage 1c: certified 22, permitting run spends 19, so unlike the
+  straight-line handler's *tight* bound this one over-approximates by 3 — the
+  price of an analytic bound across a loop. The refused run costs 4 and shows the
+  lemmas at work: the abort suppresses the counter's initialisation, so the guard
+  is already false and the loop exits at once. Still outstanding: the counter must
+  be constant-initialised and the body check-free, since a loop containing a
+  `check` can go dead mid-iteration — covered only by divergence, not a bound.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
