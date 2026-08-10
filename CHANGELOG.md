@@ -206,6 +206,27 @@ landed.
   be constant-initialised and the body check-free, since a loop containing a
   `check` can go dead mid-iteration — covered only by divergence, not a bound.
 
+- **Composable core, stage 1g — the coverage claim, corrected upward
+  (`BundleCoverage.lean`).** Stages 1c–1f were described as carrying "three
+  certificates", and `VULN-COVERAGE` was updated to match. That **under-counted**,
+  and not as a matter of interpretation: the observation in `uOptLowEq` includes
+  the cost and the halting bit, so one application of `usecTy_sound` discharges
+  three map rows at once — the same economy bricks 3, 5 and 7 had on the While
+  language, which is where the observation came from. The bundle covers **six**
+  rows, each now projected out as a theorem rather than asserted:
+  `bundle_covers_store` (row 1), `bundle_covers_timing` (row 2 — Low-equal runs
+  cost *exactly the same*), `bundle_covers_termination` (row 13 — they halt
+  together), `handler_mediated` (row 7), the budget (row 10), and
+  `bundle_covers_seam` (row 12 — which is what `UCert.seq` *is*, so the row is
+  carried by construction). `handler_covers_six_rows` states it for the worked
+  handler; stage 1e's ledger additionally supplies row 11's *mechanism*. The other
+  half is kept in the same file so the two cannot drift: `UCmd` has no strings and
+  no heap, so rows 3, 6 and 14 are not expressible here, and rows 8, 9 and 11 are
+  proved on their own machines. Left in prose deliberately — "the language has no
+  strings" is a syntactic fact, and a first draft of it as a theorem came out
+  vacuous (`Or.inr trivial`) and was deleted rather than kept as something that
+  looks like evidence.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

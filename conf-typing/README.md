@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/BundleCoverage.lean` | composable core, stage 1g | what the bundle actually covers, projected out as theorems: **six** map rows, not three (`handler_covers_six_rows`) — a correction upward |
 | `ConfTyping/BundleLoop.lean` | composable core, stage 1f | bounded loops enter the bundle: three lemmas pin down what an aborted run does (`uexec_dead_unchanged`, `uexec_dead_loop_diverges`, `uexec_dead_cost`), so `UCert.ofEmbedded` admits any certified While program — loops included |
 | `ConfTyping/BundleLedger.lean` | composable core, stage 1e | the trusted base as a fourth bundle component, accumulating by `++` (`UCertL.seq`) — and row 7's CARRIED half turned from prose into a load-bearing ledger entry (`row7_carried_is_a_ledger_entry`) |
 | `ConfTyping/UnifiedNI.lean` | composable core, stage 1d | noninterference on `UCmd` (`usecTy_sound`) — the third certificate, so `handler_three_certificates` carries a budget, mediation and NI at once |
@@ -1287,6 +1288,29 @@ Still outstanding: this admits loops *already certified as While programs*, so t
 must be constant-initialised and the body check-free. A loop containing a `check` can go
 dead mid-iteration, which the analysis covers only by divergence, not by a bound. General
 ranking-function analysis remains external, exactly as brick 34 said.
+
+## The composable core (`BundleCoverage.lean`) — stage 1g, a correction upward
+
+Stages 1c–1f were described as carrying "three certificates", and the map was updated to
+say so. That under-counted, and not as a matter of interpretation: the observation in
+`uOptLowEq` includes the **cost** and the **halting bit**, so one application of
+`usecTy_sound` discharges three separate map rows at once — exactly as bricks 3, 5 and 7
+did for the While language, which is where the observation came from.
+
+The coverage is now checkable rather than asserted, each row projected out of a certificate
+the bundle already had: `bundle_covers_store` (row 1), `bundle_covers_timing` (row 2 —
+Low-equal runs cost *exactly the same*), `bundle_covers_termination` (row 13 — they halt
+together), `handler_mediated` (row 7), the budget (row 10), and `bundle_covers_seam`
+(row 12 — this is what `UCert.seq` *is*, so the row is carried by construction).
+`handler_covers_six_rows` states it for the worked handler. Stage 1e's ledger also supplies
+row 11's *mechanism*, though not its class.
+
+Six of sixteen — and the other half is kept in the same file so the two cannot drift apart.
+`UCmd` has no strings and no heap, so rows 3, 6 and 14 are not *expressible* here at all,
+and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. That is left
+in prose deliberately: "the language has no strings" is a syntactic fact about an inductive
+type, and dressing it up as a theorem would produce something vacuous that looks like
+evidence.
 
 ## §11 pre-mechanization checklist (framework doc)
 

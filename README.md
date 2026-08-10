@@ -292,9 +292,13 @@ ledger entry (`row7_carried_is_a_ledger_entry`). Stage 1f then removed the
 loop-free limit: three lemmas pin down what an aborted run does — the abort is
 *total*, and a dead run inside a live loop never returns — so `UCert.ofEmbedded`
 admits any certified While program, loops included, and `handlerBounded` does
-bounded work while keeping its certificates. The NI result is still bought by
-having no store-dependent resource selection (`access_is_static_by_design`
-records the price).
+bounded work while keeping its certificates. Stage 1g then corrected the
+claim **upward**: because the observation carries the clock and the halting bit,
+one NI certificate discharges three map rows, so the bundle covers **six** of the
+sixteen classes, not three (`handler_covers_six_rows`). The NI result is still
+bought by having no store-dependent resource selection
+(`access_is_static_by_design` records the price), and the ten uncovered rows need
+strings or a heap.
 
 ## Scope — what is *not* claimed
 

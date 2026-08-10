@@ -1370,8 +1370,17 @@ so `WSecTy`'s discipline lifts unchanged (`usecTy_sound`), and
 **`handler_three_certificates`** carries a budget, mediation and noninterference on one
 program, composing by three different laws.
 
-**What is still not true, and the map should not be read as if it were.** Three of the
-map's properties, not sixteen. The bundle now admits **bounded loops** (stage 1f,
+**Correction, upward (stage 1g, `BundleCoverage.lean`).** This note previously said the
+bundle carries "three of the map's properties". It carries **six**. The observation in
+`uOptLowEq` includes the cost and the halting bit, so one application of `usecTy_sound`
+discharges rows **1, 2 and 13** together — the same economy bricks 3, 5 and 7 had on the
+While language. With row 7 (mediation), row 10 (budget) and row 12 (composition seams,
+which is what `UCert.seq` *is*), that is six, each now projected out as a theorem
+(`bundle_covers_store`, `bundle_covers_timing`, `bundle_covers_termination`,
+`bundle_covers_seam`, `handler_covers_six_rows`). Stage 1e's ledger additionally supplies
+row 11's *mechanism*, though not its class.
+
+**What is still not true.** Six of the map's properties, not sixteen. The bundle now admits **bounded loops** (stage 1f,
 `BundleLoop.lean`): `UCert.ofEmbedded` takes any separately-certified While program,
 loops included, once three lemmas pin down an aborted run — the abort is *total*
 (`uexec_dead_unchanged`), a dead run inside a live loop never returns
@@ -1380,9 +1389,10 @@ General loops are still out: the counter must be constant-initialised and the bo
 check-free, and ranking-function analysis remains external. The NI result is *bought* by having no
 store-dependent resource selection: with `access (e)`, `reads` would be a genuine flow
 channel and the rules would need side conditions — `access_is_static_by_design` records
-this as a price, and it is the IDOR follow-on named in brick 35. So the remaining rows'
-verdicts are still statements about their own languages, and the conjunction of all sixteen
-classes on one program is not a theorem.
+this as a price, and it is the IDOR follow-on named in brick 35. Rows 3, 6 and 14 are not even *expressible* on `UCmd` — it has no strings and no heap —
+and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
+remaining ten rows' verdicts are still statements about their own languages, and the
+conjunction of all sixteen classes on one program is not a theorem.
 
 ### The security program, standing state (thirty-five bricks, sixteen classes)
 

@@ -49,3 +49,4 @@ import ConfTyping.Bundle
 import ConfTyping.UnifiedNI
 import ConfTyping.BundleLedger
 import ConfTyping.BundleLoop
+import ConfTyping.BundleCoverage

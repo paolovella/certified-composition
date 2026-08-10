@@ -488,6 +488,14 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1g: the coverage claim must stay projected out as theorems.
+for thm in "theorem bundle_covers_timing" "theorem bundle_covers_termination" \
+           "theorem bundle_covers_seam" "theorem handler_covers_six_rows"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/BundleCoverage.lean 2>/dev/null; then
+    echo "DRIFT: the six-row coverage is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1f: what an aborted run does, and loops in the bundle.
 for thm in "theorem uexec_dead_unchanged" "theorem uexec_dead_loop_diverges" \
            "theorem uexec_dead_cost" "theorem UCert.ofEmbedded" \
@@ -559,7 +567,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
