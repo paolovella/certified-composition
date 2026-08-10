@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1i: free, and the obstruction that explains stage 1h's gap.
+for thm in "theorem slcheck_sound" "theorem slcheck_no_fault" \
+           "theorem memInv_not_preserved_by_free" "theorem use_after_free_faults" \
+           "theorem slcheck_extends_umcheck"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/MemLinear.lean 2>/dev/null; then
+    echo "DRIFT: the separating certificate is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1h: the heap, and the two limits recorded as theorems.
 for thm in "theorem umcheck_sound" "theorem umcheck_no_fault" "theorem wild_deref_faults" \
            "theorem free_has_no_rule" "theorem clobbered_pointer_rejected"; do
@@ -575,7 +584,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

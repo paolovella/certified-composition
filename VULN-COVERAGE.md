@@ -1392,10 +1392,16 @@ channel and the rules would need side conditions — `access_is_static_by_design
 this as a price, and it is the IDOR follow-on named in brick 35. Stage 1h grew the language with a **heap**, so row 6 is now partly in: `umcheck_no_fault`
 gives memory safety as a *separate* certificate — added without touching any existing
 checker, which is the extensibility claim tested rather than asserted — closing the
-wild-access half (CWE-119). `free_has_no_rule` records that use-after-free (CWE-416) is
-expressible but has no rule, since freeing invalidates aliases and needs brick 12's
-linearity in the invariant; `memops_not_yet_NI_typed` records that heap ops are not yet
-noninterference-typed, because `alloc` writes the fresh counter into the observable store.
+wild-access half (CWE-119). Stage 1i closed the other half: `SepInv` strengthens the
+invariant with separation (distinct tracked variables hold distinct addresses) and
+freshness, `free` gets a rule, and `slcheck_no_fault` rules out use-after-free (CWE-416)
+— with `use_after_free_faults` confirming the rejected program really does fault, and
+`slcheck_extends_umcheck` confirming nothing stage 1h accepted was lost. Stage 1i also
+*explains* stage 1h's gap rather than merely filling it: `memInv_not_preserved_by_free`
+exhibits a state satisfying the weaker `MemInv` that one `free` step invalidates, so the
+missing rule was an obstruction, not an unfinished proof. Standing limit:
+`memops_not_yet_NI_typed` — heap ops are not yet noninterference-typed, because `alloc`
+writes the fresh counter into the observable store.
 Rows 3 and 14 remain not even *expressible* on `UCmd` — it has no strings —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the

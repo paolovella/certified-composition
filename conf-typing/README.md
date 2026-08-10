@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/MemLinear.lean` | composable core, stage 1i | `free` gets a rule under a **separating** invariant (`slcheck_no_fault`), and `memInv_not_preserved_by_free` proves stage 1h's missing rule was a genuine obstruction |
 | `ConfTyping/MemCert.lean` | composable core, stage 1h | the language grows a **heap**, and memory safety arrives as a *separate* certificate (`umcheck_sound`, `umcheck_no_fault`) — added without touching any existing checker |
 | `ConfTyping/BundleCoverage.lean` | composable core, stage 1g | what the bundle actually covers, projected out as theorems: **six** map rows, not three (`handler_covers_six_rows`) — a correction upward |
 | `ConfTyping/BundleLoop.lean` | composable core, stage 1f | bounded loops enter the bundle: three lemmas pin down what an aborted run does (`uexec_dead_unchanged`, `uexec_dead_loop_diverges`, `uexec_dead_cost`), so `UCert.ofEmbedded` admits any certified While program — loops included |
@@ -1345,7 +1346,44 @@ writes the fresh counter into the observable store, so heap ops are not NI-typed
 allocation addresses are Low-visible is the same question stage 1d settled for `reads` and
 deserves the same care rather than a guess.
 
-## §11 pre-mechanization checklist (framework doc)
+## The composable core (`MemLinear.lean`) — stage 1i, `free`, and why 1h could not have it
+
+Stage 1h left a hole on purpose and named it: `free` in the syntax and the semantics,
+no typing rule, `free_has_no_rule`. Stage 1i does two things, and the second is the
+one worth the module.
+
+**It closes the hole.** `SepInv` adds two conjuncts to `MemInv` — tracked variables
+hold *pairwise distinct* addresses, and every live address is below the allocation
+counter. With those, `free` has a rule: freeing `x` removes one address from `live`,
+and every other tracked variable survives precisely because separation says its
+address is a different one. `slcheck_no_fault` then extends memory safety to programs
+that deallocate, which is row 6's use-after-free half (CWE-416). The freshness
+conjunct is what makes `alloc` re-establish separation: the new address is
+`s.fresh`, everything live is strictly below it, so the new pointer is provably new.
+
+**It proves the hole was real.** `memInv_not_preserved_by_free` exhibits a concrete
+state satisfying stage 1h's `MemInv` in which one `free` step lands in a state
+violating it — `q`'s address deallocated underneath it. So the missing rule was not an
+unfinished proof; the weaker invariant is not inductive for `free`, and no work on
+`MemCert` could have added it. A limit recorded as a theorem is now *explained* by one.
+
+One honest note, kept in the module. The separation conjunct is load-bearing in the
+proof and unreachable in the language: `assign` always drops its target, so this
+`UCmd` cannot construct two tracked aliases. But soundness quantifies over every state
+satisfying the invariant, not only reachable ones, and the witness above is exactly
+such an unreachable-but-admissible state. Restricting to reachable states would trade
+a two-line conjunct for a global reachability argument and would break the moment the
+language gained a pointer-copying assignment.
+
+`slcheck_extends_umcheck` records that this is a conservative extension — everything
+stage 1h accepted, stage 1i accepts, with the same tracked set — and
+`SepInv.toMemInv` lets a stage-1h consumer keep the weaker invariant. Witnesses:
+`use_after_free_rejected` with `use_after_free_faults` (the rejected program really
+does fault), `double_free_rejected_by_slcheck`, `alloc_free_ok`, and
+`free_one_keep_other` (freeing one of two pointers leaves the other usable, so the
+rule is not conservative to the point of uselessness).
+
+
 
 What this instance encodes from the framework's checklist:
 

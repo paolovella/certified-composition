@@ -298,9 +298,12 @@ one NI certificate discharges three map rows, so the bundle covers **six** of th
 sixteen classes, not three (`handler_covers_six_rows`). Stage 1h then grew the language:
 `UCmd` gains a **heap**, and memory safety arrives as a *separate* certificate
 (`umcheck_no_fault`) added without touching any existing checker — the honest test
-of the bundle's extensibility. That closes the wild-access half of row 6;
-`free_has_no_rule` and `memops_not_yet_NI_typed` record the two limits as theorems
-rather than footnotes.
+of the bundle's extensibility. That closed the wild-access half of row 6.
+Stage 1i then closed the other half: a **separating** invariant gives `free` a rule
+(`slcheck_no_fault`, CWE-416) — and `memInv_not_preserved_by_free` proves stage 1h's
+missing rule was a genuine obstruction rather than an unfinished proof, by exhibiting
+a state where one `free` step breaks the weaker invariant. `memops_not_yet_NI_typed`
+remains as the standing limit.
 
 ## Scope — what is *not* claimed
 

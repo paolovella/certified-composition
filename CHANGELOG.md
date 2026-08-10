@@ -258,6 +258,50 @@ landed.
   than left to rot, which is the reason it lives next to the claim. The handler's
   count is unchanged at six — it contains no `memop`.
 
+- **Composable core, stage 1i — `free`, and a proof that stage 1h could not have had
+  it** (`ConfTyping/MemLinear.lean`). Two results, and the second is the one worth the
+  module.
+
+  *The rule.* `SepInv` adds two conjuncts to `MemInv`: tracked variables hold pairwise
+  **distinct** addresses, and every live address is below the allocation counter. With
+  those, `free` has a rule — freeing `x` drops one address from `live`, and every other
+  tracked variable survives precisely because separation says its address is a
+  different one — and `slcheck_no_fault` extends memory safety to programs that
+  deallocate. That is row 6's use-after-free half, CWE-416. The freshness conjunct is
+  what lets `alloc` re-establish separation: the new address is `s.fresh` and
+  everything live is strictly below it, so the new pointer is provably new. Witnesses:
+  `use_after_free_rejected` with `use_after_free_faults` (the rejected program really
+  does fault), `double_free_rejected_by_slcheck`, `alloc_free_ok`, and
+  `free_one_keep_other` — freeing one of two pointers leaves the other usable, so the
+  rule is not conservative to the point of uselessness.
+
+  *Why 1h could not.* `memInv_not_preserved_by_free` exhibits a concrete state
+  satisfying stage 1h's `MemInv ["p","q"]` in which one `free "p"` step lands in a
+  state violating `MemInv ["q"]` — `q`'s address deallocated underneath it. So the
+  missing rule was not laziness or an unfinished proof: the weaker invariant is not
+  inductive for `free`, and no work on `MemCert` could have added the rule.
+  `aliasState_violates_SepInv` confirms the strengthening is aimed at that state and
+  not at something incidental. A limit that stage 1h recorded as a theorem is now
+  *explained* by a theorem.
+
+  Nothing regressed: `slcheck_extends_umcheck` proves everything `umcheck` accepted,
+  `slcheck` accepts with the same tracked set, and `SepInv.toMemInv` lets a stage-1h
+  consumer keep the weaker invariant. `free_has_no_rule` stays true as written — it is
+  a statement about `umcheck` — with a forward pointer added so it is not read as the
+  repo's last word.
+
+  One honest note, kept in the module rather than a README. The separation conjunct is
+  load-bearing in the proof and *unreachable* in the language: `assign` always drops
+  its target, so this `UCmd` cannot construct two tracked aliases. Soundness quantifies
+  over every state satisfying the invariant, not only reachable ones, and the witness
+  above is exactly such an unreachable-but-admissible state. Restricting to reachable
+  states would trade a two-line conjunct for a global reachability argument, and would
+  break the moment the language gained a pointer-copying assignment.
+
+  Stage 1g's "what it does not cover" note has now been rewritten by two later stages,
+  which is the argument for keeping it next to the claim. The handler's count is still
+  six: what the *machine* can certify is not what the *worked program* does certify.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

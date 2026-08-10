@@ -29,7 +29,10 @@
   alias of it, and soundness would need brick 12's linearity or brick 19's must-alias
   tracking carried in the invariant. So this closes the wild-access half of row 6
   (CWE-119) and not the use-after-free half (CWE-416) — `free_has_no_rule` records
-  that as a theorem rather than a footnote. **And no NI interaction**: `alloc` writes
+  that as a theorem rather than a footnote. (Stage 1i lifts the limit with a
+  *separating* invariant, and proves that this one could not have been patched:
+  `memInv_not_preserved_by_free` shows `MemInv` is not inductive for `free`. The
+  theorem below stays true as a statement about `umcheck`, which is what it says.) **And no NI interaction**: `alloc` writes
   the fresh counter into the observable store, so heap ops are not NI-typed yet
   (`memops_not_yet_NI_typed`); whether allocation addresses are Low-visible is the
   same kind of question stage 1d settled for `reads`, and deserves the same care.

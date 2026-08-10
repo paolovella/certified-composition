@@ -130,13 +130,15 @@ theorem handlerBounded_covers_mediation_and_budget :
     *expressible* here at all — they are proved for their own languages in bricks
     11–20 and are **not** carried by this bundle. Rows 8 (races), 9 (speculation) and
     11 (crypto) likewise: bricks 32, 33 and 4 prove them on their own machines. Row 6
-    is now half in — `MemCert.umcheck_no_fault` closes the wild-access half on this
-    machine, while `free_has_no_rule` records that use-after-free is expressible and
-    unproved. The two theorems named here are *not* part of the six the handler
-    carries: `handler` contains no `memop`, so the count above is unchanged.
+    is now fully in on this machine — `MemCert.umcheck_no_fault` closed the
+    wild-access half in stage 1h, and `MemLinear.slcheck_no_fault` closed the
+    use-after-free half in stage 1i. Neither is part of the six the handler carries:
+    `handler` contains no `memop`, so the count above is unchanged, and that is the
+    distinction this note exists to keep visible — what the *machine* can certify is
+    not what the *worked program* does certify.
 
-    Six rows and a half, and the remaining rows need either strings or a different
-    machine.
+    This paragraph has now been rewritten twice by later stages, which is the whole
+    argument for keeping it in the file next to the claim rather than in a README.
 
     This is stated in prose deliberately. "The language has no strings" is a syntactic
     fact about an inductive type, and dressing it up as a theorem would produce
