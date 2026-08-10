@@ -161,6 +161,27 @@ landed.
   `access (e)`; store-dependent resource selection would make `reads` a genuine
   flow channel, and that is the IDOR follow-on named in brick 35. Still loop-free.
 
+- **Composable core, stage 1e — a fourth component, and the scaling test
+  (`BundleLedger.lean`).** Three certificates is suggestive; the design claim —
+  `Bridge.pair_comp_cert`'s "no interaction term", so `n` guarantees cost `n`
+  independent accumulations — is only tested by adding a fourth and seeing
+  whether it slots in or forces rework. **It slots in: `UCertL.seq` is four
+  lines.** The fourth is the **trusted base** — brick 4's ledger lifted to the
+  bundle, accumulating by list append, a fourth genuinely different monoid after
+  `+`, Hoare threading and conjunction (`four_laws_one_composition`). The payload
+  is a debt the map carried in prose: brick 35 left *policy correctness* CARRIED
+  because `policy_correctness_not_witnessed` shows no program can decide it, and
+  the bundle's mediation certificate ("every read is π-permitted") is a
+  **security** statement only if π is the intended policy. Now
+  `handler_intended_reads` discharges the security reading *from* the ledger
+  entry, and `handler_needs_the_policy_assumption` (axiom-free) shows the entry is
+  load-bearing — with a permissive deployed policy and a restrictive
+  specification, the same program, unchanged and still carrying all three
+  certificates, reads something unintended. `row7_carried_is_a_ledger_entry`
+  states both halves. **CARRIED is no longer a caveat in prose; it is an
+  obligation with a type**, appending under composition and not silently
+  dischargeable — the discipline the repo is named for, applied to its own bundle.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

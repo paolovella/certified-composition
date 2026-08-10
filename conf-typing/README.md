@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/BundleLedger.lean` | composable core, stage 1e | the trusted base as a fourth bundle component, accumulating by `++` (`UCertL.seq`) — and row 7's CARRIED half turned from prose into a load-bearing ledger entry (`row7_carried_is_a_ledger_entry`) |
 | `ConfTyping/UnifiedNI.lean` | composable core, stage 1d | noninterference on `UCmd` (`usecTy_sound`) — the third certificate, so `handler_three_certificates` carries a budget, mediation and NI at once |
 | `ConfTyping/Bundle.lean` | composable core, stage 1c | one checker emitting a *bundle* (`ucheck`), one soundness theorem (`ucheck_sound`), and a worked handler carrying a cost budget **and** complete mediation at once (`handler_bundle_end_to_end`) |
 | `ConfTyping/Unified.lean` | composable core, stage 1b | one language (`UCmd` = `WCmd` + `check`/`access`) carrying store, cost and authorization, with `uexec_embed_eq` proving the While development is a *fragment* of it, so brick results transfer (`ucost_of_cost`) instead of forking |
@@ -1223,6 +1224,34 @@ laws — budgets add (`costGA.mul`), authorization sets thread (Hoare), NI is co
 Low, and both branching on the secret and laundering it through a Low variable are rejected
 — so this is a claim about a program that *could* have leaked and does not.
 `secret_loop_still_rejected` confirms brick 7's termination channel is still closed.
+
+## The composable core (`BundleLedger.lean`) — stage 1e, does it scale?
+
+Three certificates is suggestive; the design claim — no interaction term, so `n`
+guarantees cost `n` independent accumulations — is only tested by adding a fourth. It
+slots in, and `UCertL.seq` is four lines. That is the evidence.
+
+The fourth is not decoration: it is **the trusted base**, brick 4's ledger lifted to the
+bundle, accumulating by list append — a fourth genuinely different monoid after `+`, Hoare
+threading and conjunction. `four_laws_one_composition` states all four advancing through
+one `seq`.
+
+The payload is a debt the map was carrying in prose. Brick 35 split row 7 into *mediation*
+(generated) and *policy correctness* (CARRIED, since `policy_correctness_not_witnessed`
+shows no program can decide it). The bundle's mediation certificate says "every read is
+π-permitted" — a **security** statement only if π is the policy the specification intended.
+That gap was a paragraph. Now:
+
+- `handler_intended_reads` — given the ledger entry, the handler reads only what the
+  specification *intends*, not merely what the deployed policy permits;
+- `handler_needs_the_policy_assumption` — and the entry is load-bearing: with a permissive
+  deployed policy and a restrictive specification, the same program, unchanged and still
+  carrying all three certificates, reads something unintended;
+- `row7_carried_is_a_ledger_entry` — both halves as one theorem.
+
+So CARRIED is no longer a caveat in prose. It is an entry in a ledger that appends under
+composition and cannot be silently discharged — the discipline the repo is named for,
+applied to its own bundle.
 
 ## §11 pre-mechanization checklist (framework doc)
 

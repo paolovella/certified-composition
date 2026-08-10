@@ -443,6 +443,17 @@ a witness and "on every path" quantifies over all of them.
   no program analysis can prefer one. That is the CARRIED half, now demonstrated rather
   than asserted, and `mediation_generated_policy_carried` states both halves together.
 
+**And the CARRIED half is now typed** (composable core, stage 1e, `BundleLedger.lean`).
+The bundle's mediation certificate says every read is *π-permitted*, which is a security
+statement only if π is the policy the specification intended — exactly what
+`policy_correctness_not_witnessed` says no program can decide. That gap was a paragraph in
+this section; it is now a ledger entry that appends under composition
+(`UCertL.seq`) and is provably load-bearing: `handler_intended_reads` discharges the
+security reading *from* the assumption, and `handler_needs_the_policy_assumption` shows the
+same fully-certified program reads something unintended when the assumption fails.
+`row7_carried_is_a_ledger_entry` is both halves. CARRIED is no longer a caveat; it is an
+obligation with a type.
+
 Honest limits. Branch bodies are a separate instruction type, so nesting is excluded **by
 the syntax** rather than dropped by the semantics. The analysis intersects at joins, so it
 is sufficient, not necessary. And the model has no *subject*: this is "was the resource

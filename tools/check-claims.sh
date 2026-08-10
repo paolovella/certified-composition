@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1e: the fourth accumulation law and the typed CARRIED half.
+for thm in "theorem UCertL.seq" "theorem handler_intended_reads" \
+           "theorem handler_needs_the_policy_assumption" \
+           "theorem row7_carried_is_a_ledger_entry" "theorem four_laws_one_composition"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/BundleLedger.lean 2>/dev/null; then
+    echo "DRIFT: the ledger bundle is cited but '$thm' is missing from BundleLedger.lean"; fail=1
+  fi
+done
+
 # composable core stage 1d: the third certificate and the price recorded with it.
 for thm in "theorem usecTy_sound" "theorem handler_three_certificates" \
            "theorem access_is_static_by_design" "theorem Psec_rejects_leaks"; do
@@ -541,7 +550,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
