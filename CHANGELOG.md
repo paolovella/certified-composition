@@ -377,6 +377,41 @@ landed.
   loop that allocates although nothing about it is unsafe. The fix there is a widening
   step of brick 30's kind, which is real work rather than a missing line.
 
+- **Composable core, stage 1l — widening, and the last of 1k's conservatism**
+  (`ConfTyping/HeapWiden.lean`, plus `JSecTy.whileW` replacing `whileL` in
+  `HeapJoint.lean`). Stage 1k named the fix instead of hiding it: iterate the body's
+  effect to a fixed point, as brick 30's `loopFix` does for intervals. This is that
+  step on a different lattice — the first time that fixpoint idea serves a second
+  client.
+
+  The tracked set is a **must** set, so weakening is *shrinking* and the fixed point is
+  a descending iteration: start at the entry set, intersect with the body's effect,
+  repeat. `narrowFix_spec` extracts precisely the two side-conditions `whileW` needs —
+  the result is inside the entry set, and the body maps it into a superset of itself.
+  The sets shrink and are finite, so `V.length + 1` steps always suffice and the budget
+  is computed rather than guessed (`narrowing_budget_is_computed`).
+
+  `widenProg` is the payoff: allocate `p`; loop, allocating `q` and dereferencing `p`
+  each time round; dereference `p` again afterwards. The body's tracked set grows, so
+  stage 1k refuses it, and `p` must survive the loop for the final dereference to be
+  typable at all. `widening_beats_the_exact_rule` shows both halves — `jcheck` gives
+  `none`, `jcheckW` gives `["p"]` — and `widenProg_both` extracts noninterference and
+  memory safety for it.
+
+  **Fuel index, not well-founded recursion.** The narrowing call sits under a closure,
+  which structural recursion on the command cannot see through. Recursing on fuel keeps
+  the definition structural, and structural definitions kernel-reduce, so every witness
+  here is still a `decide`. The well-founded version was written first and type-checked
+  — but it broke `decide` on all of stage 1k's witnesses, the same trap nested
+  inductives set in bricks 32, 33 and 35. `jcheckW_out_of_fuel` records that exhausting
+  the fuel is a refusal, never an acceptance, so the index can only add conservatism.
+
+  Stage 1k's `jcheck` is left exactly as audited: its theorems and `decide`-checked
+  witnesses stand unchanged, including `allocating_loop_rejected`, which
+  `allocating_loop_now_accepted` pairs with rather than replaces. One item survives the
+  conservatism list and it is a design question, not an engineering gap: `allocL` needs
+  `fresh` in the observation, with `allocL_would_be_unsound` as the standing witness.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

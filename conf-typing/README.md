@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapWiden.lean` | composable core, stage 1l | widening for the tracked set: `narrowFix` computes a loop invariant by descending iteration, and `widening_beats_the_exact_rule` accepts a loop stage 1k had to refuse |
 | `ConfTyping/HeapJoint.lean` | composable core, stage 1k | the judgment stage 1j forced: `JSecTy P V c V'` proves noninterference **and** memory safety in one induction, and `indexed_beats_the_conjunction` shows it certifies a program neither old checker could |
 | `ConfTyping/HeapNI.lean` | composable core, stage 1j | noninterference meets the heap: High allocation is free, and `ni_and_memory_do_not_factor` finds the first pair of certificates that **cannot** be derived independently |
 | `ConfTyping/MemLinear.lean` | composable core, stage 1i | `free` gets a rule under a **separating** invariant (`slcheck_no_fault`), and `memInv_not_preserved_by_free` proves stage 1h's missing rule was a genuine obstruction |
@@ -1451,6 +1452,44 @@ preserve the tracked set *exactly*, so `allocating_loop_rejected`: a loop that
 allocates is refused although nothing about it is unsafe. The fix is a widening step —
 iterate the body's effect to a fixed point, as brick 30's `loopFix` does for intervals
 — which is real work rather than a missing line, so it is named rather than hidden.
+
+## The composable core (`HeapWiden.lean`) — stage 1l, widening
+
+Stage 1k refused a loop whose body changed the tracked set, and named the fix rather
+than hiding it: iterate the body's effect to a fixed point, as brick 30's `loopFix`
+does for intervals. This is that step on a different lattice — the first time that
+fixpoint idea serves a second client.
+
+The tracked set is a **must** set, so weakening means *shrinking* and the fixed point
+is reached by descending iteration: start at the entry set, intersect with the body's
+effect, repeat. `narrowFix_spec` extracts exactly the two side-conditions
+`JSecTy.whileW` needs — the result is inside the entry set, and the body maps it into a
+superset of itself. Because the sets shrink and are finite, `V.length + 1` steps always
+suffice, so the budget is computed rather than guessed
+(`narrowing_budget_is_computed`).
+
+`widenProg` is the payoff and deliberately not a toy: allocate `p`; loop, allocating
+`q` and dereferencing `p` each time round; dereference `p` again afterwards. The body's
+tracked set grows, so stage 1k's checker refuses it — and `p` has to survive the loop
+for the final dereference to be typable at all. `widening_beats_the_exact_rule` shows
+both halves: `jcheck` returns `none`, `jcheckW` returns `["p"]`.
+
+**Why a fuel index and not well-founded recursion.** The narrowing call sits under a
+closure, which structural recursion on the command cannot see through. Recursing on
+fuel keeps the definition structural, and structural definitions kernel-reduce — so
+every witness here is still a `decide`. The well-founded version was written first, and
+it type-checked, but it broke `decide` on all of stage 1k's witnesses: the same trap
+nested inductives set in bricks 32, 33 and 35. `jcheckW_out_of_fuel` records that
+exhausting the fuel is a refusal, never an acceptance, so the index can only make the
+analysis more conservative.
+
+Stage 1k's `jcheck` is left exactly as audited — its theorems and `decide`-checked
+witnesses stand unchanged, including `allocating_loop_rejected`, which
+`allocating_loop_now_accepted` pairs with rather than replaces.
+
+One item survives from the conservatism list, and it is the design question rather
+than an engineering gap: `allocL` is still absent, because it needs `fresh` in the
+observation. `HeapNI.allocL_would_be_unsound` is the standing witness.
 
 ## §11 pre-mechanization checklist (framework doc)
 

@@ -68,6 +68,17 @@ theorem SepCert.loop {V : List String} {e : Expr} {c : UCmd} (h : SepCert V c V)
         subst hr
         exact hinv
 
+/-- Shrinking the tracked set weakens the postcondition, so it is always allowed. -/
+theorem SepCert.weakenPost {V V₁ V' : List String} {c : UCmd} (h : SepCert V c V₁)
+    (hsub : ∀ x ∈ V', x ∈ V₁) : SepCert V c V' :=
+  ⟨fun n π s r hinv hr => SepInv.mono hsub (h.safe n π s r hinv hr)⟩
+
+/-- And a *smaller* precondition is a weaker assumption on the input state, so it may
+    be strengthened to any superset. -/
+theorem SepCert.strengthenPre {V W V' : List String} {c : UCmd} (h : SepCert W c V')
+    (hsub : ∀ x ∈ W, x ∈ V) : SepCert V c V' :=
+  ⟨fun n π s r hinv hr => h.safe n π s r (SepInv.mono hsub hinv) hr⟩
+
 /-! ## The indexed judgment -/
 
 /-- **Noninterference and memory safety, in one judgment indexed by the tracked set.**
@@ -82,8 +93,13 @@ inductive JSecTy (P : Partition) : List String → UCmd → List String → Prop
   | iteL    : ∀ {V V₁ V₂ c₁ c₂} (e), exprLow P e = true →
               JSecTy P V c₁ V₁ → JSecTy P V c₂ V₂ →
               JSecTy P V (.ite e c₁ c₂) (interStr V₁ V₂)
-  | whileL  : ∀ {V c} (e), exprLow P e = true → JSecTy P V c V →
-              JSecTy P V (.loop e c) V
+  /-- **The widened loop rule** (stage 1l). The loop is analysed at an invariant `W`
+      contained in the entry set, and the body need only *preserve* it — end with some
+      `W₁ ⊇ W` rather than with `W` on the nose. Stage 1k's exact rule is the case
+      `W = V`, `W₁ = V`. -/
+  | whileW  : ∀ {V W W₁ c} (e), exprLow P e = true → (∀ x ∈ W, x ∈ V) →
+              JSecTy P W c W₁ → (∀ x ∈ W, x ∈ W₁) →
+              JSecTy P V (.loop e c) W
   | check   : ∀ V r, JSecTy P V (.check r) V
   | access  : ∀ V r, JSecTy P V (.access r) V
   /-- Allocation into a High variable: stage 1j showed the address is invisible. -/
@@ -102,7 +118,8 @@ theorem JSecTy.toSepCert {P : Partition} {V : List String} {c : UCmd} {V' : List
   | assignL _ x e _ => exact SepCert.assign x e
   | seq _ _ ih₁ ih₂ => exact SepCert.seq ih₁ ih₂
   | iteL _ _ _ _ ih₁ ih₂ => exact SepCert.ite ih₁ ih₂
-  | whileL _ _ _ ih => exact SepCert.loop ih
+  | whileW _ _ hWV _ hWW₁ ih =>
+      exact SepCert.strengthenPre (SepCert.loop (SepCert.weakenPost ih hWW₁)) hWV
   | check _ r => exact SepCert.check r
   | access _ r => exact SepCert.access r
   | allocH _ x _ => exact SepCert.alloc x
@@ -257,19 +274,23 @@ theorem jsecTy_sound {P : Partition} :
           rw [if_neg hb, if_neg hb']
           refine uOptLowEq_mapE (ih c₂ _ _ h₂ π s s' hI hI' ⟨hst, hrd, hdd⟩) ?_
           intro r r' _ _ hs hcs htr; exact ⟨hs, by simp [hcs], by simp [htr]⟩
-    | @whileL _ c₀ e hg h₀ =>
+    | @whileW _ _ W₁ c₀ e hg hWV h₀ hWW₁ =>
+        have hIV' : SepInv V' s := SepInv.mono hWV hI
+        have hIV'' : SepInv V' s' := SepInv.mono hWV hI'
+        have hbody : SepCert V' c₀ V' := SepCert.weakenPost h₀.toSepCert hWW₁
         have hgv : evalE e s.store = evalE e s'.store := evalE_lowEq e hg hst
         show uOptLowEq P (uexec (m+1) (.loop e c₀) π s) (uexec (m+1) (.loop e c₀) π s')
         rw [uexec_loop_eq, uexec_loop_eq]
         by_cases hb : evalE e s.store ≠ 0
         · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
           rw [if_pos hb, if_pos hb']
-          refine uOptLowEq_bindE (ih c₀ V V h₀ π s s' hI hI' ⟨hst, hrd, hdd⟩) ?_
+          refine uOptLowEq_bindE (ih c₀ V' W₁ h₀ π s s' hIV' hIV'' ⟨hst, hrd, hdd⟩) ?_
           intro r₁ r₁' e₁ e₁' hs₁ hc1 ht1
-          have hJ : SepInv V r₁.1 := h₀.toSepCert.safe m π s r₁ hI e₁
-          have hJ' : SepInv V r₁'.1 := h₀.toSepCert.safe m π s' r₁' hI' e₁'
+          have hJ : SepInv V' r₁.1 := hbody.safe m π s r₁ hIV' e₁
+          have hJ' : SepInv V' r₁'.1 := hbody.safe m π s' r₁' hIV'' e₁'
           refine uOptLowEq_mapE
-            (ih (.loop e c₀) V V (.whileL e hg h₀) π r₁.1 r₁'.1 hJ hJ' hs₁) ?_
+            (ih (.loop e c₀) V' V' (.whileW e hg (fun _ hx => hx) h₀ hWW₁)
+              π r₁.1 r₁'.1 hJ hJ' hs₁) ?_
           intro r₂ r₂' _ _ hs₂ hc2 ht2
           exact ⟨hs₂, by simp [hc1, hc2], by simp [ht1, ht2]⟩
         · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
@@ -354,7 +375,8 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
       · rw [if_pos hg] at h
         simp only [Option.some.injEq] at h; subst h
         obtain ⟨hg1, hg2⟩ := Bool.and_eq_true _ _ |>.mp hg
-        exact .whileL e hg1 (jcheck_sound c₀ V V (by simpa using hg2))
+        exact .whileW e hg1 (fun _ hx => hx)
+          (jcheck_sound c₀ V V (by simpa using hg2)) (fun _ hx => hx)
       · rw [if_neg hg] at h; simp at h
 
 /-- **Both guarantees, from one run of one checker.** Noninterference *including* the

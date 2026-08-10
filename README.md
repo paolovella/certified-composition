@@ -313,7 +313,11 @@ cost n independent accumulations" reading of `Bridge.pair_comp_cert` is now qual
 where it is made. Stage 1k then built what that counterexample forced: `JSecTy P V c V'`
 carries the partition and the tracked set together, so one induction proves
 noninterference and memory safety at once — and `indexed_beats_the_conjunction`
-certifies a heap program that neither of the two separate checkers could.
+certifies a heap program that neither of the two separate checkers could. Stage 1l
+then removed 1k's last engineering conservatism with a widening step — `narrowFix`
+computes the loop invariant for the tracked set by descending iteration, reusing
+brick 30's fixpoint idea on a second lattice — leaving only the `allocL` design
+question open.
 
 ## Scope — what is *not* claimed
 
