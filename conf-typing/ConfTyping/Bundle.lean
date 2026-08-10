@@ -259,7 +259,7 @@ def ucheck : List String → UCmd → Option (List String × Nat)
                        | some p₁, some p₂ => some (interStr p₁.1 p₂.1, 1 + max p₁.2 p₂.2)
                        | _, _ => none
   | _, .loop _ _    => none
-  | _, .memop _ _   => none   -- heap ops get their own certificate; see MemCert
+  | _, .memop _ _   => none   -- stage 1h placeholder; the real rule is `UCert.memop`
 
 /-- **One soundness theorem for the bundle.** A passing check yields both
     certificates at once. -/

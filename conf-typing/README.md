@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/FullCert.lean` | composable core, stage 1n | one checker, four certificates: `allcheck` produces budget, authorization, noninterference and memory safety in one pass — and `only_the_budget_lacks_a_loop_rule` names the one law that will not compose over loops |
 | `ConfTyping/HeapAlloc.lean` | composable core, stage 1m | the last open question dissolved: because no guard may depend on a secret, the allocator stays synchronised, so **allocation loses its side condition** entirely |
 | `ConfTyping/HeapWiden.lean` | composable core, stage 1l | widening for the tracked set: `narrowFix` computes a loop invariant by descending iteration, and `widening_beats_the_exact_rule` accepts a loop stage 1k had to refuse |
 | `ConfTyping/HeapJoint.lean` | composable core, stage 1k | the judgment stage 1j forced: `JSecTy P V c V'` proves noninterference **and** memory safety in one induction, and `indexed_beats_the_conjunction` shows it certifies a program neither old checker could |
@@ -1525,6 +1526,38 @@ pair breaks the build rather than silently invalidating `JSecTy.alloc`.
 (closed here) — and stage 1k opened one more, the exact loop rule, closed in 1l by
 widening. What remains is *scope*, not conservatism: `UCmd` has no strings, and the
 budget/mediation/ledger certificates are carried by `UCert` rather than `JSecTy`.
+
+## The composable core (`FullCert.lean`) — stage 1n, one checker, four certificates
+
+Stages 1c–1e built a bundle carrying a budget, an authorization set and a ledger;
+stages 1h–1m built a joint judgment carrying noninterference and memory safety. They
+were separate artifacts — `ucheck` refused every heap operation and `jcheck` said
+nothing about cost — so no single program had ever carried all of them.
+
+`allcheck` does. One pass yields the authorization set, the tracked pointer set and the
+cost bound; `allcheck_sound` turns that into a `FullCert`. `fullProg` is the artifact
+the 1a–1n arc was for: check a permission, allocate, read the mediated resource,
+dereference, assign, free — **four certificates from one run of one checker**, with a
+budget that is *tight* (`fullProg_runs`: certified 6, spends 6). `fullProg_needs_its_check`
+confirms the mediation half is load-bearing rather than decorative.
+
+Most of this is integration: stages 1c–1e had already established that these laws do
+not interact, so merging them was expected to work, and it did.
+
+**The part that was not integration.** Extending the budget to heap operations needed a
+new rule, `UCert.memop` — stage 1h's `none` was a placeholder, not a limit — and
+writing it exposed an asymmetry that two separate `none`s had been hiding. Three of the
+four certificates have loop rules: `JSecTy.whileW` (1l), `SepCert.loop` (1k), and
+mediation threads through unchanged. **The budget does not, and cannot**: a cost bound
+over a loop requires an *iteration* bound, which is a termination argument rather than
+a typing side-condition. `only_the_budget_lacks_a_loop_rule` states it, and
+`loops_carry_three_of_four` shows the split is about which certificates a loop can
+carry, not about which programs are safe. Brick 30's `loopFix` and stage 1f's
+`countdown` are the two ways to supply the missing ingredient, and both are analyses of
+a different kind — so this is a boundary, not a to-do.
+
+The honest summary of the composable core: four certificates, one checker, on the
+loop-free fragment; three of the four on loops.
 
 ## §11 pre-mechanization checklist (framework doc)
 

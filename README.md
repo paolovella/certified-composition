@@ -319,8 +319,13 @@ computes the loop invariant for the tracked set by descending iteration, reusing
 brick 30's fixpoint idea on a second lattice — and stage 1m dissolved the `allocL` design question
 rather than deciding it: because no guard may depend on a secret, the allocator stays
 synchronised, so allocation is noninterferent with **no side condition** and the
-observation never had to change. The composable core's conservatism list is empty;
-what remains is scope.
+observation never had to change. Stage 1n then merged the two artifacts: `allcheck` produces a budget, an
+authorization set, noninterference and memory safety in **one pass**, and `fullProg`
+carries all four with a tight budget. Merging them exposed the one asymmetry two
+separate refusals had hidden — three of the four laws compose over loops, the budget
+cannot, because a cost bound needs an iteration bound
+(`only_the_budget_lacks_a_loop_rule`). The core's conservatism list is empty; what
+remains is scope.
 
 ## Scope — what is *not* claimed
 

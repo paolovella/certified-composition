@@ -1434,6 +1434,16 @@ still true and now serves as the reason the invariant cannot be dropped;
 `high_branch_desynchronises_the_allocator` plus `highBranch_is_untypable` record what
 the argument rests on, so adding High-guarded control flow would break the build.
 The composable core's conservatism list is empty; what remains is scope.
+
+Stage 1n merged the bundle and the joint judgment: `allcheck` yields a budget, an
+authorization set, noninterference and memory safety from one pass, and `fullProg`
+carries all four (rows 1, 2, 7, 10, 13 and 6) with a budget that is tight — certified
+six, spends six. Merging them turned a hidden asymmetry into a theorem:
+`only_the_budget_lacks_a_loop_rule`. Noninterference, memory safety and mediation all
+compose over loops; the cost bound cannot, because it needs an *iteration* bound, which
+is a termination argument rather than a typing side-condition. That is a boundary
+rather than a to-do — brick 30's `loopFix` and stage 1f's `countdown` are the two ways
+to supply it, and both are analyses of a different kind.
 Rows 3 and 14 remain not even *expressible* on `UCmd` — it has no strings —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the

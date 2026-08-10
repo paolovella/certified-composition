@@ -443,6 +443,37 @@ landed.
   conservatism: `UCmd` has no strings, and the budget/mediation/ledger certificates are
   carried by `UCert` rather than by `JSecTy`.
 
+- **Composable core, stage 1n — one checker, four certificates, and the law that does
+  not compose over loops** (`ConfTyping/FullCert.lean`). Stages 1c–1e built a bundle
+  (budget, authorization, ledger); stages 1h–1m built a joint judgment (noninterference,
+  memory safety). They were separate artifacts — `ucheck` refused every heap operation,
+  `jcheck` said nothing about cost — so no single program had carried all of them.
+
+  `allcheck` does: one pass yields the authorization set, the tracked pointer set and
+  the cost bound, and `allcheck_sound` turns that into a `FullCert`. `fullProg` — check
+  a permission, allocate, read the mediated resource, dereference, assign, free — is the
+  artifact the whole 1a–1n arc was for: **four certificates from one run of one
+  checker**, with a *tight* budget (`fullProg_runs`: certified 6, spends 6).
+  `fullProg_needs_its_check` confirms the mediation half is load-bearing.
+
+  Most of this is integration, and it was expected to work: stages 1c–1e had already
+  established that these laws do not interact.
+
+  **What was not integration.** Extending the budget to heap operations needed a real
+  rule, `UCert.memop` — stage 1h's `none` there was a placeholder, not a limit — and
+  writing it exposed an asymmetry that two separate `none`s had been hiding. Three of
+  the four certificates have loop rules: `JSecTy.whileW` (1l), `SepCert.loop` (1k), and
+  mediation threads through unchanged. **The budget does not, and cannot**: a cost bound
+  over a loop needs an *iteration* bound, which is a termination argument rather than a
+  typing side-condition. `only_the_budget_lacks_a_loop_rule` states it;
+  `loops_carry_three_of_four` shows the split is about which certificates a loop can
+  carry, not about which programs are safe. Brick 30's `loopFix` and stage 1f's
+  `countdown` are the two ways to supply the missing ingredient, and both are analyses
+  of a different kind — a boundary rather than a to-do.
+
+  Honest summary of the composable core: four certificates, one checker, on the
+  loop-free fragment; three of the four on loops.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
