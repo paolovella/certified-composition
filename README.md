@@ -335,7 +335,11 @@ noninterference observation, so a program could emit a secret and still be
 `sanitising_does_not_declassify` records that `san` removes delimiters and not secrets —
 the two certificates answer different questions. `fiveProg` carries **five**
 certificates: budget (tight), mediation, noninterference, memory safety and structural
-integrity.
+integrity. Stage 1q then closed the last row, path traversal, and corrected the guess
+that it was "injection with a different character": traversal is a **prefix** condition,
+not a count — `a/..` and `../a` carry the same symbols and only one escapes — so it
+needs its own property and its own rule, layered on the taint environment and applied
+per-sink.
 
 ## Scope — what is *not* claimed
 

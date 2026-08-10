@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/PathCert.lean` | composable core, stage 1q | **path traversal** (CWE-22), the last coverage row: a prefix condition rather than a count, per-sink, and layered on the taint environment |
 | `ConfTyping/AllFive.lean` | composable core, stage 1p | the sink enters the noninterference observation (closing a real weakness in 1o), and `fiveProg` carries **five** certificates |
 | `ConfTyping/TaintCert.lean` | composable core, stage 1o | **strings**, and injection on the unified machine: exact delimiter counts, a real attack (`injection_is_real`), a refusal, and a fix that survives the same payload |
 | `ConfTyping/FullCert.lean` | composable core, stage 1n | one checker, four certificates: `allcheck` produces budget, authorization, noninterference and memory safety in one pass — and `only_the_budget_lacks_a_loop_rule` names the one law that will not compose over loops |
@@ -1636,6 +1637,37 @@ Three things remain, all named in the module. Loops carry three of the five (the
 cannot, per stage 1n; structural integrity has no loop rule yet). Path traversal is
 expressible and not written. And stage 1e's ledger is not threaded through `xcheck`, so
 a program's assumptions are still tracked by hand.
+
+## The composable core (`PathCert.lean`) — stage 1q, path traversal
+
+Stage 1o said this row was "the same shape with `/` and `..` in place of the
+delimiter". That was half right, and the wrong half is what makes the stage worth
+writing. Injection is about a **count**: how many delimiters reach the sink. Traversal
+is about a **prefix condition**: a path escapes when some *prefix* pops above the root,
+and no count can see that — `counting_cannot_decide_traversal` proves it, since `a/..`
+and `../a` carry the same symbols and only one escapes.
+
+So the two-symbol alphabet gets a second reading (`ord` = ordinary segment, `quote` =
+the parent segment `..`) and a new property: `walk` runs the depth and fails on
+underflow; `safePath` is "the walk survives". `spath` computes a *lower bound* on the
+final depth, which is what makes variables usable at all.
+
+**Path safety does not factor from taint.** To know a variable can only increase depth,
+the analysis must know it contains no parent segments — exactly the count-zero fact
+stage 1o's `TaintEnv` records. `path_needs_the_taint_environment` shows the dependency:
+the same program is refused with an empty environment and accepted once the variable is
+recorded as count-zero. That is the *second* dependency in the bundle, after stage 1j's
+noninterference-needs-memory-safety — and unlike that one it is a clean layering rather
+than an entanglement, so `PathCert` takes the environment as a parameter and no new
+indexed judgment was needed. Two dependencies, two different remedies.
+
+**The discipline is per-sink**, which is what stage 1p's destination-recording sink was
+for. A query is not a path: `pcheck fs` constrains only the emits that go to `fs`, and
+`query_sink_untouched_by_path_checker` records that it says nothing about the others.
+
+The row is the same four theorems as injection: `path_escape_is_real` (the vulnerable
+program emits a path that pops above its root, on a `../..` payload),
+`path_escape_rejected`, `safe_path_checks`, and `safe_path_holds_under_every_input`.
 
 ## §11 pre-mechanization checklist (framework doc)
 

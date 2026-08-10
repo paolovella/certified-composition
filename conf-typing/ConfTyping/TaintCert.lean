@@ -174,14 +174,19 @@ structure TaintCert (C : TaintEnv) (c : UCmd) (C' : TaintEnv) (Ks : List Nat) : 
     TaintInv C s → uexec n c π s = some r → TaintInv C' r.1
   sink : ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
     TaintInv C s → uexec n c π s = some r →
-    ∀ t ∈ r.1.sink, t ∈ s.sink ∨ qcount t ∈ Ks
+    ∀ t ∈ r.1.sink, t ∈ s.sink ∨ qcount t.2 ∈ Ks
 
 /-! ### Commands that do not touch strings -/
 
-theorem TaintCert.inert {C : TaintEnv} {c : UCmd}
-    (h : ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
-      uexec n c π s = some r →
-        r.1.sstore = s.sstore ∧ r.1.sink = s.sink ∧ (r.1.dead = false → s.dead = false)) :
+/-- A command that touches neither the string store nor the sink, and cannot resurrect
+    a dead run. Named rather than inlined so the *path* certificate of stage 1q can
+    reuse the same five proofs. -/
+def StringInert (c : UCmd) : Prop :=
+  ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
+    uexec n c π s = some r →
+      r.1.sstore = s.sstore ∧ r.1.sink = s.sink ∧ (r.1.dead = false → s.dead = false)
+
+theorem TaintCert.inert {C : TaintEnv} {c : UCmd} (h : StringInert c) :
     TaintCert C c C [] :=
   ⟨fun n π s r hinv hr => by
       intro hd p hp
@@ -189,16 +194,16 @@ theorem TaintCert.inert {C : TaintEnv} {c : UCmd}
       exact hinv ((h n π s r hr).2.2 hd) p hp,
    fun n π s r _ hr t ht => Or.inl (by rwa [(h n π s r hr).2.1] at ht)⟩
 
-theorem TaintCert.skip {C : TaintEnv} : TaintCert C .skip C [] :=
-  TaintCert.inert (by
+theorem StringInert.skip  : StringInert (.skip) := by
     intro n π s r hr
     cases n with
     | zero => simp [uexec] at hr
-    | succ n => simp only [uexec, Option.some.injEq] at hr; subst hr; exact ⟨by simp, by simp, id⟩)
+    | succ n => simp only [uexec, Option.some.injEq] at hr; subst hr; exact ⟨by simp, by simp, id⟩
 
-theorem TaintCert.assign {C : TaintEnv} (x : String) (e : Expr) :
-    TaintCert C (.assign x e) C [] :=
-  TaintCert.inert (by
+theorem TaintCert.skip {C : TaintEnv} : TaintCert C (.skip) C [] :=
+  TaintCert.inert (StringInert.skip)
+
+theorem StringInert.assign (x : String) (e : Expr) : StringInert (.assign x e) := by
     intro n π s r hr
     cases n with
     | zero => simp [uexec] at hr
@@ -206,10 +211,13 @@ theorem TaintCert.assign {C : TaintEnv} (x : String) (e : Expr) :
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
         · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-        · simp only [if_neg hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩)
+        · simp only [if_neg hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
 
-theorem TaintCert.check {C : TaintEnv} (q : String) : TaintCert C (.check q) C [] :=
-  TaintCert.inert (by
+theorem TaintCert.assign {C : TaintEnv} (x : String) (e : Expr) :
+    TaintCert C (.assign x e) C [] :=
+  TaintCert.inert (StringInert.assign x e)
+
+theorem StringInert.check (q : String) : StringInert ((.check q)) := by
     intro n π s r hr
     cases n with
     | zero => simp [uexec] at hr
@@ -220,10 +228,12 @@ theorem TaintCert.check {C : TaintEnv} (q : String) : TaintCert C (.check q) C [
         · simp only [if_neg hd]
           by_cases hp : π q = true
           · simp only [if_pos hp]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-          · simp only [if_neg hp]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩)
+          · simp only [if_neg hp]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
 
-theorem TaintCert.access {C : TaintEnv} (q : String) : TaintCert C (.access q) C [] :=
-  TaintCert.inert (by
+theorem TaintCert.check {C : TaintEnv} (q : String) : TaintCert C ((.check q)) C [] :=
+  TaintCert.inert (StringInert.check q)
+
+theorem StringInert.access (q : String) : StringInert ((.access q)) := by
     intro n π s r hr
     cases n with
     | zero => simp [uexec] at hr
@@ -231,11 +241,12 @@ theorem TaintCert.access {C : TaintEnv} (q : String) : TaintCert C (.access q) C
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
         · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-        · simp only [if_neg hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩)
+        · simp only [if_neg hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
 
-theorem TaintCert.memop {C : TaintEnv} (op : MemOp) (x : String) :
-    TaintCert C (.memop op x) C [] :=
-  TaintCert.inert (by
+theorem TaintCert.access {C : TaintEnv} (q : String) : TaintCert C ((.access q)) C [] :=
+  TaintCert.inert (StringInert.access q)
+
+theorem StringInert.memop (op : MemOp) (x : String) : StringInert (.memop op x) := by
     intro n π s r hr
     cases n with
     | zero => simp [uexec] at hr
@@ -253,7 +264,11 @@ theorem TaintCert.memop {C : TaintEnv} (op : MemOp) (x : String) :
           | free =>
               by_cases hl : memInt (s.store x) s.live = true
               · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-              · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩)
+              · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+
+theorem TaintCert.memop {C : TaintEnv} (op : MemOp) (x : String) :
+    TaintCert C (.memop op x) C [] :=
+  TaintCert.inert (StringInert.memop op x)
 
 /-! ### The two string rules -/
 
@@ -525,7 +540,7 @@ theorem tcheck_sound : ∀ (c : UCmd) (C C' : TaintEnv) (Ks : List Nat),
 theorem tcheck_no_injection_from {c : UCmd} {C' : TaintEnv} {Ks : List Nat}
     (h : tcheck [] c = some (C', Ks)) :
     ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
-      s.sink = [] → uexec n c π s = some r → ∀ t ∈ r.1.sink, qcount t ∈ Ks := by
+      s.sink = [] → uexec n c π s = some r → ∀ t ∈ r.1.sink, qcount t.2 ∈ Ks := by
   intro n π s r hs hr t ht
   have hinv : TaintInv [] s := by intro _ p hp; simp at hp
   rcases (tcheck_sound c [] C' Ks h).sink n π s r hinv hr t ht with h' | h'
@@ -538,7 +553,7 @@ theorem tcheck_no_injection_from {c : UCmd} {C' : TaintEnv} {Ks : List Nat}
 theorem tcheck_no_injection {c : UCmd} {C' : TaintEnv} {Ks : List Nat}
     (h : tcheck [] c = some (C', Ks)) :
     ∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
-      uexec n c π (initU σ) = some r → ∀ t ∈ r.1.sink, qcount t ∈ Ks := by
+      uexec n c π (initU σ) = some r → ∀ t ∈ r.1.sink, qcount t.2 ∈ Ks := by
   intro n π σ r hr t ht
   have hinv : TaintInv [] (initU σ) := by intro _ p hp; simp at hp
   rcases (tcheck_sound c [] C' Ks h).sink n π (initU σ) r hinv hr t ht with h' | h'
@@ -570,9 +585,9 @@ def attackState : UState :=
     shape of the query changed — that is the injection, not a proxy for it. -/
 theorem injection_is_real :
     ((uexec 3 vulnQuery (fun _ => true) attackState).map
-      (fun r => r.1.sink.map qcount)) = some [3]
+      (fun r => r.1.sink.map (fun p => qcount p.2))) = some [3]
   ∧ ((uexec 3 safeQuery (fun _ => true) attackState).map
-      (fun r => r.1.sink.map qcount)) = some [2] := by decide
+      (fun r => r.1.sink.map (fun p => qcount p.2))) = some [2] := by decide
 
 /-- **And the checker refuses it.** The count of `var "input"` is unknown, so the
     concatenation has no count, so `q` is forgotten and the emit has no rule to appeal
@@ -589,7 +604,7 @@ theorem sanitised_query_checks : tcheck [] safeQuery = some ([("q", 2)], [2]) :=
     this on a concrete payload. -/
 theorem sanitised_query_holds_under_every_input :
     ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
-      s.sink = [] → uexec n safeQuery π s = some r → ∀ t ∈ r.1.sink, qcount t = 2 := by
+      s.sink = [] → uexec n safeQuery π s = some r → ∀ t ∈ r.1.sink, qcount t.2 = 2 := by
   intro n π s r hs hr t ht
   have := tcheck_no_injection_from sanitised_query_checks n π s r hs hr t ht
   simpa using this
@@ -598,11 +613,11 @@ theorem sanitised_query_holds_under_every_input :
     the checker rejects it, and the fix is accepted and holds under the same payload. -/
 theorem injection_row :
     ((uexec 3 vulnQuery (fun _ => true) attackState).map
-      (fun r => r.1.sink.map qcount)) = some [3]
+      (fun r => r.1.sink.map (fun p => qcount p.2))) = some [3]
   ∧ tcheck [] vulnQuery = none
   ∧ tcheck [] safeQuery = some ([("q", 2)], [2])
   ∧ (∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
-        s.sink = [] → uexec n safeQuery π s = some r → ∀ t ∈ r.1.sink, qcount t = 2) :=
+        s.sink = [] → uexec n safeQuery π s = some r → ∀ t ∈ r.1.sink, qcount t.2 = 2) :=
   ⟨injection_is_real.1, injection_rejected, sanitised_query_checks,
    sanitised_query_holds_under_every_input⟩
 

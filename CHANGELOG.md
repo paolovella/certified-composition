@@ -545,6 +545,37 @@ landed.
   integrity has no loop rule yet), path traversal is expressible and not written, and
   stage 1e's ledger is not threaded through `xcheck`.
 
+- **Composable core, stage 1q — path traversal, the last coverage row**
+  (`ConfTyping/PathCert.lean`). Stage 1o guessed this was "the same shape with `/` and
+  `..` in place of the delimiter". Half right, and the wrong half is the content:
+  injection is about a **count**, traversal about a **prefix condition**. A path escapes
+  when some *prefix* pops above the root, and no count can see that —
+  `counting_cannot_decide_traversal` proves it, since `a/..` and `../a` carry the same
+  symbols and only one escapes. So the two-symbol alphabet gets a second reading
+  (`ord` = ordinary segment, `quote` = the parent segment) and a new property: `walk`
+  runs the depth and fails on underflow, `safePath` is "the walk survives", and `spath`
+  computes a *lower bound* on the final depth, which is what makes variables usable.
+
+  **Path safety does not factor from taint.** To know a variable can only increase
+  depth, the analysis must know it holds no parent segments — exactly the count-zero
+  fact stage 1o's `TaintEnv` records. `path_needs_the_taint_environment` shows the same
+  program refused with an empty environment and accepted once the variable is recorded
+  as count-zero. That is the *second* dependency in the bundle after stage 1j's
+  noninterference-needs-memory-safety, and unlike that one it is a clean layering:
+  `PathCert` takes the environment as a parameter, so no new indexed judgment was
+  needed. Two dependencies, two different remedies — worth recording, since 1j's
+  remedy was the expensive one.
+
+  **The discipline is per-sink**, which is what stage 1p's destination-recording sink
+  was for: `pcheck fs` constrains only emits to `fs`, and
+  `query_sink_untouched_by_path_checker` records that it says nothing about the others.
+
+  The row is the same four theorems as injection: `path_escape_is_real` (the `../..`
+  payload makes the vulnerable program emit a path that pops above its root),
+  `path_escape_rejected`, `safe_path_checks`, and `safe_path_holds_under_every_input`.
+  `StringInert` was extracted from stage 1o's five inert-command proofs so both string
+  certificates share them rather than duplicating.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

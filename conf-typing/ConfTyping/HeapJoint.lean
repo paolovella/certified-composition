@@ -407,7 +407,7 @@ theorem jsecTy_sound {P : Partition} :
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
           refine ⟨hst, hrd, hdd, hfr, hss, ?_⟩
-          show evalS s.sstore e :: s.sink = evalS s'.sstore e :: s'.sink
+          show (q, evalS s.sstore e) :: s.sink = (q, evalS s'.sstore e) :: s'.sink
           rw [evalS_lowEq hss e he, hsk]
     | @seq _ V₁ _ c₁ c₂ h₁ h₂ =>
         show uOptLowEqA P (uexec (m+1) (.seq c₁ c₂) π s) (uexec (m+1) (.seq c₁ c₂) π s')

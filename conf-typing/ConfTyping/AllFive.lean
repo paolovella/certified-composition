@@ -65,7 +65,7 @@ theorem xcheck_gives_five {P : Partition} {c : UCmd}
   ∧ (∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
         uexec n c π (initU σ) = some r → r.1.err = false)
   ∧ (∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
-        uexec n c π (initU σ) = some r → ∀ t ∈ r.1.sink, qcount t ∈ Ks) := by
+        uexec n c π (initU σ) = some r → ∀ t ∈ r.1.sink, qcount t.2 ∈ Ks) := by
   simp only [xcheck] at h
   rcases ea : allcheck P [] [] c with _ | p
   · rw [ea] at h; simp at h
@@ -157,7 +157,7 @@ theorem fiveProg_five :
   ∧ (∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
         uexec n fiveProg π (initU σ) = some r → r.1.err = false)
   ∧ (∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
-        uexec n fiveProg π (initU σ) = some r → ∀ t ∈ r.1.sink, qcount t ∈ [2]) :=
+        uexec n fiveProg π (initU σ) = some r → ∀ t ∈ r.1.sink, qcount t.2 ∈ [2]) :=
   xcheck_gives_five fiveProg_checks
 
 /-- And it runs: nothing faults, nothing is refused, exactly the mediated resource is
@@ -167,7 +167,7 @@ theorem fiveProg_runs :
     ((uexec 15 fiveProg (fun _ => true) (initU (fun _ => 0))).map
       (fun r => (r.1.err, r.1.dead, r.1.reads, r.1.live))) = some (false, false, ["db"], [])
   ∧ ((uexec 15 fiveProg (fun _ => true) (initU (fun _ => 0))).map
-      (fun r => (r.1.sink.map qcount, r.2.1))) = some ([2], 6) := by
+      (fun r => (r.1.sink.map (fun p => qcount p.2), r.2.1))) = some ([2], 6) := by
   constructor
   · decide
   · decide

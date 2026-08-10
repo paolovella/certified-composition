@@ -138,7 +138,7 @@ structure UState where
   fresh : Int                -- next address to hand out
   err   : Bool               -- a memory fault happened (recorded, not conflated with `dead`)
   sstore : String → UStr      -- the string store, separate from the integer one
-  sink  : List UStr           -- everything emitted, most recent first
+  sink  : List (String × UStr) -- everything emitted, with its destination, newest first
 
 def initU (σ : Store) : UState :=
   ⟨σ, [], [], false, fun _ => 0, [], 0, false, fun _ => [], []⟩
@@ -202,7 +202,7 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
       some (if s.dead then s else
               match op with
               | .set  => { s with sstore := updSU s.sstore x (evalS s.sstore e) }
-              | .emit => { s with sink := evalS s.sstore e :: s.sink }, 1, [])
+              | .emit => { s with sink := (x, evalS s.sstore e) :: s.sink }, 1, [])
   | n + 1, .seq c₁ c₂,   π, s =>
       (uexec n c₁ π s).bind fun r₁ =>
         (uexec n c₂ π r₁.1).map fun r₂ =>

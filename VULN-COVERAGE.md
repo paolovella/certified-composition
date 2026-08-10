@@ -1451,8 +1451,17 @@ delimiter count the analysis predicted, with `injection_is_real` executing the a
 `sanitised_query_holds_under_every_input` covering all inputs rather than one payload.
 This is *narrower* than bricks 11–20's treatment, deliberately: a two-symbol alphabet
 and a count, not a tokenizer and a parse tree — it captures the structural break that
-defines an injection, and nothing else. Row 14 (path traversal) is now expressible on
-this machine but **not done**. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+defines an injection, and nothing else. Row 14 (path traversal) is done as of stage 1q, and not as a copy of row 3: traversal
+is a **prefix** condition rather than a count (`counting_cannot_decide_traversal` —
+`a/..` and `../a` carry the same symbols and only one escapes), so it has its own
+property (`safePath`, a depth walk), its own rule, and a per-sink discipline.
+`path_escape_is_real` runs the `../..` payload and shows the vulnerable program emitting
+a path that pops above its root; `path_escape_rejected` refuses it;
+`safe_path_holds_under_every_input` covers all inputs. `path_needs_the_taint_environment`
+records that this certificate *layers on* stage 1o's count environment rather than
+sitting beside it — the second dependency in the bundle after
+`ni_and_memory_do_not_factor`, and the first that a parameter rather than a new indexed
+judgment could resolve. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

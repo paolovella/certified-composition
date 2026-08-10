@@ -59,3 +59,4 @@ import ConfTyping.HeapAlloc
 import ConfTyping.FullCert
 import ConfTyping.TaintCert
 import ConfTyping.AllFive
+import ConfTyping.PathCert
