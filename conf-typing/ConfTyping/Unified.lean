@@ -44,8 +44,15 @@ namespace ConfTyping
 
 /-! ## The language -/
 
-/-- `WCmd` plus authorization. Everything the earlier While bricks can say is still
-    sayable, and two dimensions are added. -/
+/-- Heap operations, bundled into one constructor so that every downstream match —
+    `uexec`, `ucheck`, `USecTy`, `deadCost`, and the aborted-run lemmas — gains a
+    *single* new case rather than three. -/
+inductive MemOp where
+  | alloc | deref | free
+  deriving Repr, DecidableEq
+
+/-- `WCmd` plus authorization plus a heap. Everything the earlier While bricks can say
+    is still sayable, and three dimensions are added. -/
 inductive UCmd where
   | skip   : UCmd
   | assign : String → Expr → UCmd
@@ -54,6 +61,7 @@ inductive UCmd where
   | loop   : Expr → UCmd → UCmd
   | check  : String → UCmd        -- consult the policy; a refusal aborts
   | access : String → UCmd        -- the protected read
+  | memop  : MemOp → String → UCmd -- allocate into / dereference / free the pointer in a variable
 
 /-- The unified state: the store the While bricks use, plus what the mediation brick
     needs. `dead` records a refused check. -/
@@ -62,8 +70,31 @@ structure UState where
   auth  : List String
   reads : List String
   dead  : Bool
+  heap  : Int → Int          -- addressed by the pointer values the store holds
+  live  : List Int           -- currently-allocated addresses
+  fresh : Int                -- next address to hand out
+  err   : Bool               -- a memory fault happened (recorded, not conflated with `dead`)
 
-def initU (σ : Store) : UState := ⟨σ, [], [], false⟩
+def initU (σ : Store) : UState := ⟨σ, [], [], false, fun _ => 0, [], 0, false⟩
+
+/-- Membership and removal for the live-address list. Defined and proved locally —
+    the package is mathlib-free, and guessing core lemma names has cost this project
+    several build rounds. -/
+def memInt (a : Int) : List Int → Bool
+  | []      => false
+  | x :: xs => (x == a) || memInt a xs
+
+def dropInt (a : Int) : List Int → List Int
+  | []      => []
+  | x :: xs => if x == a then dropInt a xs else x :: dropInt a xs
+
+theorem memInt_mem {a : Int} : ∀ {L : List Int}, memInt a L = true → a ∈ L
+  | [],      h => by simp [memInt] at h
+  | x :: xs, h => by
+      simp only [memInt, Bool.or_eq_true, beq_iff_eq] at h
+      rcases h with h | h
+      · exact h ▸ List.mem_cons_self ..
+      · exact List.mem_cons_of_mem _ (memInt_mem h)
 
 /-- The evaluator. Shaped to mirror `wexec` line for line, so the embedding theorem
     is a structural induction and not a translation. After a refusal every step is a
@@ -79,6 +110,16 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
             else { s with dead := true }, 1, [])
   | _ + 1, .access r,    _, s =>
       some (if s.dead then s else { s with reads := r :: s.reads }, 1, [])
+  | _ + 1, .memop op x,  _, s =>
+      some (if s.dead then s else
+              match op with
+              | .alloc => { s with store := upd s.store x s.fresh,
+                                   live := s.fresh :: s.live, fresh := s.fresh + 1 }
+              | .deref => if memInt (s.store x) s.live then s
+                          else { s with dead := true, err := true }
+              | .free  => if memInt (s.store x) s.live
+                          then { s with live := dropInt (s.store x) s.live }
+                          else { s with dead := true, err := true }, 1, [])
   | n + 1, .seq c₁ c₂,   π, s =>
       (uexec n c₁ π s).bind fun r₁ =>
         (uexec n c₂ π r₁.1).map fun r₂ =>
@@ -230,7 +271,8 @@ def uFixed : UCmd := .seq (.check "db") (.access "db")
 theorem uVictim_not_mediated : ¬ UMediated uVictim := by
   intro h
   have := h 1 (fun _ => false) (fun _ => 0)
-    ({ store := fun _ => 0, auth := [], reads := ["db"], dead := false }, 1, []) rfl
+    ({ store := fun _ => 0, auth := [], reads := ["db"], dead := false,
+       heap := fun _ => 0, live := [], fresh := 0, err := false }, 1, []) rfl
     "db" (by simp)
   exact absurd this (by simp)
 

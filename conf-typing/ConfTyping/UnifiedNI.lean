@@ -114,6 +114,7 @@ theorem usecTy_sound {P : Partition} :
     intro c hc π s s' hle
     obtain ⟨hst, hrd, hdd⟩ := hle
     cases c with
+    | memop op x => cases hc      -- `USecTy` has no rule for heap ops; see below
     | skip => exact ⟨⟨hst, hrd, hdd⟩, rfl, rfl⟩
     | check r =>
         show uOptLowEq P (uexec (m+1) (.check r) π s) (uexec (m+1) (.check r) π s')
@@ -214,6 +215,7 @@ def ucheckNI (P : Partition) : UCmd → Bool
   | .loop e c    => exprLow P e && ucheckNI P c
   | .check _     => true
   | .access _    => true
+  | .memop _ _   => false        -- not yet: see `memops_not_yet_NI_typed`
 
 theorem ucheckNI_sound {P : Partition} :
     ∀ {c : UCmd}, ucheckNI P c = true → USecTy P c
@@ -234,11 +236,24 @@ theorem ucheckNI_sound {P : Partition} :
   | .loop _ _, h => by
       simp only [ucheckNI, Bool.and_eq_true] at h
       exact .whileL _ h.1 (ucheckNI_sound h.2)
+  | .memop _ _, h => by simp [ucheckNI] at h
 
 /-- Noninterference from a Boolean. -/
 theorem uNI_of_check {P : Partition} {c : UCmd} (h : ucheckNI P c = true) :
     ∀ n π s s', uLowEq P s s' → uOptLowEq P (uexec n c π s) (uexec n c π s') :=
   fun n π s s' hle => usecTy_sound n c (ucheckNI_sound h) π s s' hle
+
+/-- **Heap operations are deliberately not NI-typed yet, and the reason is a design
+    question rather than an oversight.** `alloc` writes the *fresh-address counter*
+    into the store, and the store is observable — so typing it would require `fresh`
+    (and `live`) to be Low-equal too, i.e. the heap would have to enter the
+    observation. Whether allocation addresses are visible to a Low adversary is
+    exactly the kind of question stage 1d had to settle for `reads`, and it deserves
+    the same treatment rather than a guess. Until then `ucheckNI` rejects them, so
+    the noninterference certificate covers the memop-free fragment and is *sound*
+    about it — which is the conservative direction. -/
+theorem memops_not_yet_NI_typed (op : MemOp) (x : String) (P : Partition) :
+    ucheckNI P (.memop op x) = false := rfl
 
 /-! ## The third certificate, and the price of it -/
 

@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/MemCert.lean` | composable core, stage 1h | the language grows a **heap**, and memory safety arrives as a *separate* certificate (`umcheck_sound`, `umcheck_no_fault`) — added without touching any existing checker |
 | `ConfTyping/BundleCoverage.lean` | composable core, stage 1g | what the bundle actually covers, projected out as theorems: **six** map rows, not three (`handler_covers_six_rows`) — a correction upward |
 | `ConfTyping/BundleLoop.lean` | composable core, stage 1f | bounded loops enter the bundle: three lemmas pin down what an aborted run does (`uexec_dead_unchanged`, `uexec_dead_loop_diverges`, `uexec_dead_cost`), so `UCert.ofEmbedded` admits any certified While program — loops included |
 | `ConfTyping/BundleLedger.lean` | composable core, stage 1e | the trusted base as a fourth bundle component, accumulating by `++` (`UCertL.seq`) — and row 7's CARRIED half turned from prose into a load-bearing ledger entry (`row7_carried_is_a_ledger_entry`) |
@@ -1311,6 +1312,38 @@ and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. Th
 in prose deliberately: "the language has no strings" is a syntactic fact about an inductive
 type, and dressing it up as a theorem would produce something vacuous that looks like
 evidence.
+
+## The composable core (`MemCert.lean`) — stage 1h, the language grows
+
+Stage 1g named the obstacle: the remaining rows need a bigger language. `UCmd` gains one
+constructor — `memop : MemOp → String → UCmd`, bundling `alloc`/`deref`/`free` so every
+downstream match takes **one** new case rather than three — and `UState` gains a heap, a
+live-address list, a fresh counter and an `err` flag. Pointers are ordinary `Int` values in
+the existing store, so the value domain did not change; that is why memory safety was
+reachable and injection was not.
+
+**The design decision worth naming**: memory safety is *not* folded into `ucheck`. It gets
+its own analysis and its own certificate. That is the honest test of stage 1a's claim — a
+new property, added later, should not require touching the original checker. It did not:
+`ucheck` gained a single conservative line (`none` at a `memop`), `USecTy` gained none, and
+nothing else in stages 1c–1g was modified. The certificate is again a Hoare triple
+`{V} c {V'}`, this time on the variables known to hold a live pointer, so it threads under
+`seq` and intersects at a branch — the same shape a third time.
+
+`umcheck_no_fault` is the guarantee: a checked program never faults. Four witnesses keep it
+concrete — `wild_deref_rejected` and `wild_deref_faults` (the rejected program really does
+fault, so the check is not refusing something harmless), `alloc_then_deref_ok`, and
+`clobbered_pointer_rejected` (overwriting a pointer drops it from the tracked set, so the
+analysis is not fooled by an intervening assignment).
+
+Two limits, both recorded as theorems rather than footnotes. `free_has_no_rule`: `free` is
+in the syntax and the semantics, so use-after-free is *expressible*, but dropping an address
+from `live` invalidates every alias, and soundness needs brick 12's linearity or brick 19's
+must-alias tracking in the invariant — so this closes the wild-access half of row 6
+(CWE-119) and not the use-after-free half (CWE-416). `memops_not_yet_NI_typed`: `alloc`
+writes the fresh counter into the observable store, so heap ops are not NI-typed; whether
+allocation addresses are Low-visible is the same question stage 1d settled for `reads` and
+deserves the same care rather than a guess.
 
 ## §11 pre-mechanization checklist (framework doc)
 

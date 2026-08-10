@@ -50,3 +50,4 @@ import ConfTyping.UnifiedNI
 import ConfTyping.BundleLedger
 import ConfTyping.BundleLoop
 import ConfTyping.BundleCoverage
+import ConfTyping.MemCert

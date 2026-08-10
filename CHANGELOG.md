@@ -227,6 +227,37 @@ landed.
   vacuous (`Or.inr trivial`) and was deleted rather than kept as something that
   looks like evidence.
 
+- **Composable core, stage 1h — the language grows a heap, and memory safety arrives
+  as a separate certificate** (`ConfTyping/MemCert.lean`, plus a heap in
+  `Unified.lean`). Stage 1g named the obstacle: the remaining rows need a bigger
+  language. `UCmd` gains one constructor, `memop : MemOp → String → UCmd` (bundling
+  `alloc`/`deref`/`free`, so each downstream match takes one new case rather than
+  three), and `UState` gains `heap`, `live`, `fresh` and `err`. Pointers are ordinary
+  `Int` values in the existing store, so the value domain did not change — which is
+  why memory safety was reachable at this stage and injection was not.
+
+  The point is *how* it was added: memory safety is **not** folded into `ucheck`. It
+  gets its own analysis (`umcheck`) and its own certificate (`MemCert`, a Hoare triple
+  on the variables known to hold a live pointer — threading under `seq`, intersecting
+  at a branch, the same shape a third time). That is the honest test of stage 1a's
+  extensibility claim, and it passed: `ucheck` gained one conservative line (`none` at
+  a `memop`), `USecTy` gained none, and nothing in stages 1c–1g was reworked.
+  `umcheck_no_fault` is the guarantee — a checked program never faults — with
+  `wild_deref_rejected` **and** `wild_deref_faults` (the rejected program really does
+  fault, so the check is not refusing something harmless), `alloc_then_deref_ok`, and
+  `clobbered_pointer_rejected` (overwriting a pointer drops it from the tracked set).
+
+  Both limits are theorems, not footnotes. `free_has_no_rule`: `free` is in the syntax
+  and the semantics, so use-after-free is *expressible*, but dropping an address
+  invalidates every alias and soundness needs brick 12's linearity or brick 19's
+  must-alias tracking in the invariant — so this closes the wild-access half of row 6
+  (CWE-119) and **not** the use-after-free half (CWE-416).
+  `memops_not_yet_NI_typed`: `alloc` writes the fresh counter into the observable
+  store, so heap ops are not noninterference-typed. Stage 1g's closing "what it does
+  not cover" note said row 6 was inexpressible here; that sentence was updated rather
+  than left to rot, which is the reason it lives next to the claim. The handler's
+  count is unchanged at six — it contains no `memop`.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

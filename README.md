@@ -295,10 +295,12 @@ admits any certified While program, loops included, and `handlerBounded` does
 bounded work while keeping its certificates. Stage 1g then corrected the
 claim **upward**: because the observation carries the clock and the halting bit,
 one NI certificate discharges three map rows, so the bundle covers **six** of the
-sixteen classes, not three (`handler_covers_six_rows`). The NI result is still
-bought by having no store-dependent resource selection
-(`access_is_static_by_design` records the price), and the ten uncovered rows need
-strings or a heap.
+sixteen classes, not three (`handler_covers_six_rows`). Stage 1h then grew the language:
+`UCmd` gains a **heap**, and memory safety arrives as a *separate* certificate
+(`umcheck_no_fault`) added without touching any existing checker — the honest test
+of the bundle's extensibility. That closes the wild-access half of row 6;
+`free_has_no_rule` and `memops_not_yet_NI_typed` record the two limits as theorems
+rather than footnotes.
 
 ## Scope — what is *not* claimed
 

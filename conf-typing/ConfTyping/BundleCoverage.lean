@@ -30,7 +30,8 @@
   one it is tempting not to bother making; the previous "three" was a real
   understatement of a real artifact. And six of sixteen is still not sixteen: rows
   3, 6, 8, 9, 11 and 14 are untouched, and reaching them needs the language to grow
-  strings or a heap, which is a larger step than any stage so far.
+  strings or a heap, which is a larger step than any stage so far. (Stage 1h then took
+  the heap half of that step; the closing note below is updated accordingly.)
 -/
 import ConfTyping.BundleLoop
 
@@ -121,12 +122,21 @@ theorem handlerBounded_covers_mediation_and_budget :
 
 /-! ## And what it does not cover
 
-    Kept next to the claim so the two cannot drift apart. `UCmd` has no strings and no
-    heap, so rows 3 (injection), 6 (memory safety) and 14 (path traversal) are not
+    Kept next to the claim so the two cannot drift apart, and updated by stage 1h,
+    which is the point of keeping it here: `UCmd` now *has* a heap, so the sentence
+    that said row 6 was inexpressible had to change rather than quietly rot.
+
+    `UCmd` has no strings, so rows 3 (injection) and 14 (path traversal) are not
     *expressible* here at all — they are proved for their own languages in bricks
     11–20 and are **not** carried by this bundle. Rows 8 (races), 9 (speculation) and
-    11 (crypto) likewise: bricks 32, 33 and 4 prove them on their own machines. Six of
-    sixteen, and the remaining ten need either a bigger language or a different one.
+    11 (crypto) likewise: bricks 32, 33 and 4 prove them on their own machines. Row 6
+    is now half in — `MemCert.umcheck_no_fault` closes the wild-access half on this
+    machine, while `free_has_no_rule` records that use-after-free is expressible and
+    unproved. The two theorems named here are *not* part of the six the handler
+    carries: `handler` contains no `memop`, so the count above is unchanged.
+
+    Six rows and a half, and the remaining rows need either strings or a different
+    machine.
 
     This is stated in prose deliberately. "The language has no strings" is a syntactic
     fact about an inductive type, and dressing it up as a theorem would produce

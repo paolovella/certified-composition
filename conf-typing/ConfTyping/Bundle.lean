@@ -259,6 +259,7 @@ def ucheck : List String → UCmd → Option (List String × Nat)
                        | some p₁, some p₂ => some (interStr p₁.1 p₂.1, 1 + max p₁.2 p₂.2)
                        | _, _ => none
   | _, .loop _ _    => none
+  | _, .memop _ _   => none   -- heap ops get their own certificate; see MemCert
 
 /-- **One soundness theorem for the bundle.** A passing check yields both
     certificates at once. -/
@@ -305,6 +306,7 @@ theorem ucheck_sound : ∀ (c : UCmd) (A A' : List String) (k : Nat),
           exact UCert.ite (ucheck_sound c₁ A p₁.1 p₁.2 e₁)
                           (ucheck_sound c₂ A p₂.1 p₂.2 e₂)
   | .loop _ _, _, _, _, h => by simp [ucheck] at h
+  | .memop _ _, _, _, _, h => by simp [ucheck] at h
 
 /-! ## The artifact: one program, both guarantees -/
 
