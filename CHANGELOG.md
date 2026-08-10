@@ -113,6 +113,30 @@ landed.
   now says so explicitly so the map is not read as if the rows' conjunction were
   a theorem.
 
+- **Composable core, stage 1c — one program, one check, two certificates
+  (`Bundle.lean`).** The loop closes. `UCert A c A' k` bundles a **cost budget**
+  (graded, accumulating by `costGA.mul`) with an **authorization triple**
+  `{A} c {A'}` (Hoare-shaped, accumulating by threading) — two genuinely
+  different composition laws, which is the point of bundling. `UCert.seq` shows
+  the halves advancing independently, neither mentioning the other: that is
+  `Bridge.pair_comp_cert`'s "no interaction term", concretely. `UCert.ite` joins
+  by intersecting authorization sets and taking the worse budget. **`ucheck`** is
+  one decidable analysis emitting both and **`ucheck_sound`** one soundness
+  theorem. The artifact is `handler` — authorize, read, compute, conditionally log
+  — passing by `decide` at `(["db"], 6)`, with `handler_bundle_end_to_end`
+  reporting budget **and** complete mediation: **the first program in this repo
+  holding two guarantees at once**. Three witnesses keep it concrete:
+  `handler_budget_tight` (certified 6, spent 6 — not slack padding),
+  `handler_partial_policy` (permit the database, refuse the log ⟹ reads `["db"]`
+  then aborts, so mediation is per-resource not all-or-nothing), and
+  `handler_without_check_rejected`. **Scope, stated in the module, both READMEs
+  and `VULN-COVERAGE`:** two certificates, not three — noninterference is not
+  retargeted, because lifting it needs a low-equivalence on `UState` and a
+  decision about whether `reads`/`auth` are observable, a design question rather
+  than a transcription — and the bundle is loop-free, as brick 34's `costCheck`
+  already was. So the conjunction of all sixteen classes on one program is still
+  not a theorem, and the map says so.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

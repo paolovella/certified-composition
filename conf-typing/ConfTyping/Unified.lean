@@ -184,12 +184,14 @@ def UCostAtMost (c : UCmd) (k : Nat) : Prop :=
   ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
     s.dead = false → uexec n c π s = some r → r.2.1 ≤ k
 
-/-- Complete mediation on the unified machine: started live with nothing read, every
-    resource read is one the policy permits. -/
+/-- Complete mediation on the unified machine: **started fresh** — nothing authorized,
+    nothing read, live — every resource read is one the policy permits. Starting fresh
+    rather than merely "live with no reads" is what makes the authorization invariant
+    available: an arbitrary state could arrive with `auth` already holding resources
+    the policy denies. -/
 def UMediated (c : UCmd) : Prop :=
-  ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
-    s.dead = false → s.reads = [] → uexec n c π s = some r →
-    ∀ x ∈ r.1.reads, π x = true
+  ∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
+    uexec n c π (initU σ) = some r → ∀ x ∈ r.1.reads, π x = true
 
 /-- **Brick 34's budgets transfer.** A `CostAtMost` proof about a While program is a
     budget for its image here — no reproof. -/
@@ -208,15 +210,14 @@ theorem ucost_of_cost {c : WCmd} {k : Nat} (h : CostAtMost c k) :
     so it reads nothing, and mediation holds vacuously — the new dimension cannot be
     violated by code that predates it. -/
 theorem uembed_mediated (c : WCmd) : UMediated (uembed c) := by
-  intro n π s r hd hrd hr x hx
-  rw [uexec_embed_eq n c π s hd] at hr
-  rcases ho : wexec n c s.store with _ | o
+  intro n π σ r hr x hx
+  rw [uexec_embed_eq n c π (initU σ) rfl] at hr
+  rcases ho : wexec n c (initU σ).store with _ | o
   · rw [ho] at hr; simp at hr
   · rw [ho] at hr
     simp only [Option.map_some, Option.some.injEq] at hr
     subst hr
-    simp only [hrd] at hx
-    exact absurd hx (by simp)
+    exact absurd hx (by simp [initU])
 
 /-! ## The new dimensions are live, not decorative -/
 
@@ -228,9 +229,10 @@ def uFixed : UCmd := .seq (.check "db") (.access "db")
 
 theorem uVictim_not_mediated : ¬ UMediated uVictim := by
   intro h
-  have := h 1 (fun _ => false) (initU (fun _ => 0)) _ rfl rfl rfl
-  simp only [uexec, initU] at this
-  exact absurd (this "db" (by simp)) (by simp)
+  have := h 1 (fun _ => false) (fun _ => 0)
+    ({ store := fun _ => 0, auth := [], reads := ["db"], dead := false }, 1, []) rfl
+    "db" (by simp)
+  exact absurd this (by simp)
 
 /-- Under a refusing policy the fixed program aborts and reads nothing — the abort is
     definitional, not proved. -/

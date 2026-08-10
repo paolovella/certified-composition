@@ -275,8 +275,13 @@ one place the repo's own headline most needs to hold. Two stages have landed:
 `GradedAction.prod` / `Bridge.pair_comp_cert` (bundles accumulate componentwise, no
 interaction term) and `ConfTyping/Unified.lean` (`UCmd` = `WCmd` + `check`/`access`, with
 `uexec_embed_eq` proving the While development is a *fragment* of it, so brick results
-transfer — `ucost_of_cost` — instead of forking). Stage 1c retargets the checkers and
-proves one program carrying three composed certificates; it is not done.
+transfer — `ucost_of_cost` — instead of forking). Stage 1c has landed
+(`ConfTyping/Bundle.lean`): one checker `ucheck` emitting a bundle, one soundness
+theorem, and a worked request handler carrying a **cost budget and complete
+mediation at once** (`handler_bundle_end_to_end`) — the first program here holding
+two guarantees simultaneously, with the two halves composing by *different* laws
+(budgets add, authorization sets thread, no interaction term). Two certificates,
+not three: noninterference is not yet retargeted, and the bundle is loop-free.
 
 ## Scope — what is *not* claimed
 

@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Bundle.lean` | composable core, stage 1c | one checker emitting a *bundle* (`ucheck`), one soundness theorem (`ucheck_sound`), and a worked handler carrying a cost budget **and** complete mediation at once (`handler_bundle_end_to_end`) |
 | `ConfTyping/Unified.lean` | composable core, stage 1b | one language (`UCmd` = `WCmd` + `check`/`access`) carrying store, cost and authorization, with `uexec_embed_eq` proving the While development is a *fragment* of it, so brick results transfer (`ucost_of_cost`) instead of forking |
 | `ConfTyping/Mediation.lean` | brick 35 / `VULN-COVERAGE.md` row 7 | complete mediation: missing authorization proved bypassable on an unguarded path (`victim_not_mediated`), a flow-sensitive check proved sound on every path and policy (`medCheck_sound`), and policy correctness proved *not* program-decidable (`policy_correctness_not_witnessed`) |
 | `ConfTyping/CostBound.lean` | brick 34 / `VULN-COVERAGE.md` row 10 | resource exhaustion: a uniform cost budget, accumulation as a `GradedAction` (`cost_seq_is_mul`), algorithmic-complexity DoS proved (`dos_unbounded`), and uniformity restored by a constant-initialised budget (`budget_cost`) |
@@ -1158,6 +1159,39 @@ Honest scope: this builds the object and the transfers. It does **not** yet re-d
 checkers on it — stage 1c retargets noninterference, cost and mediation onto `UCmd` and
 proves one program carrying all three composed certificates. The existing bricks are not
 superseded; they remain the record of what was proved, and the transfers make them reusable.
+
+## The composable core (`Bundle.lean`) — stage 1c, the artifact
+
+Stage 1a gave the algebra, 1b the object. This closes the loop: **one checker** over
+`UCmd` emitting a bundle, **one** soundness theorem, and a program that carries it.
+
+The two certificates were chosen because they compose by genuinely different laws — which
+is the point of bundling. A **cost budget** is graded, accumulating by `costGA.mul` (`+`).
+An **authorization transformation** is a Hoare triple `{A} c {A'}`, accumulating by
+*threading*. `UCert A c A' k` carries both, and `UCert.seq` shows the halves advancing
+independently: budgets add, authorization sets thread, neither mentions the other. That is
+`Bridge.pair_comp_cert`'s "no interaction term", concretely. `UCert.ite` joins by
+intersecting the authorization sets and taking the worse budget.
+
+`ucheck` is the single decidable analysis emitting both; `ucheck_sound` is the single
+soundness theorem. `handler` — authorize, read, compute, conditionally log — passes with
+`ucheck [] handler = some (["db"], 6)` by `decide`, and `handler_bundle_end_to_end` reports
+the budget **and** complete mediation. **The first program in this repo holding two
+guarantees at once.**
+
+Three witnesses make it concrete rather than nominal. `handler_budget_tight`: the certified
+budget is 6 and the permitting run spends 6, so the bound is not slack padding.
+`handler_partial_policy`: under a policy permitting the database but refusing the log, the
+handler reads `["db"]` and goes `dead` before the log — mediation tracks resources
+individually, it is not an all-or-nothing gate. `handler_without_check_rejected`: drop the
+`check` and the analysis says `none`.
+
+Honest scope. **Two certificates, not three** — noninterference is not retargeted. Lifting
+it needs a low-equivalence on `UState` and a decision about whether `reads` and `auth` are
+observable: a design question, not a transcription, and naming it beats rushing it. For
+embedded While programs NI still transfers via stage 1b. **Loop-free only** — `ucheck`
+returns `none` at a `loop`, exactly as brick 34's `costCheck` does; lifting brick 34's
+constant-initialised `budget` construct is the follow-on.
 
 ## §11 pre-mechanization checklist (framework doc)
 

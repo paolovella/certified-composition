@@ -488,6 +488,14 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1c: the bundle must exist and its artifact stay proved.
+for thm in "theorem ucheck_sound" "theorem UCert.seq" "theorem handler_bundle_end_to_end" \
+           "theorem handler_partial_policy"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Bundle.lean 2>/dev/null; then
+    echo "DRIFT: the bundle is cited but '$thm' is missing from Bundle.lean"; fail=1
+  fi
+done
+
 # composable core: the embedding theorem is what makes brick results transfer.
 for thm in "theorem uexec_embed_eq" "theorem ucost_of_cost" "theorem uembed_mediated"; do
   if ! grep -q "$thm" conf-typing/ConfTyping/Unified.lean 2>/dev/null; then
@@ -525,7 +533,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

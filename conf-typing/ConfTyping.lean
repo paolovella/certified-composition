@@ -45,3 +45,4 @@ import ConfTyping.Speculate
 import ConfTyping.CostBound
 import ConfTyping.Mediation
 import ConfTyping.Unified
+import ConfTyping.Bundle

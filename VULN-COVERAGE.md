@@ -1344,10 +1344,20 @@ guarantees costs `n` independent accumulations. `Unified.lean` gives the object:
 untouched — so brick results transfer (`ucost_of_cost`) rather than fork, and old programs
 satisfy the new dimensions vacuously (`uembed_mediated`).
 
-**Not yet done, and the map should not be read as if it were:** the checkers are not
-retargeted, so there is still no single program carrying noninterference *and* a budget
-*and* mediation. Until stage 1c lands, each row's verdict remains a statement about its own
-language, and their conjunction is not a theorem.
+Stage 1c has landed (`Bundle.lean`): **`ucheck`** is one decidable analysis emitting a
+bundle, **`ucheck_sound`** one soundness theorem, and **`handler_bundle_end_to_end`** a
+worked request handler carrying a cost budget *and* complete mediation at once — with the
+two halves composing by different laws (budgets add via `costGA.mul`, authorization sets
+thread as a Hoare triple, no interaction term). The budget is tight on the permitting run,
+and under a policy permitting the database but refusing the log the handler reads only the
+database, so mediation is per-resource rather than all-or-nothing.
+
+**What is still not true, and the map should not be read as if it were.** The bundle
+carries **two** of the map's properties, not all of them: noninterference is not retargeted
+(it needs a low-equivalence on `UState` and a decision about whether `reads`/`auth` are
+observable), and the bundle is **loop-free**. So each remaining row's verdict is still a
+statement about its own language, and the conjunction of all sixteen classes on one program
+is not a theorem.
 
 ### The security program, standing state (thirty-five bricks, sixteen classes)
 
