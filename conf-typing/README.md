@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapJoint.lean` | composable core, stage 1k | the judgment stage 1j forced: `JSecTy P V c V'` proves noninterference **and** memory safety in one induction, and `indexed_beats_the_conjunction` shows it certifies a program neither old checker could |
 | `ConfTyping/HeapNI.lean` | composable core, stage 1j | noninterference meets the heap: High allocation is free, and `ni_and_memory_do_not_factor` finds the first pair of certificates that **cannot** be derived independently |
 | `ConfTyping/MemLinear.lean` | composable core, stage 1i | `free` gets a rule under a **separating** invariant (`slcheck_no_fault`), and `memInv_not_preserved_by_free` proves stage 1h's missing rule was a genuine obstruction |
 | `ConfTyping/MemCert.lean` | composable core, stage 1h | the language grows a **heap**, and memory safety arrives as a *separate* certificate (`umcheck_sound`, `umcheck_no_fault`) — added without touching any existing checker |
@@ -1420,6 +1421,36 @@ inductive, not a conjunction, and it is a design conclusion reached by counterex
 rather than by preference. Both places that made the independence claim
 (`Bridge.pair_comp_cert`, `four_laws_one_composition`) now carry the qualification next
 to the claim.
+
+## The composable core (`HeapJoint.lean`) — stage 1k, the joint judgment
+
+Stage 1j proved the two properties do not factor and said exactly what to build
+instead. `JSecTy P V c V'` is that: a four-place relation carrying the partition *and*
+the tracked set, so the noninterference rule for `deref x` can demand `x ∈ V` — the
+side-condition neither system could state alone, since `USecTy` has no `V` and
+`SepCert` has no `P`. One induction (`jsecTy_sound`) proves both guarantees, with the
+memory invariant appearing as a **hypothesis of the noninterference proof**. That is
+the formal content of "these do not factor".
+
+`indexed_beats_the_conjunction` is the payoff, on `safeHeapProg` — allocate into a
+secret, dereference it, mediate an access, free it. `ucheckNI` rejects the program
+outright, so no NI certificate is available from it at any partition; `slcheck` accepts
+it but says nothing about leaks; `jcheck` certifies both. The indexed judgment is not a
+repackaging of its parts — it proves what their conjunction cannot, which is what
+stage 1j predicted from a single counterexample.
+
+Getting here needed `SepCert.loop`, a loop rule for the memory certificate that stages
+1h and 1i both ducked (`umcheck` and `slcheck` return `none` at a loop). It is a fuel
+induction with the tracked set as the loop invariant. It went in this module rather
+than as a back-patch to `MemLinear`, so stage 1i's claims stay exactly as audited.
+
+Two rules stay conservative, both argued for before being implemented. `allocL` is
+still absent — it needs `fresh` in the observation, stage 1j's open question, with
+`allocL_would_be_unsound` as the witness that it cannot just be added. And a loop must
+preserve the tracked set *exactly*, so `allocating_loop_rejected`: a loop that
+allocates is refused although nothing about it is unsafe. The fix is a widening step —
+iterate the body's effect to a fixed point, as brick 30's `loopFix` does for intervals
+— which is real work rather than a missing line, so it is named rather than hidden.
 
 ## §11 pre-mechanization checklist (framework doc)
 

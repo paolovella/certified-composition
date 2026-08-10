@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1k: the joint indexed judgment.
+for thm in "theorem jsecTy_sound" "theorem jcheck_sound" "theorem jcheck_gives_both" \
+           "theorem indexed_beats_the_conjunction" "theorem allocating_loop_rejected" \
+           "theorem SepCert.loop"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapJoint.lean 2>/dev/null; then
+    echo "DRIFT: the joint judgment is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1j: heap NI, and the non-factoring finding.
 for thm in "theorem deref_leaks_through_dead" "theorem deref_NI_given_safety" \
            "theorem ni_and_memory_do_not_factor" "theorem allocL_would_be_unsound" \
@@ -613,7 +622,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

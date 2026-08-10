@@ -310,7 +310,10 @@ unconditional NI rule at any level, and is noninterferent exactly on memory-safe
 `ni_and_memory_do_not_factor` states both halves. This is the first pair of certificates
 in the repo that cannot be derived independently and conjoined, so the "n properties
 cost n independent accumulations" reading of `Bridge.pair_comp_cert` is now qualified
-where it is made.
+where it is made. Stage 1k then built what that counterexample forced: `JSecTy P V c V'`
+carries the partition and the tracked set together, so one induction proves
+noninterference and memory safety at once — and `indexed_beats_the_conjunction`
+certifies a heap program that neither of the two separate checkers could.
 
 ## Scope — what is *not* claimed
 

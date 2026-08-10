@@ -53,3 +53,4 @@ import ConfTyping.BundleCoverage
 import ConfTyping.MemCert
 import ConfTyping.MemLinear
 import ConfTyping.HeapNI
+import ConfTyping.HeapJoint

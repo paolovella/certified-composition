@@ -1410,6 +1410,18 @@ certificates in this repo that cannot be established independently and conjoined
 is a structural finding about the bundle rather than about either row.
 `allocL_would_be_unsound` records the one genuinely open design question — whether
 allocation addresses are visible to a Low adversary.
+
+Stage 1k resolved the interaction rather than only naming it. `JSecTy P V c V'` carries
+the partition and the tracked set in one judgment, `jsecTy_sound` proves both
+properties in a single induction (the memory invariant being a *hypothesis* of the
+noninterference proof), and `jcheck_gives_both` extracts them from one run of one
+checker. `indexed_beats_the_conjunction` shows this is not a repackaging: on
+`safeHeapProg` — allocate into a secret, dereference, mediate an access, free —
+`ucheckNI` rejects outright and `slcheck` is silent about leaks, while `jcheck`
+certifies both. So on this machine rows 1, 2, 13 and 6 can now be carried by a single
+program that uses the heap. Remaining conservatism is recorded as theorems:
+`allocating_loop_rejected` (a loop must preserve the tracked set exactly; the fix is a
+widening step of brick 30's kind) and the still-absent `allocL`.
 Rows 3 and 14 remain not even *expressible* on `UCmd` — it has no strings —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the

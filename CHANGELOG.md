@@ -348,6 +348,35 @@ landed.
   caught rather than committed — the failure mode the guard suite exists for, and one
   it did not previously cover.
 
+- **Composable core, stage 1k — the joint judgment stage 1j's counterexample forced**
+  (`ConfTyping/HeapJoint.lean`). `JSecTy P V c V'` is a four-place relation carrying
+  the partition *and* the tracked set, so the noninterference rule for `deref x` can
+  demand `x ∈ V` — the side-condition neither system could state alone (`USecTy` has no
+  `V`, `SepCert` has no `P`). `jsecTy_sound` proves both guarantees in **one**
+  induction, with the memory invariant appearing as a hypothesis of the noninterference
+  proof: that is the formal content of "these do not factor". `jcheck` decides the
+  judgment and `jcheck_gives_both` extracts both guarantees from one run.
+
+  `indexed_beats_the_conjunction` is the payoff. On `safeHeapProg` — allocate into a
+  secret, dereference it, mediate an access, free it — `ucheckNI` rejects the program
+  outright so no NI certificate is available at any partition, and `slcheck` accepts it
+  but says nothing about leaks; `jcheck` certifies both. The indexed judgment proves
+  what the conjunction of its parts cannot, which is exactly what stage 1j predicted
+  from a single counterexample. `safeHeapProg_runs` confirms the program does what the
+  prose says: access mediated, nothing faulted, pointer released.
+
+  Getting here needed `SepCert.loop`, the loop rule for the memory certificate that
+  stages 1h and 1i both ducked (both checkers return `none` at a loop). It is a fuel
+  induction with the tracked set as the loop invariant, and it went in this module
+  rather than as a back-patch to `MemLinear`, so stage 1i's claims stay as audited.
+
+  Two rules stay conservative and both are recorded as theorems rather than footnotes:
+  `allocL` is still absent (stage 1j's open question — it needs `fresh` in the
+  observation, with `allocL_would_be_unsound` showing it cannot simply be added), and a
+  loop must preserve the tracked set exactly, so `allocating_loop_rejected` refuses a
+  loop that allocates although nothing about it is unsafe. The fix there is a widening
+  step of brick 30's kind, which is real work rather than a missing line.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
