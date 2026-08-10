@@ -302,8 +302,15 @@ of the bundle's extensibility. That closed the wild-access half of row 6.
 Stage 1i then closed the other half: a **separating** invariant gives `free` a rule
 (`slcheck_no_fault`, CWE-416) — and `memInv_not_preserved_by_free` proves stage 1h's
 missing rule was a genuine obstruction rather than an unfinished proof, by exhibiting
-a state where one `free` step breaks the weaker invariant. `memops_not_yet_NI_typed`
-remains as the standing limit.
+a state where one `free` step breaks the weaker invariant. Stage 1j then took the heap to the noninterference
+layer and found something that changes the bundle's story: allocation into a High
+variable is free (`USecTy.allocH`, no change to the observation), but `deref` can
+**fault**, a fault sets `dead`, and `dead` is observable — so `deref` has no
+unconditional NI rule at any level, and is noninterferent exactly on memory-safe states.
+`ni_and_memory_do_not_factor` states both halves. This is the first pair of certificates
+in the repo that cannot be derived independently and conjoined, so the "n properties
+cost n independent accumulations" reading of `Bridge.pair_comp_cert` is now qualified
+where it is made.
 
 ## Scope — what is *not* claimed
 

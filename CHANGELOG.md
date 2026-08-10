@@ -302,6 +302,52 @@ landed.
   which is the argument for keeping it next to the claim. The handler's count is still
   six: what the *machine* can certify is not what the *worked program* does certify.
 
+- **Composable core, stage 1j — noninterference meets the heap, and the first pair of
+  certificates that does not factor** (`ConfTyping/HeapNI.lean`, plus `USecTy.allocH`
+  in `UnifiedNI.lean`). Three findings.
+
+  *High allocation is free, and stage 1h's reason was wrong.* Stage 1h said heap ops
+  are not NI-typed because `alloc` writes the fresh counter into the observable store.
+  That holds only for a *Low* target. `fresh` and `live` are not in the observation at
+  all, so allocating into a **High** variable is invisible: `USecTy.allocH` is sound
+  with no change to `uLowEq`. `memops_not_yet_NI_typed` accordingly narrows to `deref`
+  and `free`, and `high_alloc_is_NI_typed` records the new positive.
+  `heapProg_two_certificates` is the first heap program carrying noninterference and
+  memory safety at once.
+
+  *Low allocation is the open design question.* `allocL_would_be_unsound` exhibits two
+  Low-equal states at different points of the allocation sequence; allocating into a
+  Low variable publishes the difference. Typing it needs `fresh` in the observation —
+  a decision about what the adversary can see, left open deliberately.
+
+  *`deref` and `free` can never have an unconditional rule.* They can **fault**, a
+  fault sets `dead`, and `dead` is observable: `deref_leaks_through_dead` separates a
+  Low-equal pair with one `deref` on a High variable. No syntactic judgment fixes this,
+  because faulting is a property of the state. What they do have is
+  `deref_NI_given_safety` / `free_NI_given_safety` — noninterference on states
+  satisfying the memory invariant, the hypothesis being literally the other
+  certificate. `the_leaking_state_is_the_unsafe_one` confirms the leaking state is
+  exactly the one failing `MemInv`.
+
+  **The finding.** `ni_and_memory_do_not_factor` puts both halves in one statement.
+  Stages 1c–1e built four accumulation laws with no interaction term, and
+  `Bridge.pair_comp_cert` was read as "carrying n properties costs n independent
+  accumulations". That reading does not extend to the heap: NI for `deref` is
+  *conditional* on memory safety, so the two cannot be certified side by side and
+  conjoined at the end. Concretely, a combined checker cannot be
+  `ucheckNI P c && slcheck V c` — the judgment must be indexed by the tracked set so
+  the NI rule for `deref x` can demand `x ∈ V`, which is a new inductive rather than a
+  conjunction. Both sites that made the independence claim (`Bridge.pair_comp_cert`,
+  `four_laws_one_composition`) now carry the qualification next to the claim, and
+  `check-claims` enforces that they keep it.
+
+- **Fixed: stage 1i deleted a README heading.** The stage-1i insert used
+  `## §11 pre-mechanization checklist (framework doc)` as its anchor and did not
+  re-emit it, orphaning that section's bullets under the stage-1i text. Restored, and
+  `check-claims` gains a required-headings guard so an insert that eats its anchor is
+  caught rather than committed — the failure mode the guard suite exists for, and one
+  it did not previously cover.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

@@ -488,6 +488,35 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1j: heap NI, and the non-factoring finding.
+for thm in "theorem deref_leaks_through_dead" "theorem deref_NI_given_safety" \
+           "theorem ni_and_memory_do_not_factor" "theorem allocL_would_be_unsound" \
+           "theorem heapProg_two_certificates"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapNI.lean 2>/dev/null; then
+    echo "DRIFT: the heap-NI finding is cited but '$thm' is missing"; fail=1
+  fi
+done
+# and the independence claim must stay qualified at both sites that make it
+for f in transport-calculus/TransportCalculus.lean conf-typing/ConfTyping/BundleLedger.lean; do
+  if ! grep -q "ni_and_memory_do_not_factor" "$f"; then
+    echo "DRIFT: $f states the no-interaction claim without stage 1j's qualification"; fail=1
+  fi
+done
+
+# required README headings: a splice that consumes its own anchor is a real failure
+# mode (it happened in stage 1i), and nothing else here would notice.
+while IFS='|' read -r f h; do
+  if ! grep -qF "$h" "$f"; then
+    echo "DRIFT: $f lost the heading '$h' - an edit probably consumed its anchor"; fail=1
+  fi
+done <<'HEADINGS'
+conf-typing/README.md|## §11 pre-mechanization checklist (framework doc)
+conf-typing/README.md|## Not yet mechanized (the honest residue)
+VULN-COVERAGE.md|## 2½. How classes are counted
+README.md|## What each sub-project actually proves
+README.md|## Scope — what is *not* claimed
+HEADINGS
+
 # composable core stage 1i: free, and the obstruction that explains stage 1h's gap.
 for thm in "theorem slcheck_sound" "theorem slcheck_no_fault" \
            "theorem memInv_not_preserved_by_free" "theorem use_after_free_faults" \
@@ -584,7 +613,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapNI.lean` | composable core, stage 1j | noninterference meets the heap: High allocation is free, and `ni_and_memory_do_not_factor` finds the first pair of certificates that **cannot** be derived independently |
 | `ConfTyping/MemLinear.lean` | composable core, stage 1i | `free` gets a rule under a **separating** invariant (`slcheck_no_fault`), and `memInv_not_preserved_by_free` proves stage 1h's missing rule was a genuine obstruction |
 | `ConfTyping/MemCert.lean` | composable core, stage 1h | the language grows a **heap**, and memory safety arrives as a *separate* certificate (`umcheck_sound`, `umcheck_no_fault`) — added without touching any existing checker |
 | `ConfTyping/BundleCoverage.lean` | composable core, stage 1g | what the bundle actually covers, projected out as theorems: **six** map rows, not three (`handler_covers_six_rows`) — a correction upward |
@@ -1383,7 +1384,44 @@ does fault), `double_free_rejected_by_slcheck`, `alloc_free_ok`, and
 `free_one_keep_other` (freeing one of two pointers leaves the other usable, so the
 rule is not conservative to the point of uselessness).
 
+## The composable core (`HeapNI.lean`) — stage 1j, where the certificates stop factoring
 
+Stage 1h carried `memops_not_yet_NI_typed` with a reason: `alloc` writes the fresh
+counter into the observable store. That reason was right only for a *Low* target, and
+stage 1j corrects it. Three findings, in increasing order of interest.
+
+**High allocation is free.** `fresh` and `live` are not in the observation, so
+allocating into a High variable is invisible — `USecTy.allocH` is sound with no change
+to `uLowEq` whatsoever. `heapProg_two_certificates` is the first heap program carrying
+noninterference *and* memory safety at once.
+
+**Low allocation is the open question.** `allocL_would_be_unsound` exhibits two
+Low-equal states at different points of the allocation sequence: allocate into a Low
+variable and the difference is published. Typing it needs `fresh` in the observation,
+which is a decision about what the adversary can see — left open deliberately, not
+left undone.
+
+**`deref` and `free` can never have an unconditional rule.** Not for stage 1h's
+reason: they can *fault*, the fault sets `dead`, and `dead` is observable.
+`deref_leaks_through_dead` separates a Low-equal pair with a single `deref` on a High
+variable. No refinement of a syntactic judgment fixes this, because whether the step
+faults is a property of the state. What they do have is `deref_NI_given_safety` — they
+are noninterferent on states satisfying the memory invariant, and the hypothesis is
+literally the other certificate.
+
+That last pair is the finding. Stages 1c–1e established four accumulation laws with no
+interaction term, and `Bridge.pair_comp_cert` was read as "carrying n properties costs
+n independent accumulations". `ni_and_memory_do_not_factor` shows that reading does not
+extend to the heap: NI for `deref` is *conditional* on memory safety, so the two cannot
+be certified side by side and conjoined at the end. The consequence is concrete — a
+combined checker cannot be `ucheckNI P c && slcheck V c`; the judgment must be indexed
+by the tracked set so the NI rule for `deref x` can demand `x ∈ V`. That is a new
+inductive, not a conjunction, and it is a design conclusion reached by counterexample
+rather than by preference. Both places that made the independence claim
+(`Bridge.pair_comp_cert`, `four_laws_one_composition`) now carry the qualification next
+to the claim.
+
+## §11 pre-mechanization checklist (framework doc)
 
 What this instance encodes from the framework's checklist:
 

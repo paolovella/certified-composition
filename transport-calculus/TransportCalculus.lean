@@ -121,7 +121,15 @@ theorem Bridge.pair_cert {X M₁ D₁ M₂ D₂ : Type}
 /-- **Bundles accumulate componentwise.** Composing two paired bridges gives exactly
     the pair of the composites' certificates: no interaction term, no extra
     hypothesis. So carrying `n` guarantees through a composition costs `n` independent
-    accumulations and nothing more — which is what makes bundling usable at scale. -/
+    accumulations and nothing more — which is what makes bundling usable at scale.
+
+    **Scope, added after a downstream counterexample.** This says the *composition* of
+    a pair costs nothing extra. It does not say two properties can always be
+    *established* independently. `conf-typing`'s stage 1j found a case where they
+    cannot: noninterference of a heap dereference is conditional on memory safety
+    (`ConfTyping.ni_and_memory_do_not_factor`), so the two certificates have to be
+    built by one judgment indexed by the tracked set, and only then paired. Bundling
+    the results is still free; deriving them separately is not always possible. -/
 theorem Bridge.pair_comp_cert {X M₁ D₁ M₂ D₂ : Type}
     {GA₁ : GradedAction M₁ D₁} {GA₂ : GradedAction M₂ D₂}
     {d₁ : X → X → D₁} {d₂ : X → X → D₂}

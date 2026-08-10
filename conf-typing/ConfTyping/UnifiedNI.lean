@@ -99,6 +99,12 @@ inductive USecTy (P : Partition) : UCmd → Prop where
   | whileL  : ∀ e, exprLow P e = true → USecTy P c → USecTy P (.loop e c)
   | check   : ∀ r, USecTy P (.check r)
   | access  : ∀ r, USecTy P (.access r)
+  /-- **Allocation into a High variable** (stage 1j). The address written is the
+      allocation counter, which is *not* in the observation, so the only channel is
+      the store — and writing a High variable is invisible. `deref` and `free` get no
+      rule here at any level: they can fault, and the fault flag *is* observable. See
+      `HeapNI.lean`. -/
+  | allocH  : ∀ x, P x = true → USecTy P (.memop .alloc x)
 
 /-- **Soundness — termination-sensitive noninterference on the unified machine.**
     At every fuel and under every policy, two Low-equal runs of a well-typed command
@@ -114,7 +120,23 @@ theorem usecTy_sound {P : Partition} :
     intro c hc π s s' hle
     obtain ⟨hst, hrd, hdd⟩ := hle
     cases c with
-    | memop op x => cases hc      -- `USecTy` has no rule for heap ops; see below
+    | memop op x =>
+        cases hc with
+        | allocH _ hy =>
+            show uOptLowEq P (uexec (m+1) (.memop .alloc x) π s)
+                            (uexec (m+1) (.memop .alloc x) π s')
+            simp only [uexec]
+            refine ⟨?_, rfl, rfl⟩
+            by_cases hd : s.dead = true
+            · have hd' : s'.dead = true := by rwa [hdd] at hd
+              rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+            · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
+              rw [if_neg hd, if_neg hd']
+              refine ⟨?_, hrd, hdd⟩
+              intro z hz
+              have hzy : z ≠ x := fun h => by rw [h, hy] at hz; cases hz
+              show upd s.store x s.fresh z = upd s'.store x s'.fresh z
+              simp only [upd, if_neg hzy]; exact hst z hz
     | skip => exact ⟨⟨hst, hrd, hdd⟩, rfl, rfl⟩
     | check r =>
         show uOptLowEq P (uexec (m+1) (.check r) π s) (uexec (m+1) (.check r) π s')
@@ -215,7 +237,8 @@ def ucheckNI (P : Partition) : UCmd → Bool
   | .loop e c    => exprLow P e && ucheckNI P c
   | .check _     => true
   | .access _    => true
-  | .memop _ _   => false        -- not yet: see `memops_not_yet_NI_typed`
+  | .memop .alloc x => P x       -- stage 1j: High allocation is invisible
+  | .memop _ _   => false        -- deref/free can fault: see `memops_not_yet_NI_typed`
 
 theorem ucheckNI_sound {P : Partition} :
     ∀ {c : UCmd}, ucheckNI P c = true → USecTy P c
@@ -236,24 +259,40 @@ theorem ucheckNI_sound {P : Partition} :
   | .loop _ _, h => by
       simp only [ucheckNI, Bool.and_eq_true] at h
       exact .whileL _ h.1 (ucheckNI_sound h.2)
-  | .memop _ _, h => by simp [ucheckNI] at h
+  | .memop .alloc x, h => .allocH x h
+  | .memop .deref _, h => by simp [ucheckNI] at h
+  | .memop .free _, h => by simp [ucheckNI] at h
 
 /-- Noninterference from a Boolean. -/
 theorem uNI_of_check {P : Partition} {c : UCmd} (h : ucheckNI P c = true) :
     ∀ n π s s', uLowEq P s s' → uOptLowEq P (uexec n c π s) (uexec n c π s') :=
   fun n π s s' hle => usecTy_sound n c (ucheckNI_sound h) π s s' hle
 
-/-- **Heap operations are deliberately not NI-typed yet, and the reason is a design
-    question rather than an oversight.** `alloc` writes the *fresh-address counter*
-    into the store, and the store is observable — so typing it would require `fresh`
-    (and `live`) to be Low-equal too, i.e. the heap would have to enter the
-    observation. Whether allocation addresses are visible to a Low adversary is
-    exactly the kind of question stage 1d had to settle for `reads`, and it deserves
-    the same treatment rather than a guess. Until then `ucheckNI` rejects them, so
-    the noninterference certificate covers the memop-free fragment and is *sound*
-    about it — which is the conservative direction. -/
-theorem memops_not_yet_NI_typed (op : MemOp) (x : String) (P : Partition) :
-    ucheckNI P (.memop op x) = false := rfl
+/-- **Deref and free are not NI-typed, and stage 1j narrows the reason — a
+    correction of record.** Stage 1h said flatly that heap operations are not NI-typed
+    because `alloc` writes the fresh-address counter into the observable store. That is
+    right only for a *Low* target. Writing the counter into a **High** variable is
+    invisible, and `fresh` and `live` are not in the observation at all, so
+    `USecTy.allocH` is sound with no change to `uLowEq` — stage 1j adds it, and this
+    theorem accordingly shrinks to `deref` and `free`.
+
+    Those two genuinely cannot have an unconditional rule *at any level*, and not for
+    the reason stage 1h gave: they can **fault**, the fault sets `dead`, and `dead` is
+    observable. `HeapNI.deref_leaks_through_dead` exhibits the leak. What they can have
+    is a rule *conditional on the memory certificate* — which is the first place in the
+    bundle where two certificates fail to be independent. See `HeapNI.lean`.
+
+    What remains genuinely open is `allocL`: allocation into a Low variable needs
+    `fresh` in the observation, which is the "are addresses public?" question, and
+    `HeapNI.allocL_would_be_unsound` shows it is not derivable as things stand. -/
+theorem memops_not_yet_NI_typed (x : String) (P : Partition) :
+    ucheckNI P (.memop .deref x) = false ∧ ucheckNI P (.memop .free x) = false :=
+  ⟨rfl, rfl⟩
+
+/-- And the stage-1j addition, stated where the old limit was: allocation into a High
+    variable *is* NI-typed. -/
+theorem high_alloc_is_NI_typed (x : String) (P : Partition) (h : P x = true) :
+    ucheckNI P (.memop .alloc x) = true := h
 
 /-! ## The third certificate, and the price of it -/
 

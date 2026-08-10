@@ -68,6 +68,15 @@ run_case "cited VULN theorem renamed" drift \
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'
 
+# required README headings: the stage-1i failure - a splice that ate its own anchor
+run_case "README heading spliced away" drift \
+  bash -c 'sed -i "/^## \xc2\xa711 pre-mechanization checklist/d" conf-typing/README.md'
+
+# the independence claim must stay qualified where it is made
+run_case "no-interaction claim unqualified" drift \
+  bash -c 'sed -i "s/ni_and_memory_do_not_factor/that other theorem/" \
+             transport-calculus/TransportCalculus.lean'
+
 # 1g. duplicate name in the flat namespace
 run_case "duplicate top-level name" drift \
   bash -c 'printf "\ntheorem medCheck_sound : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'

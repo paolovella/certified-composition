@@ -121,7 +121,15 @@ theorem row7_carried_is_a_ledger_entry :
     different laws — budget by `+`, authorization by threading, ledger by `++`, and
     (from stage 1d, conjunctively) noninterference — with no interaction term
     anywhere. Adding the fourth cost one four-line lemma; that is the evidence the
-    bundle mechanism scales rather than merely reaching three. -/
+    bundle mechanism scales rather than merely reaching three.
+
+    **And the limit, found in stage 1j.** Four was not the general case. Heap
+    dereference is noninterferent only on memory-safe states
+    (`ni_and_memory_do_not_factor`), so a fifth property does *not* slot in the same
+    way: it has to be derived by a judgment indexed by the tracked set before it can be
+    paired. The theorem below is unaffected — these four really are independent — but
+    "n properties cost n independent accumulations" is a statement about these four,
+    not a law. -/
 theorem four_laws_one_composition
     {Γ₁ Γ₂ : Ledger} {A A₁ A₂ : List String} {c₁ c₂ : UCmd} {k₁ k₂ : Nat}
     {P : Partition}

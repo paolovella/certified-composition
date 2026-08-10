@@ -1399,9 +1399,17 @@ freshness, `free` gets a rule, and `slcheck_no_fault` rules out use-after-free (
 `slcheck_extends_umcheck` confirming nothing stage 1h accepted was lost. Stage 1i also
 *explains* stage 1h's gap rather than merely filling it: `memInv_not_preserved_by_free`
 exhibits a state satisfying the weaker `MemInv` that one `free` step invalidates, so the
-missing rule was an obstruction, not an unfinished proof. Standing limit:
-`memops_not_yet_NI_typed` — heap ops are not yet noninterference-typed, because `alloc`
-writes the fresh counter into the observable store.
+missing rule was an obstruction, not an unfinished proof. Stage 1j then narrowed the standing limit and replaced its reason. `alloc` into a
+**High** variable is noninterferent with no change to the observation (`USecTy.allocH`,
+`high_alloc_is_NI_typed`), so `memops_not_yet_NI_typed` now covers only `deref` and
+`free` — and their obstacle is not the one stage 1h named: they can *fault*, a fault
+sets `dead`, and `dead` is observable (`deref_leaks_through_dead`). They are
+noninterferent precisely on memory-safe states (`deref_NI_given_safety`). Row 6 and
+row 1 therefore **interact**: `ni_and_memory_do_not_factor` is the first pair of
+certificates in this repo that cannot be established independently and conjoined, which
+is a structural finding about the bundle rather than about either row.
+`allocL_would_be_unsound` records the one genuinely open design question — whether
+allocation addresses are visible to a Low adversary.
 Rows 3 and 14 remain not even *expressible* on `UCmd` — it has no strings —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the
