@@ -488,6 +488,14 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1d: the third certificate and the price recorded with it.
+for thm in "theorem usecTy_sound" "theorem handler_three_certificates" \
+           "theorem access_is_static_by_design" "theorem Psec_rejects_leaks"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/UnifiedNI.lean 2>/dev/null; then
+    echo "DRIFT: the third certificate is cited but '$thm' is missing from UnifiedNI.lean"; fail=1
+  fi
+done
+
 # composable core stage 1c: the bundle must exist and its artifact stay proved.
 for thm in "theorem ucheck_sound" "theorem UCert.seq" "theorem handler_bundle_end_to_end" \
            "theorem handler_partial_policy"; do
@@ -533,7 +541,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

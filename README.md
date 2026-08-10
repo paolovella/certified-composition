@@ -280,8 +280,13 @@ transfer — `ucost_of_cost` — instead of forking). Stage 1c has landed
 theorem, and a worked request handler carrying a **cost budget and complete
 mediation at once** (`handler_bundle_end_to_end`) — the first program here holding
 two guarantees simultaneously, with the two halves composing by *different* laws
-(budgets add, authorization sets thread, no interaction term). Two certificates,
-not three: noninterference is not yet retargeted, and the bundle is loop-free.
+(budgets add, authorization sets thread, no interaction term). Stage 1d adds the
+third (`ConfTyping/UnifiedNI.lean`): noninterference lifts to `UCmd`, and because
+resource names are syntactic constants `check`/`access` add no flow channel at all.
+`handler_three_certificates` is the deliverable — **one program carrying a budget,
+mediation and noninterference**, composing by three different laws. Still loop-free,
+and the NI result is bought by having no store-dependent resource selection
+(`access_is_static_by_design` records the price).
 
 ## Scope — what is *not* claimed
 

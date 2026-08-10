@@ -137,6 +137,30 @@ landed.
   already was. So the conjunction of all sixteen classes on one program is still
   not a theorem, and the map says so.
 
+- **Composable core, stage 1d — the third certificate (`UnifiedNI.lean`).**
+  Stage 1c stopped at two because noninterference needed a **design decision**:
+  which parts of a `UState` can a Low adversary see? Recorded and load-bearing:
+  the Low `store`; `reads` **observable** (which resources a request touches is
+  visible — the same premise brick 33 used for cache lines and brick 29 for log
+  records, so denying it would contradict the map); `dead` **observable** (a
+  refused request is visible to whoever made it); `auth` **not** observable
+  (internal bookkeeping, its outward effect already carried by `reads`). With
+  that fixed, the result is slightly surprising: **`check` and `access` add no
+  flow channel** — resource names are syntactic constants, so reads and death are
+  determined by control flow and policy, both already Low-determined for a
+  well-typed program. `WSecTy`'s whole discipline lifts unchanged
+  (`usecTy_sound`, a fuel-and-two-run induction mirroring `wsecTy_sound`).
+  **`handler_three_certificates`** is P1's deliverable: one program carrying a
+  cost budget, complete mediation and termination-sensitive noninterference,
+  composing by three different laws — budgets add, authorization sets thread, NI
+  is conjunctive. `Psec_rejects_leaks` keeps it honest (the partition really has a
+  secret; branching on it and laundering it through a Low variable are both
+  rejected), and `secret_loop_still_rejected` confirms brick 7's termination
+  channel stays closed. The price is recorded, not hidden:
+  `access_is_static_by_design` — the NI result holds *because* there is no
+  `access (e)`; store-dependent resource selection would make `reads` a genuine
+  flow channel, and that is the IDOR follow-on named in brick 35. Still loop-free.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

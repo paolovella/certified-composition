@@ -1352,12 +1352,21 @@ thread as a Hoare triple, no interaction term). The budget is tight on the permi
 and under a policy permitting the database but refusing the log the handler reads only the
 database, so mediation is per-resource rather than all-or-nothing.
 
-**What is still not true, and the map should not be read as if it were.** The bundle
-carries **two** of the map's properties, not all of them: noninterference is not retargeted
-(it needs a low-equivalence on `UState` and a decision about whether `reads`/`auth` are
-observable), and the bundle is **loop-free**. So each remaining row's verdict is still a
-statement about its own language, and the conjunction of all sixteen classes on one program
-is not a theorem.
+Stage 1d adds the third certificate (`UnifiedNI.lean`). The design decision it turned on
+is recorded there: `reads` and `dead` are Low-observable, `auth` is not. With that,
+`check`/`access` add **no flow channel** — their resource names are syntactic constants —
+so `WSecTy`'s discipline lifts unchanged (`usecTy_sound`), and
+**`handler_three_certificates`** carries a budget, mediation and noninterference on one
+program, composing by three different laws.
+
+**What is still not true, and the map should not be read as if it were.** Three of the
+map's properties, not sixteen. The bundle is **loop-free** (`ucheck` returns `none` at a
+`loop`, as brick 34's `costCheck` does). The NI result is *bought* by having no
+store-dependent resource selection: with `access (e)`, `reads` would be a genuine flow
+channel and the rules would need side conditions — `access_is_static_by_design` records
+this as a price, and it is the IDOR follow-on named in brick 35. So the remaining rows'
+verdicts are still statements about their own languages, and the conjunction of all sixteen
+classes on one program is not a theorem.
 
 ### The security program, standing state (thirty-five bricks, sixteen classes)
 

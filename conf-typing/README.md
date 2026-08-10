@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/UnifiedNI.lean` | composable core, stage 1d | noninterference on `UCmd` (`usecTy_sound`) — the third certificate, so `handler_three_certificates` carries a budget, mediation and NI at once |
 | `ConfTyping/Bundle.lean` | composable core, stage 1c | one checker emitting a *bundle* (`ucheck`), one soundness theorem (`ucheck_sound`), and a worked handler carrying a cost budget **and** complete mediation at once (`handler_bundle_end_to_end`) |
 | `ConfTyping/Unified.lean` | composable core, stage 1b | one language (`UCmd` = `WCmd` + `check`/`access`) carrying store, cost and authorization, with `uexec_embed_eq` proving the While development is a *fragment* of it, so brick results transfer (`ucost_of_cost`) instead of forking |
 | `ConfTyping/Mediation.lean` | brick 35 / `VULN-COVERAGE.md` row 7 | complete mediation: missing authorization proved bypassable on an unguarded path (`victim_not_mediated`), a flow-sensitive check proved sound on every path and policy (`medCheck_sound`), and policy correctness proved *not* program-decidable (`policy_correctness_not_witnessed`) |
@@ -1192,6 +1193,36 @@ observable: a design question, not a transcription, and naming it beats rushing 
 embedded While programs NI still transfers via stage 1b. **Loop-free only** — `ucheck`
 returns `none` at a `loop`, exactly as brick 34's `costCheck` does; lifting brick 34's
 constant-initialised `budget` construct is the follow-on.
+
+## The composable core (`UnifiedNI.lean`) — stage 1d, the third certificate
+
+Stage 1c stopped at two because lifting noninterference needed a **design decision**, not a
+transcription: which parts of a `UState` can a Low adversary see? The answer taken, and it
+is load-bearing: the Low `store` (as always); `reads` **observable** — which resources a
+request touches is visible, the same premise brick 33 used for cache lines and brick 29 for
+log records, so denying it here would contradict the rest of the map; `dead` **observable**
+— a refused request is visible to whoever made it; `auth` **not** observable, being internal
+bookkeeping whose outward effect is already carried by `reads`.
+
+With that fixed the result is slightly surprising: **`check` and `access` add no flow
+channel**. Their resource names are syntactic constants, so the reads a run performs and
+whether it dies are determined by control flow and policy — both already Low-determined for
+a well-typed program. The two constructors are unconditionally well-typed and `WSecTy`'s
+whole discipline carries over (`usecTy_sound`, a fuel-and-two-run induction mirroring
+`wsecTy_sound`).
+
+The claim has a sharp edge, and `access_is_static_by_design` records it rather than hiding
+it: this holds *because* there is no `access (e)`. Store-dependent resource selection would
+make `reads` a genuine flow channel and both rules would need side conditions — that is
+IDOR-shaped, and it was already the named follow-on from brick 35.
+
+**`handler_three_certificates`** is P1's deliverable: one program carrying a cost budget,
+complete mediation, and termination-sensitive noninterference, composing by three different
+laws — budgets add (`costGA.mul`), authorization sets thread (Hoare), NI is conjunctive.
+`Psec_rejects_leaks` keeps it honest: `secret` really is High, the handler's own variable is
+Low, and both branching on the secret and laundering it through a Low variable are rejected
+— so this is a claim about a program that *could* have leaked and does not.
+`secret_loop_still_rejected` confirms brick 7's termination channel is still closed.
 
 ## §11 pre-mechanization checklist (framework doc)
 
