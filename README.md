@@ -339,7 +339,12 @@ integrity. Stage 1q then closed the last row, path traversal, and corrected the 
 that it was "injection with a different character": traversal is a **prefix** condition,
 not a count — `a/..` and `../a` carry the same symbols and only one escapes — so it
 needs its own property and its own rule, layered on the taint environment and applied
-per-sink.
+per-sink. Stage 1r then gave both string certificates loop rules by narrowing, and
+corrected a count that had quietly slipped: stage 1n's "three of four compose over
+loops" was measured before the string certificates existed, so the honest figure had
+become three of six. It is now **five of six**, with the budget still the only law that
+cannot — a cost bound over a loop needs an iteration bound, which is a termination
+argument rather than a typing side-condition.
 
 ## Scope — what is *not* claimed
 

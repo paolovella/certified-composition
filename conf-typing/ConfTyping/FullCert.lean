@@ -32,7 +32,11 @@
   ingredient, and both are analyses of a different kind.
 
   So the honest summary of the composable core is: four certificates, one checker, on
-  the loop-free fragment; and on loops, three of the four.
+  the loop-free fragment; and on loops, three of the four. (Stages 1o–1q added two more
+  certificates, both initially without loop rules, and stage 1r gave them loop rules by
+  narrowing — so the current figure is five of six, the budget still being the only law
+  that cannot. `StringLoop.five_of_six_compose_over_loops` is the up-to-date statement;
+  `only_the_budget_lacks_a_loop_rule` below stays true as written.)
 -/
 import ConfTyping.HeapAlloc
 

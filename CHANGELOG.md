@@ -576,6 +576,32 @@ landed.
   `StringInert` was extracted from stage 1o's five inert-command proofs so both string
   certificates share them rather than duplicating.
 
+- **Composable core, stage 1r — loops for the two string certificates, and a corrected
+  count** (`ConfTyping/StringLoop.lean`). Stage 1n measured "three of four certificates
+  compose over loops" *before* there were string certificates; 1o and 1q then added two
+  more, both with `| .loop _ _ => none`, quietly making the honest figure three of six.
+  This closes it with exactly stage 1l's narrowing:
+  `five_of_six_compose_over_loops` is now the statement, with the budget still the only
+  law that cannot — a cost bound over a loop needs an *iteration* bound, and no amount
+  of narrowing supplies one.
+
+  Two things made it cheaper than 1l. **The emission list needs no widening**: `Ks`
+  records *which* delimiter counts a program may emit — a set of possibilities, not a
+  running total — so a loop emitting the same query a thousand times draws from the same
+  `Ks`, and only the environment needs a fixed point (`interNat` iterated downwards,
+  `narrowFix` with a different meet). And **the two certificates share the shape**:
+  `TaintCert.loop` and `PathCert.loop` are the same fuel induction over the same
+  weakening lemmas — the fourth and fifth appearance of the
+  Hoare-triple-with-a-tracked-set pattern, which is the evidence the shape was right.
+
+  `loopQuery` and `loopServe` are the witnesses (a query server and a file server, each
+  emitting inside a loop); `loopQuery_needed_the_widening` shows stage 1o's checker
+  could not handle them; `loopQuery_safe` and `loopServe_safe` give the guarantees over
+  an unbounded number of emissions. Fuel-indexed for stage 1l's reason: the narrowing
+  call sits under a closure, and a well-founded definition would break every `decide`.
+  Stage 1n's docstring now carries a forward pointer so its figure is not read as
+  current.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

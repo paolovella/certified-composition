@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1r: loop rules for the string certificates.
+for thm in "theorem TaintCert.loop" "theorem PathCert.loop" "theorem narrowEnv_spec" \
+           "theorem tcheckW_sound" "theorem pcheckW_sound" \
+           "theorem five_of_six_compose_over_loops"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/StringLoop.lean 2>/dev/null; then
+    echo "DRIFT: the string loop rules are cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1q: path traversal.
 for thm in "theorem pcheck_sound" "theorem pcheck_no_escape" "theorem path_escape_is_real" \
            "theorem path_escape_rejected" "theorem path_needs_the_taint_environment" \
@@ -675,7 +684,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

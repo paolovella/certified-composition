@@ -60,3 +60,4 @@ import ConfTyping.FullCert
 import ConfTyping.TaintCert
 import ConfTyping.AllFive
 import ConfTyping.PathCert
+import ConfTyping.StringLoop

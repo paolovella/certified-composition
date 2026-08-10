@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/StringLoop.lean` | composable core, stage 1r | loop rules for both string certificates by narrowing; the loop count is corrected to **five of six**, the budget still the exception |
 | `ConfTyping/PathCert.lean` | composable core, stage 1q | **path traversal** (CWE-22), the last coverage row: a prefix condition rather than a count, per-sink, and layered on the taint environment |
 | `ConfTyping/AllFive.lean` | composable core, stage 1p | the sink enters the noninterference observation (closing a real weakness in 1o), and `fiveProg` carries **five** certificates |
 | `ConfTyping/TaintCert.lean` | composable core, stage 1o | **strings**, and injection on the unified machine: exact delimiter counts, a real attack (`injection_is_real`), a refusal, and a fix that survives the same payload |
@@ -1668,6 +1669,35 @@ for. A query is not a path: `pcheck fs` constrains only the emits that go to `fs
 The row is the same four theorems as injection: `path_escape_is_real` (the vulnerable
 program emits a path that pops above its root, on a `../..` payload),
 `path_escape_rejected`, `safe_path_checks`, and `safe_path_holds_under_every_input`.
+
+## The composable core (`StringLoop.lean`) — stage 1r, loops for the string certificates
+
+Stage 1n measured "three of four certificates compose over loops" *before* there were
+string certificates. Stages 1o and 1q then added two more, both with
+`| .loop _ _ => none`, which quietly made the honest figure three of six. This stage
+closes that with exactly stage 1l's narrowing, and the figure becomes **five of six** —
+`five_of_six_compose_over_loops` states it, with the budget still the only law that
+cannot, for the reason stage 1n gave: a cost bound over a loop needs an *iteration*
+bound, which no amount of narrowing supplies.
+
+Two things made it cheaper than stage 1l. **The emission list needs no widening**: `Ks`
+records *which* delimiter counts a program may emit — a set of possibilities, not a
+running total — so a loop emitting the same query a thousand times draws from the same
+`Ks`, and only the environment needs a fixed point. And **the two certificates share
+the shape**: `TaintCert.loop` and `PathCert.loop` are the same fuel induction over the
+same weakening lemmas, the fourth and fifth appearance of the
+Hoare-triple-with-a-tracked-set pattern. That repetition is the evidence the shape was
+right.
+
+`loopQuery` and `loopServe` are the witnesses — a query server and a file server, each
+emitting inside a loop. `loopQuery_needed_the_widening` shows stage 1o's checker could
+not handle them, and `loopQuery_safe` / `loopServe_safe` give the guarantees over an
+unbounded number of emissions.
+
+The fuel index is stage 1l's answer to the same problem for the same reason: the
+narrowing call sits under a closure, so structural recursion on the command cannot see
+through it, and a well-founded definition would stop kernel-reducing and break every
+`decide`.
 
 ## §11 pre-mechanization checklist (framework doc)
 

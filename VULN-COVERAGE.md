@@ -1461,7 +1461,12 @@ a path that pops above its root; `path_escape_rejected` refuses it;
 records that this certificate *layers on* stage 1o's count environment rather than
 sitting beside it — the second dependency in the bundle after
 `ni_and_memory_do_not_factor`, and the first that a parameter rather than a new indexed
-judgment could resolve. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+judgment could resolve. Stage 1r then gave both string certificates loop rules by
+stage 1l's narrowing, so rows 3 and 14 hold for programs that emit inside a loop
+(`loopQuery_safe`, `loopServe_safe`). It also corrected a count: stage 1n's "three of
+four compose over loops" predated the string certificates, so the honest figure had
+slipped to three of six; `five_of_six_compose_over_loops` puts it at five of six, the
+budget still being the only law that cannot. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five
