@@ -324,8 +324,11 @@ authorization set, noninterference and memory safety in **one pass**, and `fullP
 carries all four with a tight budget. Merging them exposed the one asymmetry two
 separate refusals had hidden — three of the four laws compose over loops, the budget
 cannot, because a cost bound needs an iteration bound
-(`only_the_budget_lacks_a_loop_rule`). The core's conservatism list is empty; what
-remains is scope.
+(`only_the_budget_lacks_a_loop_rule`). Stage 1o then closed the scope gap that every stage since 1h had
+recorded: `UCmd` gains **strings**, and injection becomes expressible on the unified
+machine. The certificate tracks exact delimiter counts rather than a taint bit, and the
+row is four theorems — a real attack that changes a query's shape, a refusal at the
+emit, an accepted fix, and a guarantee that holds for every attacker input.
 
 ## Scope — what is *not* claimed
 

@@ -1444,7 +1444,18 @@ compose over loops; the cost bound cannot, because it needs an *iteration* bound
 is a termination argument rather than a typing side-condition. That is a boundary
 rather than a to-do — brick 30's `loopFix` and stage 1f's `countdown` are the two ways
 to supply it, and both are analyses of a different kind.
-Rows 3 and 14 remain not even *expressible* on `UCmd` — it has no strings —
+Stage 1o gave `UCmd` **strings**, so row 3 is now expressible and partly carried here
+too: `tcheck_no_injection` guarantees that every emitted string carries exactly the
+delimiter count the analysis predicted, with `injection_is_real` executing the attack
+(three delimiters where two were written), `injection_rejected` refusing it, and
+`sanitised_query_holds_under_every_input` covering all inputs rather than one payload.
+This is *narrower* than bricks 11–20's treatment, deliberately: a two-symbol alphabet
+and a count, not a tokenizer and a parse tree — it captures the structural break that
+defines an injection, and nothing else. Row 14 (path traversal) is now expressible on
+this machine but **not done**. Standing limits: the sink is not in the noninterference
+observation, loops have no `tcheck` rule, and the other checkers still return `none` at
+a string operation, so a string program cannot yet carry the other four certificates.
+Before stage 1o both rows were not even *expressible* on `UCmd` —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the
 conjunction of all sixteen classes on one program is not a theorem.

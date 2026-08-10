@@ -87,11 +87,11 @@ theorem allocation_sync_is_load_bearing :
     secret. -/
 def secretOne : UState :=
   { store := fun y => if y == "secret" then 1 else 0, auth := [], reads := [],
-    dead := false, heap := fun _ => 0, live := [], fresh := 0, err := false }
+    dead := false, heap := fun _ => 0, live := [], fresh := 0, err := false, sstore := fun _ => [], sink := []  }
 
 def secretZero : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [], fresh := 0, err := false }
+    heap := fun _ => 0, live := [], fresh := 0, err := false, sstore := fun _ => [], sink := []  }
 
 theorem secret_states_lowEqA :
     uLowEqA Psec secretOne secretZero := by

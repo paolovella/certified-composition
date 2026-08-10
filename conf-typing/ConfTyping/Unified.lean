@@ -51,6 +51,58 @@ inductive MemOp where
   | alloc | deref | free
   deriving Repr, DecidableEq
 
+/-! ### Strings (stage 1o)
+
+    A two-symbol alphabet: the **delimiter** that gives injection its power, and
+    everything else. That is not a simplification of the problem — it is the problem.
+    An injection succeeds by contributing a delimiter the query's author did not
+    intend, so a `UCh` is exactly "is this character a delimiter or not", and the
+    guarantee below is about how many of them reach the sink. Keeping the alphabet at
+    two symbols also keeps every witness a `decide`. -/
+inductive UCh where
+  | quote   -- the delimiter
+  | ord     -- any ordinary character
+  deriving Repr, DecidableEq
+
+abbrev UStr := List UCh
+
+/-- How many delimiters a string carries. This is the quantity injection attacks. -/
+def qcount : UStr → Nat
+  | []            => 0
+  | .quote :: cs  => 1 + qcount cs
+  | .ord   :: cs  => qcount cs
+
+/-- Sanitisation: drop the delimiters. The only discharge the analysis offers. -/
+def sanStr : UStr → UStr
+  | []            => []
+  | .quote :: cs  => sanStr cs
+  | .ord   :: cs  => .ord :: sanStr cs
+
+theorem qcount_sanStr : ∀ (t : UStr), qcount (sanStr t) = 0
+  | []           => rfl
+  | .quote :: cs => qcount_sanStr cs
+  | .ord   :: cs => by simpa [sanStr, qcount] using qcount_sanStr cs
+
+theorem qcount_append : ∀ (t u : UStr), qcount (t ++ u) = qcount t + qcount u
+  | [],           _ => by simp [qcount]
+  | .quote :: cs, u => by simp [qcount, qcount_append cs u, Nat.add_assoc]
+  | .ord   :: cs, u => by simp [qcount, qcount_append cs u]
+
+/-- String expressions: literals, variables, concatenation, and sanitisation. -/
+inductive SExpr where
+  | lit : UStr → SExpr
+  | var : String → SExpr
+  | cat : SExpr → SExpr → SExpr
+  | san : SExpr → SExpr
+  deriving Repr
+
+/-- String operations, bundled into one constructor for the same reason `MemOp` is:
+    every downstream match gains one case rather than two. -/
+inductive SOp where
+  | set    -- assign to a string variable
+  | emit   -- send to a sink (the injection point)
+  deriving Repr, DecidableEq
+
 /-- `WCmd` plus authorization plus a heap. Everything the earlier While bricks can say
     is still sayable, and three dimensions are added. -/
 inductive UCmd where
@@ -62,6 +114,7 @@ inductive UCmd where
   | check  : String → UCmd        -- consult the policy; a refusal aborts
   | access : String → UCmd        -- the protected read
   | memop  : MemOp → String → UCmd -- allocate into / dereference / free the pointer in a variable
+  | sop    : SOp → String → SExpr → UCmd -- set a string variable, or emit to a named sink
 
 /-- The unified state: the store the While bricks use, plus what the mediation brick
     needs. `dead` records a refused check. -/
@@ -74,8 +127,23 @@ structure UState where
   live  : List Int           -- currently-allocated addresses
   fresh : Int                -- next address to hand out
   err   : Bool               -- a memory fault happened (recorded, not conflated with `dead`)
+  sstore : String → UStr      -- the string store, separate from the integer one
+  sink  : List UStr           -- everything emitted, most recent first
 
-def initU (σ : Store) : UState := ⟨σ, [], [], false, fun _ => 0, [], 0, false⟩
+def initU (σ : Store) : UState :=
+  ⟨σ, [], [], false, fun _ => 0, [], 0, false, fun _ => [], []⟩
+
+/-- Update in the string store. -/
+def updSU (τ : String → UStr) (x : String) (v : UStr) : String → UStr :=
+  fun y => if y = x then v else τ y
+
+/-- Evaluating a string expression. `san` is the only way to lower a delimiter count,
+    which is what makes the analysis below have exactly one discharge. -/
+def evalS (τ : String → UStr) : SExpr → UStr
+  | .lit t   => t
+  | .var x   => τ x
+  | .cat a b => evalS τ a ++ evalS τ b
+  | .san a   => sanStr (evalS τ a)
 
 /-- Membership and removal for the live-address list. Defined and proved locally —
     the package is mathlib-free, and guessing core lemma names has cost this project
@@ -120,6 +188,11 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
               | .free  => if memInt (s.store x) s.live
                           then { s with live := dropInt (s.store x) s.live }
                           else { s with dead := true, err := true }, 1, [])
+  | _ + 1, .sop op x e,  _, s =>
+      some (if s.dead then s else
+              match op with
+              | .set  => { s with sstore := updSU s.sstore x (evalS s.sstore e) }
+              | .emit => { s with sink := evalS s.sstore e :: s.sink }, 1, [])
   | n + 1, .seq c₁ c₂,   π, s =>
       (uexec n c₁ π s).bind fun r₁ =>
         (uexec n c₂ π r₁.1).map fun r₂ =>
@@ -272,7 +345,7 @@ theorem uVictim_not_mediated : ¬ UMediated uVictim := by
   intro h
   have := h 1 (fun _ => false) (fun _ => 0)
     ({ store := fun _ => 0, auth := [], reads := ["db"], dead := false,
-       heap := fun _ => 0, live := [], fresh := 0, err := false }, 1, []) rfl
+       heap := fun _ => 0, live := [], fresh := 0, err := false, sstore := fun _ => [], sink := []  }, 1, []) rfl
     "db" (by simp)
   exact absurd this (by simp)
 

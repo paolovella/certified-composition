@@ -409,6 +409,7 @@ def jcheck (P : Partition) : List String → UCmd → Option (List String)
   | V, .memop .alloc x => some (x :: V)
   | V, .memop .deref x => if memStr x V then some V else none
   | V, .memop .free x  => if memStr x V then some (dropStr x V) else none
+  | _, .sop _ _ _      => none
   | V, .seq c₁ c₂      => (jcheck P V c₁).bind fun V₁ => jcheck P V₁ c₂
   | V, .ite e c₁ c₂    => if exprLow P e then
                             match jcheck P V c₁, jcheck P V c₂ with

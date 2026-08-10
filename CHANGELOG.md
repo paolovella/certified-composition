@@ -474,6 +474,45 @@ landed.
   Honest summary of the composable core: four certificates, one checker, on the
   loop-free fragment; three of the four on loops.
 
+- **Composable core, stage 1o — strings, and injection on the unified machine**
+  (`ConfTyping/TaintCert.lean`, plus `UCh`/`UStr`/`SExpr`/`sop` in `Unified.lean`).
+  Every stage since 1h recorded the same limit: `UCmd` has no strings, so injection and
+  path traversal are not *expressible* here. This adds the value domain — one new
+  command constructor, which rippled a single new case into fourteen existing matches.
+
+  **Two symbols, and that is the problem rather than an abstraction of it.** An
+  injection succeeds by contributing a *delimiter* the author did not intend, so `UCh`
+  is exactly "delimiter or not"; everything else about a character is irrelevant to the
+  attack, and two symbols keeps every witness a `decide`.
+
+  **Exact counts, not a taint bit.** A taint bit rejects every real query, because a
+  query variable legitimately contains delimiters (`name='` has one). `TaintEnv` maps a
+  string variable to the exact number it holds, `scount` computes an expression's count
+  symbolically, and `sanStr` is the single discharge turning an unknown count into zero.
+  The guarantee is structural: every emitted string carries exactly the predicted number
+  of delimiters, so untrusted input cannot change the query's shape. `Ks` accumulating
+  by `++` is a fifth monoid after `+`, threading, conjunction and the ledger's append.
+
+  The row is four theorems: `injection_is_real` (the vulnerable program, run on a
+  malicious input, emits **three** delimiters where two were written — the shape changed,
+  which is the injection itself); `injection_rejected` (the checker refuses it, at the
+  `emit`, which is where injection happens); `sanitised_query_checks`; and
+  `sanitised_query_holds_under_every_input` (all attacker inputs, not one payload).
+
+  A first draft of the `set` rule was **unsound**: a refused run stops updating the
+  string store, so a recorded count need not survive an abort. `TaintInv` is therefore
+  conditioned on `dead = false`, the same shape `MemInv` needed for the heap and for the
+  same reason. Recorded here because the bug was mine and the fix is structural.
+
+  Three deliberate limits. The sink is not in the noninterference observation, so
+  `JSecTy` has no rule for `sop` — a checked program's *structure* is guaranteed, its
+  confidentiality is not. Loops have no `tcheck` rule (the count environment needs
+  stage 1l's narrowing — mechanical, but its own stage). And `ucheck`/`jcheck`/`allcheck`
+  return `none` at a `sop`, so a string program cannot yet carry the other four
+  certificates; merging `tcheck` into `allcheck` is packaging, not discovery. Path
+  traversal is now *expressible* and **not done** — same shape with `/` and `..` — and
+  is not claimed.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

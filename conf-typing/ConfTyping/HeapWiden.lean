@@ -86,6 +86,7 @@ def jcheckW (P : Partition) : Nat → List String → UCmd → Option (List Stri
   | _ + 1, V, .memop .alloc x  => some (x :: V)
   | _ + 1, V, .memop .deref x  => if memStr x V then some V else none
   | _ + 1, V, .memop .free x   => if memStr x V then some (dropStr x V) else none
+  | _ + 1, _, .sop _ _ _       => none
   | k + 1, V, .seq c₁ c₂       => (jcheckW P k V c₁).bind fun V₁ => jcheckW P k V₁ c₂
   | k + 1, V, .ite e c₁ c₂     => if exprLow P e then
                                     match jcheckW P k V c₁, jcheckW P k V c₂ with
@@ -109,6 +110,7 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
   | succ k ih =>
     intro c V V' h
     cases c with
+    | sop _ _ _ => simp [jcheckW] at h
     | skip => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .skip V
     | check r => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .check V r
     | access r => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .access V r

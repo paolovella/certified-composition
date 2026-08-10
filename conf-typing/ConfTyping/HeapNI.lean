@@ -51,22 +51,22 @@ namespace ConfTyping
 /-- Low-equal to `noAlloc'`, but with a different allocation counter. -/
 def noAlloc : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [], fresh := 0, err := false }
+    heap := fun _ => 0, live := [], fresh := 0, err := false, sstore := fun _ => [], sink := []  }
 
 /-- The same Low state, seven allocations later. -/
 def noAlloc' : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [], fresh := 7, err := false }
+    heap := fun _ => 0, live := [], fresh := 7, err := false, sstore := fun _ => [], sink := []  }
 
 /-- A state whose *secret* holds a live pointer. -/
 def ptrInSecret : UState :=
   { store := fun y => if y == "secret" then 5 else 0, auth := [], reads := [],
-    dead := false, heap := fun _ => 0, live := [5], fresh := 6, err := false }
+    dead := false, heap := fun _ => 0, live := [5], fresh := 6, err := false, sstore := fun _ => [], sink := []  }
 
 /-- Low-indistinguishable from it, but the secret is not a pointer. -/
 def ptrInSecret' : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [5], fresh := 6, err := false }
+    heap := fun _ => 0, live := [5], fresh := 6, err := false, sstore := fun _ => [], sink := []  }
 
 theorem noAlloc_lowEq : uLowEq Psec noAlloc noAlloc' :=
   ⟨fun _ _ => rfl, rfl, rfl⟩

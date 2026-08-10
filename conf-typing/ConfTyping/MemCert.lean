@@ -245,6 +245,7 @@ def umcheck : List String → UCmd → Option (List String)
   | V, .memop .alloc x    => some (x :: V)
   | V, .memop .deref x    => if memStr x V then some V else none
   | _, .memop .free _     => none        -- no rule: see `free_has_no_rule`
+  | _, .sop _ _ _         => none        -- strings do not touch the heap; stage 1o
   | V, .seq c₁ c₂         => (umcheck V c₁).bind fun V₁ => umcheck V₁ c₂
   | V, .ite _ c₁ c₂       => match umcheck V c₁, umcheck V c₂ with
                              | some V₁, some V₂ => some (interStr V₁ V₂)
@@ -271,6 +272,7 @@ theorem umcheck_sound : ∀ (c : UCmd) (V V' : List String),
         exact MemCert.deref x hx
       · rw [if_neg hx] at h; simp at h
   | .memop .free _, _, _, h => by simp [umcheck] at h
+  | .sop _ _ _, _, _, h => by simp [umcheck] at h
   | .seq c₁ c₂, V, V', h => by
       simp only [umcheck] at h
       rcases e₁ : umcheck V c₁ with _ | V₁

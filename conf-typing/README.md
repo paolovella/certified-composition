@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/TaintCert.lean` | composable core, stage 1o | **strings**, and injection on the unified machine: exact delimiter counts, a real attack (`injection_is_real`), a refusal, and a fix that survives the same payload |
 | `ConfTyping/FullCert.lean` | composable core, stage 1n | one checker, four certificates: `allcheck` produces budget, authorization, noninterference and memory safety in one pass — and `only_the_budget_lacks_a_loop_rule` names the one law that will not compose over loops |
 | `ConfTyping/HeapAlloc.lean` | composable core, stage 1m | the last open question dissolved: because no guard may depend on a secret, the allocator stays synchronised, so **allocation loses its side condition** entirely |
 | `ConfTyping/HeapWiden.lean` | composable core, stage 1l | widening for the tracked set: `narrowFix` computes a loop invariant by descending iteration, and `widening_beats_the_exact_rule` accepts a loop stage 1k had to refuse |
@@ -1558,6 +1559,47 @@ a different kind — so this is a boundary, not a to-do.
 
 The honest summary of the composable core: four certificates, one checker, on the
 loop-free fragment; three of the four on loops.
+
+## The composable core (`TaintCert.lean`) — stage 1o, strings and injection
+
+Every stage since 1h repeated the same limit: `UCmd` has no strings, so injection and
+path traversal are not *expressible* on the unified machine. Stage 1o adds the missing
+value domain — `UCh`, `UStr`, `SExpr`, and one new command constructor `sop` (set a
+string variable, or emit to a sink), which rippled a single new case into fourteen
+existing matches.
+
+**The alphabet is two symbols, and that is the problem rather than a simplification of
+it.** An injection succeeds by contributing a *delimiter* the query's author did not
+intend, so `UCh` is exactly "delimiter or not". Everything else about a character is
+irrelevant to the attack, and two symbols keeps every witness a `decide`.
+
+**The certificate tracks exact counts, not a taint bit.** A taint bit is too coarse to
+be usable: a query variable legitimately contains delimiters — `name='` has one — so
+"clean vs tainted" would reject every real query. `TaintEnv` maps a string variable to
+the exact number of delimiters it holds, `scount` computes an expression's count
+symbolically, and `sanStr` is the single discharge that turns an unknown count into
+zero. The guarantee is structural: every emitted string carries exactly the number of
+delimiters the analysis predicted, so untrusted input cannot change the query's shape.
+
+The row is four theorems. `injection_is_real` — run the vulnerable program on a
+malicious input and it emits a string with **three** delimiters where two were written;
+the shape changed, which is the injection itself and not a proxy for it.
+`injection_rejected` — the checker refuses it, and refuses at the `emit`, which is where
+the injection happens. `sanitised_query_checks` — the fix is accepted with the count
+pinned at two. `sanitised_query_holds_under_every_input` — and that holds for *every*
+attacker input, not the one payload.
+
+Three scope limits, all deliberate. The sink is **not** in the noninterference
+observation, so `JSecTy` still has no rule for `sop`: a checked program's *structure* is
+guaranteed, its confidentiality is not. Loops have no rule — the count environment needs
+the narrowing stage 1l gave the tracked set, which is mechanical but a stage of its own.
+And every other checker (`ucheck`, `jcheck`, `allcheck`) returns `none` at a `sop`, so a
+string program cannot yet carry the other four certificates; merging `tcheck` into
+`allcheck` is the obvious next step and is packaging, not discovery.
+
+Path traversal is now *expressible* but not done. It is the same shape with `/` and `..`
+in place of the delimiter, and claiming it without writing it is exactly the drift the
+guards exist to catch.
 
 ## §11 pre-mechanization checklist (framework doc)
 

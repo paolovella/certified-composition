@@ -336,6 +336,7 @@ def slcheck : List String → UCmd → Option (List String)
   | V, .memop .alloc x    => some (x :: V)
   | V, .memop .deref x    => if memStr x V then some V else none
   | V, .memop .free x     => if memStr x V then some (dropStr x V) else none
+  | _, .sop _ _ _         => none
   | V, .seq c₁ c₂         => (slcheck V c₁).bind fun V₁ => slcheck V₁ c₂
   | V, .ite _ c₁ c₂       => match slcheck V c₁, slcheck V c₂ with
                              | some V₁, some V₂ => some (interStr V₁ V₂)
@@ -402,7 +403,7 @@ theorem slcheck_no_fault {c : UCmd} {V' : List String} (h : slcheck [] c = some 
     stage 1h's `MemInv` — nothing there forbids aliasing — and violates `SepInv`. -/
 def aliasState : UState :=
   { store := fun _ => 5, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [5], fresh := 6, err := false }
+    heap := fun _ => 0, live := [5], fresh := 6, err := false, sstore := fun _ => [], sink := []  }
 
 /-- **Stage 1h's invariant is not inductive for `free`.** From a state satisfying
     `MemInv ["p","q"]`, one `free "p"` step lands in a state violating `MemInv ["q"]`:

@@ -95,6 +95,7 @@ def allcheck (P : Partition) :
   | A, V, .memop .alloc x => some (A, x :: V, 1)
   | A, V, .memop .deref x => if memStr x V then some (A, V, 1) else none
   | A, V, .memop .free x  => if memStr x V then some (A, dropStr x V, 1) else none
+  | _, _, .sop _ _ _      => none
   | A, V, .seq c₁ c₂      => (allcheck P A V c₁).bind fun p₁ =>
                                (allcheck P p₁.1 p₁.2.1 c₂).map fun p₂ =>
                                  (p₂.1, p₂.2.1, p₁.2.2 + p₂.2.2)
