@@ -513,6 +513,38 @@ landed.
   traversal is now *expressible* and **not done** — same shape with `/` and `..` — and
   is not claimed.
 
+- **Composable core, stage 1p — the sink becomes observable, and one program carries
+  five certificates** (`ConfTyping/AllFive.lean`, plus `sexprLow`/`evalS_lowEq` in
+  `Unified.lean`, three `JSecTy` rules and a widened `uLowEqA` in `HeapJoint.lean`).
+  Stage 1o left the sink **outside** the noninterference observation. That was a real
+  weakness rather than a scoping choice: a sink is an *output channel*, so leaving it
+  unobserved made every string operation trivially noninterferent — a program could emit
+  a secret and still be "noninterferent". `uLowEqA` now includes the Low part of the
+  string store and the sink; `JSecTy` gains `setH` (writing a High string variable is
+  invisible), `setL` and `emit` (both need a Low value); `jsecTy_sound` threads the two
+  new conjuncts through every case. `emit_of_secret_rejected` is the leak now caught.
+
+  **`san` is not declassification.** Sanitising removes *delimiters*, not *secrets*, and
+  `sexprLow` treats it that way — getting it backwards would be a vulnerability dressed
+  as a discharge. `sanitising_does_not_declassify` makes it sharp: `emit (san secret)` is
+  structurally perfect (count zero, cannot break a query) and still leaks. The taint
+  checker accepts it, the noninterference checker refuses it, and neither is wrong —
+  they answer different questions, which is the argument for carrying both.
+
+  **The fifth certificate factors, unlike the third.** Stage 1j found NI and memory
+  safety could not be established separately and conjoined, forcing 1k's indexed
+  judgment. Structural integrity is not like that: the conditions an `emit` must meet —
+  a known delimiter count, and a Low value — constrain different parts of the state. So
+  `xcheck` is a *pairing* (`factoring_holds_here`) rather than a sixth judgment. Both
+  facts are recorded because "these compose" is not a default: it held four times,
+  failed once, and holds again here, each time for a reason.
+
+  `fiveProg` carries **five certificates** — budget (tight: certified 6, spends 6),
+  mediation, noninterference, memory safety, structural integrity — from one program.
+  Remaining: loops carry three of the five (the budget cannot, per 1n; structural
+  integrity has no loop rule yet), path traversal is expressible and not written, and
+  stage 1e's ledger is not threaded through `xcheck`.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

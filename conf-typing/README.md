@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/AllFive.lean` | composable core, stage 1p | the sink enters the noninterference observation (closing a real weakness in 1o), and `fiveProg` carries **five** certificates |
 | `ConfTyping/TaintCert.lean` | composable core, stage 1o | **strings**, and injection on the unified machine: exact delimiter counts, a real attack (`injection_is_real`), a refusal, and a fix that survives the same payload |
 | `ConfTyping/FullCert.lean` | composable core, stage 1n | one checker, four certificates: `allcheck` produces budget, authorization, noninterference and memory safety in one pass — and `only_the_budget_lacks_a_loop_rule` names the one law that will not compose over loops |
 | `ConfTyping/HeapAlloc.lean` | composable core, stage 1m | the last open question dissolved: because no guard may depend on a secret, the allocator stays synchronised, so **allocation loses its side condition** entirely |
@@ -1600,6 +1601,41 @@ string program cannot yet carry the other four certificates; merging `tcheck` in
 Path traversal is now *expressible* but not done. It is the same shape with `/` and `..`
 in place of the delimiter, and claiming it without writing it is exactly the drift the
 guards exist to catch.
+
+## The composable core (`AllFive.lean`) — stage 1p, the sink becomes observable
+
+Stage 1o left the sink **outside** the noninterference observation. That was a real
+weakness rather than a scoping choice: a sink is an *output channel*, so leaving it
+unobserved made every string operation trivially noninterferent, and a program could
+emit a secret and still be "noninterferent". Stage 1p puts it in. `uLowEqA` gains the
+Low part of the string store and the sink, `JSecTy` gains `setH`/`setL`/`emit`, and
+`jsecTy_sound` threads two more conjuncts through every case.
+`emit_of_secret_rejected` is the leak that is now caught.
+
+**`san` is not declassification**, and that is this stage's security decision.
+Sanitising removes *delimiters*, not *secrets*. `sanitising_does_not_declassify` makes
+the point sharp: `emit (san secret)` is structurally perfect — count zero, it cannot
+break a query — and still leaks. The taint checker accepts it; the noninterference
+checker refuses it. Neither is wrong; they answer different questions, which is the
+argument for carrying both.
+
+**The fifth certificate factors, unlike the third.** Stage 1j found noninterference and
+memory safety could not be established separately and conjoined, forcing the indexed
+judgment of 1k. Structural integrity is not like that: the two conditions an `emit`
+must meet — a known delimiter count, and a Low value — constrain different parts of the
+state. So `xcheck` is a *pairing* (`factoring_holds_here`) rather than a sixth judgment.
+Worth recording both: "these compose" is not a default one may assume — it held four
+times, failed once, and holds again here, each time for a reason.
+
+`fiveProg` is the artifact: check a permission, allocate, read the mediated resource,
+build a sanitised query, emit it, free the buffer. **Five certificates** — budget
+(tight: certified 6, spends 6), mediation, noninterference, memory safety, structural
+integrity — from one program.
+
+Three things remain, all named in the module. Loops carry three of the five (the budget
+cannot, per stage 1n; structural integrity has no loop rule yet). Path traversal is
+expressible and not written. And stage 1e's ledger is not threaded through `xcheck`, so
+a program's assumptions are still tracked by hand.
 
 ## §11 pre-mechanization checklist (framework doc)
 

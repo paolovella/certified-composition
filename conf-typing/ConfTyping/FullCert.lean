@@ -75,6 +75,30 @@ theorem UCert.memop {A : List String} (op : MemOp) (x : String) :
               · simp only [if_neg hl]
                 exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
 
+/-- String operations cost one step and leave mediation alone, for the same reason
+    heap operations do. -/
+theorem UCert.sop {A : List String} (op : SOp) (x : String) (e : SExpr) :
+    UCert A (.sop op x e) A 1 := by
+  constructor
+  · intro n π s r hr
+    cases n with
+    | zero => simp [uexec] at hr
+    | succ n => simp only [uexec, Option.some.injEq] at hr; subst hr; simp
+  · intro n π s r hinv hr
+    cases n with
+    | zero => simp [uexec] at hr
+    | succ n =>
+        simp only [uexec, Option.some.injEq] at hr
+        subst hr
+        obtain ⟨ha, hrd, hd⟩ := hinv
+        by_cases hdead : s.dead = true
+        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
+        · have hd0 : s.dead = false := by simpa using hdead
+          simp only [if_neg hdead]
+          cases op with
+          | set  => exact ⟨ha, hrd, fun _ => hd hd0⟩
+          | emit => exact ⟨ha, hrd, fun _ => hd hd0⟩
+
 /-! ## The full certificate -/
 
 /-- Everything the composable core knows about a command, in one place: a cost bound, a
@@ -95,7 +119,8 @@ def allcheck (P : Partition) :
   | A, V, .memop .alloc x => some (A, x :: V, 1)
   | A, V, .memop .deref x => if memStr x V then some (A, V, 1) else none
   | A, V, .memop .free x  => if memStr x V then some (A, dropStr x V, 1) else none
-  | _, _, .sop _ _ _      => none
+  | A, V, .sop .set x e   => if P x || sexprLow P e then some (A, V, 1) else none
+  | A, V, .sop .emit _ e  => if sexprLow P e then some (A, V, 1) else none
   | A, V, .seq c₁ c₂      => (allcheck P A V c₁).bind fun p₁ =>
                                (allcheck P p₁.1 p₁.2.1 c₂).map fun p₂ =>
                                  (p₂.1, p₂.2.1, p₁.2.2 + p₂.2.2)
@@ -157,6 +182,25 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.memop .free x, .free V x hx⟩
       · rw [if_neg hx] at h; simp at h
+  | .sop .set x e, A, V, A', V', k, h => by
+      simp only [allcheck] at h
+      by_cases hx : (P x || sexprLow P e) = true
+      · rw [if_pos hx] at h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl, rfl⟩ := h
+        refine ⟨UCert.sop .set x e, ?_⟩
+        rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
+        · exact .setH V x e h'
+        · exact .setL V x e h'
+      · rw [if_neg hx] at h; simp at h
+  | .sop .emit q e, A, V, A', V', k, h => by
+      simp only [allcheck] at h
+      by_cases hx : sexprLow P e = true
+      · rw [if_pos hx] at h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl, rfl⟩ := h
+        exact ⟨UCert.sop .emit q e, .emit V q e hx⟩
+      · rw [if_neg hx] at h; simp at h
   | .seq c₁ c₂, A, V, A', V', k, h => by
       simp only [allcheck] at h
       rcases e₁ : allcheck P A V c₁ with _ | p₁
@@ -212,7 +256,7 @@ theorem allcheck_gives_four {P : Partition} {c : UCmd} {A' V' : List String} {k 
     have hinv : UMedInv π [] (initU σ) := ⟨by simp [initU], by simp [initU], by simp⟩
     exact (hf.bundle.auth n π (initU σ) r hinv hr).2.1 q hq
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hf.joint π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl⟩)
+      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl⟩)
   · exact (hf.joint.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## The artifact -/

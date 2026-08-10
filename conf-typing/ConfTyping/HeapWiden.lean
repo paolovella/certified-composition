@@ -86,7 +86,8 @@ def jcheckW (P : Partition) : Nat → List String → UCmd → Option (List Stri
   | _ + 1, V, .memop .alloc x  => some (x :: V)
   | _ + 1, V, .memop .deref x  => if memStr x V then some V else none
   | _ + 1, V, .memop .free x   => if memStr x V then some (dropStr x V) else none
-  | _ + 1, _, .sop _ _ _       => none
+  | _ + 1, V, .sop .set x e    => if P x || sexprLow P e then some V else none
+  | _ + 1, V, .sop .emit _ e   => if sexprLow P e then some V else none
   | k + 1, V, .seq c₁ c₂       => (jcheckW P k V c₁).bind fun V₁ => jcheckW P k V₁ c₂
   | k + 1, V, .ite e c₁ c₂     => if exprLow P e then
                                     match jcheckW P k V c₁, jcheckW P k V c₂ with
@@ -110,7 +111,24 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
   | succ k ih =>
     intro c V V' h
     cases c with
-    | sop _ _ _ => simp [jcheckW] at h
+    | sop op x e =>
+        cases op with
+        | set =>
+            simp only [jcheckW] at h
+            by_cases hx : (P x || sexprLow P e) = true
+            · rw [if_pos hx] at h
+              simp only [Option.some.injEq] at h; subst h
+              rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
+              · exact .setH V x e h'
+              · exact .setL V x e h'
+            · rw [if_neg hx] at h; simp at h
+        | emit =>
+            simp only [jcheckW] at h
+            by_cases hx : sexprLow P e = true
+            · rw [if_pos hx] at h
+              simp only [Option.some.injEq] at h; subst h
+              exact .emit V x e hx
+            · rw [if_neg hx] at h; simp at h
     | skip => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .skip V
     | check r => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .check V r
     | access r => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .access V r
@@ -176,7 +194,7 @@ theorem jcheckW_gives_both {P : Partition} {k : Nat} {c : UCmd} {V' : List Strin
   have hty := jcheckW_sound k c [] V' h
   refine ⟨fun n π σ σ' hσ => ?_, fun n π σ r hr => ?_⟩
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hty π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl⟩)
+      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl⟩)
   · exact (hty.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## What widening buys -/

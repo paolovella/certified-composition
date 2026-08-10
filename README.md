@@ -328,7 +328,14 @@ cannot, because a cost bound needs an iteration bound
 recorded: `UCmd` gains **strings**, and injection becomes expressible on the unified
 machine. The certificate tracks exact delimiter counts rather than a taint bit, and the
 row is four theorems — a real attack that changes a query's shape, a refusal at the
-emit, an accepted fix, and a guarantee that holds for every attacker input.
+emit, an accepted fix, and a guarantee that holds for every attacker input. Stage 1p
+then fixed a real weakness in 1o: the sink was an *output channel* left outside the
+noninterference observation, so a program could emit a secret and still be
+"noninterferent". With it observed, `emit_of_secret_rejected` catches that, and
+`sanitising_does_not_declassify` records that `san` removes delimiters and not secrets —
+the two certificates answer different questions. `fiveProg` carries **five**
+certificates: budget (tight), mediation, noninterference, memory safety and structural
+integrity.
 
 ## Scope — what is *not* claimed
 

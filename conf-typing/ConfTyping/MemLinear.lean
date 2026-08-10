@@ -326,6 +326,26 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
         · intro a ha
           exact hfr a (dropInt_memInt ha)
 
+/-- String operations do not touch the heap, so the separation invariant rides
+    through untouched. -/
+theorem SepCert.sop {V : List String} (op : SOp) (x : String) (e : SExpr) :
+    SepCert V (.sop op x e) V := by
+  constructor
+  intro n π s r hinv hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr
+      subst hr
+      obtain ⟨he, hv⟩ := hinv
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · have hd0 : s.dead = false := by simpa using hd
+        simp only [if_neg hd]
+        cases op with
+        | set  => exact ⟨he, fun _ => hv hd0⟩
+        | emit => exact ⟨he, fun _ => hv hd0⟩
+
 /-! ## The checker -/
 
 def slcheck : List String → UCmd → Option (List String)

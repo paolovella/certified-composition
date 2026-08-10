@@ -1452,9 +1452,15 @@ delimiter count the analysis predicted, with `injection_is_real` executing the a
 This is *narrower* than bricks 11–20's treatment, deliberately: a two-symbol alphabet
 and a count, not a tokenizer and a parse tree — it captures the structural break that
 defines an injection, and nothing else. Row 14 (path traversal) is now expressible on
-this machine but **not done**. Standing limits: the sink is not in the noninterference
-observation, loops have no `tcheck` rule, and the other checkers still return `none` at
-a string operation, so a string program cannot yet carry the other four certificates.
+this machine but **not done**. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+noninterference observation — it is an output channel, and leaving it out had made every
+string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
+caught) — and every checker accepts string operations, so `fiveProg` carries all five
+certificates at once. `sanitising_does_not_declassify` records that `san` removes
+delimiters, not secrets: the structural checker accepts `emit (san secret)` and the
+noninterference checker refuses it, which is why both are carried.
+`factoring_holds_here` records that this fifth certificate *does* factor, unlike the
+third (`ni_and_memory_do_not_factor`). Standing limit: loops have no `tcheck` rule.
 Before stage 1o both rows were not even *expressible* on `UCmd` —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the

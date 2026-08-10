@@ -103,6 +103,16 @@ inductive SOp where
   | emit   -- send to a sink (the injection point)
   deriving Repr, DecidableEq
 
+/-- Is every string variable in this expression **Low**? Note that `san` does *not*
+    declassify: sanitisation removes delimiters, not secrets, so a sanitised secret is
+    still a secret. Getting that backwards would be a security bug, so it is worth
+    saying out loud. -/
+def sexprLow (P : Partition) : SExpr → Bool
+  | .lit _   => true
+  | .var x   => !P x
+  | .cat a b => sexprLow P a && sexprLow P b
+  | .san a   => sexprLow P a
+
 /-- `WCmd` plus authorization plus a heap. Everything the earlier While bricks can say
     is still sayable, and three dimensions are added. -/
 inductive UCmd where
@@ -208,6 +218,23 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
           (uexec n (.loop e c) π r₁.1).map fun r₂ =>
             (r₂.1, 1 + r₁.2.1 + r₂.2.1, true :: (r₁.2.2 ++ r₂.2.2))
       else some (s, 1, [false])
+
+/-- Low string variables determine the value of a Low expression. -/
+theorem evalS_lowEq {P : Partition} {τ τ' : String → UStr}
+    (h : ∀ x, P x = false → τ x = τ' x) :
+    ∀ (e : SExpr), sexprLow P e = true → evalS τ e = evalS τ' e
+  | .lit _,   _  => rfl
+  | .var x,   he => by
+      have : P x = false := by simpa [sexprLow] using he
+      exact h x this
+  | .cat a b, he => by
+      simp only [sexprLow, Bool.and_eq_true] at he
+      show evalS τ a ++ evalS τ b = evalS τ' a ++ evalS τ' b
+      rw [evalS_lowEq h a he.1, evalS_lowEq h b he.2]
+  | .san a,   he => by
+      simp only [sexprLow] at he
+      show sanStr (evalS τ a) = sanStr (evalS τ' a)
+      rw [evalS_lowEq h a he]
 
 theorem uexec_seq_eq (n : Nat) (c₁ c₂ : UCmd) (π : MedPolicy) (s : UState) :
     uexec (n+1) (.seq c₁ c₂) π s

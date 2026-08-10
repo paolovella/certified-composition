@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1p: the observable sink and the five-way bundle.
+for thm in "theorem xcheck_gives_five" "theorem emit_of_secret_rejected" \
+           "theorem sanitising_does_not_declassify" "theorem factoring_holds_here" \
+           "theorem fiveProg_five" "theorem fiveProg_runs"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/AllFive.lean 2>/dev/null; then
+    echo "DRIFT: the five-certificate bundle is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1o: strings and the injection row.
 for thm in "theorem tcheck_sound" "theorem tcheck_no_injection" \
            "theorem injection_is_real" "theorem injection_rejected" \
@@ -657,7 +666,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
