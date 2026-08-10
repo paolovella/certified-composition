@@ -412,6 +412,37 @@ landed.
   conservatism list and it is a design question, not an engineering gap: `allocL` needs
   `fresh` in the observation, with `allocL_would_be_unsound` as the standing witness.
 
+- **Composable core, stage 1m — the last open question, dissolved rather than decided**
+  (`ConfTyping/HeapAlloc.lean`, plus `JSecTy.alloc` replacing `allocH` and the
+  strengthened `jsecTy_sound` in `HeapJoint.lean`). Stage 1j framed `allocL` as a fork:
+  allocation into a Low variable publishes the counter, so it looked to need `fresh` in
+  the observation — a ruling on whether addresses are visible to a Low adversary, with
+  a public allocator and an address-renaming bisimulation as the honest options.
+
+  Neither was necessary. This type system has **no High-guarded control flow** — every
+  `ite` and `loop` guard must be `exprLow` — so two Low-equal runs allocate in lockstep.
+  `jsecTy_sound` now carries `s.fresh = s'.fresh` as a **relational invariant** rather
+  than as an observation, and allocation becomes noninterferent with *no side condition
+  at all*. The stage therefore **removes a hypothesis** instead of adding a rule:
+  `JSecTy.allocH` becomes `JSecTy.alloc`, and `jcheck`/`jcheckW` lose their allocation
+  test. Public statements are unchanged: `uOptLowEqA.toLowEq` projects the strengthened
+  relation down, and two runs from `initU` agree on the counter for free.
+
+  Two theorems keep it honest. `allocation_sync_is_load_bearing`: stage 1j's
+  `allocL_would_be_unsound` is **still true** — nothing was refuted, and the same fact
+  now states that the invariant cannot be dropped. `high_branch_desynchronises_the_allocator`
+  with `highBranch_is_untypable`: one secret-guarded branch makes the counters differ,
+  and that branch is untypable here, which is *why* the rule is sound. If `UCmd` ever
+  gains High-guarded control flow, that pair breaks the build rather than silently
+  invalidating `JSecTy.alloc`. `low_alloc_now_typable` is the new ground — a Low
+  allocation the stage-1d checker still rejects outright.
+
+  **The composable core's conservatism list is now empty.** Stage 1j opened three items
+  (High allocation, `deref`/`free`, `allocL`) and 1k opened a fourth (the exact loop
+  rule); 1k, 1l and 1m closed all four. What remains is *scope* rather than
+  conservatism: `UCmd` has no strings, and the budget/mediation/ledger certificates are
+  carried by `UCert` rather than by `JSecTy`.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

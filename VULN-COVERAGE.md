@@ -1423,9 +1423,17 @@ program that uses the heap. Stage 1l then removed the loop conservatism with exa
 `narrowFix` computes the tracked-set loop invariant by descending iteration,
 `narrowFix_spec` discharges `JSecTy.whileW`'s side-conditions, and
 `widening_beats_the_exact_rule` accepts a loop that allocates while still tracking the
-pointer that must survive it. What remains is one design question, not an engineering
-gap: `allocL` is absent because it needs `fresh` in the observation, with
-`allocL_would_be_unsound` as the standing witness.
+pointer that must survive it. Stage 1m then closed the last item, and by dissolving it rather than deciding it.
+`allocL` looked like it required a ruling on whether addresses are visible to a Low
+adversary; in fact this type system has no High-guarded control flow, so two Low-equal
+runs allocate in lockstep. Carrying `s.fresh = s'.fresh` as a *relational invariant*
+(not as an observation) makes allocation noninterferent with **no side condition** —
+stage 1m removes a hypothesis rather than adding a rule, and the public statements are
+unchanged. `allocation_sync_is_load_bearing` records that stage 1j's counterexample is
+still true and now serves as the reason the invariant cannot be dropped;
+`high_branch_desynchronises_the_allocator` plus `highBranch_is_untypable` record what
+the argument rests on, so adding High-guarded control flow would break the build.
+The composable core's conservatism list is empty; what remains is scope.
 Rows 3 and 14 remain not even *expressible* on `UCmd` — it has no strings —
 and rows 8, 9 and 11 are proved on their own machines in bricks 32, 33 and 4. So the
 remaining ten rows' verdicts are still statements about their own languages, and the

@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapAlloc.lean` | composable core, stage 1m | the last open question dissolved: because no guard may depend on a secret, the allocator stays synchronised, so **allocation loses its side condition** entirely |
 | `ConfTyping/HeapWiden.lean` | composable core, stage 1l | widening for the tracked set: `narrowFix` computes a loop invariant by descending iteration, and `widening_beats_the_exact_rule` accepts a loop stage 1k had to refuse |
 | `ConfTyping/HeapJoint.lean` | composable core, stage 1k | the judgment stage 1j forced: `JSecTy P V c V'` proves noninterference **and** memory safety in one induction, and `indexed_beats_the_conjunction` shows it certifies a program neither old checker could |
 | `ConfTyping/HeapNI.lean` | composable core, stage 1j | noninterference meets the heap: High allocation is free, and `ni_and_memory_do_not_factor` finds the first pair of certificates that **cannot** be derived independently |
@@ -1490,6 +1491,40 @@ witnesses stand unchanged, including `allocating_loop_rejected`, which
 One item survives from the conservatism list, and it is the design question rather
 than an engineering gap: `allocL` is still absent, because it needs `fresh` in the
 observation. `HeapNI.allocL_would_be_unsound` is the standing witness.
+
+## The composable core (`HeapAlloc.lean`) — stage 1m, the last question dissolved
+
+Stage 1j left one item and framed it as a design fork: allocation into a *Low*
+variable publishes the counter, so `allocL` looked like it needed `fresh` in the
+observation — a decision about the adversary, with a public allocator and an
+address-renaming bisimulation as the honest options.
+
+Neither was needed. This type system has **no High-guarded control flow**: every `ite`
+and `loop` guard must be `exprLow`. So two Low-equal runs perform the same allocations
+in the same order, and their counters never drift. `jsecTy_sound` now carries
+`s.fresh = s'.fresh` as a **relational invariant** rather than as an observation, and
+allocation becomes noninterferent with *no side condition at all*. Stage 1m therefore
+removes a hypothesis instead of adding a rule: `JSecTy.allocH` becomes `JSecTy.alloc`,
+and `jcheck`'s allocation case loses its test.
+
+The public statements are unchanged. `uOptLowEqA.toLowEq` projects the strengthened
+relation back down, and two runs starting from `initU` agree on the counter for free —
+so `jcheck_gives_both` and `jcheckW_gives_both` read exactly as they did.
+
+Two theorems keep the argument honest, because "the invariant holds" is easy to assert
+and easy to get wrong. `allocation_sync_is_load_bearing`: stage 1j's
+`allocL_would_be_unsound` is *still true* — nothing was refuted, and it is now precisely
+the statement that the invariant cannot be dropped. And
+`high_branch_desynchronises_the_allocator` with `highBranch_is_untypable`: one
+secret-guarded branch makes the counters differ, and that branch is untypable here,
+which is *why* the rule is sound. If `UCmd` ever gains High-guarded control flow, that
+pair breaks the build rather than silently invalidating `JSecTy.alloc`.
+
+**The conservatism list is now empty.** Stage 1j opened three items — High allocation
+(closed there), `deref`/`free` (closed in 1k by indexing the judgment), `allocL`
+(closed here) — and stage 1k opened one more, the exact loop rule, closed in 1l by
+widening. What remains is *scope*, not conservatism: `UCmd` has no strings, and the
+budget/mediation/ledger certificates are carried by `UCert` rather than `JSecTy`.
 
 ## §11 pre-mechanization checklist (framework doc)
 

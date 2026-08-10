@@ -316,8 +316,11 @@ noninterference and memory safety at once — and `indexed_beats_the_conjunction
 certifies a heap program that neither of the two separate checkers could. Stage 1l
 then removed 1k's last engineering conservatism with a widening step — `narrowFix`
 computes the loop invariant for the tracked set by descending iteration, reusing
-brick 30's fixpoint idea on a second lattice — leaving only the `allocL` design
-question open.
+brick 30's fixpoint idea on a second lattice — and stage 1m dissolved the `allocL` design question
+rather than deciding it: because no guard may depend on a secret, the allocator stays
+synchronised, so allocation is noninterferent with **no side condition** and the
+observation never had to change. The composable core's conservatism list is empty;
+what remains is scope.
 
 ## Scope — what is *not* claimed
 

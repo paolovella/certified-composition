@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1m: allocator synchronisation, and what it rests on.
+for thm in "theorem low_alloc_now_typable" "theorem allocation_sync_is_load_bearing" \
+           "theorem high_branch_desynchronises_the_allocator" \
+           "theorem highBranch_is_untypable" "theorem alloc_rule_rests_on_low_guards"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapAlloc.lean 2>/dev/null; then
+    echo "DRIFT: allocator synchronisation is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1l: widening for the tracked set.
 for thm in "theorem narrowFix_spec" "theorem jcheckW_sound" "theorem jcheckW_out_of_fuel" \
            "theorem widening_beats_the_exact_rule" "theorem narrowing_budget_is_computed"; do
@@ -630,7 +639,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

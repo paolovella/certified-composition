@@ -55,3 +55,4 @@ import ConfTyping.MemLinear
 import ConfTyping.HeapNI
 import ConfTyping.HeapJoint
 import ConfTyping.HeapWiden
+import ConfTyping.HeapAlloc
