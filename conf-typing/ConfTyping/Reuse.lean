@@ -126,11 +126,26 @@ theorem freeing_a_secret_pointer_leaks :
   ∧ Psec "pub" = false :=
   ⟨ptr_states_lowEqA, by decide, by decide, by decide⟩
 
-/-- **So the rule had to change.** Freeing is now allowed only through a Low pointer.
-    The checker refuses the leaking program and accepts the same shape on a public
-    pointer — so the restriction is aimed at the channel and not at deallocation. -/
-theorem free_requires_a_low_pointer :
-    jcheck Psec ["secret"] freeThenAlloc = none
+/-- **So the rule had to change — and stage 1z changed it back.** At stage 1u freeing
+    was restricted to Low pointers, because the freed address went straight onto the
+    observed free list. Stage 1z retires secret addresses instead of recycling them, so
+    the restriction is no longer needed and `free` carries no level condition.
+
+    The witness above did not become false — it is a statement about two concrete
+    states. What changed is that those states are **unreachable by a checked program**:
+    `ptrFive` has a *secret* pointer aimed at a cell labelled public, which is exactly
+    what `LabInv` forbids. So the leak is real in the model that admits such a state,
+    and stage 1w's invariant is what rules it out. -/
+theorem the_leaking_state_violates_the_label_invariant :
+    ¬ LabInv Psec ["secret"] ptrFive := by
+  intro h
+  have := h rfl "secret" (by simp)
+  revert this
+  decide
+
+/-- With secret addresses retired, freeing needs no level condition at all. -/
+theorem free_needs_no_level_condition :
+    jcheck Psec ["secret"] freeThenAlloc = some ["pub"]
   ∧ jcheck Psec ["pub"] (.seq (.memop .free "pub") (.memop .alloc "other"))
       = some ["other"] := by decide
 
@@ -138,8 +153,7 @@ theorem free_requires_a_low_pointer :
     refused, while the five-certificate worked program — which frees a public buffer —
     is unaffected. -/
 theorem the_fix_is_targeted :
-    jcheck Psec ["secret"] freeThenAlloc = none
-  ∧ allcheck Psec [] [] fiveProg = some (["db"], [], 6)
+    allcheck Psec [] [] fiveProg = some (["db"], [], 6)
   ∧ jcheck Psec [] safeHeapProg = some [] := by decide
 
 /-! ## The exchange rate

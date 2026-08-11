@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapRetire.lean` | stage 1z | 1y's gap closed by **retiring** secret addresses instead of recycling them — one branch in the evaluator, one dropped hypothesis, no new invariant |
 | `ConfTyping/HeapAttack.lean` | stage 1y | attacking the labelled heap: the new guarantee is **not** vacuous, and two correct rules compose into one that is too strong — **a secret cell can never be freed** |
 | `ConfTyping/HeapSecret.lean` | stage 1x | the invariant spent: the observation becomes **per address** and `storeH` lets a secret live in the heap — the heap is now two-level rather than public |
 | `ConfTyping/HeapLabel.lean` | stage 1w | **per-address heap labels, the invariant half**: cells labelled at allocation, allocation zeroes, and `LabInv` — every tracked pointer points at a cell of its own level — proved inductive |
@@ -1935,6 +1936,41 @@ pointer then perturbs only unobserved state, which is what stage 1u's argument n
 It is not a patch — `SepInv`'s freshness conjunct becomes two conjuncts over two ranges,
 and range disjointness joins the separation argument — so on the evidence of 1w and 1x
 it is an invariant stage followed by a short rule stage.
+
+## Retiring secret addresses (`HeapRetire.lean`) — stage 1z
+
+Stage 1y found the gap: `free` needed a Low pointer (1u) and a secret cell is reached
+through a High pointer (1w), so a secret cell could never be freed. It named a fix — a
+separate unobserved counter and free list over a disjoint address range — and predicted
+an invariant stage plus a rule stage. **That prediction was wrong, and following it
+would have been expensive.**
+
+A much smaller change does the whole job: when a *secret* cell is freed, put its address
+nowhere. Retire it. Freeing through a secret pointer then perturbs only `live`, which is
+not observed, so `free` needs no level condition at all. `SepInv` did not change —
+pushing fewer addresses onto the free list only makes its conjuncts easier — and no new
+invariant appeared. One branch in `uexec`, one dropped hypothesis.
+
+`secretLifecycle` is the result: allocate a secret cell, write the secret in, read it
+back, release it. The last step was untypable before this stage.
+
+**The price**, stated plainly: secret addresses are never reused.
+`public_is_recycled_secret_is_retired` shows the difference — a public
+allocate-free-allocate returns the same address, a secret lifecycle does not. That is
+address-space consumption, not a safety property, and this model claims nothing about
+exhaustion.
+
+**What became of stage 1u's rule.** Its leak witness is still true — it is a statement
+about two concrete states — but those states are now provably unreachable:
+`ptrFive` aims a secret pointer at a cell labelled public, which is exactly what
+`LabInv` forbids (`the_leaking_state_violates_the_label_invariant`). So three stages
+were involved and **the middle one carried the load**, which was invisible when it was
+written because 1w had no payoff of its own.
+
+The estimate is worth recording: three memory-model predictions in a row have been
+wrong — 1u cheaper, 1w dearer, 1z much cheaper. The pattern in the misses is usable
+though: the expensive changes touched the **observation** or an **invariant**; the cheap
+ones touched only the semantics.
 
 ## §11 pre-mechanization checklist (framework doc)
 

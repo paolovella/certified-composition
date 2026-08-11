@@ -238,7 +238,11 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
                           else { s with dead := true, err := true }
               | .free  => if memInt (s.store x) s.live
                           then { s with live := dropInt (s.store x) s.live,
-                                        freed := s.store x :: s.freed }
+                                        -- a **secret** address is retired, not recycled:
+                                        -- putting it on the (observed) free list is what
+                                        -- made stage 1u require a Low pointer
+                                        freed := if s.hlab (s.store x) then s.freed
+                                                 else s.store x :: s.freed }
                           else { s with dead := true, err := true }, 1, [])
   | _ + 1, .sop op x e,  _, s =>
       some (if s.dead then s else

@@ -819,6 +819,38 @@ landed.
   ranges and range disjointness joins the separation argument, so on the evidence of 1w
   and 1x it is an invariant stage followed by a short rule stage.
 
+- **Stage 1z — closing the gap: secret addresses are retired, not recycled**
+  (`ConfTyping/HeapRetire.lean`, plus one branch in `uexec` and a dropped hypothesis on
+  `JSecTy.free`). Stage 1y named a fix — a separate unobserved counter and free list
+  over a disjoint address range — and predicted an invariant stage plus a rule stage.
+  **The prediction was wrong and following it would have been expensive.**
+
+  A much smaller change does the whole job: when a *secret* cell is freed, put its
+  address nowhere. Freeing through a secret pointer then perturbs only `live`, which is
+  unobserved, so `free` needs no level condition at all. `SepInv` did not change —
+  pushing fewer addresses onto the free list only makes its conjuncts easier — and no
+  new invariant appeared. `secretLifecycle` (allocate a secret cell, write, read back,
+  release) is now fully certified; the last step was untypable before.
+
+  **The price**, plainly: secret addresses are never reused.
+  `public_is_recycled_secret_is_retired` shows a public allocate-free-allocate returning
+  the same address and a secret lifecycle not. Address-space consumption, not a safety
+  property, and the model claims nothing about exhaustion.
+
+  **What became of stage 1u's rule.** Its leak witness is still true — a statement about
+  two concrete states — but those states are now provably unreachable by a checked
+  program: `ptrFive` aims a secret pointer at a cell labelled public, exactly what
+  `LabInv` forbids (`the_leaking_state_violates_the_label_invariant`). Three stages were
+  involved and **the middle one carried the load**, which was invisible when 1w was
+  written because it had no payoff of its own. `free_requires_a_low_pointer` is replaced
+  by `free_needs_no_level_condition`; 1y's `secret_cells_can_never_be_freed` and
+  `the_gap` are replaced by their closed forms.
+
+  Three memory-model estimates in a row have now been wrong — 1u cheaper than predicted,
+  1w dearer, 1z much cheaper. The pattern in the misses is usable: the expensive changes
+  touched the **observation** or an **invariant**; the cheap ones touched only the
+  semantics.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

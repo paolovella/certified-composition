@@ -488,9 +488,18 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 1z: retiring secret addresses.
+for thm in "theorem secretLifecycle_checks" "theorem free_has_no_level_condition" \
+           "theorem public_is_recycled_secret_is_retired" \
+           "theorem the_rule_is_no_longer_needed"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapRetire.lean 2>/dev/null; then
+    echo "DRIFT: address retirement is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # stage 1y: attacking the labelled heap.
-for thm in "theorem secret_write_is_not_vacuous" "theorem secret_cells_can_never_be_freed" \
-           "theorem memory_safety_would_allow_it" "theorem both_rules_are_load_bearing"; do
+for thm in "theorem secret_write_is_not_vacuous" "theorem secret_cells_can_now_be_freed" \
+           "theorem memory_safety_always_allowed_it" "theorem both_rules_are_load_bearing"; do
   if ! grep -q "$thm" conf-typing/ConfTyping/HeapAttack.lean 2>/dev/null; then
     echo "DRIFT: the heap attack is cited but '$thm' is missing"; fail=1
   fi
@@ -532,7 +541,7 @@ done
 
 # stage 1u: the reusing allocator and the channel it opened.
 for thm in "theorem the_allocator_reuses" "theorem stale_pointer_refused_after_reuse" \
-           "theorem freeing_a_secret_pointer_leaks" "theorem free_requires_a_low_pointer" \
+           "theorem freeing_a_secret_pointer_leaks" "theorem free_needs_no_level_condition" \
            "theorem freed_and_live_are_disjoint"; do
   if ! grep -q "$thm" conf-typing/ConfTyping/Reuse.lean 2>/dev/null; then
     echo "DRIFT: the reusing allocator is cited but '$thm' is missing"; fail=1
@@ -756,7 +765,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

@@ -389,8 +389,11 @@ because 1w did the work — which is what the split was for. Stage 1y then attac
 result: the new guarantee is **not** vacuous (unlike the string one stage 1t caught),
 but two correct rules compose into one that is too strong — since `free` needs a Low
 pointer (1u) and a secret cell is reached through a High one (1w), **a secret cell can
-never be freed**. The fix is named: a separate, unobserved counter and free list for
-secret allocation over a disjoint address range.
+never be freed**. Stage 1z then closed it far more cheaply than 1y predicted: a secret address is
+**retired** rather than recycled, so freeing through a secret pointer perturbs only
+unobserved state and `free` needs no level condition. One branch in the evaluator, one
+dropped hypothesis, no new invariant. The price is that secret addresses are never
+reused — address-space consumption, not safety.
 
 ## Scope — what is *not* claimed
 

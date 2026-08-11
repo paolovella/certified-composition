@@ -1522,7 +1522,11 @@ in a secret cell while staying Low-equal, unlike the string case stage 1t caught
 found a gap made by two correct rules: `free` needs a Low pointer (1u, the free list is
 observed) and a secret cell is reached through a High pointer (1w, the label matches the
 level), so **a secret cell can never be freed** and secret memory leaks by construction.
-`memory_safety_would_allow_it` places the gap on the information-flow side, not row 6. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+`memory_safety_always_allowed_it` placed the gap on the information-flow side, not
+row 6 — which is why stage 1z could close it by changing the *allocator* rather than
+either typing rule: a secret address is retired instead of recycled, so `free` needs no
+level condition and a secret cell now has a full lifecycle
+(`secretLifecycle_checks`). The price is that secret addresses are never reused. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

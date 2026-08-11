@@ -114,12 +114,14 @@ inductive JSecTy (P : Partition) : List String → UCmd → List String → Prop
   /-- **The rule that needed the index.** `deref` is noninterferent exactly when the
       pointer is known live, so the fault branch is unreachable. -/
   | deref   : ∀ V x, memStr x V = true → JSecTy P V (.memop .deref x) V
-  /-- **Freeing needs a Low pointer** (stage 1u). With a *reusing* allocator the free
-      list decides the next address handed out, so freeing a High pointer makes the two
-      runs' allocators diverge and a later allocation into a Low variable publishes the
-      difference. `freeing_a_secret_pointer_leaks` is the witness. Under the old
-      non-reusing allocator this hypothesis was unnecessary. -/
-  | free    : ∀ V x, memStr x V = true → P x = false →
+  /-- **Freeing, with no level condition** (stage 1z). Stage 1u added `P x = false`
+      because a reusing allocator hands the freed address straight back out and the
+      free list is observed — `Reuse.freeing_a_secret_pointer_leaks` is that witness,
+      and it is still a leak in the model it describes. Stage 1u needed `P x = false`
+      because the freed address went on the observed free list. A *secret* address is
+      now **retired** rather than recycled, so freeing through a secret pointer
+      perturbs only `live`, which is not observed. -/
+  | free    : ∀ V x, memStr x V = true →
               JSecTy P V (.memop .free x) (dropStr x V)
   /-- Writing a **High** string variable is invisible. -/
   | setH    : ∀ V x e, P x = true → JSecTy P V (.sop .set x e) V
@@ -163,7 +165,7 @@ theorem JSecTy.toSepCert {P : Partition} {V : List String} {c : UCmd} {V' : List
   | alloc _ x _ => exact SepCert.alloc x
   | allocS _ x _ => exact SepCert.allocS x
   | deref _ x hx => exact SepCert.deref x hx
-  | free _ x hx _ => exact SepCert.free x hx
+  | free _ x hx => exact SepCert.free x hx
   | setH _ x e _ => exact SepCert.sop .set x e
   | setL _ x e _ => exact SepCert.sop .set x e
   | emit _ q e _ => exact SepCert.sop .emit q e
@@ -417,7 +419,7 @@ theorem JSecTy.toLabInv {P : Partition} {V : List String} {c : UCmd} {V' : List 
   | storeH _ p v _ _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_hstore p v) hL hr
   | loadL _ d p _ _ => intro n π s r _ hL hr; exact labInv_load hL hr
   | loadH _ d p _ _ => intro n π s r _ hL hr; exact labInv_load hL hr
-  | free _ x _ _ =>
+  | free _ x _ =>
       intro n π s r _ hL hr
       exact LabInv.mono (fun _ hz => dropStr_mem hz)
         (labInv_of_stable (labStable_free x) hL hr)
@@ -767,7 +769,7 @@ theorem jsecTy_sound {P : Partition} :
             hI'.toMemInv.2 hd0' x (memStr_mem hx)
           rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
           exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
-    | free _ x hx hPx =>
+    | free _ x hx =>
         show uOptLowEqA P (uexec (m+1) (.memop .free x) π s)
                         (uexec (m+1) (.memop .free x) π s')
         simp only [uexec]
@@ -783,11 +785,18 @@ theorem jsecTy_sound {P : Partition} :
           have hl' : memInt (s'.store x) s'.live = true :=
             hI'.toMemInv.2 hd0' x (memStr_mem hx)
           rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
-          -- the freed address is Low, so the two free lists stay identical
-          have hpx : s.store x = s'.store x := hst x hPx
-          exact ⟨hst, hrd, hdd, hfr, hss, hsk,
-                 by show s.store x :: s.freed = s'.store x :: s'.freed
-                    rw [hpx, hfd], hhl, hho⟩
+          -- a secret address is retired (both runs list nothing); a public one is
+          -- listed, and then the pointer is Low so the two lists stay identical
+          have hlx : s.hlab (s.store x) = P x := hL hd0 x (memStr_mem hx)
+          have hlx' : s'.hlab (s'.store x) = P x := hL' hd0' x (memStr_mem hx)
+          refine ⟨hst, hrd, hdd, hfr, hss, hsk, ?_, hhl, hho⟩
+          show (if s.hlab (s.store x) then s.freed else s.store x :: s.freed)
+             = (if s'.hlab (s'.store x) then s'.freed else s'.store x :: s'.freed)
+          by_cases hPx : P x = true
+          · rw [if_pos (by rw [hlx, hPx]), if_pos (by rw [hlx', hPx])]; exact hfd
+          · have hPx' : P x = false := by simpa using hPx
+            rw [if_neg (by rw [hlx, hPx']; simp), if_neg (by rw [hlx', hPx']; simp)]
+            rw [hst x hPx', hfd]
     | setH _ x e hx =>
         show uOptLowEqA P (uexec (m+1) (.sop .set x e) π s) (uexec (m+1) (.sop .set x e) π s')
         simp only [uexec]
@@ -988,7 +997,7 @@ def jcheck (P : Partition) : List String → UCmd → Option (List String)
   | V, .memop .alloc x => if P x then none else some (x :: V)
   | V, .memop .allocS x => if P x then some (x :: V) else none
   | V, .memop .deref x => if memStr x V then some V else none
-  | V, .memop .free x  => if memStr x V && !P x then some (dropStr x V) else none
+  | V, .memop .free x  => if memStr x V then some (dropStr x V) else none
   | V, .sop .set x e   => if P x || sexprLow P e then some V else none
   | V, .sop .emit _ e  => if sexprLow P e then some V else none
   | V, .hop .load d p  => if memStr p V && (!P p || P d) then some (dropStr d V) else none
@@ -1040,11 +1049,10 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
       · rw [if_neg hx] at h; simp at h
   | .memop .free x, V, V', h => by
       simp only [jcheck] at h
-      by_cases hx : (memStr x V && !P x) = true
+      by_cases hx : memStr x V = true
       · rw [if_pos hx] at h
         simp only [Option.some.injEq] at h; subst h
-        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
-        exact .free V x h1 (by simpa using h2)
+        exact .free V x hx
       · rw [if_neg hx] at h; simp at h
   | .seq c₁ c₂, V, V', h => by
       simp only [jcheck] at h

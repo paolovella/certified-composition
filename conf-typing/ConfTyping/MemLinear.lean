@@ -453,22 +453,43 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
           exact hinj q (dropStr_mem hq) y (dropStr_mem hy) hne
         · intro a ha
           exact hfr a (dropInt_memInt ha)
-        · -- the freed address is genuinely gone from `live`, and the ones already on
-          -- the free list stay off it
+        · -- the freed address is gone from `live`, and the ones already on the free
+          -- list stay off it. A *secret* address is retired rather than listed, which
+          -- is the branch that closes stage 1y's gap.
           intro a ha
-          simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
-          rcases ha with ha | ha
+          have hstep : ∀ b : Int,
+              memInt b (if s.hlab (s.store x) then s.freed else s.store x :: s.freed) = true →
+              b = s.store x ∨ memInt b s.freed = true := by
+            intro b hb
+            by_cases hlab : s.hlab (s.store x) = true
+            · rw [if_pos hlab] at hb; exact Or.inr hb
+            · rw [if_neg hlab] at hb
+              simp only [memInt, Bool.or_eq_true, beq_iff_eq] at hb
+              rcases hb with hb | hb
+              · exact Or.inl hb.symm
+              · exact Or.inr hb
+          rcases hstep a ha with ha' | ha'
           · show memInt a (dropInt (s.store x) s.live) = false
-            rw [ha]; exact memInt_dropInt_self _ _
+            rw [ha']; exact memInt_dropInt_self _ _
           · show memInt a (dropInt (s.store x) s.live) = false
             by_cases hm : memInt a (dropInt (s.store x) s.live) = true
-            · exact absurd (dropInt_memInt hm) (by simp [hdisj a ha])
+            · exact absurd (dropInt_memInt hm) (by simp [hdisj a ha'])
             · simpa using hm
         · intro a ha
-          simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
-          rcases ha with ha | ha
-          · subst ha; exact hfr _ hxl
-          · exact hfb a ha
+          have hstep : ∀ b : Int,
+              memInt b (if s.hlab (s.store x) then s.freed else s.store x :: s.freed) = true →
+              b = s.store x ∨ memInt b s.freed = true := by
+            intro b hb
+            by_cases hlab : s.hlab (s.store x) = true
+            · rw [if_pos hlab] at hb; exact Or.inr hb
+            · rw [if_neg hlab] at hb
+              simp only [memInt, Bool.or_eq_true, beq_iff_eq] at hb
+              rcases hb with hb | hb
+              · exact Or.inl hb.symm
+              · exact Or.inr hb
+          rcases hstep a ha with ha' | ha'
+          · rw [ha']; exact hfr _ hxl
+          · exact hfb a ha'
 
 /-- **Loading through a live pointer is safe**, and the destination leaves the tracked
     set: what came out of the heap is a value, not a pointer we have any claim about. -/

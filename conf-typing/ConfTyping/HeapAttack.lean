@@ -69,14 +69,20 @@ theorem secret_write_is_not_vacuous :
 
 /-! ## The gap: secret memory cannot be released -/
 
-/-- **A secret cell can never be freed.** `free` needs a Low pointer (stage 1u: the free
-    list decides the next address and is observed) and a secret cell is reached through
-    a High pointer (stage 1w: the label matches the pointer's level). The two conditions
-    are each right and jointly unsatisfiable. -/
-theorem secret_cells_can_never_be_freed :
-    jcheck Ptwo ["sp"] (.memop .free "sp") = none
-  ∧ allcheck Ptwo [] [] (.seq (.memop .allocS "sp") (.memop .free "sp")) = none := by
-  decide
+/-- **The gap this stage found, and stage 1z's answer.** As of stage 1y a secret cell
+    could never be freed: `free` needed a Low pointer (stage 1u — the free list decides
+    the next address and is observed) while a secret cell is reached through a High
+    pointer (stage 1w — the label matches the pointer's level). Each condition was
+    right and jointly they were unsatisfiable.
+
+    Stage 1z removed the conflict by changing the *model* rather than either rule: a
+    secret address is **retired** instead of recycled, so freeing through a secret
+    pointer touches only `live`, which is unobserved. The statement below is what the
+    finding turned into. -/
+theorem secret_cells_can_now_be_freed :
+    jcheck Ptwo ["sp"] (.memop .free "sp") = some []
+  ∧ allcheck Ptwo [] [] (.seq (.memop .allocS "sp") (.memop .free "sp"))
+      = some ([], [], 2) := by decide
 
 /-- The restriction is specific, not a general failure of deallocation: a public cell is
     allocated and freed without complaint. -/
@@ -84,17 +90,18 @@ theorem public_cells_can_be_freed :
     allcheck Ptwo [] [] (.seq (.memop .alloc "buf") (.memop .free "buf"))
       = some ([], [], 2) := by decide
 
-/-- Memory safety alone has no objection — `slcheck` frees the secret pointer happily,
-    because liveness does not care about labels. The refusal comes entirely from the
-    information-flow side, which locates the gap precisely. -/
-theorem memory_safety_would_allow_it :
+/-- Memory safety never objected — `slcheck` frees the secret pointer happily, because
+    liveness does not care about labels. That is what located the gap on the
+    information-flow side, and it is why the fix was a change to the allocator rather
+    than to either typing rule. -/
+theorem memory_safety_always_allowed_it :
     slcheck ["sp"] (.memop .free "sp") = some [] := by decide
 
-/-- The three together: safe to free, refused for flow reasons, and the public case
-    unaffected. -/
-theorem the_gap :
+/-- The three together, after the fix: safe to free, *now* accepted for flow reasons
+    too, and the public case unaffected. -/
+theorem the_gap_closed :
     slcheck ["sp"] (.memop .free "sp") = some []
-  ∧ jcheck Ptwo ["sp"] (.memop .free "sp") = none
+  ∧ jcheck Ptwo ["sp"] (.memop .free "sp") = some []
   ∧ allcheck Ptwo [] [] (.seq (.memop .alloc "buf") (.memop .free "buf"))
       = some ([], [], 2) := by decide
 
