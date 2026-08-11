@@ -1,4 +1,11 @@
-"""Brute-force check of the notes-§54 walk claims on randomized (a),(c),(d),(e)-conforming
+"""LIMITATION (notes section 65): the C-sequences built here are SUBSET-increasing in
+range - the realized defect set {B_al \\ B_be : be > al} is the single class {} at every
+level sampled. So any question about coherence DEFECTS is invisible to this tool: the
+phenomenon has measure zero in the model rather than being answered wrongly. That is a
+different failure from the asymptotic inversions of sections 54/57/58, and it needs the
+tool rebuilt on a genuinely mod-finite sequence, not a caveat.
+
+Brute-force check of the notes-§54 walk claims on randomized (a),(c),(d),(e)-conforming
 C-sequences over ordinals below omega^2 * L (so limits-of-limits genuinely exist).
 
 Ordinal omega^2*c + omega*a + b  <->  integer c*A*M + a*M + b   (order-isomorphic).

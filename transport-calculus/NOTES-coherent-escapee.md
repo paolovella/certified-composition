@@ -4064,3 +4064,66 @@ dichotomy before answering the question.
 - **New ZFC fact**: Lemma V1, and with it a chain-free strengthening of Corollary X2.
 - **New evidence**: the scaling table, explicitly labelled as the unreliable kind.
 - **(Q-spread): open.** Two horns, both with a determinate next step.
+
+## 65. CORRECTION to §63: the candidate rank fails (C1) in ZFC at a single level — the two open conditions were one condition all along, and the tool cannot see defects at all (nineteenth flip)
+
+Three things, none of which needed (Q-fib). The first two are due to a review of §63–§64;
+they are recorded here with the argument written out.
+
+**Theorem V2 (the §63 candidate is dead) [proved, ZFC].** Let `u = (β,C)` and `α < β`.
+Then `{x ⊑ u : rank(x) < 1}` is **infinite** for the candidate
+`rank(α,A) := sup{ρ₁(α,β′) : β′ ∈ W(A)}`, so (C1) fails at the single level `α`.
+*Proof.* `C =∗ B_β` is cofinal in `β > α`, so `C \ α` is infinite. Fix `ξ ∈ C \ α` and put
+`A := (B_α ∩ C) ∪ {ξ}`. Then `A Δ B_α = (B_α \ C) ∪ {ξ}` is finite, so `A =∗ B_α`; and
+`A ⊆ C`; so `(α,A) ⊑ u`. But `ξ ≥ α` while `B_α ⊆ α`, so `A ⊄ B_α`, whereas
+`B_α ∩ B_{β′} ⊆ B_α` for **every** `β′`. Hence `W(A) = ∅`, `rank(α,A) = sup ∅ = 0`.
+Distinct `ξ` give distinct `A`, and there are infinitely many. ∎
+
+> This is the **same flaw §58 recorded** for the symmetric-difference rank — infinitely
+> many elements below `u` obtained by adjoining a point of the infinite set `C \ B_α` —
+> and §63 proposed a candidate carrying it while stating "(C1), on which nothing here
+> bears". Something did bear on it, fatally. The guard that would have caught this is not
+> §60's (write out the quantifiers) or §62's (try to prove the consequent) but a third:
+> **before posing a new condition on a candidate, check the conditions already known to
+> kill candidates of that shape.** Third distinct failure mode in six sections.
+
+**Lemma V3 (the two conditions are one) [proved].** Restrict to the sub-elements `A ⊆ B_α`
+— the only ones with a nonempty fibre — and index them by their **defect**
+`F := B_α \ A`, a finite subset of `B_α`, writing `W_F` and `n_F := sup{ρ₁(α,β) : β ∈ W_F}`.
+Then:
+- **(Q-fib)** says exactly that `F ↦ n_F` is **total** into `ω`;
+- **(C1) at level `α`** says exactly that `F ↦ n_F` is **finite-to-one**: `{A ⊑ u at level
+  α : rank(α,A) < N}` finite for each `N` is `{F : n_F < N}` finite.
+> So the wall is not two scalar questions but **one**: *is `F ↦ n_F` a total, finite-to-one
+> map on the defect classes of level `α`?* And the tension is now visible in a single
+> sentence — (Q-fib) pushes every fibre into *some* bounded stratum, (C1) forbids
+> infinitely many fibres from landing in the *same* one.
+
+**The tool cannot see this question [measured].** The natural next measurement — how sparse
+are the realized defects inside `[B_α]^{<ω}` — returns a degenerate answer: over three
+C-sequences at `α ∈ {12,20,28}`, the realized defect set is **a single class, the empty
+one**, so `B_α ⊆ B_β` for every `β > α` in range; 4095 of 4096 subsets are unrealized at
+`α = 12`. The model's sequences are `⊆`-increasing where it can see them, and every
+question *about defects* is therefore invisible to it.
+> **Fourth recorded limitation of the numeric model, and qualitatively new.** §54, §57 and
+> §58 were asymptotic inversions — the model answering a limit question backwards. This is
+> a **degeneracy**: the phenomenon has measure zero in the model, so there is nothing to
+> get right or wrong. Asymptotic claims need the caveat; *defect* claims need the tool
+> rebuilt with a genuinely mod-finite C-sequence. Recorded in `tools/walk-check.py`.
+
+**Where the repair lands.** Patch the rank with a per-level `ω`-enumeration of the defect
+classes: that makes `F ↦ n_F` finite-to-one by fiat and can only *raise* ranks, so (C2)'s
+canonical half survives. But the enumeration is chosen per level, and a **global** rank
+cannot carry a per-`u` enumeration — which is exactly Lemma Y3's observation that a single
+down-set is free and Corollary Y2's that the residual is simultaneity. So the repaired
+candidate does not get past §58; it lands back inside it.
+
+**Status after §65.**
+- **§63's candidate: dead** (Theorem V2, ZFC), and §63's "two scalar questions" is
+  superseded by **one** (Lemma V3).
+- **(Q-spread): open**, and the residual is unchanged from §58 — simultaneity — with the
+  §63/§64 detour now closed rather than left dangling.
+- **Standing**: Lemmas Z1, Z2, W1, W3, W3a, Corollaries Y, Y2, W4, and Lemma V1 (whose
+  dichotomy is still correct — it just applies to a candidate that fails the other
+  conjunct).
+- **Tool**: a fourth limitation, of a new kind, recorded at the source.

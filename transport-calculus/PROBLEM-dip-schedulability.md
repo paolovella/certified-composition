@@ -627,7 +627,13 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   in every model — evidence for **(Q-fib) NO**, of exactly the asymptotic kind that misled
   §54 and §57, and labelled as such. Both horns leave a determinate next step: YES
   collapses everything to (C1) for one explicit function, NO makes (C2) a scheduling
-  problem for forced exceptions.)*
+  problem for forced exceptions. **§65 then kills the candidate outright**: *Theorem V2
+  [ZFC]* — every `u=(β,C)` has infinitely many level-`α` elements `(B_α∩C) ∪ {ξ}` with
+  `ξ ∈ C\α`, which are not subsets of `B_α` and so have empty fibre and rank `sup ∅ = 0`;
+  (C1) fails at one level. Same flaw §58 recorded. *Lemma V3*: indexing by the defect
+  `F := B_α\A`, (Q-fib) is totality of `F ↦ n_F` and (C1) is its finite-to-one-ness — the
+  two open conditions are **one**. The repaired candidate lands back inside Corollary Y2's
+  simultaneity residual.)*
   *(**The W1 route, notes §61.** On the uncountable `T` where the trace is constant the
   canonical elements **freeze**: `B_α ∩ B_β = B_α ∩ X` for all `α<β₀`, `β ∈ T`, so
   `g_β = G` with no `β` in it. Pigeonhole on the finite exceptional sets over the

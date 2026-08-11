@@ -747,7 +747,24 @@ the kind that misled §54 and §57 — a supremum over an infinite fibre is the 
 regime the truncated model has inverted three times — and it is labelled as such. Either
 horn leaves a determinate next step: YES collapses everything to **(C1)** for one explicit
 function; NO turns (C2) into a scheduling problem for forced exceptions, §58's covering
-reformulation with the exceptions now identified element by element. Sixteen labelled verdict flips, plus
+reformulation with the exceptions now identified element by element.
+
+**§65 closes the §63–§64 detour (nineteenth flip), on three counts.** *(i)* **Theorem V2
+[ZFC]**: the candidate fails (C1) at a *single level*. Every `u=(β,C)` has infinitely many
+level-`α` elements `A = (B_α∩C) ∪ {ξ}` with `ξ ∈ C\α`; such an `A` is not a subset of
+`B_α`, while `B_α ∩ B_{β′} ⊆ B_α` always, so the fibre is empty and the rank is `sup ∅ = 0`.
+That is the *same* flaw §58 recorded for the symmetric-difference rank, and §63 said "(C1),
+on which nothing here bears". A third distinct guard is now recorded: before posing a new
+condition on a candidate, check the conditions already known to kill candidates of that
+shape. *(ii)* **Lemma V3**: indexing fibres by the **defect** `F := B_α\A`, (Q-fib) is
+exactly *totality* of `F ↦ n_F` and (C1) at level `α` is exactly its *finite-to-one-ness* —
+so the wall is **one** condition, and the tension is visible in a sentence. *(iii)* The
+tool cannot see this at all: the realized defect set is the single class `∅` at every
+level sampled (4095 of 4096 subsets unrealized at `α=12`), because the model's sequences
+are `⊆`-increasing in range. Fourth limitation, and a **degeneracy** rather than an
+asymptotic inversion — recorded at the top of the tool, since it needs a rebuild rather
+than a caveat. The repaired candidate (a per-level enumeration of defect classes) lands
+back inside Corollary Y2's simultaneity residual rather than past it. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

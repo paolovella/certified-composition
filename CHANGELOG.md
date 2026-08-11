@@ -1106,6 +1106,37 @@ landed.
   reformulation, with the exceptions now identified element by element rather than
   inferred from chains.
 
+- **Set-theory research line, notes §65 — CORRECTION to §63 (nineteenth flip).** Three
+  results, the first two prompted by a review of §63–§64.
+
+  **Theorem V2 [ZFC]: the candidate rank is dead**, and not for want of (Q-fib). Every
+  `u = (β,C)` has infinitely many level-`α` elements `A := (B_α ∩ C) ∪ {ξ}` with
+  `ξ ∈ C \ α`; each is `=∗ B_α` and `⊆ C`, but is **not a subset of `B_α`**, while
+  `B_α ∩ B_{β′} ⊆ B_α` for every `β′` — so the fibre is empty and the rank is `sup ∅ = 0`.
+  (C1) fails at a single level. This is the *same* flaw §58 recorded for the
+  symmetric-difference rank, and §63 asserted "(C1), on which nothing here bears".
+  **Third distinct guard**, after §60's and §62's: *before posing a new condition on a
+  candidate, check the conditions already known to kill candidates of that shape.*
+
+  **Lemma V3: the two open conditions were one.** Indexing fibres by the defect
+  `F := B_α \ A` and writing `n_F := sup{ρ₁(α,β) : β ∈ W_F}`, (Q-fib) is exactly
+  *totality* of `F ↦ n_F` and (C1) at level `α` is exactly its *finite-to-one-ness*. So
+  the wall is one condition, and the tension is a sentence: (Q-fib) pushes every fibre
+  into some bounded stratum, (C1) forbids infinitely many fibres landing in the same one.
+
+  **A fourth limitation of the numeric tool, of a new kind.** The realized defect set is
+  the single class `∅` at every level sampled — 4095 of 4096 subsets unrealized at
+  `α = 12` — because the model's C-sequences are `⊆`-increasing in range. §54/§57/§58 were
+  asymptotic *inversions*; this is a **degeneracy**, the phenomenon having measure zero in
+  the model, so there is nothing to get right or wrong. Recorded at the top of
+  `tools/walk-check.py`, since it needs the tool rebuilt on a genuinely mod-finite
+  sequence rather than a caveat.
+
+  The repaired candidate — a per-level enumeration of defect classes — makes `F ↦ n_F`
+  finite-to-one by fiat and preserves (C2)'s canonical half, but a global rank cannot
+  carry a per-`u` enumeration, so it lands back inside Corollary Y2's simultaneity
+  residual rather than past it. §63–§64 is therefore a closed detour, not a dangling one.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value
