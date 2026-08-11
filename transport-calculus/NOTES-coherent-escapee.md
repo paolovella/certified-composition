@@ -3730,3 +3730,67 @@ statement of the wall than "the down-sets overlap", and it explains why every at
   β₀)|` in `β`. It is a question about the C-sequence alone — no ranks, no down-sets —
   which is the first time this program's residual has reduced to a property of the
   sequence itself.
+
+## 60. CORRECTION to §59: the "sharpened question" does not decide (Q-spread) — two gaps in the implication, and what survives (seventeenth flip)
+
+§59 closed with a claim that a **yes** to "is `|B_{β₀} Δ (B_β ∩ β₀)|` bounded in `β`?"
+would resolve (Q-spread) negative via Theorem X, and that the residual had therefore
+reduced to a question about the C-sequence alone. **That implication does not hold.**
+Lemmas Z1, Z2 and Corollary Z3 are unaffected — they are proved and machine-checked — but
+the paragraph built on them overreached in two independent ways, and the "property of the
+sequence itself" headline is withdrawn.
+
+**Gap 1: bounded discrepancy does not give a finite perturbation family.** The route needs
+the values `g_β(α) = rank(α, B_α ∩ B_β)` to be dominated by a level function, and Z3 gives
+that only when the modifications are drawn from a *fixed finite* family. A bound
+`|F(β₀,β)| ≤ k` does not supply one: the sets within Hamming distance `k` of `B_{β₀}` are
+**infinitely many**, because up to `k` elements may be added from the infinite pool
+`β₀ \ B_{β₀}`. So the family `{B_β ∩ β₀ : β > β₀}` can be infinite even with the
+discrepancy bounded, and `sup_β rank(α, ·)` over it need not be finite. Bounded ≠ finitely
+many; the section conflated them.
+
+**Gap 2: a level function below `β₀` cannot contradict Theorem X.** Even granting a level
+function `M` with `g_β ≤ M` on `β₀`, what follows is that `{α < β₀ : M(α) < ρ₁(α,β)}` is
+finite for every `β > β₀`. That is a statement about a **countable** set of levels and is
+not the hypothesis Theorem X refutes: extend `M` above `β₀` by anything — say `0` — and for
+`β > β₀` the set `{α<β : M(α) < ρ₁(α,β)}` contains all but finitely many `α ∈ [β₀,β)`, so
+the extended function fails the hypothesis outright. Theorem X's proof runs on the
+regularity of `ℵ₁`; below a countable `β₀` there is nothing for it to bite on.
+
+**What actually would suffice [corrected].** To run the Theorem-X route one needs a single
+`M : ω₁ → ω` dominating `g_β` off finitely many levels *for every* `β`, i.e.
+> `M(α) := sup_{β>α} rank(α, B_α ∩ B_β) < ∞` for cofinally many `α`.
+That is a condition on the **rank**, not on the C-sequence: the adversary constructing the
+rank is free to send `rank(α, B_α ∩ B_β) → ∞` along `β`, and nothing in Z2 or Z3 prevents
+it. So §59's reduction to a property of the sequence is withdrawn; the residual is where
+§58 left it, with Z2/Z3 as a budget statement rather than a decision procedure.
+
+**Lemma W1 (the free pigeonhole) [proved, ZFC].** For every `β₀` there is a single set `X`
+with `X =∗ B_{β₀}` and `B_β ∩ β₀ = X` for **uncountably many** `β > β₀`.
+*Proof.* Coherence gives `B_β ∩ β₀ =∗ B_{β₀}` for every `β > β₀`, and the sets `=∗ B_{β₀}`
+are the `B_{β₀} Δ D` for `D ⊆ β₀` finite — countably many, since `β₀` is countable. So
+`β ↦ B_β ∩ β₀` maps `ω₁ \ β₀` into a countable set and some fibre is uncountable. ∎
+No boundedness hypothesis is needed: this holds for **every** coherent sequence. It is
+what §59 should have extracted instead of the bounded-discrepancy question — the trace on
+any countable initial segment is not merely eventually-constant-mod-finite, it is
+*literally constant on an uncountable set of levels*.
+
+**Why W1 does not close the gap either [checked].** One might hope to thread the `X`'s: if
+`X_{β₀}` and `X_{β₁}` agree (`X_{β₁} ∩ β₀ = X_{β₀}`) for `β₀ < β₁`, the union would be a
+thread and the sequence trivial. But the uncountable fibres `T_{β₀}` and `T_{β₁}` need not
+meet — two uncountable subsets of `ω₁` can be disjoint — so nothing forces the values to
+cohere. The same obstacle defeats the "flippy ordinal" count: the sets
+`{β : ξ ∈ D(β₀,β)}` for distinct `ξ` can be uncountable and pairwise disjoint. Recorded
+because both routes look like they should work and neither does.
+
+**Status after §60.**
+- **Withdrawn**: §59's sharpened question as a decision procedure, and the claim that the
+  residual reduced to a property of the C-sequence.
+- **Standing**: Lemmas Z1, Z2, Corollary Z3 (proved; Z2 machine-checked at 732000
+  instances). The budget reading — one finite set of ordinals governs the perturbation at
+  every level at once — is unaffected.
+- **New**: Lemma W1, free of hypotheses, and the record of two natural threading routes
+  that fail for the same reason (uncountable sets need not meet).
+- **Seventeenth labelled flip**, and the first in this line caught within one section of
+  being written. The prompt was mechanical: the claim asserted an implication with two
+  quantifier steps in it and neither had been written out.

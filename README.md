@@ -85,8 +85,9 @@ The same accountancy appears at every level:
   compares their rates; and a single down-set is free, so the whole residual
   is simultaneity), then **budgeted** (§59: Lemma Z2, one finite set of
   ordinals governs the perturbation at *every* level at once, machine-checked
-  at 732000 instances — and the residual now reduces to a question about the
-  C-sequence alone) — and the two-sided independence
+  at 732000 instances; §60 **withdraws** that section's further claim that the
+  residual reduced to a question about the C-sequence, with the two gaps
+  written out, and salvages Lemma W1) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

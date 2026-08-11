@@ -980,8 +980,38 @@ landed.
   **The residual now reduces to a question about the C-sequence alone** — no ranks, no
   down-sets: *is `|B_{β₀} Δ (B_β ∩ β₀)|` bounded in `β` for some `β₀`?* Yes gives a single
   dominating level function below `β₀` and resolves (Q-spread) negative via Theorem X; no
-  names the discrepancy as the resource a construction must spend. First time this
-  program's residual has reduced to a property of the sequence itself.
+  names the discrepancy as the resource a construction must spend.
+
+- **Set-theory research line, notes §60 — CORRECTION to §59 (seventeenth flip).** §59's
+  closing claim — that a bound on `|B_{β₀} Δ (B_β ∩ β₀)|` would resolve (Q-spread)
+  negative via Theorem X, so the residual reduced to a question about the C-sequence
+  alone — **does not hold**, and is withdrawn. Two independent gaps:
+
+  *Bounded is not finitely many.* The Theorem-X route needs the perturbations drawn from
+  a **fixed finite** family; a bound `|F| ≤ k` does not supply one, since up to `k`
+  elements may be added from the infinite pool `β₀ \ B_{β₀}`, so the family
+  `{B_β ∩ β₀ : β>β₀}` can be infinite and the sup of ranks over it unbounded.
+
+  *A countable initial segment cannot contradict Theorem X.* Even granted a level
+  function `M` below `β₀`, what follows concerns a **countable** set of levels; extend `M`
+  above `β₀` by anything and the hypothesis fails immediately. Theorem X's proof runs on
+  the regularity of `ℵ₁`.
+
+  What would actually suffice is `sup_{β>α} rank(α, B_α ∩ B_β) < ∞` cofinally — a
+  condition on the **rank**, not on the sequence — so the reduction to a property of the
+  sequence is withdrawn.
+
+  **Salvaged: Lemma W1**, free of hypotheses. For every `β₀` there is a single
+  `X =∗ B_{β₀}` with `B_β ∩ β₀ = X` for *uncountably many* `β`, because the trace takes
+  only countably many values on a countable initial segment. Also recorded: two natural
+  routes from W1 to triviality both fail for the same reason — two uncountable subsets of
+  `ω₁` need not meet — which is worth having written down, since both look like they
+  should work.
+
+  Lemmas Z1, Z2 and Corollary Z3 stand unaffected; the budget reading of §59 is intact.
+  First flip in this line caught within one section of being written, and the prompt was
+  mechanical: the claim asserted an implication with two quantifier steps in it and
+  neither had been written out.
 
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance

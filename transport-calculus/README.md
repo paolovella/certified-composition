@@ -685,10 +685,15 @@ simultaneity.** **Lemma Z2 (uniform discrepancy)**: for `α<β<β′`, the canon
 satisfy `(B_α∩B_β) Δ (B_α∩B_{β′}) ⊆ B_β Δ (B_{β′}∩β)` — one finite set, *independent of
 `α`*, governing every level at once (machine-checked, 732000 instances). So a rank has,
 between two down-sets, at most `2^{|F|}` choices per level and the choice is dictated by
-`B_α ∩ F`. The residual then reduces to a question about the **C-sequence alone**: is
-`|B_{β₀} Δ (B_β ∩ β₀)|` bounded in `β` for some `β₀`? Yes would give a single dominating
-level function below `β₀` and resolve (Q-spread) negative via Theorem X; no leaves the
-construction route open and names the discrepancy as the resource to spend. Sixteen labelled verdict flips, plus
+`B_α ∩ F`. **§60 is a correction of record to that section's last paragraph** (seventeenth flip):
+the claim that a bound on `|B_{β₀} Δ (B_β ∩ β₀)|` would resolve (Q-spread) does **not**
+hold. Two independent gaps — *bounded* discrepancy does not give a *finitely many*
+perturbation family (up to `k` elements may be added from an infinite pool), and a level
+function below a **countable** `β₀` cannot contradict Theorem X, whose proof runs on the
+regularity of `ℵ₁`. What would actually suffice is `sup_β rank(α, B_α∩B_β) < ∞` cofinally
+— a condition on the **rank**, not the sequence. Salvaged: **Lemma W1**, free of
+hypotheses — for every `β₀` some single `X =∗ B_{β₀}` equals `B_β ∩ β₀` for *uncountably
+many* `β`. Z1, Z2 and Z3 stand unaffected. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 
