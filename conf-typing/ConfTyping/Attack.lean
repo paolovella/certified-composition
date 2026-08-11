@@ -131,7 +131,8 @@ theorem allcheck_NI_general {P : Partition} {c : UCmd} {A' V' : List String} {k 
       SepInv [] s → SepInv [] s' → uLowEqA P s s' →
       uOptLowEqA P (uexec n c π s) (uexec n c π s') :=
   fun n π s s' hs hs' hle =>
-    jsecTy_sound n c [] V' (allcheck_sound c [] [] A' V' k h).joint π s s' hs hs' hle
+    jsecTy_sound n c [] V' (allcheck_sound c [] [] A' V' k h).joint π s s' hs hs'
+      (fun _ x hx => by simp at hx) (fun _ x hx => by simp at hx) hle
 
 /-- Two states that differ in a secret string and agree on everything Low. -/
 def secretStr : UState :=
@@ -144,7 +145,7 @@ def secretStr' : UState :=
     live := [], fresh := 0, err := false, freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := [] }
 
 theorem secretStr_lowEqA : uLowEqA Psec secretStr secretStr' := by
-  refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl, rfl, rfl⟩
+  refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl, rfl, rfl, fun _ _ => rfl⟩
   intro y hy
   show (if y == "secret" then [UCh.quote] else []) = []
   have : ¬ (y == "secret") = true := by simpa [Psec] using hy

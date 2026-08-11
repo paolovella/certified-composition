@@ -382,7 +382,10 @@ reuse, a recycled secret cell would otherwise leak into a public one), and `LabI
 every tracked pointer points at a cell of its own level — is proved inductive, resting
 on stage 1i's separation. The observation does not yet use the labels, so the heap is
 still public; that is the next stage, and splitting it this way audits the invariant
-before anything depends on it.
+before anything depends on it. Stage 1x then spent it: the observation became **per
+address**, `storeH` lets a secret live in the heap when it is reached through a secret
+pointer, and the heap is now **two-level** rather than public. The stage is short
+because 1w did the work — which is what the split was for.
 
 ## Scope — what is *not* claimed
 

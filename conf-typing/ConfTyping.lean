@@ -66,3 +66,4 @@ import ConfTyping.Attack
 import ConfTyping.Reuse
 import ConfTyping.HeapValue
 import ConfTyping.HeapLabel
+import ConfTyping.HeapSecret

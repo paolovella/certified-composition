@@ -158,7 +158,7 @@ def allcheck (P : Partition) :
   | A, V, .sop .emit _ e  => if sexprLow P e then some (A, V, 1) else none
   | A, V, .hop .load d p  => if memStr p V && (!P p || P d)
                              then some (A, dropStr d V, 1) else none
-  | A, V, .hop .store p v => if memStr p V && !P p && !P v then some (A, V, 1) else none
+  | A, V, .hop .store p v => if memStr p V && (P p || !P v) then some (A, V, 1) else none
   | A, V, .seq c₁ c₂      => (allcheck P A V c₁).bind fun p₁ =>
                                (allcheck P p₁.1 p₁.2.1 c₂).map fun p₂ =>
                                  (p₂.1, p₂.2.1, p₁.2.2 + p₂.2.2)
@@ -294,13 +294,17 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
       · rw [if_neg hx] at h; simp at h
   | .hop .store p v, A, V, A', V', k, h => by
       simp only [allcheck] at h
-      by_cases hx : (memStr p V && !P p && !P v) = true
+      by_cases hx : (memStr p V && (P p || !P v)) = true
       · rw [if_pos hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
-        obtain ⟨h12, h3⟩ := Bool.and_eq_true _ _ |>.mp hx
-        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp h12
-        exact ⟨UCert.hop .store p v, .storeL V p v h1 (by simpa using h2) (by simpa using h3)⟩
+        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
+        refine ⟨UCert.hop .store p v, ?_⟩
+        rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
+        · exact .storeH V p v h1 h'
+        · by_cases hpp : P p = true
+          · exact .storeH V p v h1 hpp
+          · exact .storeL V p v h1 (by simpa using hpp) (by simpa using h')
       · rw [if_neg hx] at h; simp at h
   | .loop _ _, _, _, _, _, _, h => by simp [allcheck] at h
 
@@ -329,7 +333,8 @@ theorem allcheck_gives_four {P : Partition} {c : UCmd} {A' V' : List String} {k 
     have hinv : UMedInv π [] (initU σ) := ⟨by simp [initU], by simp [initU], by simp⟩
     exact (hf.bundle.auth n π (initU σ) r hinv hr).2.1 q hq
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hf.joint π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩)
+      SepInv.initU SepInv.initU LabInv.initU LabInv.initU
+      ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl, fun _ _ => rfl⟩)
   · exact (hf.joint.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## The artifact -/

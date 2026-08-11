@@ -67,9 +67,15 @@ theorem wild_store_rejected : slcheck [] (.hop .store "p" "v") = none := by deci
 
 /-! ## The heap is public, and that is a real restriction -/
 
-/-- **The finding.** The heap is in the observation, so writing a secret into it would
-    make the two runs' heaps differ. There is no `storeH` rule, and this is what its
-    absence means: a secret value cannot be put in the heap at all. -/
+/-- **The finding, as it stood at stage 1v.** The whole heap was in the observation, so
+    writing a secret into it would make the two runs' heaps differ; there was no
+    `storeH` rule, and a secret value could not be put in the heap at all.
+
+    **Stage 1x narrowed this.** With per-address labels the heap is two-level, and a
+    secret *can* be stored — through a secret pointer
+    (`HeapSecret.secret_through_a_secret_pointer`). The statement below survived
+    unchanged because its pointer is public, and a public pointer points at a public
+    cell; what changed is that it is now a boundary rather than a blanket ban. -/
 theorem storing_a_secret_is_refused :
     jcheck Psec ["p"] (.hop .store "p" "secret") = none := by decide
 

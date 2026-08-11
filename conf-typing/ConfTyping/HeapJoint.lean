@@ -141,6 +141,11 @@ inductive JSecTy (P : Partition) : List String → UCmd → List String → Prop
       deliberately no High counterpart: see `HeapValue.storing_a_secret_is_refused`. -/
   | storeL  : ∀ V p v, memStr p V = true → P p = false → P v = false →
               JSecTy P V (.hop .store p v) V
+  /-- **Storing a secret through a secret pointer** (stage 1x). `LabInv` says the cell
+      is secret, so neither the address nor the value is observable. Stage 1v had no
+      such rule and the heap was therefore public; this is what the invariant buys. -/
+  | storeH  : ∀ V p v, memStr p V = true → P p = true →
+              JSecTy P V (.hop .store p v) V
 
 /-- Every joint derivation contains a memory-safety derivation. -/
 theorem JSecTy.toSepCert {P : Partition} {V : List String} {c : UCmd} {V' : List String}
@@ -165,6 +170,330 @@ theorem JSecTy.toSepCert {P : Partition} {V : List String} {c : UCmd} {V' : List
   | loadL _ d p hp _ => exact SepCert.load d p hp
   | loadH _ d p hp _ => exact SepCert.load d p hp
   | storeL _ p v hp _ _ => exact SepCert.store p v hp
+  | storeH _ p v hp _ => exact SepCert.store p v hp
+
+/-! ## The invariant -/
+
+/-- Every tracked pointer points at a cell of its own security level. -/
+def LabInv (P : Partition) (V : List String) (s : UState) : Prop :=
+  s.dead = false → ∀ x ∈ V, s.hlab (s.store x) = P x
+
+theorem LabInv.mono {P : Partition} {V W : List String} {s : UState}
+    (hsub : ∀ x ∈ W, x ∈ V) (h : LabInv P V s) : LabInv P W s :=
+  fun hd x hx => h hd x (hsub x hx)
+
+/-- The invariant carries whenever a step leaves the labels alone and leaves the store
+    alone on the *surviving* tracked variables. Every rule but the two allocations. -/
+theorem labInv_carry {P : Partition} {V V' : List String} {s t : UState}
+    (hsub : ∀ x ∈ V', x ∈ V) (hst : ∀ x ∈ V', t.store x = s.store x)
+    (hhl : t.hlab = s.hlab) (hdd : t.dead = false → s.dead = false)
+    (h : LabInv P V s) : LabInv P V' t := by
+  intro hdt x hx
+  rw [hst x hx, hhl]
+  exact h (hdd hdt) x (hsub x hx)
+
+/-! ## Steps that leave the store and the labels alone -/
+
+def LabStable (c : UCmd) : Prop :=
+  ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
+    uexec n c π s = some r →
+      (∀ x, r.1.store x = s.store x) ∧ r.1.hlab = s.hlab ∧
+      (r.1.dead = false → s.dead = false)
+
+theorem labStable_skip : LabStable .skip := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      exact ⟨fun _ => by simp, by simp, by simp⟩
+
+theorem labStable_check (q : String) : LabStable (.check q) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [if_neg hd]
+        by_cases hp : π q = true
+        · simp only [if_pos hp]
+          exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+        · simp only [if_neg hp]
+          exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
+
+theorem labStable_access (q : String) : LabStable (.access q) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [if_neg hd]
+        exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+
+theorem labStable_sop (op : SOp) (x : String) (e : SExpr) : LabStable (.sop op x e) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [if_neg hd]
+        cases op with
+        | set  => exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+        | emit => exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+
+theorem labStable_deref (x : String) : LabStable (.memop .deref x) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [if_neg hd]
+        by_cases hl : memInt (s.store x) s.live = true
+        · simp only [if_pos hl]
+          exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+        · simp only [if_neg hl]
+          exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
+
+theorem labStable_free (x : String) : LabStable (.memop .free x) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [if_neg hd]
+        by_cases hl : memInt (s.store x) s.live = true
+        · simp only [if_pos hl]
+          exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+        · simp only [if_neg hl]
+          exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
+
+theorem labStable_hstore (p v : String) : LabStable (.hop .store p v) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [if_neg hd]
+        by_cases hl : memInt (s.store p) s.live = true
+        · simp only [if_pos hl]
+          exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
+        · simp only [if_neg hl]
+          exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
+
+theorem labInv_of_stable {P : Partition} {V : List String} {c : UCmd}
+    (hc : LabStable c) {n : Nat} {π : MedPolicy} {s : UState}
+    {r : UState × Nat × List Bool} (hL : LabInv P V s) (hr : uexec n c π s = some r) :
+    LabInv P V r.1 :=
+  labInv_carry (s := s) (fun _ hx => hx) (fun x _ => (hc n π s r hr).1 x)
+    (hc n π s r hr).2.1 (hc n π s r hr).2.2 hL
+
+/-! ## The three steps that move the store -/
+
+theorem labInv_assign {P : Partition} {V : List String} {x : String} {e : Expr}
+    {n : Nat} {π : MedPolicy} {s : UState} {r : UState × Nat × List Bool}
+    (hL : LabInv P V s) (hr : uexec n (.assign x e) π s = some r) :
+    LabInv P (dropStr x V) r.1 := by
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]
+        exact labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun _ _ => rfl) rfl id hL
+      · simp only [if_neg hd]
+        refine labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun y hy => ?_) rfl id hL
+        show upd s.store x (evalE e s.store) y = s.store y
+        simp only [upd, if_neg (dropStr_ne hy)]
+
+theorem labInv_load {P : Partition} {V : List String} {d p : String}
+    {n : Nat} {π : MedPolicy} {s : UState} {r : UState × Nat × List Bool}
+    (hL : LabInv P V s) (hr : uexec n (.hop .load d p) π s = some r) :
+    LabInv P (dropStr d V) r.1 := by
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]
+        exact labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun _ _ => rfl) rfl id hL
+      · simp only [if_neg hd]
+        by_cases hl : memInt (s.store p) s.live = true
+        · simp only [if_pos hl]
+          refine labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun y hy => ?_) rfl id hL
+          show upd s.store d (s.heap (s.store p)) y = s.store y
+          simp only [upd, if_neg (dropStr_ne hy)]
+        · simp only [if_neg hl]
+          intro hc; exact absurd hc (by simp)
+
+/-- **The allocation case**, and the only one that needs the separation invariant: the
+    new cell takes the label the rule demands, and every variable already tracked keeps
+    its own, because the new address is not live and therefore not any of theirs. -/
+theorem labInv_alloc {P : Partition} {V : List String} {x : String} {b : Bool}
+    {n : Nat} {π : MedPolicy} {s : UState} {r : UState × Nat × List Bool}
+    (hb : P x = b) (hS : SepInv V s) (hL : LabInv P V s)
+    (hr : uexec n (.memop (if b then .allocS else .alloc) x) π s = some r) :
+    LabInv P (x :: V) r.1 := by
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      by_cases hd : s.dead = true
+      · cases b <;>
+          simp only [uexec, if_pos hd, Option.some.injEq, if_true, if_false] at hr <;>
+          subst hr <;> intro hc <;> exact absurd (hd ▸ hc) (by simp)
+      · have hd0 : s.dead = false := by simpa using hd
+        obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hS.2 hd0
+        have hnl : memInt (pickAddr s.freed s.fresh) s.live = false := by
+          cases hq : s.freed with
+          | nil =>
+              show memInt s.fresh s.live = false
+              by_cases hm : memInt s.fresh s.live = true
+              · exact absurd (hfr _ hm) (by omega)
+              · simpa using hm
+          | cons c cs => exact hdisj c (by rw [hq]; simp [memInt])
+        have key : ∀ (lab : Bool), P x = lab →
+            LabInv P (x :: V)
+              ({ s with store := upd s.store x (pickAddr s.freed s.fresh),
+                        live := pickAddr s.freed s.fresh :: s.live,
+                        freed := dropInt (pickAddr s.freed s.fresh) s.freed,
+                        fresh := bumpFresh s.freed s.fresh,
+                        hlab := updBU s.hlab (pickAddr s.freed s.fresh) lab,
+                        heap := updHU s.heap (pickAddr s.freed s.fresh) 0 }) := by
+          intro lab hlabx _ y hy
+          show updBU s.hlab (pickAddr s.freed s.fresh) lab
+                 (upd s.store x (pickAddr s.freed s.fresh) y) = P y
+          by_cases hyx : y = x
+          · subst hyx
+            simp only [upd, if_pos rfl]
+            show (if pickAddr s.freed s.fresh = pickAddr s.freed s.fresh then lab
+                  else s.hlab (pickAddr s.freed s.fresh)) = P y
+            rw [if_pos rfl, hlabx]
+          · have hyV : y ∈ V := memCons_ne hy hyx
+            have hne : ¬ (s.store y = pickAddr s.freed s.fresh) := by
+              intro hc
+              exact absurd (hc ▸ hlive y hyV) (by simp [hnl])
+            simp only [upd, if_neg hyx, updBU, if_neg hne]
+            exact hL hd0 y hyV
+        cases b with
+        | false =>
+            simp only [uexec, if_neg hd, if_false, Option.some.injEq] at hr
+            subst hr; exact key false hb
+        | true =>
+            simp only [uexec, if_neg hd, if_true, Option.some.injEq] at hr
+            subst hr; exact key true hb
+
+/-! ## Preservation -/
+
+/-- **The label invariant is inductive.** Every rule of the joint judgment preserves
+    "each tracked pointer points at a cell of its own level". The separation invariant
+    is a hypothesis because the allocation case needs it — which is stage 1i paying for
+    stage 1w. -/
+theorem JSecTy.toLabInv {P : Partition} {V : List String} {c : UCmd} {V' : List String}
+    (h : JSecTy P V c V') :
+    ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
+      SepInv V s → LabInv P V s → uexec n c π s = some r → LabInv P V' r.1 := by
+  induction h with
+  | skip _ => intro n π s r _ hL hr; exact labInv_of_stable labStable_skip hL hr
+  | assignH _ x e _ => intro n π s r _ hL hr; exact labInv_assign hL hr
+  | assignL _ x e _ => intro n π s r _ hL hr; exact labInv_assign hL hr
+  | check _ q => intro n π s r _ hL hr; exact labInv_of_stable (labStable_check q) hL hr
+  | access _ q => intro n π s r _ hL hr; exact labInv_of_stable (labStable_access q) hL hr
+  | setH _ x e _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_sop .set x e) hL hr
+  | setL _ x e _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_sop .set x e) hL hr
+  | emit _ q e _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_sop .emit q e) hL hr
+  | deref _ x _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_deref x) hL hr
+  | storeL _ p v _ _ _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_hstore p v) hL hr
+  | storeH _ p v _ _ => intro n π s r _ hL hr; exact labInv_of_stable (labStable_hstore p v) hL hr
+  | loadL _ d p _ _ => intro n π s r _ hL hr; exact labInv_load hL hr
+  | loadH _ d p _ _ => intro n π s r _ hL hr; exact labInv_load hL hr
+  | free _ x _ _ =>
+      intro n π s r _ hL hr
+      exact LabInv.mono (fun _ hz => dropStr_mem hz)
+        (labInv_of_stable (labStable_free x) hL hr)
+  | alloc _ x hx =>
+      intro n π s r hS hL hr
+      exact labInv_alloc (b := false) hx hS hL (by simpa using hr)
+  | allocS _ x hx =>
+      intro n π s r hS hL hr
+      exact labInv_alloc (b := true) hx hS hL (by simpa using hr)
+  | @seq V V₁ V₂ c₁ c₂ h₁ h₂ ih₁ ih₂ =>
+      intro n π s r hS hL hr
+      cases n with
+      | zero => simp [uexec] at hr
+      | succ m =>
+          rw [uexec_seq_eq] at hr
+          rcases e₁ : uexec m c₁ π s with _ | r₁
+          · rw [e₁] at hr; simp at hr
+          · rw [e₁, Option.bind_some] at hr
+            rcases e₂ : uexec m c₂ π r₁.1 with _ | r₂
+            · rw [e₂] at hr; simp at hr
+            · rw [e₂] at hr
+              simp only [Option.map_some, Option.some.injEq] at hr
+              subst hr
+              exact ih₂ m π r₁.1 r₂ (h₁.toSepCert.safe m π s r₁ hS e₁)
+                (ih₁ m π s r₁ hS hL e₁) e₂
+  | @iteL V V₁ V₂ c₁ c₂ e _ h₁ h₂ ih₁ ih₂ =>
+      intro n π s r hS hL hr
+      cases n with
+      | zero => simp [uexec] at hr
+      | succ m =>
+          rw [uexec_ite_eq] at hr
+          by_cases hg : evalE e s.store ≠ 0
+          · rw [if_pos hg] at hr
+            rcases e₁ : uexec m c₁ π s with _ | r₁
+            · rw [e₁] at hr; simp at hr
+            · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
+              subst hr
+              exact LabInv.mono (fun _ hz => interStr_left hz) (ih₁ m π s r₁ hS hL e₁)
+          · rw [if_neg hg] at hr
+            rcases e₂ : uexec m c₂ π s with _ | r₂
+            · rw [e₂] at hr; simp at hr
+            · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
+              subst hr
+              exact LabInv.mono (fun _ hz => interStr_right hz) (ih₂ m π s r₂ hS hL e₂)
+  | @whileW V W W₁ c₀ e _ hWV h₀ hWW₁ ih =>
+      have hbody : SepCert W c₀ W := SepCert.weakenPost h₀.toSepCert hWW₁
+      have main : ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
+          SepInv W s → LabInv P W s → uexec n (.loop e c₀) π s = some r →
+          LabInv P W r.1 := by
+        intro n
+        induction n with
+        | zero => intro π s r _ _ hr; simp [uexec] at hr
+        | succ m ihm =>
+            intro π s r hSW hLW hr
+            rw [uexec_loop_eq] at hr
+            by_cases hg : evalE e s.store ≠ 0
+            · rw [if_pos hg] at hr
+              rcases e₁ : uexec m c₀ π s with _ | r₁
+              · rw [e₁] at hr; simp at hr
+              · rw [e₁, Option.bind_some] at hr
+                rcases e₂ : uexec m (.loop e c₀) π r₁.1 with _ | r₂
+                · rw [e₂] at hr; simp at hr
+                · rw [e₂] at hr
+                  simp only [Option.map_some, Option.some.injEq] at hr
+                  subst hr
+                  exact ihm π r₁.1 r₂ (hbody.safe m π s r₁ hSW e₁)
+                    (LabInv.mono hWW₁ (ih m π s r₁ hSW hLW e₁)) e₂
+            · rw [if_neg hg] at hr
+              simp only [Option.some.injEq] at hr; subst hr; exact hLW
+      intro n π s r hS hL hr
+      exact main n π s r (SepInv.mono hWV hS) (LabInv.mono hWV hL) hr
+
+/-- From a fresh state the invariant holds trivially, so a checked program maintains it
+    all the way through. -/
+theorem LabInv.initU {P : Partition} {σ : Store} : LabInv P [] (initU σ) := by
+  intro _ x hx; simp at hx
 
 /-! ## Two combinators that keep the equations
 
@@ -224,7 +553,9 @@ theorem uOptLowEq_mapE {P : Partition} {a a' : Option (UState × Nat × List Boo
 def uLowEqA (P : Partition) (s s' : UState) : Prop :=
   lowEq P s.store s'.store ∧ s.reads = s'.reads ∧ s.dead = s'.dead ∧ s.fresh = s'.fresh
   ∧ (∀ x, P x = false → s.sstore x = s'.sstore x) ∧ s.sink = s'.sink
-  ∧ s.freed = s'.freed ∧ s.heap = s'.heap
+  ∧ s.freed = s'.freed
+  -- the heap is observed **per address**: labels agree, and public cells agree
+  ∧ s.hlab = s'.hlab ∧ (∀ a, s.hlab a = false → s.heap a = s'.heap a)
 
 def uOptLowEqA (P : Partition) :
     Option (UState × Nat × List Bool) → Option (UState × Nat × List Bool) → Prop
@@ -278,48 +609,49 @@ theorem uOptLowEqA_mapE {P : Partition} {a a' : Option (UState × Nat × List Bo
     is the formal content of stage 1j's "these do not factor". -/
 theorem jsecTy_sound {P : Partition} :
     ∀ (n : Nat) (c : UCmd) (V V' : List String), JSecTy P V c V' →
-      ∀ (π : MedPolicy) (s s' : UState), SepInv V s → SepInv V s' → uLowEqA P s s' →
+      ∀ (π : MedPolicy) (s s' : UState), SepInv V s → SepInv V s' →
+        LabInv P V s → LabInv P V s' → uLowEqA P s s' →
         uOptLowEqA P (uexec n c π s) (uexec n c π s') := by
   intro n
   induction n with
-  | zero => intro c V V' _ π s s' _ _ _; exact True.intro
+  | zero => intro c V V' _ π s s' _ _ _ _ _; exact True.intro
   | succ m ih =>
-    intro c V V' hc π s s' hI hI' hle
-    obtain ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩ := hle
+    intro c V V' hc π s s' hI hI' hL hL' hle
+    obtain ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩ := hle
     cases hc with
-    | skip _ => exact ⟨⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩, rfl, rfl⟩
+    | skip _ => exact ⟨⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩, rfl, rfl⟩
     | check _ r =>
         show uOptLowEqA P (uexec (m+1) (.check r) π s) (uexec (m+1) (.check r) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
           by_cases hp : π r = true
-          · rw [if_pos hp, if_pos hp]; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
-          · rw [if_neg hp, if_neg hp]; exact ⟨hst, hrd, rfl, hfr, hss, hsk, hfd, hhp⟩
+          · rw [if_pos hp, if_pos hp]; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          · rw [if_neg hp, if_neg hp]; exact ⟨hst, hrd, rfl, hfr, hss, hsk, hfd, hhl, hho⟩
     | access _ r =>
         show uOptLowEqA P (uexec (m+1) (.access r) π s) (uexec (m+1) (.access r) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
-          exact ⟨hst, by simp [hrd], hdd, hfr, hss, hsk, hfd, hhp⟩
+          exact ⟨hst, by simp [hrd], hdd, hfr, hss, hsk, hfd, hhl, hho⟩
     | assignH _ x e hx =>
         show uOptLowEqA P (uexec (m+1) (.assign x e) π s) (uexec (m+1) (.assign x e) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
-          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro y hy
           have hyx : y ≠ x := fun h => by rw [h, hx] at hy; cases hy
           show upd s.store x (evalE e s.store) y = upd s'.store x (evalE e s'.store) y
@@ -330,10 +662,10 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
-          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro y hy
           show upd s.store x (evalE e s.store) y = upd s'.store x (evalE e s'.store) y
           simp only [upd]
@@ -347,7 +679,7 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
           refine ⟨?_, hrd, hdd,
@@ -357,9 +689,21 @@ theorem jsecTy_sound {P : Partition} :
                   by show dropInt (pickAddr s.freed s.fresh) s.freed
                         = dropInt (pickAddr s'.freed s'.fresh) s'.freed
                      rw [hfr, hfd],
-                  by show updHU s.heap (pickAddr s.freed s.fresh) 0
-                        = updHU s'.heap (pickAddr s'.freed s'.fresh) 0
-                     rw [hhp, hfr, hfd]⟩
+                  by show updBU s.hlab (pickAddr s.freed s.fresh) false
+                        = updBU s'.hlab (pickAddr s'.freed s'.fresh) false
+                     rw [hhl, hfr, hfd],
+                  by intro b hb
+                     have hba' : b = pickAddr s.freed s.fresh ↔
+                         b = pickAddr s'.freed s'.fresh := by rw [hfr, hfd]
+                     show (if b = pickAddr s.freed s.fresh then (0 : Int) else s.heap b)
+                        = (if b = pickAddr s'.freed s'.fresh then (0 : Int) else s'.heap b)
+                     by_cases hba : b = pickAddr s.freed s.fresh
+                     · rw [if_pos hba, if_pos (hba'.mp hba)]
+                     · rw [if_neg hba, if_neg (fun h => hba (hba'.mpr h))]
+                       refine hho b ?_
+                       have hb2 : updBU s.hlab (pickAddr s.freed s.fresh) false b
+                           = s.hlab b := by simp only [updBU, if_neg hba]
+                       rw [← hb2]; exact hb⟩
           intro z hz
           show upd s.store x (pickAddr s.freed s.fresh) z
              = upd s'.store x (pickAddr s'.freed s'.fresh) z
@@ -374,7 +718,7 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
           refine ⟨?_, hrd, hdd,
@@ -384,9 +728,21 @@ theorem jsecTy_sound {P : Partition} :
                   by show dropInt (pickAddr s.freed s.fresh) s.freed
                         = dropInt (pickAddr s'.freed s'.fresh) s'.freed
                      rw [hfr, hfd],
-                  by show updHU s.heap (pickAddr s.freed s.fresh) 0
-                        = updHU s'.heap (pickAddr s'.freed s'.fresh) 0
-                     rw [hhp, hfr, hfd]⟩
+                  by show updBU s.hlab (pickAddr s.freed s.fresh) true
+                        = updBU s'.hlab (pickAddr s'.freed s'.fresh) true
+                     rw [hhl, hfr, hfd],
+                  by intro b hb
+                     have hba' : b = pickAddr s.freed s.fresh ↔
+                         b = pickAddr s'.freed s'.fresh := by rw [hfr, hfd]
+                     show (if b = pickAddr s.freed s.fresh then (0 : Int) else s.heap b)
+                        = (if b = pickAddr s'.freed s'.fresh then (0 : Int) else s'.heap b)
+                     by_cases hba : b = pickAddr s.freed s.fresh
+                     · rw [if_pos hba, if_pos (hba'.mp hba)]
+                     · rw [if_neg hba, if_neg (fun h => hba (hba'.mpr h))]
+                       refine hho b ?_
+                       have hb2 : updBU s.hlab (pickAddr s.freed s.fresh) true b
+                           = s.hlab b := by simp only [updBU, if_neg hba]
+                       rw [← hb2]; exact hb⟩
           intro z hz
           show upd s.store x (pickAddr s.freed s.fresh) z
              = upd s'.store x (pickAddr s'.freed s'.fresh) z
@@ -401,7 +757,7 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
@@ -410,7 +766,7 @@ theorem jsecTy_sound {P : Partition} :
           have hl' : memInt (s'.store x) s'.live = true :=
             hI'.toMemInv.2 hd0' x (memStr_mem hx)
           rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
-          exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
     | free _ x hx hPx =>
         show uOptLowEqA P (uexec (m+1) (.memop .free x) π s)
                         (uexec (m+1) (.memop .free x) π s')
@@ -418,7 +774,7 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
@@ -431,17 +787,17 @@ theorem jsecTy_sound {P : Partition} :
           have hpx : s.store x = s'.store x := hst x hPx
           exact ⟨hst, hrd, hdd, hfr, hss, hsk,
                  by show s.store x :: s.freed = s'.store x :: s'.freed
-                    rw [hpx, hfd], hhp⟩
+                    rw [hpx, hfd], hhl, hho⟩
     | setH _ x e hx =>
         show uOptLowEqA P (uexec (m+1) (.sop .set x e) π s) (uexec (m+1) (.sop .set x e) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
-          refine ⟨hst, hrd, hdd, hfr, ?_, hsk, hfd, hhp⟩
+          refine ⟨hst, hrd, hdd, hfr, ?_, hsk, hfd, hhl, hho⟩
           intro z hz
           have hzx : ¬ (z = x) := fun h => by rw [h, hx] at hz; cases hz
           show updSU s.sstore x (evalS s.sstore e) z
@@ -453,10 +809,10 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
-          refine ⟨hst, hrd, hdd, hfr, ?_, hsk, hfd, hhp⟩
+          refine ⟨hst, hrd, hdd, hfr, ?_, hsk, hfd, hhl, hho⟩
           intro z hz
           show updSU s.sstore x (evalS s.sstore e) z
              = updSU s'.sstore x (evalS s'.sstore e) z
@@ -471,10 +827,10 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           rw [if_neg hd, if_neg hd']
-          refine ⟨hst, hrd, hdd, hfr, hss, ?_, hfd, hhp⟩
+          refine ⟨hst, hrd, hdd, hfr, hss, ?_, hfd, hhl, hho⟩
           show (q, evalS s.sstore e) :: s.sink = (q, evalS s'.sstore e) :: s'.sink
           rw [evalS_lowEq hss e he, hsk]
     | loadL _ d p hp hPp =>
@@ -484,20 +840,21 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
           rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
-          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro z hz
           show upd s.store d (s.heap (s.store p)) z
              = upd s'.store d (s'.heap (s'.store p)) z
           simp only [upd]
           by_cases hzd : z = d
-          · rw [if_pos hzd, if_pos hzd, hhp, hst p hPp]
+          · rw [if_pos hzd, if_pos hzd, hst p hPp]
+            exact hho (s'.store p) (by rw [← hst p hPp]; exact (hL hd0 p (memStr_mem hp)).trans hPp)
           · rw [if_neg hzd, if_neg hzd]; exact hst z hz
     | loadH _ d p hp hPd =>
         show uOptLowEqA P (uexec (m+1) (.hop .load d p) π s)
@@ -506,14 +863,14 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
           rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
-          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro z hz
           have hzd : z ≠ d := fun h => by rw [h, hPd] at hz; cases hz
           show upd s.store d (s.heap (s.store p)) z
@@ -526,25 +883,56 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
           rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
-          refine ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, ?_⟩
-          show updHU s.heap (s.store p) (s.store v)
-             = updHU s'.heap (s'.store p) (s'.store v)
-          rw [hhp, hst p hPp, hst v hPv]
+          refine ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, ?_⟩
+          intro b hb
+          show (if b = s.store p then s.store v else s.heap b)
+             = (if b = s'.store p then s'.store v else s'.heap b)
+          rw [hst p hPp, hst v hPv]
+          by_cases hbp : b = s'.store p
+          · rw [if_pos hbp, if_pos hbp]
+          · rw [if_neg hbp, if_neg hbp]; exact hho b hb
+    | storeH _ p v hp hPp =>
+        show uOptLowEqA P (uexec (m+1) (.hop .store p v) π s)
+                        (uexec (m+1) (.hop .store p v) π s')
+        simp only [uexec]
+        refine ⟨?_, rfl, rfl⟩
+        by_cases hd : s.dead = true
+        · have hd' : s'.dead = true := by rwa [hdd] at hd
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+        · have hd0 : s.dead = false := by simpa using hd
+          have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
+          have hd0' : s'.dead = false := by simpa using hd'
+          have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
+          have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
+          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          refine ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, ?_⟩
+          -- both runs write a **secret** cell, so no public cell moves
+          intro b hb
+          have hsec : s.hlab (s.store p) = true := (hL hd0 p (memStr_mem hp)).trans hPp
+          have hsec' : s'.hlab (s'.store p) = true := (hL' hd0' p (memStr_mem hp)).trans hPp
+          have hbp : ¬ (b = s.store p) := fun h => by rw [h, hsec] at hb; cases hb
+          have hbp' : ¬ (b = s'.store p) := by
+            intro h; rw [← hhl] at hsec'; rw [h, hsec'] at hb; cases hb
+          show (if b = s.store p then s.store v else s.heap b)
+             = (if b = s'.store p then s'.store v else s'.heap b)
+          rw [if_neg hbp, if_neg hbp']; exact hho b hb
     | @seq _ V₁ _ c₁ c₂ h₁ h₂ =>
         show uOptLowEqA P (uexec (m+1) (.seq c₁ c₂) π s) (uexec (m+1) (.seq c₁ c₂) π s')
         rw [uexec_seq_eq, uexec_seq_eq]
-        refine uOptLowEqA_bindE (ih c₁ _ V₁ h₁ π s s' hI hI' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩) ?_
+        refine uOptLowEqA_bindE (ih c₁ _ V₁ h₁ π s s' hI hI' hL hL' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
         intro r₁ r₁' e₁ e₁' hs₁ hc1 ht1
         have hJ : SepInv V₁ r₁.1 := h₁.toSepCert.safe m π s r₁ hI e₁
         have hJ' : SepInv V₁ r₁'.1 := h₁.toSepCert.safe m π s' r₁' hI' e₁'
-        refine uOptLowEqA_mapE (ih c₂ V₁ _ h₂ π r₁.1 r₁'.1 hJ hJ' hs₁) ?_
+        have hLJ : LabInv P V₁ r₁.1 := h₁.toLabInv m π s r₁ hI hL e₁
+        have hLJ' : LabInv P V₁ r₁'.1 := h₁.toLabInv m π s' r₁' hI' hL' e₁'
+        refine uOptLowEqA_mapE (ih c₂ V₁ _ h₂ π r₁.1 r₁'.1 hJ hJ' hLJ hLJ' hs₁) ?_
         intro r₂ r₂' _ _ hs₂ hc2 ht2
         exact ⟨hs₂, by simp [hc1, hc2], by simp [ht1, ht2]⟩
     | @iteL _ _ _ c₁ c₂ e hg h₁ h₂ =>
@@ -554,15 +942,17 @@ theorem jsecTy_sound {P : Partition} :
         by_cases hb : evalE e s.store ≠ 0
         · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
           rw [if_pos hb, if_pos hb']
-          refine uOptLowEqA_mapE (ih c₁ _ _ h₁ π s s' hI hI' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩) ?_
+          refine uOptLowEqA_mapE (ih c₁ _ _ h₁ π s s' hI hI' hL hL' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
           intro r r' _ _ hs hcs htr; exact ⟨hs, by simp [hcs], by simp [htr]⟩
         · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
           rw [if_neg hb, if_neg hb']
-          refine uOptLowEqA_mapE (ih c₂ _ _ h₂ π s s' hI hI' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩) ?_
+          refine uOptLowEqA_mapE (ih c₂ _ _ h₂ π s s' hI hI' hL hL' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
           intro r r' _ _ hs hcs htr; exact ⟨hs, by simp [hcs], by simp [htr]⟩
     | @whileW _ _ W₁ c₀ e hg hWV h₀ hWW₁ =>
         have hIV' : SepInv V' s := SepInv.mono hWV hI
         have hIV'' : SepInv V' s' := SepInv.mono hWV hI'
+        have hLV' : LabInv P V' s := LabInv.mono hWV hL
+        have hLV'' : LabInv P V' s' := LabInv.mono hWV hL'
         have hbody : SepCert V' c₀ V' := SepCert.weakenPost h₀.toSepCert hWW₁
         have hgv : evalE e s.store = evalE e s'.store := evalE_lowEq e hg hst
         show uOptLowEqA P (uexec (m+1) (.loop e c₀) π s) (uexec (m+1) (.loop e c₀) π s')
@@ -570,18 +960,22 @@ theorem jsecTy_sound {P : Partition} :
         by_cases hb : evalE e s.store ≠ 0
         · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
           rw [if_pos hb, if_pos hb']
-          refine uOptLowEqA_bindE (ih c₀ V' W₁ h₀ π s s' hIV' hIV'' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩) ?_
+          refine uOptLowEqA_bindE (ih c₀ V' W₁ h₀ π s s' hIV' hIV'' hLV' hLV'' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
           intro r₁ r₁' e₁ e₁' hs₁ hc1 ht1
           have hJ : SepInv V' r₁.1 := hbody.safe m π s r₁ hIV' e₁
           have hJ' : SepInv V' r₁'.1 := hbody.safe m π s' r₁' hIV'' e₁'
+          have hLJ : LabInv P V' r₁.1 :=
+            LabInv.mono hWW₁ (h₀.toLabInv m π s r₁ hIV' hLV' e₁)
+          have hLJ' : LabInv P V' r₁'.1 :=
+            LabInv.mono hWW₁ (h₀.toLabInv m π s' r₁' hIV'' hLV'' e₁')
           refine uOptLowEqA_mapE
             (ih (.loop e c₀) V' V' (.whileW e hg (fun _ hx => hx) h₀ hWW₁)
-              π r₁.1 r₁'.1 hJ hJ' hs₁) ?_
+              π r₁.1 r₁'.1 hJ hJ' hLJ hLJ' hs₁) ?_
           intro r₂ r₂' _ _ hs₂ hc2 ht2
           exact ⟨hs₂, by simp [hc1, hc2], by simp [ht1, ht2]⟩
         · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
           rw [if_neg hb, if_neg hb']
-          exact ⟨⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩, rfl, rfl⟩
+          exact ⟨⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩, rfl, rfl⟩
 
 /-! ## The checker -/
 
@@ -598,7 +992,7 @@ def jcheck (P : Partition) : List String → UCmd → Option (List String)
   | V, .sop .set x e   => if P x || sexprLow P e then some V else none
   | V, .sop .emit _ e  => if sexprLow P e then some V else none
   | V, .hop .load d p  => if memStr p V && (!P p || P d) then some (dropStr d V) else none
-  | V, .hop .store p v => if memStr p V && !P p && !P v then some V else none
+  | V, .hop .store p v => if memStr p V && (P p || !P v) then some V else none
   | V, .seq c₁ c₂      => (jcheck P V c₁).bind fun V₁ => jcheck P V₁ c₂
   | V, .ite e c₁ c₂    => if exprLow P e then
                             match jcheck P V c₁, jcheck P V c₂ with
@@ -698,12 +1092,15 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
       · rw [if_neg hx] at h; simp at h
   | .hop .store p v, V, V', h => by
       simp only [jcheck] at h
-      by_cases hx : (memStr p V && !P p && !P v) = true
+      by_cases hx : (memStr p V && (P p || !P v)) = true
       · rw [if_pos hx] at h
         simp only [Option.some.injEq] at h; subst h
-        obtain ⟨h12, h3⟩ := Bool.and_eq_true _ _ |>.mp hx
-        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp h12
-        exact .storeL V p v h1 (by simpa using h2) (by simpa using h3)
+        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
+        rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
+        · exact .storeH V p v h1 h'
+        · by_cases hpp : P p = true
+          · exact .storeH V p v h1 hpp
+          · exact .storeL V p v h1 (by simpa using hpp) (by simpa using h')
       · rw [if_neg hx] at h; simp at h
   | .loop e c₀, V, V', h => by
       simp only [jcheck] at h
@@ -727,7 +1124,8 @@ theorem jcheck_gives_both {P : Partition} {c : UCmd} {V' : List String}
   have hty := jcheck_sound c [] V' h
   refine ⟨fun n π σ σ' hσ => ?_, fun n π σ r hr => ?_⟩
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hty π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩)
+      SepInv.initU SepInv.initU LabInv.initU LabInv.initU
+      ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl, fun _ _ => rfl⟩)
   · exact (hty.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## What the index buys -/

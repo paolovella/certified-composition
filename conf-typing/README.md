@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapSecret.lean` | stage 1x | the invariant spent: the observation becomes **per address** and `storeH` lets a secret live in the heap — the heap is now two-level rather than public |
 | `ConfTyping/HeapLabel.lean` | stage 1w | **per-address heap labels, the invariant half**: cells labelled at allocation, allocation zeroes, and `LabInv` — every tracked pointer points at a cell of its own level — proved inductive |
 | `ConfTyping/HeapValue.lean` | stage 1v | the heap gets real `load`/`store`: memory safety extended for free, noninterference did not — the heap enters the observation and becomes a **public resource** |
 | `ConfTyping/Reuse.lean` | stage 1u | the allocator now **reuses** freed addresses: the separation argument survived with two new invariant conjuncts, but reuse turned the free list into a **channel**, so `free` needs a Low pointer |
@@ -1877,6 +1878,34 @@ cells agree", and add the rules that spend the invariant — `storeH` (a secret 
 secret pointer is invisible) and a label-aware `loadL`. Splitting it this way means the
 invariant is audited before anything depends on it, the order stages 1j and 1k used for
 the analogous problem.
+
+## Spending the invariant (`HeapSecret.lean`) — stage 1x
+
+Stage 1v made the heap public; stage 1w built `LabInv` and deliberately did not use it.
+This uses it, and it is short — which is the argument for having split them.
+
+Two changes. **The observation is per address**: `uLowEqA`'s `s.heap = s'.heap` becomes
+`s.hlab = s'.hlab ∧ (∀ a, s.hlab a = false → s.heap a = s'.heap a)`, so labels are
+public, public cells are public, and secret cells are not observed. And **`storeH`**: a
+secret may be stored through a secret pointer, because `LabInv` lets the analysis read
+the cell's level off the pointer's — that is exactly what makes the rule syntactic.
+
+`jsecTy_sound` gained the two `LabInv` hypotheses, with `JSecTy.toLabInv` supplying them
+at every intermediate state; nothing else about the proof changed shape.
+
+**What is new and what is not.** `secret_through_a_secret_pointer` and
+`secret_round_trip_checks` are the new ground — a secret can now live in the heap.
+`public_pointer_still_cannot_carry_a_secret` is the boundary that remains, and it is the
+right one: a public pointer points at a public cell, so writing a secret there really
+would leak. `secret_cell_cannot_be_read_into_a_public_variable` closes the other
+direction. `the_heap_is_two_level` puts all four in one statement. Stage 1v's
+`storing_a_secret_is_refused` survived *unchanged* — its pointer is public — but it is
+now a boundary rather than a blanket ban, and its docstring says so.
+
+The remaining restriction is a design point, not a gap: labels are fixed at allocation
+and there is no relabelling operation (`no_relabelling_operation_exists`), so a cell
+cannot change level and a secret cannot be released. Declassification is a policy
+decision of the kind stage 1e's ledger exists to record, not another typing rule.
 
 ## §11 pre-mechanization checklist (framework doc)
 

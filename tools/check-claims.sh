@@ -488,10 +488,25 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-# stage 1w: per-address labels, the invariant half.
-for thm in "theorem JSecTy.toLabInv" "theorem labInv_alloc" "theorem allocation_zeroes" \
-           "theorem allocation_site_must_match_the_level" \
-           "theorem heap_still_public_at_this_stage"; do
+# stage 1x: the invariant spent, and the heap becoming two-level.
+for thm in "theorem secret_through_a_secret_pointer" "theorem the_heap_is_two_level" \
+           "theorem public_pointer_still_cannot_carry_a_secret" \
+           "theorem secret_cell_cannot_be_read_into_a_public_variable" \
+           "theorem no_relabelling_operation_exists"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapSecret.lean 2>/dev/null; then
+    echo "DRIFT: the two-level heap is cited but '$thm' is missing"; fail=1
+  fi
+done
+
+# stage 1w: per-address labels, the invariant half. The invariant itself lives in
+# HeapJoint (it has to precede jsecTy_sound); the witnesses live in HeapLabel.
+for thm in "theorem JSecTy.toLabInv" "theorem labInv_alloc"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapJoint.lean 2>/dev/null; then
+    echo "DRIFT: the label invariant is cited but '$thm' is missing"; fail=1
+  fi
+done
+for thm in "theorem allocation_zeroes" "theorem allocation_site_must_match_the_level" \
+           "theorem public_pointer_cannot_carry_a_secret"; do
   if ! grep -q "$thm" conf-typing/ConfTyping/HeapLabel.lean 2>/dev/null; then
     echo "DRIFT: heap labels are cited but '$thm' is missing"; fail=1
   fi
@@ -733,7 +748,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

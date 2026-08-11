@@ -1507,10 +1507,14 @@ rule meaning **the heap is public** (`storing_a_secret_is_refused`). Per-address
 would lift that; stage 1w builds the invariant half of them. Cells are labelled at
 allocation, allocation zeroes (with reuse a recycled secret cell would otherwise leak
 into a public one — `allocation_zeroes`), and `LabInv` is proved inductive over all
-nineteen rules, resting on stage 1i's separation. The observation does not yet consult
-the labels, so row 1's restriction stands for now
-(`heap_still_public_at_this_stage`); the rules that spend the invariant are the
-following stage. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+nineteen rules, resting on stage 1i's separation. Stage 1x then spent the invariant: the observation became per address and `storeH`
+was added, so a secret may live in the heap when it is reached through a secret pointer
+(`secret_through_a_secret_pointer`, `secret_round_trip_checks`). Row 1's restriction is
+now a *boundary* rather than a ban — a public pointer points at a public cell and still
+cannot carry a secret (`public_pointer_still_cannot_carry_a_secret`), and a secret cell
+cannot be read into a public variable. `the_heap_is_two_level` states all four. Labels
+are fixed at allocation and there is no relabelling operation, so declassification
+remains a policy decision rather than a missing rule. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

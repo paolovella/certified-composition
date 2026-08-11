@@ -760,6 +760,36 @@ landed.
   (`heap_still_public_at_this_stage` records it). `LabInv` is proved and not yet used by
   noninterference — the honest description of an invariant stage.
 
+- **Stage 1x — spending the invariant: the heap stops being public**
+  (`ConfTyping/HeapSecret.lean`, plus a per-address observation and `JSecTy.storeH` in
+  `HeapJoint.lean`). Two changes, and the stage is short because 1w did the work.
+
+  The **observation is now per address**: `uLowEqA`'s `s.heap = s'.heap` becomes
+  `s.hlab = s'.hlab ∧ (∀ a, s.hlab a = false → s.heap a = s'.heap a)` — labels are
+  public, public cells are public, secret cells are not observed. And **`storeH`**: a
+  secret may be stored through a secret pointer, because `LabInv` lets the analysis read
+  the cell's level off the pointer's, which is exactly what makes the rule syntactic.
+  `jsecTy_sound` gained the two `LabInv` hypotheses, with `JSecTy.toLabInv` supplying
+  them at every intermediate state; nothing else about the proof changed shape.
+
+  New ground: `secret_through_a_secret_pointer` and `secret_round_trip_checks` — a
+  secret can now live in the heap. Boundaries that remain, and they are the right ones:
+  `public_pointer_still_cannot_carry_a_secret` (a public pointer points at a public
+  cell, so that really would leak) and
+  `secret_cell_cannot_be_read_into_a_public_variable`. `the_heap_is_two_level` states
+  all four. Stage 1v's `storing_a_secret_is_refused` survived **unchanged** — its
+  pointer is public — but it is now a boundary rather than a blanket ban and its
+  docstring says so; 1w's scope theorem is renamed
+  `public_pointer_cannot_carry_a_secret` for the same reason.
+
+  The remaining restriction is a design point, not a gap:
+  `no_relabelling_operation_exists` — labels are fixed at allocation, so a cell cannot
+  change level and a secret cannot be released. Declassification is a policy decision of
+  the kind stage 1e's ledger records, not another typing rule.
+
+  The invariant `LabInv` and its preservation moved from `HeapLabel` into `HeapJoint`,
+  since they now have to precede `jsecTy_sound`; the guard was repointed accordingly.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
