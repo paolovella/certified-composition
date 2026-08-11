@@ -633,7 +633,13 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   (C1) fails at one level. Same flaw §58 recorded. *Lemma V3*: indexing by the defect
   `F := B_α\A`, (Q-fib) is totality of `F ↦ n_F` and (C1) is its finite-to-one-ness — the
   two open conditions are **one**. The repaired candidate lands back inside Corollary Y2's
-  simultaneity residual.)*
+  simultaneity residual. **§66** withdraws §65's defect-census claim — it sampled two
+  *successor* ordinals, where the defect is vacuously empty; the tool sees defects fine
+  (13272 of 38367 pairs). Realized defects are however **extremely thin**, one or two
+  classes per limit level, which kills the *restricted* candidate as well: unrealized
+  classes all have `n_F = 0`, so `F ↦ n_F` is not finite-to-one. It also withdraws §64's
+  reading of its scaling table, the "widest fibre" being essentially everything when there
+  are two classes.)*
   *(**The W1 route, notes §61.** On the uncountable `T` where the trace is constant the
   canonical elements **freeze**: `B_α ∩ B_β = B_α ∩ X` for all `α<β₀`, `β ∈ T`, so
   `g_β = G` with no `β` in it. Pigeonhole on the finite exceptional sets over the

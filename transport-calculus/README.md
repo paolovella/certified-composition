@@ -758,13 +758,19 @@ on which nothing here bears". A third distinct guard is now recorded: before pos
 condition on a candidate, check the conditions already known to kill candidates of that
 shape. *(ii)* **Lemma V3**: indexing fibres by the **defect** `F := B_α\A`, (Q-fib) is
 exactly *totality* of `F ↦ n_F` and (C1) at level `α` is exactly its *finite-to-one-ness* —
-so the wall is **one** condition, and the tension is visible in a sentence. *(iii)* The
-tool cannot see this at all: the realized defect set is the single class `∅` at every
-level sampled (4095 of 4096 subsets unrealized at `α=12`), because the model's sequences
-are `⊆`-increasing in range. Fourth limitation, and a **degeneracy** rather than an
-asymptotic inversion — recorded at the top of the tool, since it needs a rebuild rather
-than a caveat. The repaired candidate (a per-level enumeration of defect classes) lands
-back inside Corollary Y2's simultaneity residual rather than past it. Sixteen labelled verdict flips, plus
+so the wall is **one** condition, and the tension is visible in a sentence. *(iii)* a measurement of
+defect sparsity, **which §66 withdraws**: it sampled `α ∈ {12,20,28}`, of which two are
+*successor* ordinals where `C_x = {x-1}` makes the defect vacuously empty. The tool sees
+defects perfectly well — 13272 of 38367 pairs have one. What is true, and is the
+prediction the review made, is that they are **extremely thin**: one or two realized
+classes per *limit* level against `2^{|B_α|}` subsets. That thinness kills the *restricted*
+candidate too, since every unrealized class has `n_F = sup ∅ = 0` and `F ↦ n_F` is then far
+from finite-to-one — a second mechanism reaching V2's verdict. It also **guts §64's
+reading of its own table**: with one or two classes per level the "widest fibre" is
+essentially all of `(α,ω₁)`, so "the fibre barely constrains the cost" says little more
+than "`ρ₁` takes many values". The table stands as data; the interpretation does not, and
+Lemma V1 is a proof and is unaffected. The repaired candidate (a per-level enumeration of
+defect classes) lands back inside Corollary Y2's simultaneity residual. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

@@ -1,9 +1,10 @@
-"""LIMITATION (notes section 65): the C-sequences built here are SUBSET-increasing in
-range - the realized defect set {B_al \\ B_be : be > al} is the single class {} at every
-level sampled. So any question about coherence DEFECTS is invisible to this tool: the
-phenomenon has measure zero in the model rather than being answered wrongly. That is a
-different failure from the asymptotic inversions of sections 54/57/58, and it needs the
-tool rebuilt on a genuinely mod-finite sequence, not a caveat.
+"""SAMPLING CAVEAT (notes sections 65-66): defect questions - anything about
+B_al \\ B_be - must be sampled at LIMIT levels. At successor x the rule C_x = {x-1}
+makes the walk trivial and the defect vacuously empty, and a section-65 measurement
+that sampled two successors concluded, wrongly, that the model cannot see defects at
+all. It can: 13272 of 38367 pairs have a nonempty defect at the standard parameters.
+They are however extremely THIN - one or two realized classes per limit level against
+2^|B_al| subsets - so any census must report the realized classes, not a ratio.
 
 Brute-force check of the notes-§54 walk claims on randomized (a),(c),(d),(e)-conforming
 C-sequences over ordinals below omega^2 * L (so limits-of-limits genuinely exist).

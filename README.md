@@ -103,9 +103,10 @@ The same accountancy appears at every level:
   horn; §65 then **kills the candidate in ZFC** — it ranks infinitely many
   elements of every down-set at 0, the flaw §58 had already recorded — shows
   the two open conditions were **one** (is the defect-to-cost map total and
-  finite-to-one?), and records a fourth, qualitatively new limitation of the
-  numeric tool: its sequences are `⊆`-increasing, so defects are invisible to
-  it) — and the two-sided independence
+  finite-to-one?), ; §66 then **withdraws** §65's third claim — the tool is *not*
+  blind to defects, the sample was two successor ordinals — and with it §64's
+  reading of its own table, while confirming the review's prediction that
+  realized defects are extremely thin) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

@@ -4127,3 +4127,66 @@ candidate does not get past §58; it lands back inside it.
   dichotomy is still correct — it just applies to a candidate that fails the other
   conjunct).
 - **Tool**: a fourth limitation, of a new kind, recorded at the source.
+
+## 66. CORRECTION to §65 (and a knock-on to §64): the tool is *not* blind to defects — the sample was two successor ordinals. Defects are real but extremely thin, which supports the review's point and guts §64's evidence (twentieth flip)
+
+§65 claimed, as its third result, that the numeric model cannot see coherence defects at
+all: "the realized defect set is a single class, the empty one, at every level sampled."
+**That is false.** Defects occur in abundance — 13272 of 38367 pairs at the standard
+parameters have `B_α \ B_β ≠ ∅`, across 20 distinct classes.
+
+**What went wrong.** The measurement sampled `α ∈ {12, 20, 28}`. With `A,M = 6,14`, the
+first two decode as `(0,0,12)` and `(0,1,6)` — **successor ordinals**, where `C_x = {x-1}`
+makes the walk trivial and the defect vacuously empty. Only `α = 28` was a limit, and it is
+one of the small limits that happens to have no defect. Three samples, two of them
+structurally disqualified, and no check that they were limits. The claim was then
+generalized to "every level sampled", which was true and useless, and stated as "the tool
+cannot see this question", which was false.
+
+**The corrected measurement.** At limit levels, over the standard sequence:
+
+| `α` | `dec(α)` | `|B_α|` | realized defect classes | their sizes |
+|---|---|---|---|---|
+| 14 | (0,1,0) | 14 | 1 | 0 |
+| 28 | (0,2,0) | 28 | 1 | 0 |
+| 42 | (0,3,0) | 42 | 2 | 0, 3 |
+| 56 | (0,4,0) | 56 | 2 | 0, 10 |
+| 70 | (0,5,0) | 70 | 2 | 0, 18 |
+| 84 | (1,0,0) | 58 | 1 | 0 |
+
+So defects are **real but extremely thin**: one or two realized classes per level, against
+`2^{|B_α|}` finite subsets. That is exactly the sparsity the review predicted, and it is
+the measurement that was actually asked for.
+
+**Consequence for the restricted candidate [model evidence].** Lemma V3 restricts the
+candidate to sub-elements `A ⊆ B_α`, indexed by their defect `F`. If only finitely many
+`F` are realized then every unrealized `F` has `W_F = ∅` and `n_F = sup ∅ = 0`, so
+infinitely many defect classes share rank `0` and `F ↦ n_F` is not finite-to-one — **(C1)
+fails for the restricted candidate too**. Theorem V2 kills the unrestricted candidate in
+ZFC via the elements that are *not* subsets of `B_α`; this kills the restricted one in the
+model, by the classes that are subsets but unrealized. Two different mechanisms, the same
+verdict, and the review anticipated both.
+
+**Knock-on: §64's evidence is much weaker than it was presented.** The scaling table
+measured the largest `ρ₁`-spread *inside a single fibre* and found it spanning `0 … max−1`,
+concluding "the fibre constrains the cost hardly at all". With one or two realized classes
+per level, the widest fibre is essentially **all** of `(α, ω₁)` — so that finding says
+little more than "`ρ₁` takes many values", which was never in doubt. The table stands as
+data; the interpretation does not. §64's Lemma V1 (the dichotomy) is a proof and is
+unaffected.
+
+**Method note, and it is a different one again.** §60: write out the quantifiers. §62:
+try to prove the consequent. §65: check the known killers for the shape. Now §66:
+**check that the sample instantiates the hypothesis** — here, that the `α` sampled were
+limits. Four sections, four distinct failure modes, all in measurements or their reading
+rather than in proofs. The proofs in this line have held; the prose around them has not,
+and every correction so far has come from the same place.
+
+**Status after §66.**
+- **Withdrawn**: §65's third claim (tool blind to defects) and §64's interpretation of the
+  scaling table.
+- **Standing**: Theorem V2, Lemma V3, Lemma V1 — all proofs, all unaffected.
+- **New**: the corrected defect census at limit levels; the observation that thinness kills
+  the restricted candidate too.
+- **Tool**: the header caveat added in §65 is wrong and is replaced by the accurate one —
+  defects are visible, they are thin, and sampling must be at **limit** levels.

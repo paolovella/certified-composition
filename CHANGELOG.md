@@ -1137,6 +1137,37 @@ landed.
   carry a per-`u` enumeration, so it lands back inside Corollary Y2's simultaneity
   residual rather than past it. §63–§64 is therefore a closed detour, not a dangling one.
 
+- **Set-theory research line, notes §66 — CORRECTION to §65, and a knock-on to §64
+  (twentieth flip).** §65's third claim — that the numeric model cannot see coherence
+  defects — is **false**. Defects are everywhere: 13272 of 38367 pairs have
+  `B_α \ B_β ≠ ∅` at the standard parameters, across 20 classes.
+
+  **Cause**: the measurement sampled `α ∈ {12,20,28}`, and with `A,M = 6,14` the first two
+  decode as `(0,0,12)` and `(0,1,6)` — **successor** ordinals, where `C_x = {x-1}` makes
+  the walk trivial and the defect vacuously empty. Two of three samples structurally
+  disqualified, no check that they were limits, and the result then stated as a property
+  of the tool.
+
+  **Corrected census** at limit levels: one or two realized defect classes per level
+  (sizes 0; 0,3; 0,10; 0,18) against `2^{|B_α|}` subsets. Defects are real but **extremely
+  thin** — which is exactly the sparsity the review predicted, and it kills the
+  *restricted* candidate too: every unrealized class has `n_F = sup ∅ = 0`, so `F ↦ n_F`
+  is far from finite-to-one and (C1) fails again, by a second mechanism.
+
+  **Knock-on to §64.** Its scaling table measured the largest `ρ₁`-spread inside a single
+  fibre and read it as "the fibre constrains the cost hardly at all". With one or two
+  classes per level the widest fibre is essentially all of `(α,ω₁)`, so the finding says
+  little beyond "`ρ₁` takes many values". The table stands as data; the interpretation is
+  withdrawn. Lemma V1 is a proof and is unaffected.
+
+  **Fourth distinct method note**: §60 write out the quantifiers; §62 try to prove the
+  consequent; §65 check the known killers for the shape; §66 **check that the sample
+  instantiates the hypothesis**. All four failures were in measurements or their reading,
+  none in a proof.
+
+  The false caveat §65 added to the top of `tools/walk-check.py` is replaced by an accurate
+  one: defects are visible, they are thin, and sampling must be at limit levels.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value
