@@ -140,6 +140,19 @@ def run(seed, verbose=False):
         # truncation artefact (notes section 54, 57, 58). Only the identity-level half
         # (monotonicity of the counts) is asserted.
         tested_rows += 1
+    # --- Lemma Z2 (notes section 59), uniform discrepancy: for al < be < be',
+    #     (B_al & B_be) sym (B_al & B_be') is contained in B_be sym (B_be' & be) -
+    #     ONE finite set serving every level al at once. Identity-level, so the
+    #     truncated model is sound for it.
+    tested_Z2 = 0
+    for be in range(4, N // 2):
+        for bep in range(be + 1, min(be + 9, N)):
+            FD = B(be) ^ (B(bep) & set(range(be)))
+            for al in range(2, be):
+                tested_Z2 += 1
+                if not ((B(al) & B(be)) ^ (B(al) & B(bep))) <= FD:
+                    fails.append(("Z2-uniform-discrepancy", al, be, bep))
+
     # --- 3.8(2) at n=0 : Lambda n B_beta finite (here: small) — sanity
     for be in range(2, N, 37):
         hits = [x for x in B(be) if is_limit(x)]
@@ -198,17 +211,17 @@ def run(seed, verbose=False):
                 tested_M += 1
                 if (rho3(C, xi, be) == 1) != (rho3(C, xi, al) == 1 and rho1(C, xi, al) >= W):
                     fails.append(("M3", al, be, xi))
-    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows
+    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2
 
 if __name__ == "__main__":
-    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = 0
+    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = 0
     allfails = []
     for seed in range(12):
-        f, a1, a2, a3, a4, a5 = run(seed)
-        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5
+        f, a1, a2, a3, a4, a5, a6 = run(seed)
+        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6
         allfails += [(seed,) + tuple(x) for x in f[:4]]
     print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}"
-          f" | 1.16(a) rows: {tot_rows}")
+          f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2}")
     if allfails:
         print(f"FAILURES ({len(allfails)}):")
         for x in allfails[:12]: print("  ", x)

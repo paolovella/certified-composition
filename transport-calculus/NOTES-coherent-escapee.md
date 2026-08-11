@@ -3660,3 +3660,73 @@ expensive walks to exist. The assertion was removed and the reason recorded in t
   down-set lattice with every `↓u` receiving finitely many — or a proof that the
   `S`-levels force some `↓u` to collect infinitely many, which would refute (C2) and,
   with §56, close the sufficiency route for good.
+
+## 59. Where the simultaneity lives: the canonical reduction, and the uniform-discrepancy lemma — all the freedom between two down-sets sits inside one finite set of ordinals, shared by every level
+
+§58 reduced (Q-spread) to simultaneity across overlapping down-sets. This section asks
+what governs the overlaps, and the answer is sharper than expected: moving from one
+down-set to another perturbs **every level at once, by subsets of a single finite set**.
+
+**Lemma Z1 (canonical necessary form) [proved, ZFC].** (C2) implies: for every `β` and
+every `C =∗ B_β`, the set `{α < β : rank(α, B_α ∩ C) < ρ₁(α,β)}` is finite.
+*Proof.* `(α, B_α ∩ C) ⊑ (β,C)` by level-fullness (§57), so each such `α` contributes a
+distinct element to `BS((β,C))`. ∎
+This is only *necessary* — `m_u(α)` is a minimum over all of `↓u ∩ γ⁻¹(α)` and may fall
+below the canonical value — but it is the form a construction has to satisfy first, and
+it is the one the next lemma controls.
+
+**Lemma Z2 (uniform discrepancy) [proved, ZFC].** Let `α < β < β′`. Put
+`F(β,β′) := B_β Δ (B_{β′} ∩ β)`, which is finite by coherence. Then
+> `(B_α ∩ B_β) Δ (B_α ∩ B_{β′}) ⊆ F(β,β′)` — **and `F` does not depend on `α`.**
+*Proof.* `B_α ⊆ α < β`, so `B_α ∩ B_{β′} = B_α ∩ (B_{β′} ∩ β)`. Hence the left side is
+`B_α ∩ (B_β Δ (B_{β′} ∩ β)) ⊆ F(β,β′)`. ∎
+*Checked:* 366000 instances over six C-sequences in `tools/walk-check.py`, no failures.
+This is an identity-level claim, which is the regime the truncated model is sound for
+(contrast §58's method note); it is checked because it is used, not because it is doubted.
+
+> **Corollary Z3 (the freedom is finite and shared) [proved].** Fix `β₀ < β` and write
+> `F := F(β₀,β)`, `F⁺ := (B_β ∩ β₀) \ B_{β₀}`, `F⁻ := B_{β₀} \ B_β`, both `⊆ F`. For
+> every `α < β₀`,
+> `B_α ∩ B_β = ((B_α ∩ B_{β₀}) ∪ (B_α ∩ F⁺)) \ F⁻`.
+> So the canonical element at level `α` for the down-set at `β` is obtained from the one
+> at `β₀` by a modification drawn from **subsets of the single finite set `F`** — the
+> same `F` at every level. At each level there are therefore at most `2^{|F|}` possible
+> canonical values, and the choice among them is dictated by `B_α ∩ F`, not free.
+
+**What this says about the residual.** §58 showed the difficulty is simultaneity; Z2 and
+Z3 say where the simultaneity is *budgeted*. Between two down-sets the rank has, at every
+level at once, only the freedom encoded by one finite set of ordinals. A construction
+must therefore make `ρ₁(α,β)`-sized gains at cofinitely many levels out of a perturbation
+budget that is finite and **shared across all of them** — which is a much tighter
+statement of the wall than "the down-sets overlap", and it explains why every attempt in
+§50–§58 has run into the same place from a different direction.
+
+**Two things Z3 does *not* give, recorded so the reduction is not over-read.**
+1. It does **not** turn `g_β(·) := rank(·, B_α ∩ B_β)` into a level function. The
+   selection `B_α ∩ F` varies with `α`, so `g_β` is a *pointwise* choice among at most
+   `2^{|F|}` level functions, and only the pointwise **maximum** `M_β` is a level
+   function. That gives `g_β ≤ M_β` on `β₀` — with `M_β` depending on `β`, which is
+   exactly the dependence Theorem X cannot rule out.
+2. It does **not** bound `|F(β₀,β)|` as `β → ω₁`. If that supremum were finite for some
+   `β₀` the perturbation family would be uniformly small and the route to a Theorem-X
+   contradiction would be short; the discrepancies of a coherent sequence are not bounded
+   in general, and nothing here proves they are not.
+
+> **The sharpened question.** Is there, for some `β₀`, a bound on `|B_{β₀} Δ (B_β ∩ β₀)|`
+> as `β` ranges over `(β₀, ω₁)`? A **yes** for a single `β₀` — for the specific coherent
+> sequence in play — would give a uniformly finite perturbation family below `β₀`, hence
+> a single level function dominating every `g_β` there, hence a Theorem-X contradiction
+> and **(Q-spread) resolved negative**. A **no** leaves the construction route open and
+> tells a constructor that the discrepancy is the resource to spend.
+
+**Status after §59.**
+- **(Q-spread): open.** Localized (§57), reframed as a rate race with both one-sided
+  problems solved (§58), and now budgeted: the freedom between two down-sets is one
+  finite set of ordinals, shared by every level.
+- **New ZFC facts**: Lemma Z1 (canonical necessary form); **Lemma Z2** (uniform
+  discrepancy, machine-checked at 366000 instances); Corollary Z3 (the perturbation
+  family and its size).
+- **New sharpened question**: boundedness of the coherence discrepancy `|B_{β₀} Δ (B_β ∩
+  β₀)|` in `β`. It is a question about the C-sequence alone — no ranks, no down-sets —
+  which is the first time this program's residual has reduced to a property of the
+  sequence itself.

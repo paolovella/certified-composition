@@ -598,6 +598,16 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   **not** settle schedulability. Discharged on the way: for binary-valued `e` the value-form
   (ii) is *equivalent* to the set-form (i), so §50's "modulo the value-form bookkeeping"
   hedge costs nothing over `ρ₃`.)*
+  *(**(Q-spread) budgeted, notes §59.** **Lemma Z1**: (C2) implies the canonical form —
+  for every `β` and `C =∗ B_β`, `{α<β : rank(α,B_α∩C) < ρ₁(α,β)}` is finite. **Lemma Z2
+  [ZFC, machine-checked]**: for `α<β<β′`, `(B_α∩B_β) Δ (B_α∩B_{β′}) ⊆ B_β Δ (B_{β′}∩β)`,
+  and that finite set does **not depend on `α`** — one perturbation budget shared by every
+  level. **Corollary Z3**: between two down-sets a rank has at most `2^{|F|}` canonical
+  values per level, selected by `B_α ∩ F` rather than freely. The residual therefore
+  reduces to a question about the C-sequence alone: **is `|B_{β₀} Δ (B_β ∩ β₀)|` bounded
+  in `β` for some `β₀`?** Yes ⟹ a single level function dominates every `g_β` below `β₀`
+  ⟹ (Q-spread) negative by Theorem X. No ⟹ the discrepancy is the resource a construction
+  must spend.)*
   *(**(Q-spread) reframed, notes §58.** (C2) is not a boundedness condition but a **rate**
   one. **Lemma Y1 [ZFC]**: (C1) alone forces `{α<β : m_u(α) < N}` finite for every `N`, so
   the level-minima diverge — and Handbook 1.16(a) diverges the bars, so both sides of (C2)

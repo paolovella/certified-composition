@@ -680,7 +680,15 @@ same kind** — a rate question, not a boundedness one, and the two conjuncts of
 independent: the first supplies the shape the second needs. **Lemma Y3**: at any *single*
 down-set both conjuncts are satisfiable together, with `BS(u)` empty. So the entire residual
 of (Q-spread) is **simultaneity across overlapping down-sets** — the program's recurring
-wall, for the first time isolated with both one-sided problems solved. Sixteen labelled verdict flips, plus
+wall, for the first time isolated with both one-sided problems solved. **§59 budgets that
+simultaneity.** **Lemma Z2 (uniform discrepancy)**: for `α<β<β′`, the canonical elements
+satisfy `(B_α∩B_β) Δ (B_α∩B_{β′}) ⊆ B_β Δ (B_{β′}∩β)` — one finite set, *independent of
+`α`*, governing every level at once (machine-checked, 732000 instances). So a rank has,
+between two down-sets, at most `2^{|F|}` choices per level and the choice is dictated by
+`B_α ∩ F`. The residual then reduces to a question about the **C-sequence alone**: is
+`|B_{β₀} Δ (B_β ∩ β₀)|` bounded in `β` for some `β₀`? Yes would give a single dominating
+level function below `β₀` and resolve (Q-spread) negative via Theorem X; no leaves the
+construction route open and names the discrepancy as the resource to spend. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

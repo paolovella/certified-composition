@@ -959,6 +959,30 @@ landed.
   instead of pinning one. A negative test that goes stale is worse than no negative test,
   and this is exactly the failure mode the suite exists to catch — this time in itself.
 
+- **Set-theory research line, notes §59 — where the simultaneity lives.** §58 reduced
+  (Q-spread) to simultaneity across overlapping down-sets; §59 asks what governs the
+  overlaps, and the answer is tighter than expected.
+
+  **Lemma Z1**: (C2) implies the canonical necessary form — for every `β` and `C =∗ B_β`,
+  `{α<β : rank(α, B_α∩C) < ρ₁(α,β)}` is finite. **Lemma Z2 (uniform discrepancy) [ZFC]**:
+  for `α<β<β′`, `(B_α∩B_β) Δ (B_α∩B_{β′}) ⊆ B_β Δ (B_{β′}∩β)`, and *that finite set does
+  not depend on `α`* — moving between two down-sets perturbs **every level at once, by
+  subsets of a single finite set**. Machine-checked at 732000 instances over six
+  C-sequences and added to `tools/walk-check.py`; it is an identity-level claim, the
+  regime §58 established the truncated model is sound for.
+
+  **Corollary Z3**: between two down-sets a rank has at most `2^{|F|}` canonical values
+  per level, and the choice is dictated by `B_α ∩ F` rather than free. Two things it does
+  *not* give are recorded so the reduction is not over-read: `g_β` is a pointwise
+  selection among level functions, not a level function; and `|F(β₀,β)|` is not bounded
+  by anything proved here.
+
+  **The residual now reduces to a question about the C-sequence alone** — no ranks, no
+  down-sets: *is `|B_{β₀} Δ (B_β ∩ β₀)|` bounded in `β` for some `β₀`?* Yes gives a single
+  dominating level function below `β₀` and resolves (Q-spread) negative via Theorem X; no
+  names the discrepancy as the resource a construction must spend. First time this
+  program's residual has reduced to a property of the sequence itself.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value
