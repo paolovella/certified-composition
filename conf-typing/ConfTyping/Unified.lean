@@ -48,7 +48,9 @@ namespace ConfTyping
     `uexec`, `ucheck`, `USecTy`, `deadCost`, and the aborted-run lemmas — gains a
     *single* new case rather than three. -/
 inductive MemOp where
-  | alloc | deref | free
+  | alloc      -- allocate a **public** cell
+  | allocS     -- allocate a **secret** cell (stage 1w)
+  | deref | free
   deriving Repr, DecidableEq
 
 /-! ### Strings (stage 1o)
@@ -146,11 +148,12 @@ structure UState where
   fresh : Int                -- next address to hand out
   err   : Bool               -- a memory fault happened (recorded, not conflated with `dead`)
   freed : List Int           -- addresses returned by `free`, available for reuse
+  hlab  : Int → Bool         -- per-address secrecy label, fixed at allocation
   sstore : String → UStr      -- the string store, separate from the integer one
   sink  : List (String × UStr) -- everything emitted, with its destination, newest first
 
 def initU (σ : Store) : UState :=
-  ⟨σ, [], [], false, fun _ => 0, [], 0, false, [], fun _ => [], []⟩
+  ⟨σ, [], [], false, fun _ => 0, [], 0, false, [], fun _ => false, fun _ => [], []⟩
 
 /-- **The allocator reuses.** A freed address goes back on the free list and is handed
     out again before the counter advances. Real allocators do this, and it is what makes
@@ -164,6 +167,9 @@ def pickAddr : List Int → Int → Int
 def bumpFresh : List Int → Int → Int
   | [],     f => f + 1
   | _ :: _, f => f
+
+/-- Update a label. -/
+def updBU (f : Int → Bool) (a : Int) (b : Bool) : Int → Bool := fun c => if c = a then b else f c
 
 /-- Update in the heap. -/
 def updHU (h : Int → Int) (a v : Int) : Int → Int := fun b => if b = a then v else h b
@@ -219,7 +225,15 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
               | .alloc => { s with store := upd s.store x (pickAddr s.freed s.fresh),
                                    live := pickAddr s.freed s.fresh :: s.live,
                                    freed := dropInt (pickAddr s.freed s.fresh) s.freed,
-                                   fresh := bumpFresh s.freed s.fresh }
+                                   fresh := bumpFresh s.freed s.fresh,
+                                   hlab := updBU s.hlab (pickAddr s.freed s.fresh) false,
+                                   heap := updHU s.heap (pickAddr s.freed s.fresh) 0 }
+              | .allocS => { s with store := upd s.store x (pickAddr s.freed s.fresh),
+                                    live := pickAddr s.freed s.fresh :: s.live,
+                                    freed := dropInt (pickAddr s.freed s.fresh) s.freed,
+                                    fresh := bumpFresh s.freed s.fresh,
+                                    hlab := updBU s.hlab (pickAddr s.freed s.fresh) true,
+                                    heap := updHU s.heap (pickAddr s.freed s.fresh) 0 }
               | .deref => if memInt (s.store x) s.live then s
                           else { s with dead := true, err := true }
               | .free  => if memInt (s.store x) s.live
@@ -409,7 +423,7 @@ theorem uVictim_not_mediated : ¬ UMediated uVictim := by
   intro h
   have := h 1 (fun _ => false) (fun _ => 0)
     ({ store := fun _ => 0, auth := [], reads := ["db"], dead := false,
-       heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := []  }, 1, []) rfl
+       heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := []  }, 1, []) rfl
     "db" (by simp)
   exact absurd this (by simp)
 

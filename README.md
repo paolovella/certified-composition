@@ -376,7 +376,13 @@ reacted differently to the same change — memory safety extended for free, beca
 separation invariant never mentioned heap contents, while noninterference needed the
 heap in the observation and three new rules. The consequence is that **the heap is a
 public resource**: a secret value cannot be stored at any address, and lifting that
-needs per-address labels rather than another rule.
+needs per-address labels rather than another rule. Stage 1w then built the invariant
+half of exactly that: cells are labelled at allocation, **allocation zeroes** (with
+reuse, a recycled secret cell would otherwise leak into a public one), and `LabInv` —
+every tracked pointer points at a cell of its own level — is proved inductive, resting
+on stage 1i's separation. The observation does not yet use the labels, so the heap is
+still public; that is the next stage, and splitting it this way audits the invariant
+before anything depends on it.
 
 ## Scope — what is *not* claimed
 

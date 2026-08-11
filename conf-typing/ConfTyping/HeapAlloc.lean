@@ -87,11 +87,11 @@ theorem allocation_sync_is_load_bearing :
     secret. -/
 def secretOne : UState :=
   { store := fun y => if y == "secret" then 1 else 0, auth := [], reads := [],
-    dead := false, heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := []  }
+    dead := false, heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := []  }
 
 def secretZero : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := []  }
+    heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := []  }
 
 theorem secret_states_lowEqA :
     uLowEqA Psec secretOne secretZero := by
@@ -123,15 +123,23 @@ theorem highBranch_is_untypable :
   ∧ jcheck Psec [] highBranch = none
   ∧ jcheckW Psec 6 [] highBranch = none := by decide
 
-/-- The dependency, in one statement: allocation is unconditionally noninterferent
-    **because** guards are Low. Drop the second and the first goes with it. -/
+/-- The dependency, in one statement: allocation is noninterferent **because** guards
+    are Low. Drop the second and the first goes with it.
+
+    **Corrected by stage 1w.** This said "unconditionally" and now carries `P x = false`.
+    The two side conditions are different in kind and it is worth not conflating them:
+    stage 1j's was a *secrecy* condition (the target had to be High, or the address
+    leaked), which stage 1m genuinely removed. Stage 1w's is a *consistency* condition —
+    the allocation site fixes the cell's label, so the site must agree with the
+    pointer's level — and a secret pointer allocates with `allocS` rather than being
+    refused. Nothing that 1m proved became false; the rule was split, not restricted. -/
 theorem alloc_rule_rests_on_low_guards :
-    (∀ (P : Partition) (V : List String) (x : String),
+    (∀ (P : Partition) (V : List String) (x : String), P x = false →
         JSecTy P V (.memop .alloc x) (x :: V))
   ∧ exprLow Psec (.var "secret") = false
   ∧ ((uexec 3 highBranch (fun _ => true) secretOne).map (fun r => r.1.fresh))
       ≠ ((uexec 3 highBranch (fun _ => true) secretZero).map (fun r => r.1.fresh)) :=
-  ⟨fun P V x => JSecTy.alloc (P := P) V x, by decide, by decide⟩
+  ⟨fun P V x hx => JSecTy.alloc (P := P) V x hx, by decide, by decide⟩
 
 /-! ## The conservatism list is empty
 

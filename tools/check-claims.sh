@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 1w: per-address labels, the invariant half.
+for thm in "theorem JSecTy.toLabInv" "theorem labInv_alloc" "theorem allocation_zeroes" \
+           "theorem allocation_site_must_match_the_level" \
+           "theorem heap_still_public_at_this_stage"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapLabel.lean 2>/dev/null; then
+    echo "DRIFT: heap labels are cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # stage 1v: heap values, and the heap becoming public.
 for thm in "theorem the_heap_is_live" "theorem wild_store_faults" \
            "theorem storing_a_secret_is_refused" \
@@ -724,7 +733,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

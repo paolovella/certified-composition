@@ -1504,7 +1504,13 @@ so row 6 covers what a pointer points at and not only whether it is live
 separation invariant never mentioned heap contents — while row 1 again paid: the heap
 entered the observation and three flow rules appeared, with the absence of a `storeH`
 rule meaning **the heap is public** (`storing_a_secret_is_refused`). Per-address labels
-would lift that; they are a different design and are not claimed. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+would lift that; stage 1w builds the invariant half of them. Cells are labelled at
+allocation, allocation zeroes (with reuse a recycled secret cell would otherwise leak
+into a public one — `allocation_zeroes`), and `LabInv` is proved inductive over all
+nineteen rules, resting on stage 1i's separation. The observation does not yet consult
+the labels, so row 1's restriction stands for now
+(`heap_still_public_at_this_stage`); the rules that spend the invariant are the
+following stage. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

@@ -731,6 +731,35 @@ landed.
   `heap_is_never_touched` is gone, being false now; `uexec_heap_fresh` is split into
   `uexec_fresh_mono`, which is the half that survives.
 
+- **Stage 1w — per-address heap labels: the invariant** (`ConfTyping/HeapLabel.lean`,
+  plus `hlab`/`MemOp.allocS`/`updBU` in `Unified.lean` and a split allocation rule).
+  Stage 1v made the heap real and, to stay sound, made it entirely public. Lifting that
+  needs a label per address, and the payoff rules can only be *syntactic* if the
+  analysis can read a cell's level off the program text. This is the invariant half of
+  that change; the rules are the next stage, so the invariant is audited before anything
+  depends on it — the order 1j and 1k used for the analogous problem.
+
+  * Cells are labelled at allocation, and `MemOp.allocS` makes the **site** declare the
+    level. `allocation_site_must_match_the_level` shows a mismatch is refused.
+  * **Allocation zeroes its cell**, and that is not tidiness: with reuse (stage 1u) a
+    freed *secret* cell handed back out as a *public* one would expose its old contents
+    — a public address whose value differs between runs. `allocation_zeroes` writes 7,
+    frees, reallocates and reads 0. An interaction between two stages that neither
+    produced alone.
+  * `LabInv P V s` — every tracked pointer points at a cell of its own level — with
+    `JSecTy.toLabInv` proving it inductive across all nineteen rules. **Separation
+    (stage 1i) is what makes it hold**: no two tracked pointers can share a cell, so no
+    cell has two levels, and the allocation case is the only one needing `SepInv`.
+  * `JSecTy.alloc` gains `P x = false`, `allocS` requires `P x = true`. That is a
+    *consistency* condition, not a secrecy one: stage 1m removed a secrecy condition and
+    nothing it proved became false — the rule was split, not restricted. The correction
+    sits on `alloc_rule_rests_on_low_guards`, where the old claim lives.
+
+  **Not claimed:** the observation still contains `s.heap = s'.heap`, so the heap is
+  still public and `storing_a_secret_is_refused` still holds
+  (`heap_still_public_at_this_stage` records it). `LabInv` is proved and not yet used by
+  noninterference — the honest description of an invariant stage.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

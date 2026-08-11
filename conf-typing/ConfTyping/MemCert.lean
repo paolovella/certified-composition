@@ -218,6 +218,37 @@ theorem MemCert.alloc {V : List String} (x : String) :
           · simp only [upd, if_neg hqx, memInt, Bool.or_eq_true]
             exact Or.inr (hv hd0 q hqv)
 
+/-- **Secret allocation.** The same liveness argument: the label is not part of
+    the separation invariant. The fresh address is added to `live` and stored in `x`, so `x`
+    joins the tracked set — and every variable already tracked stays tracked, because
+    `live` only grows. -/
+theorem MemCert.allocS {V : List String} (x : String) :
+    MemCert V (.memop .allocS x) (x :: V) := by
+  constructor
+  intro n π s r hinv hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr
+      subst hr
+      obtain ⟨he, hv⟩ := hinv
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · have hd0 : s.dead = false := by simpa using hd
+        simp only [if_neg hd]
+        refine ⟨he, fun _ q hq => ?_⟩
+        rcases List.mem_cons.mp hq with hqx | hqv
+        · subst hqx
+          show memInt (upd s.store q (pickAddr s.freed s.fresh) q)
+              (pickAddr s.freed s.fresh :: s.live) = true
+          simp [upd, memInt]
+        · show memInt (upd s.store x (pickAddr s.freed s.fresh) q)
+                (pickAddr s.freed s.fresh :: s.live) = true
+          by_cases hqx : q = x
+          · subst hqx; simp [upd, memInt]
+          · simp only [upd, if_neg hqx, memInt, Bool.or_eq_true]
+            exact Or.inr (hv hd0 q hqv)
+
 /-- **Dereference.** Tracked means live, so the fault branch is unreachable and `err`
     stays `false` — which is exactly the memory-safety guarantee. -/
 theorem MemCert.deref {V : List String} (x : String) (hx : memStr x V = true) :
@@ -245,6 +276,7 @@ def umcheck : List String → UCmd → Option (List String)
   | V, .check _           => some V
   | V, .access _          => some V
   | V, .memop .alloc x    => some (x :: V)
+  | V, .memop .allocS x   => some (x :: V)
   | V, .memop .deref x    => if memStr x V then some V else none
   | _, .memop .free _     => none        -- no rule: see `free_has_no_rule`
   | _, .sop _ _ _         => none        -- strings do not touch the heap; stage 1o
@@ -267,6 +299,8 @@ theorem umcheck_sound : ∀ (c : UCmd) (V V' : List String),
       simp only [umcheck, Option.some.injEq] at h; subst h; exact MemCert.access r
   | .memop .alloc x, V, V', h => by
       simp only [umcheck, Option.some.injEq] at h; subst h; exact MemCert.alloc x
+  | .memop .allocS x, V, V', h => by
+      simp only [umcheck, Option.some.injEq] at h; subst h; exact MemCert.allocS x
   | .memop .deref x, V, V', h => by
       simp only [umcheck] at h
       by_cases hx : memStr x V = true

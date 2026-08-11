@@ -70,12 +70,12 @@ theorem stale_pointer_refused_after_reuse :
 def ptrFive : UState :=
   { store := fun y => if y == "secret" then 5 else 0, auth := [], reads := [],
     dead := false, heap := fun _ => 0, live := [5], fresh := 8, err := false,
-    freed := [], sstore := fun _ => [], sink := [] }
+    freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := [] }
 
 def ptrSeven : UState :=
   { store := fun y => if y == "secret" then 7 else 0, auth := [], reads := [],
     dead := false, heap := fun _ => 0, live := [7], fresh := 8, err := false,
-    freed := [], sstore := fun _ => [], sink := [] }
+    freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := [] }
 
 theorem ptr_states_lowEqA : uLowEqA Psec ptrFive ptrSeven := by
   refine ⟨?_, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩

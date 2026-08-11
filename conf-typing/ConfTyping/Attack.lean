@@ -136,12 +136,12 @@ theorem allcheck_NI_general {P : Partition} {c : UCmd} {A' V' : List String} {k 
 /-- Two states that differ in a secret string and agree on everything Low. -/
 def secretStr : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false, heap := fun _ => 0,
-    live := [], fresh := 0, err := false, freed := [],
+    live := [], fresh := 0, err := false, freed := [], hlab := fun _ => false,
     sstore := fun y => if y == "secret" then [UCh.quote] else [], sink := [] }
 
 def secretStr' : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false, heap := fun _ => 0,
-    live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := [] }
+    live := [], fresh := 0, err := false, freed := [], hlab := fun _ => false, sstore := fun _ => [], sink := [] }
 
 theorem secretStr_lowEqA : uLowEqA Psec secretStr secretStr' := by
   refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl, rfl, rfl⟩
@@ -241,6 +241,11 @@ theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
           · simp only [if_neg hd]
             cases op with
             | alloc =>
+                show s.fresh ≤ bumpFresh s.freed s.fresh
+                cases s.freed with
+                | nil => show s.fresh ≤ s.fresh + 1; omega
+                | cons _ _ => exact Int.le_refl _
+            | allocS =>
                 show s.fresh ≤ bumpFresh s.freed s.fresh
                 cases s.freed with
                 | nil => show s.fresh ≤ s.fresh + 1; omega

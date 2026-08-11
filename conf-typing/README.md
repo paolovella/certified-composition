@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapLabel.lean` | stage 1w | **per-address heap labels, the invariant half**: cells labelled at allocation, allocation zeroes, and `LabInv` — every tracked pointer points at a cell of its own level — proved inductive |
 | `ConfTyping/HeapValue.lean` | stage 1v | the heap gets real `load`/`store`: memory safety extended for free, noninterference did not — the heap enters the observation and becomes a **public resource** |
 | `ConfTyping/Reuse.lean` | stage 1u | the allocator now **reuses** freed addresses: the separation argument survived with two new invariant conjuncts, but reuse turned the free list into a **channel**, so `free` needs a Low pointer |
 | `ConfTyping/Attack.lean` | **attacking the core**, stage 1t | twelve adversarial programs, all refused — and three defects found by looking on purpose, all of them a guarantee narrower than its name |
@@ -1839,6 +1840,43 @@ a rule, so it is named here rather than attempted.
 
 `wild_store_faults` and `wild_store_rejected` confirm the new operations really can go
 wrong and that the analysis stops them, the same pairing stages 1h and 1i used.
+
+## Per-address heap labels (`HeapLabel.lean`) — stage 1w, the invariant
+
+Stage 1v made the heap real and, to stay sound, made it entirely **public**. Lifting
+that needs a label per address — and the payoff rules can only be *syntactic* if the
+analysis can read a cell's level off the program text. This stage establishes exactly
+that, and nothing more: it is the invariant half of a two-stage change.
+
+* `UState` gains `hlab : Int → Bool`, fixed at allocation; `MemOp` gains `allocS`, so
+  the allocation **site** declares the cell's level.
+* **Allocation zeroes its cell**, and this is not tidiness. With reuse (stage 1u) a
+  freed *secret* cell handed back out as a *public* one would expose its old contents —
+  a public address whose value differs between runs. `allocation_zeroes` is the witness:
+  write 7, free, reallocate, read 0. It is an interaction between two stages that
+  neither produced alone.
+* `LabInv P V s` — every tracked pointer points at a cell of its own level — with
+  `JSecTy.toLabInv` proving it inductive across all nineteen rules. **Separation (stage
+  1i) is what makes it work**: no two tracked pointers can share a cell, so no cell has
+  two levels. The allocation case is the only one that needs `SepInv`, which is 1i
+  paying for 1w.
+* `JSecTy.alloc` gains `P x = false` and `allocS` requires `P x = true`
+  (`allocation_site_must_match_the_level`). That is a *consistency* condition, not a
+  secrecy one — stage 1m removed a secrecy condition and nothing it proved became false;
+  the rule was split, not restricted. The note on `alloc_rule_rests_on_low_guards` says
+  so where the old claim lives.
+
+**What this stage does not do**, stated because the field would otherwise look like it
+earns more than it does: the observation still contains `s.heap = s'.heap`, so the heap
+is still public and `storing_a_secret_is_refused` still holds —
+`heap_still_public_at_this_stage` records it as a theorem. `LabInv` is proved and *not
+yet used* by noninterference.
+
+Stage 1x is the other half: replace the heap conjunct with "labels agree, and public
+cells agree", and add the rules that spend the invariant — `storeH` (a secret through a
+secret pointer is invisible) and a label-aware `loadL`. Splitting it this way means the
+invariant is audited before anything depends on it, the order stages 1j and 1k used for
+the analogous problem.
 
 ## §11 pre-mechanization checklist (framework doc)
 

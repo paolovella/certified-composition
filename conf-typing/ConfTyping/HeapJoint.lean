@@ -102,11 +102,15 @@ inductive JSecTy (P : Partition) : List String → UCmd → List String → Prop
               JSecTy P V (.loop e c) W
   | check   : ∀ V r, JSecTy P V (.check r) V
   | access  : ∀ V r, JSecTy P V (.access r) V
-  /-- **Allocation, with no side condition** (stage 1m). Stage 1j needed `P x = true`
-      because the counter is written into the store. With the allocator carried as a
-      relational invariant — sound here because no guard may depend on a secret — the
-      two runs allocate the same address, so a Low target is fine too. -/
-  | alloc   : ∀ V x, JSecTy P V (.memop .alloc x) (x :: V)
+  /-- **Public allocation** (stage 1w gives it a side condition). The cell's label is
+      fixed at the allocation site, so the site must agree with the pointer's level —
+      otherwise `LabInv` is not inductive. Stage 1m removed a *secrecy* condition
+      ("the target must be High"); this is a *consistency* one, and they are different
+      in kind: 1m's was about whether the address leaks, this is about which cell you
+      get. -/
+  | alloc   : ∀ V x, P x = false → JSecTy P V (.memop .alloc x) (x :: V)
+  /-- **Secret allocation.** -/
+  | allocS  : ∀ V x, P x = true → JSecTy P V (.memop .allocS x) (x :: V)
   /-- **The rule that needed the index.** `deref` is noninterferent exactly when the
       pointer is known live, so the fault branch is unreachable. -/
   | deref   : ∀ V x, memStr x V = true → JSecTy P V (.memop .deref x) V
@@ -151,7 +155,8 @@ theorem JSecTy.toSepCert {P : Partition} {V : List String} {c : UCmd} {V' : List
       exact SepCert.strengthenPre (SepCert.loop (SepCert.weakenPost ih hWW₁)) hWV
   | check _ r => exact SepCert.check r
   | access _ r => exact SepCert.access r
-  | alloc _ x => exact SepCert.alloc x
+  | alloc _ x _ => exact SepCert.alloc x
+  | allocS _ x _ => exact SepCert.allocS x
   | deref _ x hx => exact SepCert.deref x hx
   | free _ x hx _ => exact SepCert.free x hx
   | setH _ x e _ => exact SepCert.sop .set x e
@@ -335,7 +340,7 @@ theorem jsecTy_sound {P : Partition} :
           by_cases hxy : y = x
           · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hst]
           · rw [if_neg hxy, if_neg hxy]; exact hst y hy
-    | alloc _ x =>
+    | alloc _ x _ =>
         show uOptLowEqA P (uexec (m+1) (.memop .alloc x) π s)
                         (uexec (m+1) (.memop .alloc x) π s')
         simp only [uexec]
@@ -351,7 +356,37 @@ theorem jsecTy_sound {P : Partition} :
                   hss, hsk,
                   by show dropInt (pickAddr s.freed s.fresh) s.freed
                         = dropInt (pickAddr s'.freed s'.fresh) s'.freed
-                     rw [hfr, hfd], hhp⟩
+                     rw [hfr, hfd],
+                  by show updHU s.heap (pickAddr s.freed s.fresh) 0
+                        = updHU s'.heap (pickAddr s'.freed s'.fresh) 0
+                     rw [hhp, hfr, hfd]⟩
+          intro z hz
+          show upd s.store x (pickAddr s.freed s.fresh) z
+             = upd s'.store x (pickAddr s'.freed s'.fresh) z
+          simp only [upd]
+          by_cases hzx : z = x
+          · rw [if_pos hzx, if_pos hzx, hfr, hfd]
+          · rw [if_neg hzx, if_neg hzx]; exact hst z hz
+    | allocS _ x _ =>
+        show uOptLowEqA P (uexec (m+1) (.memop .allocS x) π s)
+                        (uexec (m+1) (.memop .allocS x) π s')
+        simp only [uexec]
+        refine ⟨?_, rfl, rfl⟩
+        by_cases hd : s.dead = true
+        · have hd' : s'.dead = true := by rwa [hdd] at hd
+          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhp⟩
+        · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
+          rw [if_neg hd, if_neg hd']
+          refine ⟨?_, hrd, hdd,
+                  by show bumpFresh s.freed s.fresh = bumpFresh s'.freed s'.fresh
+                     rw [hfr, hfd],
+                  hss, hsk,
+                  by show dropInt (pickAddr s.freed s.fresh) s.freed
+                        = dropInt (pickAddr s'.freed s'.fresh) s'.freed
+                     rw [hfr, hfd],
+                  by show updHU s.heap (pickAddr s.freed s.fresh) 0
+                        = updHU s'.heap (pickAddr s'.freed s'.fresh) 0
+                     rw [hhp, hfr, hfd]⟩
           intro z hz
           show upd s.store x (pickAddr s.freed s.fresh) z
              = upd s'.store x (pickAddr s'.freed s'.fresh) z
@@ -556,7 +591,8 @@ def jcheck (P : Partition) : List String → UCmd → Option (List String)
   | V, .assign x e     => if P x || exprLow P e then some (dropStr x V) else none
   | V, .check _        => some V
   | V, .access _       => some V
-  | V, .memop .alloc x => some (x :: V)
+  | V, .memop .alloc x => if P x then none else some (x :: V)
+  | V, .memop .allocS x => if P x then some (x :: V) else none
   | V, .memop .deref x => if memStr x V then some V else none
   | V, .memop .free x  => if memStr x V && !P x then some (dropStr x V) else none
   | V, .sop .set x e   => if P x || sexprLow P e then some V else none
@@ -589,7 +625,19 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
         · exact .assignL V x e h'
       · rw [if_neg hx] at h; simp at h
   | .memop .alloc x, V, V', h => by
-      simp only [jcheck, Option.some.injEq] at h; subst h; exact .alloc V x
+      simp only [jcheck] at h
+      by_cases hx : P x = true
+      · rw [if_pos hx] at h; simp at h
+      · rw [if_neg hx] at h
+        simp only [Option.some.injEq] at h; subst h
+        exact .alloc V x (by simpa using hx)
+  | .memop .allocS x, V, V', h => by
+      simp only [jcheck] at h
+      by_cases hx : P x = true
+      · rw [if_pos hx] at h
+        simp only [Option.some.injEq] at h; subst h
+        exact .allocS V x hx
+      · rw [if_neg hx] at h; simp at h
   | .memop .deref x, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : memStr x V = true

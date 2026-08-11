@@ -83,7 +83,8 @@ def jcheckW (P : Partition) : Nat → List String → UCmd → Option (List Stri
   | _ + 1, V, .assign x e      => if P x || exprLow P e then some (dropStr x V) else none
   | _ + 1, V, .check _         => some V
   | _ + 1, V, .access _        => some V
-  | _ + 1, V, .memop .alloc x  => some (x :: V)
+  | _ + 1, V, .memop .alloc x  => if P x then none else some (x :: V)
+  | _ + 1, V, .memop .allocS x => if P x then some (x :: V) else none
   | _ + 1, V, .memop .deref x  => if memStr x V then some V else none
   | _ + 1, V, .memop .free x   => if memStr x V && !P x then some (dropStr x V) else none
   | _ + 1, V, .sop .set x e    => if P x || sexprLow P e then some V else none
@@ -168,7 +169,19 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
     | memop op x =>
         cases op with
         | alloc =>
-            simp only [jcheckW, Option.some.injEq] at h; subst h; exact .alloc V x
+            simp only [jcheckW] at h
+            by_cases hx : P x = true
+            · rw [if_pos hx] at h; simp at h
+            · rw [if_neg hx] at h
+              simp only [Option.some.injEq] at h; subst h
+              exact .alloc V x (by simpa using hx)
+        | allocS =>
+            simp only [jcheckW] at h
+            by_cases hx : P x = true
+            · rw [if_pos hx] at h
+              simp only [Option.some.injEq] at h; subst h
+              exact .allocS V x hx
+            · rw [if_neg hx] at h; simp at h
         | deref =>
             simp only [jcheckW] at h
             by_cases hx : memStr x V = true
@@ -232,9 +245,9 @@ def Pheap : Partition := fun x => x == "p" || x == "q"
     again. The body's tracked set **grows**, which is what stage 1k could not handle,
     and `p` must survive the loop for the final dereference to be typable. -/
 def widenProg : UCmd :=
-  .seq (.memop .alloc "p")
+  .seq (.memop .allocS "p")
    (.seq (.loop (.var "n")
-           (.seq (.memop .alloc "q") (.seq (.memop .deref "p") (.assign "n" (.num 0)))))
+           (.seq (.memop .allocS "q") (.seq (.memop .deref "p") (.assign "n" (.num 0)))))
     (.memop .deref "p"))
 
 /-- **The conservatism is gone, and the difference is visible.** Stage 1k's exact rule
@@ -248,8 +261,8 @@ theorem widening_beats_the_exact_rule :
     the loop allocates and never frees, so nothing survives it — which is the right
     answer rather than a refusal. -/
 theorem allocating_loop_now_accepted :
-    jcheck Psec [] (.loop (.num 1) (.memop .alloc "secret")) = none
-  ∧ jcheckW Psec 6 [] (.loop (.num 1) (.memop .alloc "secret")) = some [] := by decide
+    jcheck Psec [] (.loop (.num 1) (.memop .allocS "secret")) = none
+  ∧ jcheckW Psec 6 [] (.loop (.num 1) (.memop .allocS "secret")) = some [] := by decide
 
 /-- And nothing regressed on stage 1k's worked program. -/
 theorem widened_agrees_on_safeHeapProg :

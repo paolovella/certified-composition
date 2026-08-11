@@ -68,6 +68,7 @@ theorem UCert.memop {A : List String} (op : MemOp) (x : String) :
           simp only [if_neg hdead]
           cases op with
           | alloc => exact ⟨ha, hrd, fun _ => hd hd0⟩
+          | allocS => exact ⟨ha, hrd, fun _ => hd hd0⟩
           | deref =>
               by_cases hl : memInt (s.store x) s.live = true
               · simp only [if_pos hl]; exact ⟨ha, hrd, hd⟩
@@ -149,7 +150,8 @@ def allcheck (P : Partition) :
   | A, V, .assign x e     => if P x || exprLow P e then some (A, dropStr x V, 1) else none
   | A, V, .check r        => some (r :: A, V, 1)
   | A, V, .access r       => if memStr r A then some (A, V, 1) else none
-  | A, V, .memop .alloc x => some (A, x :: V, 1)
+  | A, V, .memop .alloc x => if P x then none else some (A, x :: V, 1)
+  | A, V, .memop .allocS x => if P x then some (A, x :: V, 1) else none
   | A, V, .memop .deref x => if memStr x V then some (A, V, 1) else none
   | A, V, .memop .free x  => if memStr x V && !P x then some (A, dropStr x V, 1) else none
   | A, V, .sop .set x e   => if P x || sexprLow P e then some (A, V, 1) else none
@@ -199,9 +201,21 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
         exact ⟨UCert.access r hr, .access V r⟩
       · rw [if_neg hr] at h; simp at h
   | .memop .alloc x, A, V, A', V', k, h => by
-      simp only [allcheck, Option.some.injEq, Prod.mk.injEq] at h
-      obtain ⟨rfl, rfl, rfl⟩ := h
-      exact ⟨UCert.memop .alloc x, .alloc V x⟩
+      simp only [allcheck] at h
+      by_cases hx : P x = true
+      · rw [if_pos hx] at h; simp at h
+      · rw [if_neg hx] at h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl, rfl⟩ := h
+        exact ⟨UCert.memop .alloc x, .alloc V x (by simpa using hx)⟩
+  | .memop .allocS x, A, V, A', V', k, h => by
+      simp only [allcheck] at h
+      by_cases hx : P x = true
+      · rw [if_pos hx] at h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl, rfl⟩ := h
+        exact ⟨UCert.memop .allocS x, .allocS V x hx⟩
+      · rw [if_neg hx] at h; simp at h
   | .memop .deref x, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : memStr x V = true
