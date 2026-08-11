@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 2b: the ownership invariant.
+for thm in "theorem separation_is_not_conjunctive" "theorem union_gives_both" \
+           "theorem alloc_frames_over_a_disjoint_set" "theorem free_is_the_obstruction" \
+           "theorem free_frames_when_owned"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Ownership.lean 2>/dev/null; then
+    echo "DRIFT: the ownership stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # stage 2a: two threads, and the obstruction.
 for thm in "theorem interleaving_breaks_memory_safety" "theorem both_threads_are_certified" \
            "theorem budget_composes_across_threads" "theorem disjoint_threads_are_safe" \
@@ -774,7 +783,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

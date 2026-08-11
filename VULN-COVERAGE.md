@@ -1533,7 +1533,11 @@ interleaving) and found the obstruction that row 8 will have to clear: memory sa
 **thread-local** and does not compose. Two individually certified threads —
 `slcheck [] (alloc p; deref p)` and `slcheck ["p"] (free p)` — have a faulting
 interleaving. Row 1 inherits the failure through stage 1j's dependency. The budget
-composes across threads. Row 8 remains covered only by brick 32, on its own language. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+composes across threads. Row 8 remains covered only by brick 32, on its own language. Stage 2b located the
+failure precisely: `SepInv` is not conjunctive (`separation_is_not_conjunctive`), so the
+invariant a concurrent judgment must maintain is the one over the *union* of the
+threads' tracked sets, and the frame rule splits into a dull majority, `alloc`
+(interesting, proved) and `free` (needs an ownership hypothesis). Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

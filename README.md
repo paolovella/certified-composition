@@ -397,7 +397,11 @@ reused — address-space consumption, not safety. Stage 2a then took the first s
 concurrency: `uexecPar` interleaves two threads at command granularity, and
 **memory safety does not compose** — two individually certified threads have a faulting
 interleaving, because the tracked set is thread-local with no ownership discipline. The
-budget does compose. The fix has a shape (disjoint ownership) and is not attempted.
+budget does compose. Stage 2b then pinned the failure at the *invariant* rather than the
+run: `SepInv` is **not conjunctive** — one state satisfies it for each thread's tracked
+set and fails it for the union, because the pointers alias — so the object to maintain
+is the union, and the frame rule decomposes into a dull majority, `alloc` (interesting,
+proved) and `free` (impossible without an ownership hypothesis).
 
 ## Scope — what is *not* claimed
 

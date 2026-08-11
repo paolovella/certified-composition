@@ -889,6 +889,36 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2b — ownership: why thread-local certificates cannot compose**
+  (`ConfTyping/Ownership.lean`). Stage 2a's counterexample was about *runs*, which
+  leaves open where the reasoning fails. This pins it at the invariant.
+
+  **`SepInv` is not conjunctive.** `separation_is_not_conjunctive` gives one state
+  satisfying `SepInv ["p"]` and `SepInv ["q"]` and *not* `SepInv ["p","q"]` — the two
+  pointers alias. Two thread-local certificates therefore say nothing about the pair,
+  which is exactly where 2a's faulting interleaving comes from. Same shape as stage 1i's
+  `memInv_not_preserved_by_free`: a counterexample at the level of the invariant,
+  showing the missing rule is an obstruction rather than an omission.
+
+  So the object to maintain is `SepInv (V₁ ++ V₂)`, over the **union**.
+  `union_gives_both` shows it delivers both thread-local invariants and
+  `ownership_is_the_missing_hypothesis` shows what it adds: cross-thread address
+  disjointness.
+
+  **The frame rule decomposes into three kinds of case**, which is worth knowing before
+  writing it. Most commands frame dully — they change neither `live` nor the store
+  outside their own targets. `alloc` frames for an *interesting* reason: the new address
+  must differ from the other thread's pointers, the freshness conjunct working across a
+  thread boundary (`alloc_frames_over_a_disjoint_set`, proved). And `free` **cannot**
+  frame, because it removes an address another thread may hold;
+  `free_frames_when_owned` states the rule an ownership discipline would license, and
+  its hypothesis is what the discipline must enforce.
+
+  Next is a judgment indexed by an ownership split with the frame rule as its central
+  lemma. Both precedents for that shape — 1j → 1k and 1w → 1x — were about a dependency
+  between two *properties*; this one is between two *threads*, and the recurrence is
+  itself worth noting.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

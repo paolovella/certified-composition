@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Ownership.lean` | stage 2b | the failure pinned at the *invariant*: `SepInv` is **not conjunctive**, so two thread-local certificates say nothing about the pair — plus the frame rule's decomposition |
 | `ConfTyping/Interleave.lean` | stage 2a | two threads on the unified machine: **memory safety does not compose** (two certified threads, one faulting interleaving) while the budget does |
 | `ConfTyping/HeapRetire.lean` | stage 1z | 1y's gap closed by **retiring** secret addresses instead of recycling them — one branch in the evaluator, one dropped hypothesis, no new invariant |
 | `ConfTyping/HeapAttack.lean` | stage 1y | attacking the labelled heap: the new guarantee is **not** vacuous, and two correct rules compose into one that is too strong — **a secret cell can never be freed** |
@@ -2013,6 +2014,38 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## Ownership (`Ownership.lean`) — stage 2b
+
+Stage 2a's counterexample was about *runs*, which leaves open where the reasoning
+actually fails. This pins it at the invariant, which is where a fix has to act.
+
+**`SepInv` is not conjunctive.** `separation_is_not_conjunctive` gives one state
+satisfying `SepInv ["p"]` and `SepInv ["q"]` and *not* `SepInv ["p","q"]` — the two
+pointers alias. Two thread-local certificates therefore say nothing about the pair, and
+that is exactly where 2a's faulting interleaving comes from. It is the same shape as
+stage 1i's `memInv_not_preserved_by_free`: a counterexample at the level of the
+invariant, showing the missing rule was an obstruction rather than an omission.
+
+So the object a concurrent judgment must maintain is `SepInv (V₁ ++ V₂)`, over the
+**union**. `union_gives_both` shows the union delivers both thread-local invariants, and
+`ownership_is_the_missing_hypothesis` shows what it adds: cross-thread address
+disjointness.
+
+**The frame rule decomposes into three kinds of case**, which is worth knowing before
+writing it: most commands frame for a dull reason (they change neither `live` nor the
+store outside their own targets); `alloc` frames for an *interesting* reason — the new
+address must differ from the other thread's pointers, which is the freshness conjunct
+working across a thread boundary, already proved as
+`alloc_frames_over_a_disjoint_set`; and `free` **cannot** frame, because it removes an
+address another thread may hold. `free_frames_when_owned` states the rule an ownership
+discipline would license, and its hypothesis is exactly what the discipline must
+enforce.
+
+The next stage is a judgment indexed by an ownership split with the frame rule as its
+central lemma. Both precedents for that shape — 1j → 1k and 1w → 1x — were about a
+dependency between two *properties*; this one is between two *threads*, and the
+recurrence of the shape is itself worth noting.
 
 ## §11 pre-mechanization checklist (framework doc)
 
