@@ -632,6 +632,43 @@ landed.
   ledger buys is that the ways it can be wrong are listed, appendable, and impossible to
   discharge by accident.
 
+- **Stage 1t — attacking the core on purpose** (`ConfTyping/Attack.lean`). Every finding
+  from 1h onwards came from a counterexample that turned up while building something
+  else, which only finds defects that happen to block the next step. This looks
+  deliberately.
+
+  **Twelve attacks, all refused**, each a theorem rather than an assertion: laundering a
+  secret through concatenation and through sanitisation, branching and looping on a
+  secret, use-after-free through an alias, freeing through a second name, a path built
+  from a variable with unknown parent-segment count, an escaping literal, an access
+  without its check, a check of the wrong resource. `twelve_attacks_refused` collects
+  them so the list cannot shrink unnoticed. **No unsoundness was found in any checker.**
+
+  **Three defects, all the same kind** — a guarantee narrower than its name:
+
+  1. *The exported noninterference statement was vacuous for strings.*
+     `xcheck_gives_five` states NI from `initU σ`, and `initU` gives every string
+     variable the empty value — so two runs from it cannot differ in a secret string,
+     and everything it said about the sink was true and empty. `jsecTy_sound` was
+     general all along; only the wrapper was weak. Fixed by `allcheck_NI_general`, with
+     `secretTouching_NI_is_real` as a witness where the runs genuinely differ in a
+     secret string. Stage 1o's unobserved-sink mistake, one level up. The correction
+     sits in `AllFive.lean` beside the claim it corrects, and `check-claims` enforces
+     that it stays there.
+  2. *The heap is a fiction.* `heap_is_never_touched`: no command reads or writes the
+     `heap` field, so memory safety here is the liveness of addresses and says nothing
+     about stored values — which is what the no-fault theorems claim, but not what a
+     `heap : Int → Int` field in `UState` implies.
+  3. *The allocator never reuses an address* (`allocator_never_reuses`), and `SepInv`'s
+     freshness conjunct is where the proof uses it. Real allocators reuse, which is how
+     use-after-free becomes exploitable rather than merely wrong; stage 1i's CWE-416
+     result therefore carries a hypothesis that had never been written down.
+
+  Also fixed: `fiveProg_deployed` took a mediation hypothesis that was derivable from
+  `fiveProg_five`, making the theorem weaker than it needed to be.
+
+  All three defects were in the **statements**, not the proofs.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

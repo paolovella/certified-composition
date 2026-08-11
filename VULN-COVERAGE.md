@@ -1477,7 +1477,17 @@ entry each (`Discharged`: the policy author, the query parser, the filesystem), 
 given those three. `sink_assumption_is_load_bearing` shows the entries are obligations
 rather than decoration, and `machine_guarantees_need_no_deployment` shows the other
 three really do hold with an empty ledger. **The trusted base of a fully-certified
-program on this machine is three lines long.** Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+program on this machine is three lines long.**
+
+Stage 1t attacked the core deliberately. Twelve adversarial programs are refused
+(`twelve_attacks_refused`) and no checker was found unsound. Three findings, all
+narrowing claims rather than breaking them, and all in the *statements*: the exported
+noninterference guarantee was vacuous in its string dimension because it started from
+`initU` (fixed by `allcheck_NI_general`, with `secretTouching_NI_is_real` as a witness
+that the general form does real work); `heap_is_never_touched` shows memory safety here
+is about the liveness of addresses and not about stored values; and
+`allocator_never_reuses` shows stage 1i's CWE-416 result depends on a non-reusing
+allocator, which real allocators are not. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

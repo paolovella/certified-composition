@@ -62,3 +62,4 @@ import ConfTyping.AllFive
 import ConfTyping.PathCert
 import ConfTyping.StringLoop
 import ConfTyping.Deploy
+import ConfTyping.Attack

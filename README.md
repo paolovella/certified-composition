@@ -352,6 +352,15 @@ steps), and mediation, structural integrity and path safety need exactly one ent
 each, belonging to three different external components. **The trusted base of a
 fully-certified program is three lines long, and enumerated.**
 
+Stage 1t then attacked the core on purpose. Twelve adversarial programs are refused and
+no unsoundness was found — but three defects were, all of the same kind: a guarantee
+narrower than its name. The exported noninterference statement was **vacuous for
+strings** (it started from `initU`, where every string variable is empty, so two runs
+could not differ in a secret string); the `heap` field is never touched by any command,
+so memory safety means liveness of addresses and nothing more; and the allocator never
+reuses an address, which is a hypothesis stage 1i's use-after-free result depended on
+without saying so. All three were in the statements rather than the proofs.
+
 ## Scope — what is *not* claimed
 
 - The transport interface is **not** asserted to be the "correct general

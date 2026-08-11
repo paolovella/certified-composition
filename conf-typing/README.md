@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Attack.lean` | **attacking the core**, stage 1t | twelve adversarial programs, all refused — and three defects found by looking on purpose, all of them a guarantee narrower than its name |
 | `ConfTyping/Deploy.lean` | composable core, stage 1s | the ledger, threaded: what must be true of the **world** — and the answer is a trusted base **three lines long**, with two of the six certificates needing nothing at all |
 | `ConfTyping/StringLoop.lean` | composable core, stage 1r | loop rules for both string certificates by narrowing; the loop count is corrected to **five of six**, the budget still the exception |
 | `ConfTyping/PathCert.lean` | composable core, stage 1q | **path traversal** (CWE-22), the last coverage row: a prefix condition rather than a count, per-sink, and layered on the taint environment |
@@ -1737,6 +1738,42 @@ fact rather than a presentation choice.
 That last number is the point. A program can be certified to the hilt and still be
 wrong about the world; what the ledger buys is that the ways it can be wrong are
 listed, appendable, and impossible to discharge by accident.
+
+## Attacking the core (`Attack.lean`) — stage 1t
+
+Every finding from stage 1h onwards came from a counterexample that turned up while
+building something else. That only finds defects which happen to block the next step, so
+this stage looks on purpose.
+
+**Twelve attacks, all refused**, each recorded as a theorem rather than asserted:
+laundering a secret through concatenation and through sanitisation, branching and
+looping on a secret, use-after-free through an alias, freeing through a second name, a
+path built from a variable with an unknown parent-segment count, an escaping literal, an
+access without its check, and a check of the wrong resource. `twelve_attacks_refused`
+collects them so the list cannot quietly shrink. **No unsoundness was found in any
+checker.**
+
+**Three defects, all of the same kind** — a guarantee narrower than its name, which is
+the failure mode this repo treats as most serious:
+
+1. **The exported noninterference statement was vacuous for strings.**
+   `xcheck_gives_five` states noninterference from `initU σ`, and `initU` gives every
+   string variable the empty value — so two runs from it *cannot differ in a secret
+   string*, and everything the statement said about the sink was true and empty. The
+   underlying `jsecTy_sound` was general all along; only the wrapper was weak.
+   `allcheck_NI_general` exports the general form and `secretTouching_NI_is_real` is a
+   witness where the two runs genuinely differ in a secret string. This is stage 1o's
+   unobserved-sink mistake made one level up.
+2. **The heap is a fiction.** `heap_is_never_touched` proves `uexec` never reads or
+   writes the `heap` field, so memory safety here means *liveness of addresses* and
+   nothing about stored values. That is exactly what the no-fault theorems claim, but a
+   `heap : Int → Int` field in `UState` implies more.
+3. **The allocator never reuses an address** (`allocator_never_reuses`), and `SepInv`'s
+   freshness conjunct is where the proof *uses* that. Real allocators reuse, which is how
+   use-after-free becomes exploitable rather than merely wrong — so stage 1i's CWE-416
+   result carries a hypothesis that had never been written down.
+
+All three were in the **statements**, not the proofs. That is where to look next time.
 
 ## §11 pre-mechanization checklist (framework doc)
 

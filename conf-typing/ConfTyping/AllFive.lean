@@ -34,6 +34,14 @@
   build a sanitised query, emit it, free. Five certificates — budget (tight, 6),
   mediation, noninterference, memory safety, structural integrity — from two checkers
   and one program.
+
+  **Correction, from stage 1t.** The noninterference guarantee exported here is stated
+  from `initU σ`, and `initU` gives every string variable the empty value — so two runs
+  from it cannot differ in a secret *string*, and this statement's string dimension is
+  vacuous. The underlying `jsecTy_sound` was general all along;
+  `Attack.allcheck_NI_general` exports the general form, and
+  `Attack.secretTouching_NI_is_real` is a witness where the two runs really do differ in
+  a secret string. Use the general form when strings matter.
 -/
 import ConfTyping.TaintCert
 

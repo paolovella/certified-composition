@@ -488,6 +488,19 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 1t: the attack record, and the three findings it produced.
+for thm in "theorem twelve_attacks_refused" "theorem allcheck_NI_general" \
+           "theorem secretTouching_NI_is_real" "theorem heap_is_never_touched" \
+           "theorem allocator_never_reuses" "theorem initU_hides_string_inputs"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Attack.lean 2>/dev/null; then
+    echo "DRIFT: the attack record is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the vacuity correction must stay beside the claim it corrects
+if ! grep -q "allcheck_NI_general" conf-typing/ConfTyping/AllFive.lean; then
+  echo "DRIFT: AllFive states the initU-only NI guarantee without stage 1t's correction"; fail=1
+fi
+
 # composable core stage 1s: the deployment ledger.
 for thm in "theorem sat_toLedger" "theorem deployment_reading" \
            "theorem machine_guarantees_need_no_deployment" \
@@ -693,7 +706,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

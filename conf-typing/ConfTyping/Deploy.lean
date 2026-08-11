@@ -137,9 +137,7 @@ theorem fiveProg_paths_vacuous :
 
 /-- **The deployment-level guarantees for the worked program**, from its five machine
     certificates plus three ledger entries. -/
-theorem fiveProg_deployed (D : Deployment) (hD : Discharged D [2])
-    (hpol : ∀ (n : Nat) (σ : Store) (r : UState × Nat × List Bool),
-        uexec n fiveProg D.policy (initU σ) = some r → ∀ q ∈ r.1.reads, D.policy q = true) :
+theorem fiveProg_deployed (D : Deployment) (hD : Discharged D [2]) :
     (∀ (n : Nat) (σ : Store) (r : UState × Nat × List Bool),
         uexec n fiveProg D.policy (initU σ) = some r →
         ∀ q ∈ r.1.reads, D.intended q = true)
@@ -148,7 +146,8 @@ theorem fiveProg_deployed (D : Deployment) (hD : Discharged D [2])
   ∧ (∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
         uexec n fiveProg π (initU σ) = some r →
         ∀ p ∈ r.1.sink, p.1 = "fs" → D.inside p.2) :=
-  deployment_reading (fs := "fs") hD hpol
+  deployment_reading (fs := "fs") hD
+    (fun n σ r hr q hq => fiveProg_five.2.1 n D.policy σ r hr q hq)
     (fun n π σ r hr t ht => fiveProg_five.2.2.2.2 n π σ r hr t ht)
     fiveProg_paths_vacuous
 
