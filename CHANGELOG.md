@@ -1056,6 +1056,32 @@ landed.
   `ρ₁` coherence added to `tools/walk-check.py` (13284 pairs; identity-level content only,
   its unboundedness deliberately not asserted).
 
+- **Set-theory research line, notes §63 — the per-element constraint and the first
+  explicit candidate rank.** §62 put the residual in the interaction between frozen
+  families; §63 carries that out for a *single element* and gets (C2)'s canonical half in
+  final form, with no `β₀`, no family and no down-set in it.
+
+  With `W(A) := {β > α : B_α ∩ B_β = A}` the **coherence fibre** of `(α,A)`, Lemma Z1 says
+  exactly: for every `β ∈ W(A)`, either `α` is one of `β`'s finitely many exceptions or
+  `rank(α,A) ≥ ρ₁(α,β)`. So the canonical half of (C2) is *dominate `ρ₁(α,·)` on every
+  coherence fibre*. That has an obvious least solution —
+  `rank(α,A) := sup{ρ₁(α,β) : β ∈ W(A)}` — the **first explicit candidate rank** in the
+  program, meeting the canonical half with no exceptions provided the sup is finite. That
+  is the scalar question **(Q-fib)**.
+
+  **The determinism form is false**, machine-checked: 1552 multi-member fibres over six
+  C-sequences, one of size 239 at `α=12` carrying `ρ₁` values 0 … 11. So the fibre is a
+  coarse invariant of the walk, and — applying §62's guard before adopting the target —
+  (Q-fib)'s consequent is *not* a triviality. Neither direction is provable by the
+  freezing argument: W3 bounds `ρ₁(α,·)` on an uncountable *sub*-fibre only, and the
+  measured spread shows sub-fibres are strictly coarser than fibres.
+
+  Stated so the candidate is not over-sold: even granted (Q-fib), the candidate must still
+  satisfy **(C1)**, on which nothing here bears — and §58 already showed the two conjuncts
+  can pull apart, the natural symmetric-difference rank having (C2)'s shape and failing
+  (C1). The wall is now two scalar questions about one explicit function, the smallest it
+  has been.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value

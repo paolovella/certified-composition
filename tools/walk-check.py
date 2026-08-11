@@ -140,6 +140,24 @@ def run(seed, verbose=False):
         # truncation artefact (notes section 54, 57, 58). Only the identity-level half
         # (monotonicity of the counts) is asserted.
         tested_rows += 1
+    # --- section 63: the coherence fibre does NOT determine the walk cost. Existence
+    #     claim, identity-level: there are be, be' with B_al & B_be = B_al & B_be' and
+    #     rho1(al,be) != rho1(al,be'). Asserted as "at least one such fibre exists",
+    #     which is what the section claims; the SIZE of the spread is model-dependent
+    #     and is reported, not asserted.
+    tested_fib = 0
+    fib_spread = 0
+    for al in range(3, N // 3):
+        groups = {}
+        for be in range(al + 1, N):
+            groups.setdefault(frozenset(B(al) & B(be)), []).append(rho1(C, al, be))
+        for vals in groups.values():
+            if len(vals) > 1:
+                tested_fib += 1
+                fib_spread = max(fib_spread, max(vals) - min(vals))
+    if tested_fib > 0 and fib_spread == 0:
+        fails.append(("fibre-determines-cost", "section 63 claims it does not"))
+
     # --- rho1 coherence (used since section 51, load-bearing in section 62's Lemma
     #     W3a): for be < ga, {xi < be : rho1(xi,be) != rho1(xi,ga)} is finite. Over the
     #     truncated model, "finite" reads as "small and not growing with be" - we assert
@@ -224,17 +242,18 @@ def run(seed, verbose=False):
                 tested_M += 1
                 if (rho3(C, xi, be) == 1) != (rho3(C, xi, al) == 1 and rho1(C, xi, al) >= W):
                     fails.append(("M3", al, be, xi))
-    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2, tested_coh
+    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2, tested_coh, tested_fib
 
 if __name__ == "__main__":
-    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = tot_coh = 0
+    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = tot_coh = tot_fib = 0
     allfails = []
     for seed in range(12):
-        f, a1, a2, a3, a4, a5, a6, a7 = run(seed)
-        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6; tot_coh += a7
+        f, a1, a2, a3, a4, a5, a6, a7, a8 = run(seed)
+        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6; tot_coh += a7; tot_fib += a8
         allfails += [(seed,) + tuple(x) for x in f[:4]]
     print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}"
-          f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2} | coh: {tot_coh}")
+          f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2} | coh: {tot_coh}"
+          f" | fibres: {tot_fib}")
     if allfails:
         print(f"FAILURES ({len(allfails)}):")
         for x in allfails[:12]: print("  ", x)

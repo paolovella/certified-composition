@@ -93,8 +93,11 @@ The same accountancy appears at every level:
   **answers that YES unconditionally** from `ρ₁`'s coherence, closing the
   route, and generalises W1 to **double freezing** — trace and bar freeze
   together on an uncountable set, so no frozen family obstructs (C2) and the
-  residual lives in the interaction *between* families) — and the two-sided
-  independence
+  residual lives in the interaction *between* families; §63 carries that out
+  for a single element and gets (C2)'s canonical half in final form —
+  *dominate `ρ₁(α,·)` on every coherence fibre* — with the **first explicit
+  candidate rank** and a single scalar question **(Q-fib)** deciding whether
+  it is well-defined) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

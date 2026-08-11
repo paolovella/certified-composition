@@ -610,6 +610,16 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   `sup_β rank(α, B_α∩B_β) < ∞` cofinally, a condition on the rank. Salvaged: **Lemma W1**
   — for every `β₀`, some single `X =∗ B_{β₀}` equals `B_β ∩ β₀` for uncountably many `β`,
   with no hypothesis at all.)*
+  *(**The per-element constraint and the candidate rank, notes §63.** With
+  `W(A) := {β>α : B_α ∩ B_β = A}` the coherence fibre of `(α,A)`, Lemma Z1 says exactly:
+  for every `β ∈ W(A)`, either `α` is one of `β`'s finitely many exceptions or
+  `rank(α,A) ≥ ρ₁(α,β)`. So (C2)'s canonical half is **dominate `ρ₁(α,·)` on every
+  coherence fibre** — no `β₀`, no family, no down-set. Least solution, and the program's
+  first explicit candidate: `rank(α,A) := sup{ρ₁(α,β) : β ∈ W(A)}`, well-defined iff
+  **(Q-fib)**: is `ρ₁(α,·)` bounded on every fibre? The determinism form is **false**
+  (machine-checked: a fibre of 239 members at `α=12` carries `ρ₁` values 0…11), so
+  (Q-fib)'s consequent is not a triviality; and W3 bounds `ρ₁(α,·)` only on an uncountable
+  *sub*-fibre. Second hurdle, stated: the candidate must still satisfy **(C1)**.)*
   *(**The W1 route, notes §61.** On the uncountable `T` where the trace is constant the
   canonical elements **freeze**: `B_α ∩ B_β = B_α ∩ X` for all `α<β₀`, `β ∈ T`, so
   `g_β = G` with no `β` in it. Pigeonhole on the finite exceptional sets over the

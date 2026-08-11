@@ -720,7 +720,20 @@ Salvaged and stronger: **Lemma W3 (double freezing)** — pigeonholing the *pair
 residual lives in the interaction *between* families: a countable amount of exceptional
 data per level, and the first version of the wall that does not mention the rank at all.
 Method note: §60's failure was an unwritten quantifier, §62's a consequent never tested
-for provability — two distinct modes needing two distinct guards. Sixteen labelled verdict flips, plus
+for provability — two distinct modes needing two distinct guards.
+
+**§63 carries the interaction out for a single element**, and gets (C2)'s canonical half
+in final form — no `β₀`, no family, no down-set. With `W(A) := {β : B_α ∩ B_β = A}` the
+**coherence fibre** of an element `(α,A)`, Lemma Z1 says exactly: `rank` must dominate
+`ρ₁(α,·)` on every fibre, modulo each `β`'s finite exceptions. That has an obvious least
+solution — the **first explicit candidate rank** the program has produced,
+`rank(α,A) := sup{ρ₁(α,β) : β ∈ W(A)}`, which meets the canonical half with *no*
+exceptions provided the sup is finite: the scalar question **(Q-fib)**. Machine-checked
+against the determinism form, which is **false**: 1552 multi-member fibres, one of size
+239 at `α=12` carrying `ρ₁` values 0 … 11, so the fibre is a coarse invariant of the walk
+and (Q-fib)'s consequent is not a triviality (the §62 guard, applied before adopting the
+target). Two hurdles remain and are stated: (Q-fib), and **(C1)** for the candidate, on
+which nothing here bears. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

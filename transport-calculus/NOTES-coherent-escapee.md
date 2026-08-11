@@ -3934,3 +3934,67 @@ and it is the first version of the wall that does not mention the rank at all.
   consequent.
 - **Machine-checked**: `ρ₁` coherence, 6642 pairs over six C-sequences, difference sets of
   size ≤ 32 and exactly 0 in 4212 of them. Identity-level, so the model is sound for it.
+
+## 63. The per-element constraint, and the first explicit candidate rank: (C2)'s canonical half is exactly "dominate ρ₁ on every coherence fibre", and the fibre does not determine the cost
+
+§62 put the residual in the interaction between frozen families. This section carries out
+that interaction for a *single element* and gets the sharpest form of (C2) yet: a
+condition with no `β₀`, no family, and no down-set in it — only the element and the walk.
+
+**The per-element constraint [proved, ZFC].** Fix `x = (α, A)` with `A =∗ B_α`, and put
+> `W(A) := {β > α : B_α ∩ B_β = A}` — the **coherence fibre** of `A`.
+For `β ∈ W(A)` we have `A ⊆ B_β`, so `x ⊑ (β, B_β)`, and `A = B_α ∩ B_β` is the canonical
+element at level `α` for that down-set. Lemma Z1 therefore gives: for every `β ∈ W(A)`,
+> either `α ∈ E_β` (the finite exceptional set of `β`), or `rank(α,A) ≥ ρ₁(α,β)`.
+So the canonical half of (C2) says exactly: **`rank` must dominate `ρ₁(α,·)` on each
+coherence fibre, modulo the finitely many exceptions each `β` is allowed.**
+
+**The fibres partition, and one is uncountable [proved].** As `A` ranges over the
+countably many sets `=∗ B_α`, the `W(A)` partition `(α, ω₁)`; some `W(A)` is therefore
+uncountable. Applying Lemma W3 at `β₀ := α+1` refines this: there is an uncountable set on
+which the fibre **and** `ρ₁(α,·)` are simultaneously constant. So every level has an
+uncountable, completely frozen piece — consistent with W4, and again no obstruction there.
+
+> **The candidate rank.** The constraint above has an obvious least solution:
+> `rank(α, A) := sup{ρ₁(α,β) : β ∈ W(A)}`,
+> which satisfies the canonical half of (C2) **with no exceptions at all** — provided the
+> sup is finite. Call that condition **(Q-fib)**: *is `ρ₁(α,·)` bounded on every coherence
+> fibre `W(A)`?* This is the first explicit candidate the program has produced, and the
+> first time (C2) has been reduced to a single scalar question per element.
+
+**The determinism form is false [identity-level, machine-checked].** One might hope the
+fibre *determines* the cost — that `B_α ∩ B_β` fixes `ρ₁(α,β)` — which would make the sup
+trivially finite. It does not: over six C-sequences there are 762 fibres with more than
+one member, and one fibre at `α = 12` has **239 members with `ρ₁(α,·)` ranging over
+0 … 11**. The fibre is a coarse invariant of the walk, not a complete one. This is an
+identity-level observation — a witness pair inside one model — and is sound in the regime
+§58 fixed for the tool.
+
+**(Q-fib) itself is asymptotic and is not claimed either way.** Following §62's method
+note, the consequent was tested for provability *before* being adopted as a target:
+- *Can some fibre be proved unbounded?* Not from `α ∈ S`. The sup over the whole of
+  `(α,ω₁)` is infinite for `α ∈ S`, but the fibres are countably many, and a countable
+  family of finitely-bounded sets has unbounded union. No contradiction.
+- *Can every fibre be proved bounded?* Not by the freezing argument. W3 at `β₀ := α+1`
+  bounds `ρ₁(α,·)` on an uncountable **sub**-fibre, not on `W(A)`; and the measured spread
+  above shows sub-fibres are strictly coarser than fibres.
+So (Q-fib) is genuinely open, and — unlike §61's (Q-col) — its consequent is not a
+triviality: the spread witness rules that out.
+
+**A second hurdle, stated so the candidate is not over-sold.** Even granted (Q-fib), the
+candidate `rank(α,A) := sup{ρ₁(α,β) : β ∈ W(A)}` still has to satisfy **(C1)** —
+finite-to-one on every down-set. Nothing above bears on that, and the two conjuncts have
+already been shown to pull in different directions (§58: the natural
+symmetric-difference rank satisfies (C2)'s shape and fails (C1)). A construction needs
+both; this section supplies a candidate for one.
+
+**Status after §63.**
+- **(C2)'s canonical half, in final form**: dominate `ρ₁(α,·)` on every coherence fibre,
+  modulo each `β`'s finite exceptions. No `β₀`, no family, no down-set.
+- **First explicit candidate rank**, with a single scalar condition **(Q-fib)** deciding
+  whether it is well-defined.
+- **New**: the fibre does not determine the cost (machine-checked, 762 multi-member
+  fibres, spread up to 11); the fibres partition with an uncountable, fully frozen member
+  at every level.
+- **Open**: (Q-fib), and (C1) for the candidate. The program's wall is now two scalar
+  questions about one explicit function, which is the smallest it has been.
