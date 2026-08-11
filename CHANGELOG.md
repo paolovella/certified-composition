@@ -1082,6 +1082,30 @@ landed.
   (C1). The wall is now two scalar questions about one explicit function, the smallest it
   has been.
 
+- **Set-theory research line, notes §64 — (Q-fib) is the dividing line.** **Lemma V1
+  [ZFC]**: if `sup{ρ₁(α,β) : β ∈ W(A)}` is finite, §63's candidate meets the canonical
+  half of (C2) at that element *with no exceptions*; if it is infinite, then **every**
+  rank has `α ∈ E_β` for infinitely many `β`, because `rank(α,A)` is a single number. A
+  chain-free strengthening of §57's Corollary X2: it names which elements are forced into
+  the exceptional sets, and why.
+
+  **A scaling experiment**, run at four model sizes: the widest coherence fibre spans
+  `ρ₁`-values `0 … max−1` in *every* model (spreads 5, 11, 13, 15 against model maxima
+  6, 12, 14, 16). The fibre constrains the cost hardly at all.
+
+  **Labelled as unreliable, deliberately.** Each row is identity-level and sound; the
+  *trend* is not. (Q-fib) is a supremum over an infinite fibre — the asymptotic regime the
+  truncated model has inverted three times — and the table's last column is itself the
+  kind of growth §58 recorded the model getting backwards at small `N`. So this is
+  evidence for **(Q-fib) NO** of exactly the kind that misled §54 and §57, recorded to
+  direct the next attempt and not to settle anything.
+
+  Either horn leaves a determinate next step, which is the point of settling the dichotomy
+  before the question: **YES** collapses the problem to (C1) for one explicit function;
+  **NO** turns (C2) into a scheduling problem for forced exceptions — §58's covering
+  reformulation, with the exceptions now identified element by element rather than
+  inferred from chains.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value

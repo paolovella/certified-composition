@@ -97,7 +97,10 @@ The same accountancy appears at every level:
   for a single element and gets (C2)'s canonical half in final form —
   *dominate `ρ₁(α,·)` on every coherence fibre* — with the **first explicit
   candidate rank** and a single scalar question **(Q-fib)** deciding whether
-  it is well-defined) — and the two-sided independence
+  it is well-defined; §64 shows (Q-fib) is the **dividing line** between an
+  exception-free rank and mandatory exceptions, with a scaling experiment
+  pointing — as evidence of the explicitly unreliable kind — at the second
+  horn) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

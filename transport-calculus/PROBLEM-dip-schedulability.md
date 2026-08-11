@@ -619,7 +619,15 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   **(Q-fib)**: is `ρ₁(α,·)` bounded on every fibre? The determinism form is **false**
   (machine-checked: a fibre of 239 members at `α=12` carries `ρ₁` values 0…11), so
   (Q-fib)'s consequent is not a triviality; and W3 bounds `ρ₁(α,·)` only on an uncountable
-  *sub*-fibre. Second hurdle, stated: the candidate must still satisfy **(C1)**.)*
+  *sub*-fibre. Second hurdle, stated: the candidate must still satisfy **(C1)**. **§64**: (Q-fib) is the
+  **dividing line**. *Lemma V1 [ZFC]* — finite sup ⟹ the candidate is exception-free at
+  that element; infinite sup ⟹ **every** rank has `α ∈ E_β` for infinitely many `β`, since
+  `rank(α,A)` is one number (a chain-free strengthening of Corollary X2). A scaling
+  experiment over four model sizes finds the widest fibre spanning `ρ₁`-values `0…max−1`
+  in every model — evidence for **(Q-fib) NO**, of exactly the asymptotic kind that misled
+  §54 and §57, and labelled as such. Both horns leave a determinate next step: YES
+  collapses everything to (C1) for one explicit function, NO makes (C2) a scheduling
+  problem for forced exceptions.)*
   *(**The W1 route, notes §61.** On the uncountable `T` where the trace is constant the
   canonical elements **freeze**: `B_α ∩ B_β = B_α ∩ X` for all `α<β₀`, `β ∈ T`, so
   `g_β = G` with no `β` in it. Pigeonhole on the finite exceptional sets over the

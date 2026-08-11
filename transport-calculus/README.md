@@ -733,7 +733,21 @@ against the determinism form, which is **false**: 1552 multi-member fibres, one 
 239 at `α=12` carrying `ρ₁` values 0 … 11, so the fibre is a coarse invariant of the walk
 and (Q-fib)'s consequent is not a triviality (the §62 guard, applied before adopting the
 target). Two hurdles remain and are stated: (Q-fib), and **(C1)** for the candidate, on
-which nothing here bears. Sixteen labelled verdict flips, plus
+which nothing here bears.
+
+**§64 shows (Q-fib) is the dividing line, not one route among several.** **Lemma V1
+[ZFC]**: if a fibre's sup is finite the candidate meets the canonical half *exception-free*
+at that element; if it is infinite then **every** rank has `α ∈ E_β` for infinitely many
+`β`, since `rank(α,A)` is one number. That is a chain-free strengthening of §57's
+Corollary X2 — it names which elements are forced into the exceptional sets and why. A
+scaling experiment across four model sizes then finds the widest fibre spanning `ρ₁`-values
+`0 … max−1` **in every model** (spreads 5, 11, 13, 15 against maxima 6, 12, 14, 16): the
+fibre constrains the cost hardly at all. That is evidence for **(Q-fib) NO** of exactly
+the kind that misled §54 and §57 — a supremum over an infinite fibre is the asymptotic
+regime the truncated model has inverted three times — and it is labelled as such. Either
+horn leaves a determinate next step: YES collapses everything to **(C1)** for one explicit
+function; NO turns (C2) into a scheduling problem for forced exceptions, §58's covering
+reformulation with the exceptions now identified element by element. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

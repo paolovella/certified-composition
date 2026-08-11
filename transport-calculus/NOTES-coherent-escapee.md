@@ -3998,3 +3998,69 @@ both; this section supplies a candidate for one.
   at every level.
 - **Open**: (Q-fib), and (C1) for the candidate. The program's wall is now two scalar
   questions about one explicit function, which is the smallest it has been.
+
+## 64. (Q-fib) is the dividing line between an exception-free rank and mandatory exceptions — with a scaling experiment that points, without proving, at the second horn
+
+§63 posed **(Q-fib)**: is `ρ₁(α,·)` bounded on every coherence fibre
+`W(A) = {β : B_α ∩ B_β = A}`? This section does two things: it shows (Q-fib) is *exactly*
+the line between two qualitatively different situations, and it reports a controlled
+experiment whose answer points at one of them.
+
+**Lemma V1 (the dichotomy) [proved, ZFC].** Fix `α` and a fibre `W(A)`.
+- If `sup{ρ₁(α,β) : β ∈ W(A)} < ∞`, the candidate `rank(α,A) := that sup` satisfies the
+  canonical constraint at `(α,A)` **with no exceptions**: `rank(α,A) ≥ ρ₁(α,β)` for every
+  `β ∈ W(A)`.
+- If the sup is infinite, then for **every** rank whatsoever, `rank(α,A)` is some fixed
+  `r < ω`, so infinitely many `β ∈ W(A)` have `ρ₁(α,β) > r`, and for each of them the
+  canonical element `(α,A) ⊑ (β,B_β)` has rank below its bar — i.e. `α ∈ E_β`.
+> So (Q-fib) decides whether the canonical half of (C2) can be met **exception-free**, or
+> whether exceptions are **mandatory at every level with an unbounded fibre**. ∎
+This sharpens §57's Corollary X2, which said the exceptional sets grow along `⊑`-chains;
+Lemma V1 says *which elements* are forced into them and *why*, and it does so without any
+chain.
+
+**A scaling experiment.** The determinism form died in §63 on a single model. The question
+now is whether the fibre constrains the cost *at all*, so the measurement was repeated at
+four model sizes, recording the largest `ρ₁`-spread inside a single fibre against the
+largest `ρ₁` the model attains:
+
+| `L,A,M` | `N` | multi-member fibres | max within-fibre spread | max `ρ₁` in model |
+|---|---|---|---|---|
+| 3,4,8   |  96 |   160 |  5 |  6 |
+| 3,6,14  | 252 |   522 | 11 | 12 |
+| 4,7,16  | 448 |   900 | 13 | 14 |
+| 5,8,18  | 720 |  1568 | 15 | 16 |
+
+In **every** model the widest fibre spans `ρ₁`-values `0 … max−1`: a single coherence
+fibre realizes essentially every cost the model can produce. The fibre is not merely a
+coarse invariant of the walk (§63) — on this evidence it constrains the cost hardly at
+all.
+
+**Evidential status, stated because the standing caveat applies with full force.** Each
+row is identity-level and sound: *in this model there is a fibre with that spread*. The
+**trend** is not. The quantity in (Q-fib) is a supremum over an infinite fibre, which is
+precisely the asymptotic regime the truncated model has inverted three times (§54, §57,
+§58) — and note the last column, `max ρ₁`, is itself growing with `N`, which is the very
+claim §58 recorded the model as getting *backwards* at small `N`. So: this is evidence
+that (Q-fib) is **NO**, of the same kind and no better than the evidence that misled §54
+and §57. It is recorded to direct the next attempt, not to settle anything.
+
+**What follows on each horn.**
+- **(Q-fib) YES**: §63's candidate is well-defined and meets the canonical half of (C2)
+  outright. The whole problem collapses to **(C1)** for that specific function — a single,
+  fully explicit question.
+- **(Q-fib) NO** (where the evidence points): the exception-free route is closed, every
+  rank has `α ∈ E_β` for infinitely many `β` at every level with an unbounded fibre, and
+  (C2) becomes a *scheduling* problem for the exceptions — exactly §58's covering
+  reformulation, now with the forced exceptions identified element by element rather than
+  inferred from chains.
+
+Either way the next step is determinate, which is the point of establishing the
+dichotomy before answering the question.
+
+**Status after §64.**
+- **(Q-fib): open**, and now known to be the dividing line rather than one route among
+  several.
+- **New ZFC fact**: Lemma V1, and with it a chain-free strengthening of Corollary X2.
+- **New evidence**: the scaling table, explicitly labelled as the unreliable kind.
+- **(Q-spread): open.** Two horns, both with a determinate next step.
