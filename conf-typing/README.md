@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Reuse.lean` | stage 1u | the allocator now **reuses** freed addresses: the separation argument survived with two new invariant conjuncts, but reuse turned the free list into a **channel**, so `free` needs a Low pointer |
 | `ConfTyping/Attack.lean` | **attacking the core**, stage 1t | twelve adversarial programs, all refused — and three defects found by looking on purpose, all of them a guarantee narrower than its name |
 | `ConfTyping/Deploy.lean` | composable core, stage 1s | the ledger, threaded: what must be true of the **world** — and the answer is a trusted base **three lines long**, with two of the six certificates needing nothing at all |
 | `ConfTyping/StringLoop.lean` | composable core, stage 1r | loop rules for both string certificates by narrowing; the loop count is corrected to **five of six**, the budget still the exception |
@@ -1774,6 +1775,40 @@ the failure mode this repo treats as most serious:
    result carries a hypothesis that had never been written down.
 
 All three were in the **statements**, not the proofs. That is where to look next time.
+
+## The allocator reuses (`Reuse.lean`) — stage 1u
+
+Stage 1t found that `uexec`'s allocator only advanced a counter, so a freed address was
+never handed out again — and that stage 1i's use-after-free result silently depended on
+it. Real allocators reuse. This one now does: `free` returns the address to a free list,
+`alloc` takes from the free list before touching the counter.
+
+**The separation argument survived**, which I had predicted it would not. It needed two
+more conjuncts in `SepInv`: every freed address is *not live*, and every freed address
+is below the counter. With those, `alloc` still hands out an address distinct from every
+tracked one — from the free list by disjointness, from the counter by freshness. The old
+proof used only the second route, so this is a genuine case split rather than a
+re-derivation. `stale_pointer_refused_after_reuse` shows the ABA hazard is handled:
+after `alloc p; free p; alloc q` both variables hold **the same address**, `q` is usable
+and `p` is refused — the stale pointer is rejected even though its address is live
+again, which is precisely what makes reuse dangerous in practice.
+
+**Reuse opened a channel.** The free list decides the next address, so freeing a *High*
+pointer makes the two runs' allocators diverge and the next allocation into a Low
+variable publishes the difference. `freeing_a_secret_pointer_leaks` is the witness: two
+Low-equal, memory-safe states whose secret pointers hold 5 and 7; after one `free` and
+one `alloc`, a public variable holds 5 in one run and 7 in the other. Nothing faults —
+it is a well-behaved program leaking through the allocator.
+
+So `JSecTy.free` gained a hypothesis it never needed before, `P x = false`, and all
+three checkers gained the test. Under the non-reusing allocator that rule was
+unnecessary, which is why it was absent: **the model had been too kind to require it.**
+One worked program had to change — `safeHeapProg` now allocates through a public
+variable rather than a secret one, because freeing a secret pointer is now genuinely
+unsafe rather than merely unmodelled.
+
+The exchange rate is worth stating: removing a *limitation* cost one new typing
+restriction and two invariant conjuncts. Nothing that had been proved became false.
 
 ## §11 pre-mechanization checklist (framework doc)
 

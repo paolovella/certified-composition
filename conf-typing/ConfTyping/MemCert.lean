@@ -208,9 +208,11 @@ theorem MemCert.alloc {V : List String} (x : String) :
         refine ⟨he, fun _ q hq => ?_⟩
         rcases List.mem_cons.mp hq with hqx | hqv
         · subst hqx
-          show memInt (upd s.store q s.fresh q) (s.fresh :: s.live) = true
+          show memInt (upd s.store q (pickAddr s.freed s.fresh) q)
+              (pickAddr s.freed s.fresh :: s.live) = true
           simp [upd, memInt]
-        · show memInt (upd s.store x s.fresh q) (s.fresh :: s.live) = true
+        · show memInt (upd s.store x (pickAddr s.freed s.fresh) q)
+                (pickAddr s.freed s.fresh :: s.live) = true
           by_cases hqx : q = x
           · subst hqx; simp [upd, memInt]
           · simp only [upd, if_neg hqx, memInt, Bool.or_eq_true]

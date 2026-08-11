@@ -669,6 +669,40 @@ landed.
 
   All three defects were in the **statements**, not the proofs.
 
+- **Stage 1u — the allocator reuses addresses, and that opens a channel**
+  (`ConfTyping/Reuse.lean`, plus a free list in `Unified.lean`, two new `SepInv`
+  conjuncts in `MemLinear.lean`, and a new hypothesis on `JSecTy.free`). Stage 1t
+  recorded "the allocator never reuses" as a limitation that stage 1i's use-after-free
+  result silently depended on. Real allocators reuse; this one now does — `free` returns
+  the address to a free list, `alloc` takes from it before touching the counter.
+
+  **The separation argument survived**, which I had predicted it would not. It needed
+  two more conjuncts: every freed address is *not live*, and every freed address is
+  below the counter. With those, `alloc` still hands out an address distinct from every
+  tracked one — from the free list by disjointness, from the counter by freshness. The
+  old proof used only the second route, so this is a genuine case split.
+  `stale_pointer_refused_after_reuse` shows the ABA hazard handled: after
+  `alloc p; free p; alloc q` both variables hold **the same address** (`the_allocator_reuses`),
+  `q` is usable and `p` is refused — the stale pointer rejected even though its address
+  is live again, which is exactly what makes reuse dangerous.
+
+  **Reuse opened a channel.** The free list decides the next address, so freeing a
+  **High** pointer makes two Low-equal runs' allocators diverge and the next allocation
+  into a Low variable publishes the difference. `freeing_a_secret_pointer_leaks`: two
+  Low-equal, memory-safe states whose secret pointers hold 5 and 7; one `free`, one
+  `alloc`, and a public variable holds 5 in one run and 7 in the other. Nothing faults.
+
+  So `JSecTy.free` gained `P x = false` and all three checkers gained the test. Under
+  the non-reusing allocator that rule was unnecessary — **the model had been too kind to
+  require it**. `safeHeapProg` now allocates through a public variable instead of a
+  secret one, because freeing a secret pointer is now genuinely unsafe rather than
+  merely unmodelled. `allocator_never_reuses` is renamed `fresh_counter_is_monotone`,
+  which is what it always proved.
+
+  The exchange rate, stated plainly: removing a *limitation* cost one new typing
+  restriction and two invariant conjuncts, and nothing that had been proved became
+  false.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

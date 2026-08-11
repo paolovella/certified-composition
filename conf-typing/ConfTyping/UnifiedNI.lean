@@ -136,7 +136,8 @@ theorem usecTy_sound {P : Partition} :
               refine ⟨?_, hrd, hdd⟩
               intro z hz
               have hzy : z ≠ x := fun h => by rw [h, hy] at hz; cases hz
-              show upd s.store x s.fresh z = upd s'.store x s'.fresh z
+              show upd s.store x (pickAddr s.freed s.fresh) z
+                 = upd s'.store x (pickAddr s'.freed s'.fresh) z
               simp only [upd, if_neg hzy]; exact hst z hz
     | skip => exact ⟨⟨hst, hrd, hdd⟩, rfl, rfl⟩
     | check r =>

@@ -68,6 +68,20 @@ theorem dropInt_memInt {a b : Int} : ∀ {L : List Int},
         · exact Or.inl h
         · exact Or.inr (dropInt_memInt h)
 
+theorem memInt_dropInt_self (a : Int) : ∀ (L : List Int), memInt a (dropInt a L) = false
+  | []      => rfl
+  | x :: xs => by
+      by_cases hx : x = a
+      · rw [dropInt, if_pos (by simp [hx])]; exact memInt_dropInt_self a xs
+      · rw [dropInt, if_neg (by simpa using hx)]
+        simp only [memInt, Bool.or_eq_false_iff, beq_eq_false_iff_ne]
+        exact ⟨by simpa using hx, memInt_dropInt_self a xs⟩
+
+theorem memInt_cons_ne {a b : Int} {L : List Int} (hne : ¬ (b = a))
+    (h : memInt b L = false) : memInt b (a :: L) = false := by
+  simp only [memInt, Bool.or_eq_false_iff, beq_eq_false_iff_ne]
+  exact ⟨fun hc => hne hc.symm, h⟩
+
 /-! ## The separating invariant -/
 
 /-- Stage 1h's invariant plus the two conjuncts `free` needs: distinct tracked
@@ -79,7 +93,10 @@ def SepInv (V : List String) (s : UState) : Prop :=
   (s.dead = false →
       (∀ x ∈ V, memInt (s.store x) s.live = true)
     ∧ (∀ x ∈ V, ∀ y ∈ V, ¬ (x = y) → ¬ (s.store x = s.store y))
-    ∧ (∀ a : Int, memInt a s.live = true → a < s.fresh))
+    ∧ (∀ a : Int, memInt a s.live = true → a < s.fresh)
+    -- the two conjuncts a *reusing* allocator forces:
+    ∧ (∀ a : Int, memInt a s.freed = true → memInt a s.live = false)
+    ∧ (∀ a : Int, memInt a s.freed = true → a < s.fresh))
 
 /-- The strengthening really is a strengthening, so anything downstream that only
     needs stage 1h's invariant can still be fed one. -/
@@ -88,10 +105,11 @@ theorem SepInv.toMemInv {V : List String} {s : UState} (h : SepInv V s) : MemInv
 
 /-- The fresh state satisfies it. -/
 theorem SepInv.initU {σ : Store} : SepInv [] (initU σ) :=
-  ⟨rfl, fun _ => ⟨by intro x hx; simp at hx, by intro x hx; simp at hx,
-                  by intro a ha
-                     have h0 : memInt a ([] : List Int) = true := ha
-                     simp [memInt] at h0⟩⟩
+  ⟨rfl, fun _ =>
+    ⟨by intro x hx; simp at hx, by intro x hx; simp at hx,
+     by intro a ha; have h0 : memInt a ([] : List Int) = true := ha; simp [memInt] at h0,
+     by intro a ha; have h0 : memInt a ([] : List Int) = true := ha; simp [memInt] at h0,
+     by intro a ha; have h0 : memInt a ([] : List Int) = true := ha; simp [memInt] at h0⟩⟩
 
 /-- Membership in a cons, minus the head. Used four times in `SepCert.alloc`. -/
 theorem memCons_ne {q x : String} {V : List String} (hq : q ∈ x :: V) (hqx : ¬ (q = x)) :
@@ -133,7 +151,7 @@ theorem SepInv.mono {V W : List String} {s : UState} (hsub : ∀ x ∈ W, x ∈ 
   ⟨h.1, fun hd =>
     ⟨fun x hx => (h.2 hd).1 x (hsub x hx),
      fun x hx y hy => (h.2 hd).2.1 x (hsub x hx) y (hsub y hy),
-     (h.2 hd).2.2⟩⟩
+     (h.2 hd).2.2.1, (h.2 hd).2.2.2.1, (h.2 hd).2.2.2.2⟩⟩
 
 theorem SepCert.ite {V V₁ V₂ : List String} {e : Expr} {c₁ c₂ : UCmd}
     (h₁ : SepCert V c₁ V₁) (h₂ : SepCert V c₂ V₂) :
@@ -182,8 +200,8 @@ theorem SepCert.assign {V : List String} (x : String) (e : Expr) :
         exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
         simp only [if_neg hd]
-        obtain ⟨hlive, hinj, hfr⟩ := hv hd0
-        refine ⟨he, fun _ => ⟨?_, ?_, hfr⟩⟩
+        obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
+        refine ⟨he, fun _ => ⟨?_, ?_, hfr, hdisj, hfb⟩⟩
         · intro q hq
           show memInt (upd s.store x (evalE e s.store) q) s.live = true
           simp only [upd, if_neg (dropStr_ne hq)]
@@ -241,41 +259,71 @@ theorem SepCert.alloc {V : List String} (x : String) :
       · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
         simp only [if_neg hd]
-        obtain ⟨hlive, hinj, hfr⟩ := hv hd0
-        -- every tracked variable's address is strictly below the new one
-        have hlt : ∀ y ∈ V, s.store y < s.fresh := fun y hy => hfr _ (hlive y hy)
-        refine ⟨he, fun _ => ⟨?_, ?_, ?_⟩⟩
+        obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
+        -- the address handed out is not live, whether it came from the free list or
+        -- the counter: from the free list by disjointness, from the counter by
+        -- freshness. This is the step reuse makes non-trivial.
+        have hnl : memInt (pickAddr s.freed s.fresh) s.live = false := by
+          cases hq : s.freed with
+          | nil =>
+              show memInt s.fresh s.live = false
+              by_cases hm : memInt s.fresh s.live = true
+              · exact absurd (hfr _ hm) (by omega)
+              · simpa using hm
+          | cons b bs =>
+              show memInt b s.live = false
+              exact hdisj b (by rw [hq]; simp [memInt])
+        have hlt : pickAddr s.freed s.fresh < bumpFresh s.freed s.fresh := by
+          cases hq : s.freed with
+          | nil => show s.fresh < s.fresh + 1; omega
+          | cons b bs =>
+              show b < s.fresh
+              exact hfb b (by rw [hq]; simp [memInt])
+        have hbump : s.fresh ≤ bumpFresh s.freed s.fresh := by
+          cases s.freed with
+          | nil => show s.fresh ≤ s.fresh + 1; omega
+          | cons _ _ => exact Int.le_refl _
+        refine ⟨he, fun _ => ⟨?_, ?_, ?_, ?_, ?_⟩⟩
         · intro q hq
-          show memInt (upd s.store x s.fresh q) (s.fresh :: s.live) = true
+          show memInt (upd s.store x (pickAddr s.freed s.fresh) q)
+                 (pickAddr s.freed s.fresh :: s.live) = true
           by_cases hqx : q = x
           · subst hqx; simp [upd, memInt]
           · simp only [upd, if_neg hqx, memInt, Bool.or_eq_true]
             exact Or.inr (hlive q (memCons_ne hq hqx))
         · intro q hq y hy hne
-          show ¬ (upd s.store x s.fresh q = upd s.store x s.fresh y)
+          show ¬ (upd s.store x (pickAddr s.freed s.fresh) q
+                = upd s.store x (pickAddr s.freed s.fresh) y)
           by_cases hqx : q = x
           · have hyx : ¬ (y = x) := fun h => hne (hqx.trans h.symm)
-            have hyV : y ∈ V := memCons_ne hy hyx
             simp only [upd, if_pos hqx, if_neg hyx]
-            intro h
-            have hy' := hlt y hyV
-            omega
+            intro hc
+            exact absurd (hc ▸ hlive y (memCons_ne hy hyx)) (by simp [hnl])
           · by_cases hyx : y = x
-            · have hqV : q ∈ V := memCons_ne hq hqx
-              simp only [upd, if_neg hqx, if_pos hyx]
-              intro h
-              have hq' := hlt q hqV
-              omega
-            · have hqV : q ∈ V := memCons_ne hq hqx
-              have hyV : y ∈ V := memCons_ne hy hyx
-              simp only [upd, if_neg hqx, if_neg hyx]
-              exact hinj q hqV y hyV hne
+            · simp only [upd, if_neg hqx, if_pos hyx]
+              intro hc
+              exact absurd (hc ▸ hlive q (memCons_ne hq hqx)) (by simp [hnl])
+            · simp only [upd, if_neg hqx, if_neg hyx]
+              exact hinj q (memCons_ne hq hqx) y (memCons_ne hy hyx) hne
         · intro a ha
-          show a < s.fresh + 1
+          show a < bumpFresh s.freed s.fresh
           simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
           rcases ha with ha | ha
           · omega
           · have := hfr a ha; omega
+        · intro a ha
+          have ha' : memInt a s.freed = true :=
+            dropInt_memInt (b := pickAddr s.freed s.fresh) ha
+          have hne : ¬ (a = pickAddr s.freed s.fresh) := by
+            intro hc
+            have : memInt a (dropInt a s.freed) = true := by rw [hc] at ha ⊢; exact ha
+            rw [memInt_dropInt_self] at this
+            exact absurd this (by simp)
+          exact memInt_cons_ne hne (hdisj a ha')
+        · intro a ha
+          show a < bumpFresh s.freed s.fresh
+          have := hfb a (dropInt_memInt (b := pickAddr s.freed s.fresh) ha)
+          omega
 
 theorem SepCert.deref {V : List String} (x : String) (hx : memStr x V = true) :
     SepCert V (.memop .deref x) V := by
@@ -312,11 +360,11 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
       · simp only [if_pos hd]
         exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        obtain ⟨hlive, hinj, hfr⟩ := hv hd0
+        obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
         have hxV : x ∈ V := memStr_mem hx
         have hxl : memInt (s.store x) s.live = true := hlive x hxV
         simp only [if_neg hd, if_pos hxl]
-        refine ⟨he, fun _ => ⟨?_, ?_, ?_⟩⟩
+        refine ⟨he, fun _ => ⟨?_, ?_, ?_, ?_, ?_⟩⟩
         · intro q hq
           show memInt (s.store q) (dropInt (s.store x) s.live) = true
           exact memInt_dropInt_of_ne (hlive q (dropStr_mem hq))
@@ -325,6 +373,22 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
           exact hinj q (dropStr_mem hq) y (dropStr_mem hy) hne
         · intro a ha
           exact hfr a (dropInt_memInt ha)
+        · -- the freed address is genuinely gone from `live`, and the ones already on
+          -- the free list stay off it
+          intro a ha
+          simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
+          rcases ha with ha | ha
+          · show memInt a (dropInt (s.store x) s.live) = false
+            rw [ha]; exact memInt_dropInt_self _ _
+          · show memInt a (dropInt (s.store x) s.live) = false
+            by_cases hm : memInt a (dropInt (s.store x) s.live) = true
+            · exact absurd (dropInt_memInt hm) (by simp [hdisj a ha])
+            · simpa using hm
+        · intro a ha
+          simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
+          rcases ha with ha | ha
+          · subst ha; exact hfr _ hxl
+          · exact hfb a ha
 
 /-- String operations do not touch the heap, so the separation invariant rides
     through untouched. -/
@@ -423,7 +487,7 @@ theorem slcheck_no_fault {c : UCmd} {V' : List String} (h : slcheck [] c = some 
     stage 1h's `MemInv` — nothing there forbids aliasing — and violates `SepInv`. -/
 def aliasState : UState :=
   { store := fun _ => 5, auth := [], reads := [], dead := false,
-    heap := fun _ => 0, live := [5], fresh := 6, err := false, sstore := fun _ => [], sink := []  }
+    heap := fun _ => 0, live := [5], fresh := 6, err := false, freed := [], sstore := fun _ => [], sink := []  }
 
 /-- **Stage 1h's invariant is not inductive for `free`.** From a state satisfying
     `MemInv ["p","q"]`, one `free "p"` step lands in a state violating `MemInv ["q"]`:

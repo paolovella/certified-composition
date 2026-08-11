@@ -361,6 +361,15 @@ so memory safety means liveness of addresses and nothing more; and the allocator
 reuses an address, which is a hypothesis stage 1i's use-after-free result depended on
 without saying so. All three were in the statements rather than the proofs.
 
+Stage 1u then removed the third: the allocator now **reuses** freed addresses. The
+separation argument survived — with two new invariant conjuncts, and a real case split
+in the proof — and the ABA hazard is handled: after `alloc p; free p; alloc q` both
+variables hold the same address, and the stale one is still refused. But reuse turned
+the free list into a **channel**: freeing a *High* pointer makes two Low-equal runs'
+allocators diverge, so a later public allocation publishes a secret address
+(`freeing_a_secret_pointer_leaks`). `free` therefore gained a typing restriction it had
+never needed — the model had been too kind to require it.
+
 ## Scope — what is *not* claimed
 
 - The transport interface is **not** asserted to be the "correct general

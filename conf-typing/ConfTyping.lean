@@ -63,3 +63,4 @@ import ConfTyping.PathCert
 import ConfTyping.StringLoop
 import ConfTyping.Deploy
 import ConfTyping.Attack
+import ConfTyping.Reuse

@@ -420,7 +420,7 @@ def safePathProg : UCmd := .sop .emit "fs" (.cat (.lit [.ord]) (.san (.var "inpu
 /-- An input of `../..`: the traversal payload, in this alphabet. -/
 def escapeState : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false, heap := fun _ => 0,
-    live := [], fresh := 0, err := false,
+    live := [], fresh := 0, err := false, freed := [],
     sstore := fun y => if y == "input" then [UCh.quote, UCh.quote] else [], sink := [] }
 
 /-- **The escape is real.** The vulnerable program emits a path that pops above its

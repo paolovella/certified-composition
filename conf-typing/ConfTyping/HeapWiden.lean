@@ -85,7 +85,7 @@ def jcheckW (P : Partition) : Nat → List String → UCmd → Option (List Stri
   | _ + 1, V, .access _        => some V
   | _ + 1, V, .memop .alloc x  => some (x :: V)
   | _ + 1, V, .memop .deref x  => if memStr x V then some V else none
-  | _ + 1, V, .memop .free x   => if memStr x V then some (dropStr x V) else none
+  | _ + 1, V, .memop .free x   => if memStr x V && !P x then some (dropStr x V) else none
   | _ + 1, V, .sop .set x e    => if P x || sexprLow P e then some V else none
   | _ + 1, V, .sop .emit _ e   => if sexprLow P e then some V else none
   | k + 1, V, .seq c₁ c₂       => (jcheckW P k V c₁).bind fun V₁ => jcheckW P k V₁ c₂
@@ -153,9 +153,11 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
             · rw [if_neg hx] at h; simp at h
         | free =>
             simp only [jcheckW] at h
-            by_cases hx : memStr x V = true
+            by_cases hx : (memStr x V && !P x) = true
             · rw [if_pos hx] at h
-              simp only [Option.some.injEq] at h; subst h; exact .free V x hx
+              simp only [Option.some.injEq] at h; subst h
+              obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
+              exact .free V x h1 (by simpa using h2)
             · rw [if_neg hx] at h; simp at h
     | seq c₁ c₂ =>
         simp only [jcheckW] at h
@@ -194,7 +196,7 @@ theorem jcheckW_gives_both {P : Partition} {k : Nat} {c : UCmd} {V' : List Strin
   have hty := jcheckW_sound k c [] V' h
   refine ⟨fun n π σ σ' hσ => ?_, fun n π σ r hr => ?_⟩
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hty π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl⟩)
+      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl⟩)
   · exact (hty.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## What widening buys -/

@@ -488,10 +488,19 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 1u: the reusing allocator and the channel it opened.
+for thm in "theorem the_allocator_reuses" "theorem stale_pointer_refused_after_reuse" \
+           "theorem freeing_a_secret_pointer_leaks" "theorem free_requires_a_low_pointer" \
+           "theorem freed_and_live_are_disjoint"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Reuse.lean 2>/dev/null; then
+    echo "DRIFT: the reusing allocator is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # stage 1t: the attack record, and the three findings it produced.
 for thm in "theorem twelve_attacks_refused" "theorem allcheck_NI_general" \
            "theorem secretTouching_NI_is_real" "theorem heap_is_never_touched" \
-           "theorem allocator_never_reuses" "theorem initU_hides_string_inputs"; do
+           "theorem fresh_counter_is_monotone" "theorem initU_hides_string_inputs"; do
   if ! grep -q "$thm" conf-typing/ConfTyping/Attack.lean 2>/dev/null; then
     echo "DRIFT: the attack record is cited but '$thm' is missing"; fail=1
   fi
@@ -706,7 +715,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

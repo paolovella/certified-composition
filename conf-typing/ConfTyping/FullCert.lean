@@ -122,7 +122,7 @@ def allcheck (P : Partition) :
   | A, V, .access r       => if memStr r A then some (A, V, 1) else none
   | A, V, .memop .alloc x => some (A, x :: V, 1)
   | A, V, .memop .deref x => if memStr x V then some (A, V, 1) else none
-  | A, V, .memop .free x  => if memStr x V then some (A, dropStr x V, 1) else none
+  | A, V, .memop .free x  => if memStr x V && !P x then some (A, dropStr x V, 1) else none
   | A, V, .sop .set x e   => if P x || sexprLow P e then some (A, V, 1) else none
   | A, V, .sop .emit _ e  => if sexprLow P e then some (A, V, 1) else none
   | A, V, .seq c₁ c₂      => (allcheck P A V c₁).bind fun p₁ =>
@@ -180,11 +180,12 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
       · rw [if_neg hx] at h; simp at h
   | .memop .free x, A, V, A', V', k, h => by
       simp only [allcheck] at h
-      by_cases hx : memStr x V = true
+      by_cases hx : (memStr x V && !P x) = true
       · rw [if_pos hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
-        exact ⟨UCert.memop .free x, .free V x hx⟩
+        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
+        exact ⟨UCert.memop .free x, .free V x h1 (by simpa using h2)⟩
       · rw [if_neg hx] at h; simp at h
   | .sop .set x e, A, V, A', V', k, h => by
       simp only [allcheck] at h
@@ -260,7 +261,7 @@ theorem allcheck_gives_four {P : Partition} {c : UCmd} {A' V' : List String} {k 
     have hinv : UMedInv π [] (initU σ) := ⟨by simp [initU], by simp [initU], by simp⟩
     exact (hf.bundle.auth n π (initU σ) r hinv hr).2.1 q hq
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hf.joint π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl⟩)
+      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl⟩)
   · exact (hf.joint.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## The artifact -/

@@ -1486,8 +1486,17 @@ noninterference guarantee was vacuous in its string dimension because it started
 `initU` (fixed by `allcheck_NI_general`, with `secretTouching_NI_is_real` as a witness
 that the general form does real work); `heap_is_never_touched` shows memory safety here
 is about the liveness of addresses and not about stored values; and
-`allocator_never_reuses` shows stage 1i's CWE-416 result depends on a non-reusing
-allocator, which real allocators are not. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+stage 1i's CWE-416 result depended on a non-reusing allocator, which real allocators
+are not.
+
+Stage 1u removed that dependency: the allocator reuses freed addresses. Row 6's
+use-after-free half now holds on a model where the ABA hazard is real —
+`stale_pointer_refused_after_reuse` shows a stale pointer refused even though its
+address has been handed out again. The cost lands on row 1: with reuse the free list
+decides the next address, so `freeing_a_secret_pointer_leaks` exhibits two Low-equal
+runs whose public variable ends up holding a secret address, and `free` now requires a
+Low pointer in all three checkers. A more realistic memory model produced a *new*
+information-flow rule, not a weaker guarantee. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

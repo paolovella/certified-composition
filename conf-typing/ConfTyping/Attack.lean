@@ -28,12 +28,14 @@
      `slcheck_no_fault` actually say, but a `heap : Int → Int` field sitting in `UState`
      implies more, and implying more is the failure mode this repo exists to avoid.
 
-  3. **The allocator never reuses an address** (`allocator_never_reuses`), and the
-     separation proof *depends* on that: `SepInv`'s freshness conjunct is what makes a
-     new pointer provably distinct from every tracked one. Real allocators reuse freed
-     addresses, which is precisely how use-after-free becomes exploitable rather than
-     merely wrong. So stage 1i's CWE-416 result holds for a non-reusing allocator, and
-     that hypothesis was never written down.
+  3. **The allocator never reuses an address**, and the separation proof *depends* on
+     that: `SepInv`'s freshness conjunct is what makes a new pointer provably distinct
+     from every tracked one. Real allocators reuse freed addresses, which is precisely
+     how use-after-free becomes exploitable rather than merely wrong. So stage 1i's
+     CWE-416 result held for a non-reusing allocator, and that hypothesis was never
+     written down. **(Fixed in stage 1u: the allocator now reuses. See `Reuse.lean` —
+     the separation argument survived with two extra invariant conjuncts, but reuse
+     turned the free list into a channel and `free` gained a typing restriction.)**
 
   None of the three is unsoundness. All three are the guarantee being narrower than its
   name, which is the defect this project treats as most serious.
@@ -134,15 +136,15 @@ theorem allcheck_NI_general {P : Partition} {c : UCmd} {A' V' : List String} {k 
 /-- Two states that differ in a secret string and agree on everything Low. -/
 def secretStr : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false, heap := fun _ => 0,
-    live := [], fresh := 0, err := false,
+    live := [], fresh := 0, err := false, freed := [],
     sstore := fun y => if y == "secret" then [UCh.quote] else [], sink := [] }
 
 def secretStr' : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false, heap := fun _ => 0,
-    live := [], fresh := 0, err := false, sstore := fun _ => [], sink := [] }
+    live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := [] }
 
 theorem secretStr_lowEqA : uLowEqA Psec secretStr secretStr' := by
-  refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl⟩
+  refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl, rfl⟩
   intro y hy
   show (if y == "secret" then [UCh.quote] else []) = []
   have : ¬ (y == "secret") = true := by simpa [Psec] using hy
@@ -150,8 +152,12 @@ theorem secretStr_lowEqA : uLowEqA Psec secretStr secretStr' := by
 
 theorem secretStr_sepInv : SepInv [] secretStr ∧ SepInv [] secretStr' :=
   ⟨⟨rfl, fun _ => ⟨by intro x hx; simp at hx, by intro x hx; simp at hx,
+                   by intro a ha; simp [secretStr, memInt] at ha,
+                   by intro a ha; simp [secretStr, memInt] at ha,
                    by intro a ha; simp [secretStr, memInt] at ha⟩⟩,
    ⟨rfl, fun _ => ⟨by intro x hx; simp at hx, by intro x hx; simp at hx,
+                   by intro a ha; simp [secretStr', memInt] at ha,
+                   by intro a ha; simp [secretStr', memInt] at ha,
                    by intro a ha; simp [secretStr', memInt] at ha⟩⟩⟩
 
 /-- A program that *uses* the secret string and still emits publicly. -/
@@ -223,7 +229,12 @@ theorem uexec_heap_fresh : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
           · simp only [if_pos hd]; exact ⟨by simp, by simp⟩
           · simp only [if_neg hd]
             cases op with
-            | alloc => exact ⟨by simp, by show s.fresh ≤ s.fresh + 1; omega⟩
+            | alloc =>
+                refine ⟨by simp, ?_⟩
+                show s.fresh ≤ bumpFresh s.freed s.fresh
+                cases s.freed with
+                | nil => show s.fresh ≤ s.fresh + 1; omega
+                | cons _ _ => exact Int.le_refl _
             | deref =>
                 by_cases hl : memInt (s.store x) s.live = true
                 · simp only [if_pos hl]; exact ⟨by simp, by simp⟩
@@ -285,13 +296,16 @@ theorem heap_is_never_touched (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
     (r : UState × Nat × List Bool) (h : uexec n c π s = some r) : r.1.heap = s.heap :=
   (uexec_heap_fresh n c π s r h).1
 
-/-- **Defect 3, as a theorem.** The allocation counter only ever increases, so a freed
-    address is never handed out again. Stage 1i's use-after-free result therefore holds
-    for a **non-reusing allocator** — and `SepInv`'s freshness conjunct is exactly where
-    that hypothesis is used. Real allocators reuse, which is how use-after-free becomes
-    exploitable rather than merely wrong; extending to a reusing allocator would need
-    the separation argument rebuilt, not patched. -/
-theorem allocator_never_reuses (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
+/-- **Defect 3, and what became of it.** When this was written the allocator only
+    advanced a counter, so a freed address was never handed out again — a limitation
+    that stage 1i's use-after-free result silently depended on. Stage 1u removed it:
+    `free` now returns the address to a free list and `alloc` reuses it
+    (`Reuse.the_allocator_reuses`). The statement below survives the change — the
+    counter is still monotone, it just no longer implies non-reuse — so it is renamed to
+    say what it actually proves. What the removal cost is recorded in `Reuse.lean`: two
+    new invariant conjuncts and one new typing restriction, because with reuse the free
+    list becomes a channel. -/
+theorem fresh_counter_is_monotone (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
     (r : UState × Nat × List Bool) (h : uexec n c π s = some r) : s.fresh ≤ r.1.fresh :=
   (uexec_heap_fresh n c π s r h).2
 

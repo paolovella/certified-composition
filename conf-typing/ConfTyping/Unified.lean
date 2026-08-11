@@ -137,11 +137,25 @@ structure UState where
   live  : List Int           -- currently-allocated addresses
   fresh : Int                -- next address to hand out
   err   : Bool               -- a memory fault happened (recorded, not conflated with `dead`)
+  freed : List Int           -- addresses returned by `free`, available for reuse
   sstore : String → UStr      -- the string store, separate from the integer one
   sink  : List (String × UStr) -- everything emitted, with its destination, newest first
 
 def initU (σ : Store) : UState :=
-  ⟨σ, [], [], false, fun _ => 0, [], 0, false, fun _ => [], []⟩
+  ⟨σ, [], [], false, fun _ => 0, [], 0, false, [], fun _ => [], []⟩
+
+/-- **The allocator reuses.** A freed address goes back on the free list and is handed
+    out again before the counter advances. Real allocators do this, and it is what makes
+    use-after-free *exploitable* rather than merely wrong: the address a stale pointer
+    holds can belong to a live object again. -/
+def pickAddr : List Int → Int → Int
+  | [],     f => f
+  | a :: _, _ => a
+
+/-- The counter only advances when the free list was empty. -/
+def bumpFresh : List Int → Int → Int
+  | [],     f => f + 1
+  | _ :: _, f => f
 
 /-- Update in the string store. -/
 def updSU (τ : String → UStr) (x : String) (v : UStr) : String → UStr :=
@@ -191,12 +205,15 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
   | _ + 1, .memop op x,  _, s =>
       some (if s.dead then s else
               match op with
-              | .alloc => { s with store := upd s.store x s.fresh,
-                                   live := s.fresh :: s.live, fresh := s.fresh + 1 }
+              | .alloc => { s with store := upd s.store x (pickAddr s.freed s.fresh),
+                                   live := pickAddr s.freed s.fresh :: s.live,
+                                   freed := dropInt (pickAddr s.freed s.fresh) s.freed,
+                                   fresh := bumpFresh s.freed s.fresh }
               | .deref => if memInt (s.store x) s.live then s
                           else { s with dead := true, err := true }
               | .free  => if memInt (s.store x) s.live
-                          then { s with live := dropInt (s.store x) s.live }
+                          then { s with live := dropInt (s.store x) s.live,
+                                        freed := s.store x :: s.freed }
                           else { s with dead := true, err := true }, 1, [])
   | _ + 1, .sop op x e,  _, s =>
       some (if s.dead then s else
@@ -372,7 +389,7 @@ theorem uVictim_not_mediated : ¬ UMediated uVictim := by
   intro h
   have := h 1 (fun _ => false) (fun _ => 0)
     ({ store := fun _ => 0, auth := [], reads := ["db"], dead := false,
-       heap := fun _ => 0, live := [], fresh := 0, err := false, sstore := fun _ => [], sink := []  }, 1, []) rfl
+       heap := fun _ => 0, live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := []  }, 1, []) rfl
     "db" (by simp)
   exact absurd this (by simp)
 

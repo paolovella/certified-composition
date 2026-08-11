@@ -577,7 +577,7 @@ def safeQuery : UCmd :=
 /-- An input carrying a delimiter: the attack payload, in this alphabet. -/
 def attackState : UState :=
   { store := fun _ => 0, auth := [], reads := [], dead := false, heap := fun _ => 0,
-    live := [], fresh := 0, err := false,
+    live := [], fresh := 0, err := false, freed := [],
     sstore := fun y => if y == "input" then [UCh.quote] else [], sink := [] }
 
 /-- **The attack is real.** Run the vulnerable program on the malicious input and the
