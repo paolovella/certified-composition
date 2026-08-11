@@ -87,7 +87,10 @@ The same accountancy appears at every level:
   ordinals governs the perturbation at *every* level at once, machine-checked
   at 732000 instances; §60 **withdraws** that section's further claim that the
   residual reduced to a question about the C-sequence, with the two gaps
-  written out, and salvages Lemma W1) — and the two-sided independence
+  written out, and salvages Lemma W1; §61 then *uses* W1 — on an uncountable
+  set of levels the canonical elements freeze, giving **Theorem W2**:
+  (Q-spread) falls if `ρ₁` has countable columns at `S`-levels, a question
+  about the walk alone) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

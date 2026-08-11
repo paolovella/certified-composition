@@ -610,6 +610,15 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   `sup_β rank(α, B_α∩B_β) < ∞` cofinally, a condition on the rank. Salvaged: **Lemma W1**
   — for every `β₀`, some single `X =∗ B_{β₀}` equals `B_β ∩ β₀` for uncountably many `β`,
   with no hypothesis at all.)*
+  *(**The W1 route, notes §61.** On the uncountable `T` where the trace is constant the
+  canonical elements **freeze**: `B_α ∩ B_β = B_α ∩ X` for all `α<β₀`, `β ∈ T`, so
+  `g_β = G` with no `β` in it. Pigeonhole on the finite exceptional sets over the
+  uncountable `T` gives **Theorem W2 [ZFC]**: (C2) implies that for every `β₀`, all but
+  finitely many `α<β₀` have an **uncountable** column `{β : ρ₁(α,β) ≤ G(α)}`. So
+  **(Q-spread) is answered NO if `ρ₁` has countable columns at `S`-levels** — the new
+  question **(Q-col)**, about the walk alone. Not settled: the one-step bound
+  `ρ₁(α,β) ≥ |C_β ∩ α|` is not enough, since uncountably many ladders may avoid `α`; and
+  (Q-col) is asymptotic, so the numeric model is not consulted.)*
   *(**(Q-spread) reframed, notes §58.** (C2) is not a boundedness condition but a **rate**
   one. **Lemma Y1 [ZFC]**: (C1) alone forces `{α<β : m_u(α) < N}` finite for every `N`, so
   the level-minima diverge — and Handbook 1.16(a) diverges the bars, so both sides of (C2)

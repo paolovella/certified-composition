@@ -3794,3 +3794,76 @@ because both routes look like they should work and neither does.
 - **Seventeenth labelled flip**, and the first in this line caught within one section of
   being written. The prompt was mechanical: the claim asserted an implication with two
   quantifier steps in it and neither had been written out.
+
+## 61. The W1 route: (Q-spread) falls if ρ₁ has countable columns at S-levels — a four-step chain with every quantifier written out, and the new question is about the walk alone
+
+§60 salvaged **Lemma W1** and left it unused. It is not decoration: it converts the
+`β`-dependence that defeated §59 into a *constant*, on an uncountable set of `β`, and that
+is exactly what the Theorem-X route needed and could not get. The chain below is short and
+elementary; after §60 every step is written out with its quantifier, and the conclusion is
+an implication, not a resolution.
+
+Throughout assume (C2), fix `β₀ < ω₁`, and write `g_β(α) := rank(α, B_α ∩ B_β)`.
+
+**Step 1 (W1).** There are `X =∗ B_{β₀}` and an **uncountable** `T ⊆ ω₁ \ β₀` with
+`B_β ∩ β₀ = X` for every `β ∈ T`. [§60, no hypothesis.]
+
+**Step 2 (the canonical elements freeze).** For every `α < β₀` and every `β ∈ T`,
+`B_α ⊆ α ⊆ β₀`, so `B_α ∩ B_β = B_α ∩ (B_β ∩ β₀) = B_α ∩ X`. Hence
+> `g_β(α) = rank(α, B_α ∩ X) =: G(α)` for **all** `β ∈ T` and **all** `α < β₀`
+— a single function of `α`, with no `β` in it. This is the step §59 wanted and got wrong:
+the perturbation is not merely *small* across `T`, it is *absent*.
+
+**Step 3 (pigeonhole on the exceptional sets).** By Lemma Z1 at `u = (β, B_β)`, the set
+`E_β := {α < β₀ : G(α) < ρ₁(α,β)}` is finite for every `β ∈ T`. The map `β ↦ E_β` sends
+the uncountable `T` into the finite subsets of the countable `β₀` — countably many — so
+some finite `E∗` has `T∗ := {β ∈ T : E_β = E∗}` **uncountable**.
+
+**Step 4 (the columns).** For every `α ∈ β₀ \ E∗` and every `β ∈ T∗`, `G(α) ≥ ρ₁(α,β)`.
+Equivalently
+> `T∗ ⊆ Col(α, G(α))` where `Col(α,n) := {β > α : ρ₁(α,β) ≤ n}`,
+so **for all but finitely many `α < β₀`, some column of `α` is uncountable.**
+
+> **Theorem W2 (the reduction) [proved, ZFC].** If (C2) holds then for every `β₀` there is
+> a finite `E∗ ⊆ β₀` and a function `G : β₀ → ω` such that `Col(α, G(α))` is uncountable
+> for every `α ∈ β₀ \ E∗`. Contrapositively:
+> **if for cofinally many `α` every column `Col(α,n)` is countable, (C2) fails and
+> (Q-spread) is answered NO.**
+
+**The new question, and it is about the walk alone.**
+> **(Q-col).** For `α ∈ S = {α : sup_β ρ₁(α,β) = ∞}`, are the columns
+> `Col(α,n) = {β : ρ₁(α,β) ≤ n}` countable?
+
+Two remarks that keep it honest.
+- **`α ∉ S` is no obstacle.** For those `α`, `sup_β ρ₁(α,β) = N < ω` and `Col(α,N) = ω₁`
+  outright, so the columns are uncountable for a trivial reason. But Corollary X1 (§57)
+  gives `S ∩ β` infinite for every large `β`, so `β₀ \ E∗` meets `S` in an infinite set
+  and Theorem W2's conclusion bites on `S`-levels, which is where (Q-col) is posed.
+- **The first step of the walk already bounds a column.** `ρ₁(α,β) ≥ |C_β ∩ α|`, so
+  `Col(α,n) ⊆ {β : |C_β ∩ α| ≤ n}`, and that set is uncountable whenever uncountably many
+  ladders `C_β` avoid `α` — which is the generic situation. So (Q-col) is **not** settled
+  by the first step, and any proof must control the whole walk. This is stated because the
+  one-step bound is the first thing one reaches for and it is not enough.
+
+**What this does and does not claim.**
+- **Proved**: Theorem W2, the implication. Steps 1–4 are pigeonhole and coherence; nothing
+  asymptotic enters, and nothing about the rank beyond Z1.
+- **Not claimed**: any answer to (Q-col). In particular it is *not* claimed that columns
+  are countable; the remark above shows the obvious argument fails.
+- **Not checkable here.** (Q-col) is an *asymptotic* statement about `ρ₁` — countability of
+  a set of `β` — and the truncated model has been wrong about exactly this kind of claim
+  three times (§54, §57, §58). No numeric evidence is offered for it and none should be
+  read into the tool's output.
+
+**Why this route is better than §59's.** §59 tried to make the `β`-dependence *small* and
+conflated bounded with finitely many; W1 makes it **vanish** on an uncountable set, which
+is what the argument actually required. The lesson is worth stating: the useful move was
+not to bound the discrepancy but to find where it is *constant*, and W1 gives that for
+free in every coherent sequence.
+
+**Status after §61.**
+- **(Q-spread): open**, with a new sufficient condition for a negative answer.
+- **New ZFC facts**: Steps 1–4 and **Theorem W2**.
+- **New question (Q-col)**, about `ρ₁` alone, with the naive one-step attack shown to
+  fail. This is the reduction §59 aimed at and missed: a question about the walk rather
+  than about the rank — but arrived at through W1's constancy rather than through a bound.

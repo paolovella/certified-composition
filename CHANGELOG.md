@@ -1013,6 +1013,25 @@ landed.
   mechanical: the claim asserted an implication with two quantifier steps in it and
   neither had been written out.
 
+- **Set-theory research line, notes §61 — the W1 route.** §60 salvaged Lemma W1 and left
+  it unused; it turns out to be exactly what the Theorem-X route needed. On the
+  uncountable `T` where the trace on `β₀` is constant, the canonical elements **freeze**:
+  `B_α ∩ B_β = B_α ∩ X` for every `α<β₀` and `β ∈ T`, so `g_β` is one function `G` with no
+  `β` in it. A pigeonhole on the finite exceptional sets over the uncountable `T` then
+  gives **Theorem W2 [ZFC]**: if (C2) holds, for every `β₀` all but finitely many `α<β₀`
+  have an **uncountable** column `Col(α,G(α)) = {β : ρ₁(α,β) ≤ G(α)}`.
+
+  Contrapositively, **(Q-spread) is answered NO if `ρ₁` has countable columns at
+  `S`-levels** — the new question **(Q-col)**, about the walk alone. This is the reduction
+  §59 aimed at and missed, reached by a different move: not *bounding* the discrepancy but
+  finding where it is **constant**, which W1 supplies for free in every coherent sequence.
+
+  Kept honest: (Q-col) is **not** answered, and the obvious attack is shown to fail —
+  `ρ₁(α,β) ≥ |C_β ∩ α|` controls only the first step of the walk, and uncountably many
+  ladders may avoid `α`. (Q-col) is asymptotic, the regime the truncated model has
+  inverted three times, so no numeric evidence is offered. After §60, every quantifier
+  step in the chain is written out.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value

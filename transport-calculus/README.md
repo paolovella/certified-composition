@@ -693,7 +693,19 @@ function below a **countable** `β₀` cannot contradict Theorem X, whose proof 
 regularity of `ℵ₁`. What would actually suffice is `sup_β rank(α, B_α∩B_β) < ∞` cofinally
 — a condition on the **rank**, not the sequence. Salvaged: **Lemma W1**, free of
 hypotheses — for every `β₀` some single `X =∗ B_{β₀}` equals `B_β ∩ β₀` for *uncountably
-many* `β`. Z1, Z2 and Z3 stand unaffected. Sixteen labelled verdict flips, plus
+many* `β`. Z1, Z2 and Z3 stand unaffected.
+
+**§61 puts W1 to work, and it is the reduction §59 was reaching for.** On the uncountable
+`T` where the trace is constant, the canonical elements *freeze*: `B_α ∩ B_β = B_α ∩ X`
+for every `α<β₀` and every `β ∈ T`, so `g_β` is a single function `G` with no `β` in it.
+A pigeonhole on the (finite) exceptional sets over the uncountable `T` then gives
+**Theorem W2**: if (C2) holds, then for every `β₀` all but finitely many `α<β₀` have an
+uncountable column `Col(α,G(α)) = {β : ρ₁(α,β) ≤ G(α)}`. Contrapositively, **(Q-spread)
+is answered NO if `ρ₁` has countable columns at `S`-levels** — the new question **(Q-col)**,
+about the walk alone. The naive attack is shown to fail (`ρ₁(α,β) ≥ |C_β ∩ α|` bounds only
+the first step, and uncountably many ladders may avoid `α`), and (Q-col) is asymptotic, so
+the truncated model is explicitly not consulted. The lesson over §59: the useful move was
+not to *bound* the discrepancy but to find where it is **constant**. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 
