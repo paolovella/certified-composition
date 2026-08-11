@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Deploy.lean` | composable core, stage 1s | the ledger, threaded: what must be true of the **world** — and the answer is a trusted base **three lines long**, with two of the six certificates needing nothing at all |
 | `ConfTyping/StringLoop.lean` | composable core, stage 1r | loop rules for both string certificates by narrowing; the loop count is corrected to **five of six**, the budget still the exception |
 | `ConfTyping/PathCert.lean` | composable core, stage 1q | **path traversal** (CWE-22), the last coverage row: a prefix condition rather than a count, per-sink, and layered on the taint environment |
 | `ConfTyping/AllFive.lean` | composable core, stage 1p | the sink enters the noninterference observation (closing a real weakness in 1o), and `fiveProg` carries **five** certificates |
@@ -1698,6 +1699,44 @@ The fuel index is stage 1l's answer to the same problem for the same reason: the
 narrowing call sits under a closure, so structural recursion on the command cannot see
 through it, and a well-founded definition would stop kernel-reducing and break every
 `decide`.
+
+## The composable core (`Deploy.lean`) — stage 1s, what must be true of the world
+
+Five certificates say things about the *machine*. A deployment cares about something
+else: that the database accepts the query, that the filesystem serves a file inside the
+root, that the policy the program consulted is the policy the specification meant.
+Stage 1e built the mechanism for exactly this — a ledger that appends under composition
+and cannot be silently discharged — and it was never threaded through the rest of the
+core. This threads it.
+
+**The useful part is the sorting**, which the exercise forces and which was not obvious
+in advance:
+
+* **Noninterference** and **memory safety** need *nothing*. They are statements about
+  the machine's own state, and the machine is the artifact.
+* The **budget** needs nothing either, because it is denominated in the model's own
+  steps. Converting it to seconds would need an assumption; "at most six steps" does
+  not.
+* **Mediation**, **structural integrity** and **path safety** each need exactly one
+  entry — and the three entries belong to three *different* external components: the
+  policy author, the query parser, the filesystem.
+
+So the trusted base of a fully-certified program is **three lines long**, and
+`Discharged` names them. `deployment_reading` is the transformation from machine
+guarantees to deployment guarantees, and it needs no axioms at all. `toLedger` and
+`sat_toLedger` connect the entries to stage 1e, so they append under composition like
+any others.
+
+Two theorems keep it from being a formality. `sink_assumption_is_load_bearing` exhibits
+a deployment whose parser accepts nothing: `fiveProg` really does emit, so the
+conclusion fails with the assumption, however well the program is certified. And
+`machine_guarantees_need_no_deployment` records the other half — noninterference,
+memory safety and the budget hold with the ledger *empty* — so the sorting above is a
+fact rather than a presentation choice.
+
+That last number is the point. A program can be certified to the hilt and still be
+wrong about the world; what the ledger buys is that the ways it can be wrong are
+listed, appendable, and impossible to discharge by accident.
 
 ## §11 pre-mechanization checklist (framework doc)
 

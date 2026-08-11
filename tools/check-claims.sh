@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# composable core stage 1s: the deployment ledger.
+for thm in "theorem sat_toLedger" "theorem deployment_reading" \
+           "theorem machine_guarantees_need_no_deployment" \
+           "theorem sink_assumption_is_load_bearing" "structure Discharged"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Deploy.lean 2>/dev/null; then
+    echo "DRIFT: the deployment ledger is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # composable core stage 1r: loop rules for the string certificates.
 for thm in "theorem TaintCert.loop" "theorem PathCert.loop" "theorem narrowEnv_spec" \
            "theorem tcheckW_sound" "theorem pcheckW_sound" \
@@ -684,7 +693,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

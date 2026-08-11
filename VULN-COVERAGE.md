@@ -1466,7 +1466,18 @@ stage 1l's narrowing, so rows 3 and 14 hold for programs that emit inside a loop
 (`loopQuery_safe`, `loopServe_safe`). It also corrected a count: stage 1n's "three of
 four compose over loops" predated the string certificates, so the honest figure had
 slipped to three of six; `five_of_six_compose_over_loops` puts it at five of six, the
-budget still being the only law that cannot. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+budget still being the only law that cannot.
+
+Stage 1s threaded stage 1e's ledger through the core and sorted the certificates by
+what they need from the world. Noninterference and memory safety need nothing — they
+are statements about the machine. The budget needs nothing, being denominated in the
+model's own steps. Mediation, structural integrity and path safety need exactly one
+entry each (`Discharged`: the policy author, the query parser, the filesystem), and
+`deployment_reading` converts the machine guarantees into the deployment-level ones
+given those three. `sink_assumption_is_load_bearing` shows the entries are obligations
+rather than decoration, and `machine_guarantees_need_no_deployment` shows the other
+three really do hold with an empty ledger. **The trusted base of a fully-certified
+program on this machine is three lines long.** Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

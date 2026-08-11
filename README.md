@@ -344,7 +344,13 @@ corrected a count that had quietly slipped: stage 1n's "three of four compose ov
 loops" was measured before the string certificates existed, so the honest figure had
 become three of six. It is now **five of six**, with the budget still the only law that
 cannot — a cost bound over a loop needs an iteration bound, which is a termination
-argument rather than a typing side-condition.
+argument rather than a typing side-condition. Stage 1s then threaded stage 1e's ledger
+through the whole core and answered the question it exists for — what must be true of
+the *world*. The sorting is the result: noninterference and memory safety need nothing
+(they are about the machine), the budget needs nothing (it is in the machine's own
+steps), and mediation, structural integrity and path safety need exactly one entry
+each, belonging to three different external components. **The trusted base of a
+fully-certified program is three lines long, and enumerated.**
 
 ## Scope — what is *not* claimed
 

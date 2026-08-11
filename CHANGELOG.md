@@ -602,6 +602,36 @@ landed.
   Stage 1n's docstring now carries a forward pointer so its figure is not read as
   current.
 
+- **Composable core, stage 1s — the ledger, threaded: what must be true of the world**
+  (`ConfTyping/Deploy.lean`). Five certificates say things about the *machine*. A
+  deployment cares that the database accepts the query, that the filesystem serves a
+  file inside the root, that the policy consulted is the policy intended. Stage 1e built
+  the mechanism — a ledger that appends under composition and cannot be silently
+  discharged — and it was never threaded through the rest of the core.
+
+  **The result is a sorting, and it was not obvious in advance.** Noninterference and
+  memory safety need *nothing*: they are statements about the machine's own state, and
+  the machine is the artifact. The budget needs nothing either, being denominated in the
+  model's own steps — converting it to seconds would need an assumption, "at most six
+  steps" does not. Mediation, structural integrity and path safety need exactly one
+  entry each, and the three belong to three *different* external components: the policy
+  author, the query parser, the filesystem. So the trusted base of a fully-certified
+  program is **three lines long**, and `Discharged` enumerates it.
+
+  `deployment_reading` is the transformation from machine guarantees to deployment
+  guarantees, and it needs no axioms at all. `toLedger`/`sat_toLedger` connect the
+  entries to stage 1e so they append like any others.
+
+  Two theorems stop it being a formality. `sink_assumption_is_load_bearing` exhibits a
+  deployment whose parser accepts nothing: `fiveProg` really does emit, so the
+  conclusion fails with the assumption however well the program is certified.
+  `machine_guarantees_need_no_deployment` records the other half — the other three hold
+  with the ledger *empty* — so the sorting is a fact rather than a presentation choice.
+
+  A program can be certified to the hilt and still be wrong about the world. What the
+  ledger buys is that the ways it can be wrong are listed, appendable, and impossible to
+  discharge by accident.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
