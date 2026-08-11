@@ -672,7 +672,15 @@ strictly weaker than the finiteness condition (i) demands. So **the crux is a co
 and settling (Q-rows-lim) or (Q-T) affirmatively would *not* settle schedulability. §57
 localized (C2) to level-minima and proved **Theorem X**: no level function dominates the
 walk bars, so (Q-spread) needs per-element freedom — Question 1's own dichotomy, one level
-down, with the level-factored side refuted on both. Sixteen labelled verdict flips, plus
+down, with the level-factored side refuted on both. **§58 then inverted the reading of
+(C2).** Fiber-specialness *already* forces the level-minima to diverge (**Lemma Y1**:
+under (C1), `{α<β : m_u(α) < N}` is finite for every `N`), and Handbook 1.16(a) forces the
+bars to diverge; so (C2) is an **eventual-domination between two divergent sequences of the
+same kind** — a rate question, not a boundedness one, and the two conjuncts of §56 are not
+independent: the first supplies the shape the second needs. **Lemma Y3**: at any *single*
+down-set both conjuncts are satisfiable together, with `BS(u)` empty. So the entire residual
+of (Q-spread) is **simultaneity across overlapping down-sets** — the program's recurring
+wall, for the first time isolated with both one-sided problems solved. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

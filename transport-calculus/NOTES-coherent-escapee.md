@@ -3568,3 +3568,95 @@ proof already in hand.
   exception sets grow along every ω-chain — or a proof that the multiplicity cannot be
   organised coherently across overlapping down-sets, which is the same wall the program
   has met at every level, now stated for the smallest object it has yet reached.
+
+## 58. (Q-spread) is a rate race, not an impossibility: (C1) already forces the level-minima to diverge, a single down-set is free, and the whole content is simultaneity
+
+§57 localized (C2) to the level-minima `m_u(α) := min{rank(x) : x ⊑ u, γ(x) = α}` and
+refuted the level-factored side (Theorem X). It left the impression — which the
+"domination" language encourages — that (C2) asks the minima to beat something they have
+no reason to reach. That impression is **wrong**, and this section says why. Both sides
+of the required inequality diverge, for reasons already proved; (C2) compares their
+*rates*; and for a **single** down-set the comparison can always be won. The entire
+residual content of (Q-spread) is therefore simultaneity across overlapping down-sets —
+which is the program's recurring wall, now isolated with both one-sided problems solved.
+
+**Lemma Y1 (fiber-specialness already diverges the minima) [proved, ZFC].** Assume (C1)
+at `u = (β, C)`. Then for every `N`, the set `{α < β : m_u(α) < N}` is finite. Hence
+`m_u(α) → ∞` as `α → β` through the levels realized in `↓u`.
+*Proof.* For each `α` in that set choose `x_α ⊑ u` with `γ(x_α) = α` and `rank(x_α) < N`.
+Distinct levels give distinct elements, and all lie in `{x ⊑ u : rank x < N}`, which (C1)
+says is finite. ∎
+
+**Lemma Y2 (the bars diverge too) [cited, Handbook 1.16(a)].** For every `β` and every
+`n`, `{α < β : ρ₁(α,β) ≤ n}` is finite. So `ρ₁(α,β) → ∞` as `α → β`.
+
+> **Corollary Y (the shape of (C2)) [proved].** At each `u`, (C2) compares two functions
+> of `α < β` that both tend to infinity, each finite-to-one below every bound. It is an
+> **eventual-domination** condition between two divergent sequences — a question of
+> rate, not of one side being bounded and the other not. The symmetry is exact: Lemma Y1
+> gives `m_u` the same finite-to-one-below-every-bound property that 1.16(a) gives the
+> bar, and it gives it *for free from (C1)*.
+
+This is the first structural news about (C2) since §56 split the crux, and it inverts the
+prior reading. §57's Theorem X shows no *level-only* rank wins the race; it does not show
+the race is unwinnable, and Corollary Y says the two runners are of the same kind.
+
+**Lemma Y3 (a single down-set is free) [proved, ZFC].** Fix `u = (β,C)`. There is a rank
+on `↓u` satisfying (C1) at `u` and making `BS(u) = ∅` — not merely finite.
+*Proof.* `↓u` is countable: it meets each of the countably many levels `α ≤ β`, and at
+level `α` its members are the sets `A =∗ B_α` with `A ⊆ C`, i.e. the cofinite subsets of
+`B_α ∩ C`, countably many. Enumerate `↓u = {x_0, x_1, …}` and set
+`rank(x_i) := max(i, ρ₁(γ(x_i), β))`. Then `{x ⊑ u : rank x < N} ⊆ {x_i : i < N}` is
+finite, giving (C1) at `u`; and `rank(x) ≥ ρ₁(γ(x), β)` for every `x ⊑ u`, so `BS(u)` is
+empty. ∎
+
+> **Corollary Y2 (the residual is simultaneity, and nothing else) [proved].** Each of the
+> two conjuncts is satisfiable, and each is satisfiable *together with the other* at any
+> one down-set. (Q-spread) is therefore not obstructed at any single `u`: its whole
+> content is that one rank must do this at **every** `u` at once, and the `↓u` overlap.
+
+**Where the overlap bites, exactly [proved].** If `x ⊑ u ⊑ u′` then `x ⊑ u′`, and the bar
+on `x` at `u′` is `ρ₁(γ(x), γ(u′)) ≥` nothing in particular — but by Corollary X1 the
+levels `α ∈ S` have `sup_β ρ₁(α,β) = ∞`, so for `x` at such a level the bar over the
+`u`'s above `x` is **unbounded** while `rank(x)` is one number. Hence:
+> every `x` at a level in `S` is **exceptional at cofinally many `u` above it**.
+Each `u` may have only finitely many exceptions, and there are uncountably many `u`. So
+the combinatorial content is a covering condition: the uncountably many "unavoidable
+exceptions" must be distributed so that no single down-set collects infinitely many. That
+is a statement about how the `↓u` overlap, and it is the first time the difficulty has
+been reduced to a distribution problem with both endpoints solved.
+
+**What this does and does not settle.**
+- **Does not** answer (Q-spread). No rank is constructed and none is refuted.
+- **Does** remove the reading under which (C2) looked hopeless: the minima are not
+  bounded, they diverge, and they diverge *because of* (C1) — the two conjuncts of §56
+  are not independent, the first supplies the shape the second needs.
+- **Does** localize the residual to simultaneity, with a proof that both one-sided
+  problems (one conjunct alone; both conjuncts at one `u`) are solvable.
+- **Fifth appearance** of the program's self-similarity, and the sharpest: the wall is
+  again *element-dependent versus factored*, but now the factored side is refuted
+  (Theorem X), the pointwise side is solved (Lemma Y3), and only the gluing is open.
+
+**Method note, and a third recorded inversion.** Nothing in the *proofs* above used the
+numeric model: Lemmas Y1 and Y3 are counting arguments over a countable down-set, and Y2
+is a citation. But 1.16(a) is now load-bearing four times over, so it was added to
+`tools/walk-check.py` — and the attempt immediately reproduced the standing caveat. The
+**identity-level** half (the counts `|{ξ<β : ρ₁(ξ,β) ≤ n}|` are monotone in `n`) checks
+out, 15000 instances across twelve C-sequences. The **asymptotic** half — that rows are
+*unbounded*, so no fixed `n` covers every level — is false in the model: for `β ≤ 11`
+every `ξ` has `ρ₁(ξ,β) ≤ 3`, because the truncation has too few limits-of-limits for the
+expensive walks to exist. The assertion was removed and the reason recorded in the tool.
+> Third instance, after §54 and §57, and the first one *deliberately provoked*: the model
+> is sound for identities and unreliable for anything asymptotic, and a section whose
+> whole content is a comparison of *rates* is exactly where it must not be consulted.
+
+**Status after §58.**
+- **(Q-spread): open**, and now known to be a simultaneity problem rather than a
+  domination problem. Both one-sided versions are proved satisfiable.
+- **New ZFC facts**: Lemma Y1 (fiber-specialness diverges the level-minima); Corollary Y
+  (the two sides are of the same kind); Lemma Y3 (one down-set is free, with `BS(u)`
+  empty); the covering reformulation of the overlap.
+- **What would settle it**: a distribution of the unavoidable exceptions across the
+  down-set lattice with every `↓u` receiving finitely many — or a proof that the
+  `S`-levels force some `↓u` to collect infinitely many, which would refute (C2) and,
+  with §56, close the sufficiency route for good.

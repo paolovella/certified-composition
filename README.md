@@ -80,7 +80,10 @@ The same accountancy appears at every level:
   crux is a *conjunction* — fiber-specialness controls the leftover only block
   by block, so §51–§54 narrowed one conjunct), its residual (Q-spread)
   localized to level-minima and its level-factored side refuted (§57,
-  Theorem X) — and the two-sided independence
+  Theorem X), and then **reframed as a rate race** (§58: fiber-specialness
+  *already* diverges the level-minima, so both sides of (C2) diverge and it
+  compares their rates; and a single down-set is free, so the whole residual
+  is simultaneity) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

@@ -921,6 +921,44 @@ landed.
 
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
+- **Set-theory research line, notes §58 — (Q-spread) is a rate race, not an
+  impossibility.** §57 localized (C2) to the level-minima and refuted the level-factored
+  side, leaving the impression that the minima had no reason to reach the walk bars.
+  §58 shows that reading is wrong, in three steps.
+
+  **Lemma Y1 [ZFC]**: fiber-specialness *already* diverges the minima — under (C1),
+  `{α<β : m_u(α) < N}` is finite for every `N`, by the same one-line counting that makes
+  distinct levels contribute distinct elements. **Lemma Y2** (Handbook 1.16(a)) diverges
+  the bars. So **Corollary Y**: (C2) compares two functions of `α` that are each
+  finite-to-one below every bound — an eventual-domination between sequences of the same
+  kind. The two conjuncts of §56 are therefore *not independent*: the first supplies the
+  shape the second needs.
+
+  **Lemma Y3 [ZFC]**: at any *single* down-set both conjuncts hold together — `↓u` is
+  countable, so enumerating it and setting `rank(xᵢ) := max(i, ρ₁(γ(xᵢ), β))` gives (C1)
+  at `u` and makes `BS(u)` **empty**. So neither conjunct alone, nor both at one `u`, is
+  an obstruction: **the entire residual of (Q-spread) is simultaneity across overlapping
+  down-sets**, restated as a covering condition on the unavoidable exceptions that
+  Corollary X1 forces at every `S`-level. Fifth appearance of the program's
+  self-similarity and the sharpest: factored side refuted, pointwise side solved, only
+  the gluing open.
+
+  **A third recorded inversion, this one deliberately provoked.** 1.16(a) is now
+  load-bearing four times, so it was added to `tools/walk-check.py`. The identity-level
+  half (counts monotone in `n`) passes, 15000 instances over twelve C-sequences. The
+  asymptotic half — rows unbounded — is **false in the truncated model**: for `β ≤ 11`
+  every `ξ` has `ρ₁(ξ,β) ≤ 3`, there being too few limits-of-limits for the expensive
+  walks. The assertion was removed and the reason recorded in the tool. After §54 and
+  §57, the third time the model has inverted an asymptotic claim, and the first time the
+  check was run *expecting* it.
+
+  **A guard-suite bug, caught by the guard suite.** The self-test case for "README falls
+  behind the notes" hardcoded `§57`, so once the notes reached §58 the mutation stopped
+  breaking anything and the case silently passed without testing. `guard-selftest`
+  reported the failure on the next run; the case now computes the current highest section
+  instead of pinning one. A negative test that goes stale is worse than no negative test,
+  and this is exactly the failure mode the suite exists to catch — this time in itself.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value

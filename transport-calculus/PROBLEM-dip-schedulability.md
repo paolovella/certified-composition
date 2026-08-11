@@ -598,6 +598,16 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   **not** settle schedulability. Discharged on the way: for binary-valued `e` the value-form
   (ii) is *equivalent* to the set-form (i), so §50's "modulo the value-form bookkeeping"
   hedge costs nothing over `ρ₃`.)*
+  *(**(Q-spread) reframed, notes §58.** (C2) is not a boundedness condition but a **rate**
+  one. **Lemma Y1 [ZFC]**: (C1) alone forces `{α<β : m_u(α) < N}` finite for every `N`, so
+  the level-minima diverge — and Handbook 1.16(a) diverges the bars, so both sides of (C2)
+  are finite-to-one below every bound. The two conjuncts of §56 are therefore *not*
+  independent: fiber-specialness supplies the shape block-spread needs. **Lemma Y3 [ZFC]**:
+  for any single `u`, a rank on the (countable) `↓u` gives (C1) at `u` and `BS(u) = ∅`. So
+  neither conjunct alone, nor both at one down-set, is an obstruction: **the whole residual
+  is simultaneity across overlapping `↓u`**. Restated as a covering condition: by Corollary
+  X1 every element at a level in `S` is exceptional at cofinally many `u` above it, and
+  those unavoidable exceptions must be distributed so no `↓u` collects infinitely many.)*
   *(**(Q-spread) worked, notes §57.** Localized: assuming (C1), **(C2) ⟺ for every `u` the
   level-minima `m_u(α) := min{rank(x) : x ⊑ u, γ(x)=α}` dominate `ρ₁(α,γ(u))` off finitely
   many levels** — because at each level all but finitely many elements of `↓u` already

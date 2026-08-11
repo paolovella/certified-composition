@@ -52,8 +52,13 @@ run_case "set-theory theorem renamed" drift \
              transport-kernel/TransportKernel/OmegaOneCoherent.lean'
 
 # 1b-second. READMEs must reference the latest notes section
+# NOTE: computes the current highest notes section rather than hardcoding one. An
+# earlier version pinned the number and went stale the next time the notes grew, so the
+# case silently stopped testing anything - caught by this suite, which is its job.
 run_case "README falls behind the notes" drift \
-  bash -c 'sed -i "s/§57/§56/g" README.md transport-calculus/README.md'
+  bash -c 'm=$(grep -oE "^## [0-9]+\." transport-calculus/NOTES-coherent-escapee.md \
+               | grep -oE "[0-9]+" | sort -n | tail -1); \
+           sed -i "s/§$m/§0/g" README.md transport-calculus/README.md'
 
 # 1b4. the class count must match the documented convention
 run_case "class count contradicts §2½" drift \

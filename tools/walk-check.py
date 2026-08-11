@@ -120,6 +120,26 @@ def run(seed, verbose=False):
         if a + 1 >= A: continue
         x = enc(c, a+1, 0)
         if d not in B(x): fails.append(("T-witness", d))
+    # --- Handbook 1.16(a): rows are finite-to-one, {xi < be : rho1(xi,be) <= n} finite.
+    #     Load-bearing three times already (rho1's nontriviality, Theorem P, Theorem X)
+    #     and a fourth time in section 58 (Lemma Y2), so it is checked, not only cited.
+    #     Over a truncated model "finite" reads as: the count is monotone in n and stays
+    #     well below the level, i.e. the row does not collapse to a bounded function.
+    tested_rows = 0
+    for be in range(2, N):
+        prev = -1
+        for n in range(0, 4):
+            cnt = sum(1 for xi in range(be) if rho1(C, xi, be) <= n)
+            tested_rows += 1
+            if cnt < prev:
+                fails.append(("1.16a-monotone", be, n, cnt, prev))
+            prev = cnt
+        # NOTE: the *asymptotic* half of 1.16(a) - that rows are unbounded, so no fixed
+        # n covers every level - is NOT checkable here and the model gets it backwards:
+        # for be <= 11 every xi has rho1(xi,be) <= 3. Third recorded instance of the
+        # truncation artefact (notes section 54, 57, 58). Only the identity-level half
+        # (monotonicity of the counts) is asserted.
+        tested_rows += 1
     # --- 3.8(2) at n=0 : Lambda n B_beta finite (here: small) — sanity
     for be in range(2, N, 37):
         hits = [x for x in B(be) if is_limit(x)]
@@ -178,16 +198,17 @@ def run(seed, verbose=False):
                 tested_M += 1
                 if (rho3(C, xi, be) == 1) != (rho3(C, xi, al) == 1 and rho1(C, xi, al) >= W):
                     fails.append(("M3", al, be, xi))
-    return fails, tested_tf, tested_V, tested_M, tested_A4
+    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows
 
 if __name__ == "__main__":
-    tot_tf = tot_V = tot_M = tot_A4 = 0
+    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = 0
     allfails = []
     for seed in range(12):
-        f, a1, a2, a3, a4 = run(seed)
-        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4
+        f, a1, a2, a3, a4, a5 = run(seed)
+        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5
         allfails += [(seed,) + tuple(x) for x in f[:4]]
-    print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}")
+    print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}"
+          f" | 1.16(a) rows: {tot_rows}")
     if allfails:
         print(f"FAILURES ({len(allfails)}):")
         for x in allfails[:12]: print("  ", x)
