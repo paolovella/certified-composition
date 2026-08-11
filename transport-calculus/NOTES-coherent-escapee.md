@@ -3867,3 +3867,70 @@ free in every coherent sequence.
 - **New question (Q-col)**, about `ρ₁` alone, with the naive one-step attack shown to
   fail. This is the reduction §59 aimed at and missed: a question about the walk rather
   than about the rank — but arrived at through W1's constancy rather than through a bound.
+
+## 62. CORRECTION to §61: Theorem W2's conclusion is a ZFC triviality, so the route is vacuous — but the reason generalises W1 into double freezing, and localizes the obstruction off every frozen family (eighteenth flip)
+
+(Q-col) is settled, and against §61's route. The conclusion of **Theorem W2** — that for
+every `β₀` all but finitely many `α < β₀` have an uncountable column — is **provable in
+ZFC with no hypothesis at all**. W2 is therefore true and useless: its contrapositive has
+an antecedent that can never hold. The instrument that kills it is the one property of
+`ρ₁` the program has been using since §51 without turning it on this question:
+**coherence**.
+
+**Lemma W3a (columns are uncountable, unconditionally) [proved, ZFC].** For every `β₀`
+there are a finite `D ⊆ β₀` and a function `G : β₀ → ω` such that `Col(α, G(α))` is
+uncountable for every `α ∈ β₀ \ D`.
+*Proof.* Fix any `β₁ > β₀`. `ρ₁` is coherent, so for every `β > β₀` the set
+`D_β := {α < β₀ : ρ₁(α,β) ≠ ρ₁(α,β₁)}` is finite. The map `β ↦ D_β` sends the uncountable
+`ω₁ \ β₀` into the finite subsets of the countable `β₀` — countably many — so some `D` has
+`T∗ := {β : D_β = D}` uncountable. Put `G(α) := ρ₁(α,β₁)`. For `α ∈ β₀ \ D` and `β ∈ T∗`,
+`ρ₁(α,β) = G(α)`, so `T∗ ⊆ Col(α,G(α))`. ∎
+No `rank`, no (C2), no `S`. **(Q-col) is answered YES** in its uniform form, and §61's
+route closes.
+
+**What went wrong, and it is not the same mistake as §59.** §61's chain is valid — Steps
+1–4 are correct and Theorem W2 is a true implication. The error is one level up: the
+conclusion was treated as a *candidate for refutation* without first asking whether it
+might be a theorem. Writing out every quantifier, which §60 prescribed, does not catch
+this; the missing check is different, and cheap: **before using a contrapositive, try to
+prove the consequent outright.** Recorded as a method note because it is the second
+distinct failure mode in three sections and the two need different guards.
+
+**Lemma W3 (double freezing) [proved, ZFC].** For every `β₀` there are a finite `D ⊆ β₀`,
+an uncountable `T∗ ⊆ ω₁ \ β₀`, a set `X =∗ B_{β₀}` and a function `R : β₀ \ D → ω` with,
+for every `β ∈ T∗`:
+> `B_β ∩ β₀ = X`  and  `ρ₁(α,β) = R(α)` for all `α ∈ β₀ \ D`.
+*Proof.* Pigeonhole on the **pair** `β ↦ (B_β ∩ β₀, D_β)`: the first coordinate ranges
+over the countably many sets `=∗ B_{β₀}` (Lemma W1) and the second over the countably many
+finite subsets of `β₀` (coherence), so the product is countable and some fibre is
+uncountable. ∎
+So both sides of (C2) freeze together, not just the trace. W1 was half of a symmetric
+phenomenon.
+
+> **Corollary W4 (no frozen family obstructs) [proved].** On `T∗`, condition (C2) reads:
+> `rank(α, B_α ∩ X) ≥ R(α)` for all but finitely many `α < β₀` — a single inequality
+> between two functions of `α` that do not depend on `β`. It is satisfiable outright.
+> **Whatever obstructs (C2), it is not visible on any single frozen family.**
+
+**Where this leaves the search.** §58 localized the residual to simultaneity; §59 tried to
+budget it and overreached; §61 tried to convert it into a column question and hit a
+triviality. W3 and W4 say why all three missed: for each `β₀` the uncountably many `β`
+sort into frozen families, and *inside* a family there is nothing to prove. The obstruction,
+if there is one, lives in the **interaction between families** — in how the finite
+exceptional data `(B_β ∩ β₀, D_β)` varies as `β` ranges over the countably many fibres,
+and in how the fibres for different `β₀` cut across each other. That is a statement about a
+countable amount of data per level, which is the smallest the residual has ever been made,
+and it is the first version of the wall that does not mention the rank at all.
+
+**Status after §62.**
+- **(Q-col): answered YES** (uniform form), by Lemma W3a. §61's route is closed and
+  Theorem W2 is withdrawn as a tool, though it remains a true implication.
+- **(Q-spread): open.** Localized (§57), reframed (§58), budgeted (§59, with §60's
+  correction), and now shown to be invisible inside any frozen family (§62).
+- **New ZFC facts**: Lemma W3a (unconditional uncountable columns); **Lemma W3** (double
+  freezing — trace and bar freeze together on an uncountable set); Corollary W4.
+- **Method note, second distinct failure mode**: §60's was an unwritten quantifier; this
+  one was an unexamined consequent. Before relying on a contrapositive, try to prove the
+  consequent.
+- **Machine-checked**: `ρ₁` coherence, 6642 pairs over six C-sequences, difference sets of
+  size ≤ 32 and exactly 0 in 4212 of them. Identity-level, so the model is sound for it.

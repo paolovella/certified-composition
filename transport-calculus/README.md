@@ -705,7 +705,22 @@ is answered NO if `ρ₁` has countable columns at `S`-levels** — the new ques
 about the walk alone. The naive attack is shown to fail (`ρ₁(α,β) ≥ |C_β ∩ α|` bounds only
 the first step, and uncountably many ladders may avoid `α`), and (Q-col) is asymptotic, so
 the truncated model is explicitly not consulted. The lesson over §59: the useful move was
-not to *bound* the discrepancy but to find where it is **constant**. Sixteen labelled verdict flips, plus
+not to *bound* the discrepancy but to find where it is **constant**.
+
+**§62 closes that route and is the eighteenth flip.** (Q-col) is answered **YES
+unconditionally**: `ρ₁` is coherent, so for fixed `β₀` and any `β₁`, the sets
+`D_β := {α<β₀ : ρ₁(α,β) ≠ ρ₁(α,β₁)}` are finite, and a pigeonhole over the countably many
+finite subsets of the countable `β₀` gives an uncountable `T∗` on which the whole row is
+constant — hence uncountable columns, with **no `rank` and no (C2)** (**Lemma W3a**). So
+Theorem W2's conclusion is a ZFC triviality and its contrapositive can never fire.
+Salvaged and stronger: **Lemma W3 (double freezing)** — pigeonholing the *pair*
+`(B_β ∩ β₀, D_β)` freezes the trace *and* the bar on one uncountable set — whence
+**Corollary W4**: inside a frozen family (C2) is a single inequality between two
+`β`-independent functions, satisfiable outright. **No frozen family obstructs**, so the
+residual lives in the interaction *between* families: a countable amount of exceptional
+data per level, and the first version of the wall that does not mention the rank at all.
+Method note: §60's failure was an unwritten quantifier, §62's a consequent never tested
+for provability — two distinct modes needing two distinct guards. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

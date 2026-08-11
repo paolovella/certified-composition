@@ -616,9 +616,17 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   uncountable `T` gives **Theorem W2 [ZFC]**: (C2) implies that for every `β₀`, all but
   finitely many `α<β₀` have an **uncountable** column `{β : ρ₁(α,β) ≤ G(α)}`. So
   **(Q-spread) is answered NO if `ρ₁` has countable columns at `S`-levels** — the new
-  question **(Q-col)**, about the walk alone. Not settled: the one-step bound
-  `ρ₁(α,β) ≥ |C_β ∩ α|` is not enough, since uncountably many ladders may avoid `α`; and
-  (Q-col) is asymptotic, so the numeric model is not consulted.)*
+  question **(Q-col)**, about the walk alone. **Settled in §62, against the route.** (Q-col) is **YES
+  unconditionally**: `ρ₁` is coherent, so `D_β := {α<β₀ : ρ₁(α,β) ≠ ρ₁(α,β₁)}` is finite
+  and a pigeonhole over the countably many finite subsets of the countable `β₀` gives an
+  uncountable `T∗` on which the row is constant — uncountable columns with no rank and no
+  (C2) (**Lemma W3a**). Theorem W2's conclusion is therefore a ZFC triviality and the
+  contrapositive cannot fire. Salvaged and stronger: **Lemma W3 (double freezing)**, the
+  trace *and* the bar freeze together on one uncountable `T∗`; **Corollary W4**, inside a
+  frozen family (C2) is a single inequality between two `β`-independent functions, hence
+  satisfiable. So **no frozen family obstructs** and the residual lives in the interaction
+  *between* families — a countable amount of exceptional data per level, and the first
+  form of the wall that does not mention the rank.)*
   *(**(Q-spread) reframed, notes §58.** (C2) is not a boundedness condition but a **rate**
   one. **Lemma Y1 [ZFC]**: (C1) alone forces `{α<β : m_u(α) < N}` finite for every `N`, so
   the level-minima diverge — and Handbook 1.16(a) diverges the bars, so both sides of (C2)

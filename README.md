@@ -89,8 +89,12 @@ The same accountancy appears at every level:
   residual reduced to a question about the C-sequence, with the two gaps
   written out, and salvages Lemma W1; §61 then *uses* W1 — on an uncountable
   set of levels the canonical elements freeze, giving **Theorem W2**:
-  (Q-spread) falls if `ρ₁` has countable columns at `S`-levels, a question
-  about the walk alone) — and the two-sided independence
+  (Q-spread) falls if `ρ₁` has countable columns at `S`-levels; §62 then
+  **answers that YES unconditionally** from `ρ₁`'s coherence, closing the
+  route, and generalises W1 to **double freezing** — trace and bar freeze
+  together on an uncountable set, so no frozen family obstructs (C2) and the
+  residual lives in the interaction *between* families) — and the two-sided
+  independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

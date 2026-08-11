@@ -140,6 +140,19 @@ def run(seed, verbose=False):
         # truncation artefact (notes section 54, 57, 58). Only the identity-level half
         # (monotonicity of the counts) is asserted.
         tested_rows += 1
+    # --- rho1 coherence (used since section 51, load-bearing in section 62's Lemma
+    #     W3a): for be < ga, {xi < be : rho1(xi,be) != rho1(xi,ga)} is finite. Over the
+    #     truncated model, "finite" reads as "small and not growing with be" - we assert
+    #     the difference set is a proper subset of be, which is the identity-level
+    #     content. Its UNBOUNDEDNESS is asymptotic and deliberately not asserted.
+    tested_coh = 0
+    for be in range(3, N // 2):
+        for ga in range(be + 1, min(be + 10, N)):
+            d = sum(1 for xi in range(be) if rho1(C, xi, be) != rho1(C, xi, ga))
+            tested_coh += 1
+            if d >= be and be > 4:
+                fails.append(("rho1-coherence", be, ga, d))
+
     # --- Lemma Z2 (notes section 59), uniform discrepancy: for al < be < be',
     #     (B_al & B_be) sym (B_al & B_be') is contained in B_be sym (B_be' & be) -
     #     ONE finite set serving every level al at once. Identity-level, so the
@@ -211,17 +224,17 @@ def run(seed, verbose=False):
                 tested_M += 1
                 if (rho3(C, xi, be) == 1) != (rho3(C, xi, al) == 1 and rho1(C, xi, al) >= W):
                     fails.append(("M3", al, be, xi))
-    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2
+    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2, tested_coh
 
 if __name__ == "__main__":
-    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = 0
+    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = tot_coh = 0
     allfails = []
     for seed in range(12):
-        f, a1, a2, a3, a4, a5, a6 = run(seed)
-        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6
+        f, a1, a2, a3, a4, a5, a6, a7 = run(seed)
+        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6; tot_coh += a7
         allfails += [(seed,) + tuple(x) for x in f[:4]]
     print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}"
-          f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2}")
+          f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2} | coh: {tot_coh}")
     if allfails:
         print(f"FAILURES ({len(allfails)}):")
         for x in allfails[:12]: print("  ", x)

@@ -1032,6 +1032,30 @@ landed.
   inverted three times, so no numeric evidence is offered. After §60, every quantifier
   step in the chain is written out.
 
+- **Set-theory research line, notes §62 — CORRECTION to §61 (eighteenth flip).** (Q-col)
+  is settled, against the route. **Lemma W3a [ZFC]**: for every `β₀` there are a finite
+  `D` and a `G` with `Col(α,G(α))` uncountable for every `α ∈ β₀\D` — with **no rank, no
+  (C2), no `S`**. `ρ₁` is coherent, so `D_β := {α<β₀ : ρ₁(α,β) ≠ ρ₁(α,β₁)}` is finite, and
+  a pigeonhole over the countably many finite subsets of the countable `β₀` freezes the
+  whole row on an uncountable set. So **Theorem W2's conclusion is a ZFC triviality**: the
+  implication is true and the contrapositive can never fire.
+
+  **Salvaged, and stronger than W1: Lemma W3 (double freezing).** Pigeonholing the *pair*
+  `(B_β ∩ β₀, D_β)` — countable × countable — gives an uncountable `T∗` on which the trace
+  `B_β ∩ β₀` **and** the bar `ρ₁(·,β)↾β₀` are both constant. **Corollary W4**: inside such
+  a family (C2) reads as one inequality between two `β`-independent functions and is
+  satisfiable outright, so **no frozen family obstructs**. The residual therefore lives in
+  the interaction *between* families — a countable amount of exceptional data per level,
+  and the first form of the wall that does not mention the rank at all.
+
+  **Method note, a second distinct failure mode.** §60's error was an unwritten quantifier;
+  §61's chain was valid and the error was one level up — a consequent treated as a
+  refutation target without first asking whether it was a theorem. The guard is different
+  and equally cheap: *before relying on a contrapositive, try to prove the consequent.*
+
+  `ρ₁` coherence added to `tools/walk-check.py` (13284 pairs; identity-level content only,
+  its unboundedness deliberately not asserted).
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value
