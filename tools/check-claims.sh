@@ -488,6 +488,14 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 1y: attacking the labelled heap.
+for thm in "theorem secret_write_is_not_vacuous" "theorem secret_cells_can_never_be_freed" \
+           "theorem memory_safety_would_allow_it" "theorem both_rules_are_load_bearing"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeapAttack.lean 2>/dev/null; then
+    echo "DRIFT: the heap attack is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # stage 1x: the invariant spent, and the heap becoming two-level.
 for thm in "theorem secret_through_a_secret_pointer" "theorem the_heap_is_two_level" \
            "theorem public_pointer_still_cannot_carry_a_secret" \
@@ -748,7 +756,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

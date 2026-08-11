@@ -1514,7 +1514,15 @@ now a *boundary* rather than a ban — a public pointer points at a public cell 
 cannot carry a secret (`public_pointer_still_cannot_carry_a_secret`), and a secret cell
 cannot be read into a public variable. `the_heap_is_two_level` states all four. Labels
 are fixed at allocation and there is no relabelling operation, so declassification
-remains a policy decision rather than a missing rule. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+remains a policy decision rather than a missing rule.
+
+Stage 1y attacked the result. The heap guarantee is **not** vacuous —
+`secret_write_is_not_vacuous` shows two runs from `initU` landing with different values
+in a secret cell while staying Low-equal, unlike the string case stage 1t caught. But it
+found a gap made by two correct rules: `free` needs a Low pointer (1u, the free list is
+observed) and a secret cell is reached through a High pointer (1w, the label matches the
+level), so **a secret cell can never be freed** and secret memory leaks by construction.
+`memory_safety_would_allow_it` places the gap on the information-flow side, not row 6. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

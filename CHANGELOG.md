@@ -790,6 +790,35 @@ landed.
   The invariant `LabInv` and its preservation moved from `HeapLabel` into `HeapJoint`,
   since they now have to precede `jsecTy_sound`; the guard was repointed accordingly.
 
+- **Stage 1y — attacking the labelled heap** (`ConfTyping/HeapAttack.lean`). Stage 1t's
+  discipline applied to 1v–1x: is the new guarantee vacuous, and is anything reasonable
+  refused for a bad reason?
+
+  **Not vacuous.** Stage 1t found noninterference exported from `initU` said nothing
+  about strings, because `initU` makes both runs identical in that dimension. The heap
+  could have gone the same way and does not: `secret_write_is_not_vacuous` runs a
+  certified program from two `initU` states differing only in a High variable and lands
+  with **different values in the secret cell** — 3 against 0 — while the runs stay
+  Low-equal. The per-address observation is doing work.
+
+  **A real gap, made by two correct rules.** Stage 1u: `free` needs a **Low** pointer,
+  because the free list decides the next address and is observed. Stage 1w: a secret
+  cell is reached through a **High** pointer, because the label must match the pointer's
+  level. Each is right; jointly they are unsatisfiable, so **a secret cell can never be
+  freed** and secret memory leaks by construction
+  (`secret_cells_can_never_be_freed`). `memory_safety_would_allow_it` places the gap
+  precisely — `slcheck` frees the secret pointer happily, so the refusal is entirely on
+  the information-flow side — and `public_cells_can_be_freed` shows the restriction is
+  specific. `both_rules_are_load_bearing` keeps the witnesses that neither rule can just
+  be dropped.
+
+  The fix is named rather than attempted: a separate, **unobserved** counter and free
+  list for secret allocation over a disjoint address range, so that freeing a secret
+  pointer perturbs only unobserved state — which is exactly what stage 1u's argument
+  needs. Not a patch: `SepInv`'s freshness conjunct becomes two conjuncts over two
+  ranges and range disjointness joins the separation argument, so on the evidence of 1w
+  and 1x it is an invariant stage followed by a short rule stage.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

@@ -385,7 +385,12 @@ still public; that is the next stage, and splitting it this way audits the invar
 before anything depends on it. Stage 1x then spent it: the observation became **per
 address**, `storeH` lets a secret live in the heap when it is reached through a secret
 pointer, and the heap is now **two-level** rather than public. The stage is short
-because 1w did the work — which is what the split was for.
+because 1w did the work — which is what the split was for. Stage 1y then attacked the
+result: the new guarantee is **not** vacuous (unlike the string one stage 1t caught),
+but two correct rules compose into one that is too strong — since `free` needs a Low
+pointer (1u) and a secret cell is reached through a High one (1w), **a secret cell can
+never be freed**. The fix is named: a separate, unobserved counter and free list for
+secret allocation over a disjoint address range.
 
 ## Scope — what is *not* claimed
 

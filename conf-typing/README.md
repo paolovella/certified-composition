@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapAttack.lean` | stage 1y | attacking the labelled heap: the new guarantee is **not** vacuous, and two correct rules compose into one that is too strong — **a secret cell can never be freed** |
 | `ConfTyping/HeapSecret.lean` | stage 1x | the invariant spent: the observation becomes **per address** and `storeH` lets a secret live in the heap — the heap is now two-level rather than public |
 | `ConfTyping/HeapLabel.lean` | stage 1w | **per-address heap labels, the invariant half**: cells labelled at allocation, allocation zeroes, and `LabInv` — every tracked pointer points at a cell of its own level — proved inductive |
 | `ConfTyping/HeapValue.lean` | stage 1v | the heap gets real `load`/`store`: memory safety extended for free, noninterference did not — the heap enters the observation and becomes a **public resource** |
@@ -1906,6 +1907,34 @@ The remaining restriction is a design point, not a gap: labels are fixed at allo
 and there is no relabelling operation (`no_relabelling_operation_exists`), so a cell
 cannot change level and a secret cannot be released. Declassification is a policy
 decision of the kind stage 1e's ledger exists to record, not another typing rule.
+
+## Attacking the labelled heap (`HeapAttack.lean`) — stage 1y
+
+Stage 1t's discipline applied to 1v–1x. Two questions: is the new guarantee vacuous the
+way the string one was, and does anything reasonable get refused for a bad reason?
+
+**Not vacuous.** Stage 1t found noninterference exported from `initU` said nothing about
+strings, because `initU` makes both runs identical in that dimension. The heap could
+have gone the same way. It does not: `secret_write_is_not_vacuous` runs a certified
+program from two `initU` states differing only in a High variable and lands with
+**different values in the secret cell** — 3 against 0 — while the runs stay Low-equal.
+
+**But a real gap: a secret cell can never be freed.** Neither rule is wrong; two correct
+rules compose into something too strong. Stage 1u: `free` needs a **Low** pointer,
+because the free list decides the next address and is observed. Stage 1w: a secret cell
+is reached through a **High** pointer, because the label must match the pointer's level.
+The two are each right and jointly unsatisfiable, so secret memory leaks by
+construction. `memory_safety_would_allow_it` locates the gap precisely — `slcheck` frees
+the secret pointer happily, and the refusal is entirely from the information-flow side —
+and `public_cells_can_be_freed` shows the restriction is specific.
+`both_rules_are_load_bearing` keeps the witnesses that neither rule can just be dropped.
+
+The fix is identifiable and named rather than attempted: give secret allocation its own
+counter and free list, neither observed, over a disjoint address range. Freeing a secret
+pointer then perturbs only unobserved state, which is what stage 1u's argument needs.
+It is not a patch — `SepInv`'s freshness conjunct becomes two conjuncts over two ranges,
+and range disjointness joins the separation argument — so on the evidence of 1w and 1x
+it is an invariant stage followed by a short rule stage.
 
 ## §11 pre-mechanization checklist (framework doc)
 
