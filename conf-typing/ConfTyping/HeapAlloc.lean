@@ -95,7 +95,7 @@ def secretZero : UState :=
 
 theorem secret_states_lowEqA :
     uLowEqA Psec secretOne secretZero := by
-  refine ⟨?_, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl⟩
+  refine ⟨?_, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩
   intro y hy
   show (if y == "secret" then (1 : Int) else 0) = 0
   have : ¬ (y == "secret") = true := by simpa [Psec] using hy

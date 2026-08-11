@@ -78,7 +78,7 @@ def ptrSeven : UState :=
     freed := [], sstore := fun _ => [], sink := [] }
 
 theorem ptr_states_lowEqA : uLowEqA Psec ptrFive ptrSeven := by
-  refine ⟨?_, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl⟩
+  refine ⟨?_, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩
   intro y hy
   show (if y == "secret" then (5 : Int) else 0) = (if y == "secret" then (7 : Int) else 0)
   have : ¬ (y == "secret") = true := by simpa [Psec] using hy

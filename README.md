@@ -370,6 +370,14 @@ allocators diverge, so a later public allocation publishes a secret address
 (`freeing_a_secret_pointer_leaks`). `free` therefore gained a typing restriction it had
 never needed — the model had been too kind to require it.
 
+Stage 1v then removed stage 1t's second finding: the heap gets real `load` and `store`,
+so memory safety is about stored values and not only about liveness. The two properties
+reacted differently to the same change — memory safety extended for free, because the
+separation invariant never mentioned heap contents, while noninterference needed the
+heap in the observation and three new rules. The consequence is that **the heap is a
+public resource**: a secret value cannot be stored at any address, and lifting that
+needs per-address labels rather than another rule.
+
 ## Scope — what is *not* claimed
 
 - The transport interface is **not** asserted to be the "correct general

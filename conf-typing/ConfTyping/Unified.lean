@@ -113,6 +113,13 @@ def sexprLow (P : Partition) : SExpr → Bool
   | .cat a b => sexprLow P a && sexprLow P b
   | .san a   => sexprLow P a
 
+/-- Heap **value** operations (stage 1v). `load d p` is `d := *p`; `store p v` is
+    `*p := v`. Both fault if the pointer is not live, so they are the first commands
+    that can fault for a reason other than a bare dereference. -/
+inductive HOp where
+  | load | store
+  deriving Repr, DecidableEq
+
 /-- `WCmd` plus authorization plus a heap. Everything the earlier While bricks can say
     is still sayable, and three dimensions are added. -/
 inductive UCmd where
@@ -125,6 +132,7 @@ inductive UCmd where
   | access : String → UCmd        -- the protected read
   | memop  : MemOp → String → UCmd -- allocate into / dereference / free the pointer in a variable
   | sop    : SOp → String → SExpr → UCmd -- set a string variable, or emit to a named sink
+  | hop    : HOp → String → String → UCmd -- `load d p` is `d := *p`; `store p v` is `*p := v`
 
 /-- The unified state: the store the While bricks use, plus what the mediation brick
     needs. `dead` records a refused check. -/
@@ -156,6 +164,9 @@ def pickAddr : List Int → Int → Int
 def bumpFresh : List Int → Int → Int
   | [],     f => f + 1
   | _ :: _, f => f
+
+/-- Update in the heap. -/
+def updHU (h : Int → Int) (a v : Int) : Int → Int := fun b => if b = a then v else h b
 
 /-- Update in the string store. -/
 def updSU (τ : String → UStr) (x : String) (v : UStr) : String → UStr :=
@@ -220,6 +231,15 @@ def uexec : Nat → UCmd → MedPolicy → UState → Option (UState × Nat × L
               match op with
               | .set  => { s with sstore := updSU s.sstore x (evalS s.sstore e) }
               | .emit => { s with sink := (x, evalS s.sstore e) :: s.sink }, 1, [])
+  | _ + 1, .hop op x y,  _, s =>
+      some (if s.dead then s else
+              match op with
+              | .load  => if memInt (s.store y) s.live
+                          then { s with store := upd s.store x (s.heap (s.store y)) }
+                          else { s with dead := true, err := true }
+              | .store => if memInt (s.store x) s.live
+                          then { s with heap := updHU s.heap (s.store x) (s.store y) }
+                          else { s with dead := true, err := true }, 1, [])
   | n + 1, .seq c₁ c₂,   π, s =>
       (uexec n c₁ π s).bind fun r₁ =>
         (uexec n c₂ π r₁.1).map fun r₂ =>

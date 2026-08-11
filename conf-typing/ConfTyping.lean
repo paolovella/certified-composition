@@ -64,3 +64,4 @@ import ConfTyping.StringLoop
 import ConfTyping.Deploy
 import ConfTyping.Attack
 import ConfTyping.Reuse
+import ConfTyping.HeapValue

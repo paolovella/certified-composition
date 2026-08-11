@@ -261,6 +261,7 @@ def ucheck : List String → UCmd → Option (List String × Nat)
   | _, .loop _ _    => none
   | _, .memop _ _   => none   -- stage 1h placeholder; the real rule is `UCert.memop`
   | _, .sop _ _ _   => none   -- stage 1o: strings get their own certificate; see TaintCert
+  | _, .hop _ _ _   => none   -- stage 1v placeholder; the real rule is `UCert.hop`
 
 /-- **One soundness theorem for the bundle.** A passing check yields both
     certificates at once. -/
@@ -309,6 +310,7 @@ theorem ucheck_sound : ∀ (c : UCmd) (A A' : List String) (k : Nat),
   | .loop _ _, _, _, _, h => by simp [ucheck] at h
   | .memop _ _, _, _, _, h => by simp [ucheck] at h
   | .sop _ _ _, _, _, _, h => by simp [ucheck] at h
+  | .hop _ _ _, _, _, _, h => by simp [ucheck] at h
 
 /-! ## The artifact: one program, both guarantees -/
 

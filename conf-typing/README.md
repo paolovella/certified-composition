@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/HeapValue.lean` | stage 1v | the heap gets real `load`/`store`: memory safety extended for free, noninterference did not — the heap enters the observation and becomes a **public resource** |
 | `ConfTyping/Reuse.lean` | stage 1u | the allocator now **reuses** freed addresses: the separation argument survived with two new invariant conjuncts, but reuse turned the free list into a **channel**, so `free` needs a Low pointer |
 | `ConfTyping/Attack.lean` | **attacking the core**, stage 1t | twelve adversarial programs, all refused — and three defects found by looking on purpose, all of them a guarantee narrower than its name |
 | `ConfTyping/Deploy.lean` | composable core, stage 1s | the ledger, threaded: what must be true of the **world** — and the answer is a trusted base **three lines long**, with two of the six certificates needing nothing at all |
@@ -1809,6 +1810,35 @@ unsafe rather than merely unmodelled.
 
 The exchange rate is worth stating: removing a *limitation* cost one new typing
 restriction and two invariant conjuncts. Nothing that had been proved became false.
+
+## The heap holds values (`HeapValue.lean`) — stage 1v
+
+Stage 1t found the `heap` field was never read or written, so memory safety meant the
+liveness of addresses and nothing about stored values. This gives the heap real
+operations: `load d p` is `d := *p`, `store p v` is `*p := v`, both faulting if the
+pointer is not live. `the_heap_is_live` closes the finding — allocate, write 42, read it
+back, and 42 comes back.
+
+**The two properties reacted very differently to the same change**, which is the point
+of the stage. Memory safety extended *for free*: the separation invariant never
+mentioned heap contents, so `SepCert.load` and `SepCert.store` need the pointer tracked
+and nothing else (`memory_safety_extended_for_free`). Noninterference did not: once a
+value can travel from the heap into the store, the heap is part of what an adversary
+sees. `uLowEqA` gained `s.heap = s'.heap`, and three rules appeared where there had been
+none — `loadL` (through a Low pointer the value is Low), `loadH` (through a High pointer
+the address is unpredictable, so the destination must be High), and `storeL` (both
+operands Low).
+
+**The absence of a `storeH` rule is the finding.** Making the whole heap Low-observable
+is the simplest sound choice, and its consequence is that the heap is a **public
+resource**: `storing_a_secret_is_refused` shows a secret value cannot be written to it
+at any address. That is more restrictive than a real system needs. Lifting it requires
+a *label per address* — a heap of labelled cells, with the label read at the `load` and
+checked at the `store` — which changes the state and the observation rather than adding
+a rule, so it is named here rather than attempted.
+
+`wild_store_faults` and `wild_store_rejected` confirm the new operations really can go
+wrong and that the analysis stops them, the same pairing stages 1h and 1i used.
 
 ## §11 pre-mechanization checklist (framework doc)
 

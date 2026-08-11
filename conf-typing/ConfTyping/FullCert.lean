@@ -103,6 +103,35 @@ theorem UCert.sop {A : List String} (op : SOp) (x : String) (e : SExpr) :
           | set  => exact ⟨ha, hrd, fun _ => hd hd0⟩
           | emit => exact ⟨ha, hrd, fun _ => hd hd0⟩
 
+/-- Heap value operations cost one step and leave mediation alone. -/
+theorem UCert.hop {A : List String} (op : HOp) (x y : String) :
+    UCert A (.hop op x y) A 1 := by
+  constructor
+  · intro n π s r hr
+    cases n with
+    | zero => simp [uexec] at hr
+    | succ n => simp only [uexec, Option.some.injEq] at hr; subst hr; simp
+  · intro n π s r hinv hr
+    cases n with
+    | zero => simp [uexec] at hr
+    | succ n =>
+        simp only [uexec, Option.some.injEq] at hr
+        subst hr
+        obtain ⟨ha, hrd, hd⟩ := hinv
+        by_cases hdead : s.dead = true
+        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
+        · have hd0 : s.dead = false := by simpa using hdead
+          simp only [if_neg hdead]
+          cases op with
+          | load =>
+              by_cases hl : memInt (s.store y) s.live = true
+              · simp only [if_pos hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
+              · simp only [if_neg hl]; exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
+          | store =>
+              by_cases hl : memInt (s.store x) s.live = true
+              · simp only [if_pos hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
+              · simp only [if_neg hl]; exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
+
 /-! ## The full certificate -/
 
 /-- Everything the composable core knows about a command, in one place: a cost bound, a
@@ -125,6 +154,9 @@ def allcheck (P : Partition) :
   | A, V, .memop .free x  => if memStr x V && !P x then some (A, dropStr x V, 1) else none
   | A, V, .sop .set x e   => if P x || sexprLow P e then some (A, V, 1) else none
   | A, V, .sop .emit _ e  => if sexprLow P e then some (A, V, 1) else none
+  | A, V, .hop .load d p  => if memStr p V && (!P p || P d)
+                             then some (A, dropStr d V, 1) else none
+  | A, V, .hop .store p v => if memStr p V && !P p && !P v then some (A, V, 1) else none
   | A, V, .seq c₁ c₂      => (allcheck P A V c₁).bind fun p₁ =>
                                (allcheck P p₁.1 p₁.2.1 c₂).map fun p₂ =>
                                  (p₂.1, p₂.2.1, p₁.2.2 + p₂.2.2)
@@ -234,6 +266,28 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
             have f₂ := allcheck_sound c₂ A V p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂])
             exact ⟨UCert.ite f₁.bundle f₂.bundle, .iteL e hg f₁.joint f₂.joint⟩
       · rw [if_neg hg] at h; simp at h
+  | .hop .load d p, A, V, A', V', k, h => by
+      simp only [allcheck] at h
+      by_cases hx : (memStr p V && (!P p || P d)) = true
+      · rw [if_pos hx] at h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl, rfl⟩ := h
+        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
+        refine ⟨UCert.hop .load d p, ?_⟩
+        rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
+        · exact .loadL V d p h1 (by simpa using h')
+        · exact .loadH V d p h1 h'
+      · rw [if_neg hx] at h; simp at h
+  | .hop .store p v, A, V, A', V', k, h => by
+      simp only [allcheck] at h
+      by_cases hx : (memStr p V && !P p && !P v) = true
+      · rw [if_pos hx] at h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl, rfl⟩ := h
+        obtain ⟨h12, h3⟩ := Bool.and_eq_true _ _ |>.mp hx
+        obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp h12
+        exact ⟨UCert.hop .store p v, .storeL V p v h1 (by simpa using h2) (by simpa using h3)⟩
+      · rw [if_neg hx] at h; simp at h
   | .loop _ _, _, _, _, _, _, h => by simp [allcheck] at h
 
 /-! ## Four certificates from one run of one checker -/
@@ -261,7 +315,7 @@ theorem allcheck_gives_four {P : Partition} {c : UCmd} {A' V' : List String} {k 
     have hinv : UMedInv π [] (initU σ) := ⟨by simp [initU], by simp [initU], by simp⟩
     exact (hf.bundle.auth n π (initU σ) r hinv hr).2.1 q hq
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hf.joint π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl⟩)
+      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩)
   · exact (hf.joint.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## The artifact -/

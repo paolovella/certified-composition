@@ -1496,7 +1496,15 @@ address has been handed out again. The cost lands on row 1: with reuse the free 
 decides the next address, so `freeing_a_secret_pointer_leaks` exhibits two Low-equal
 runs whose public variable ends up holding a secret address, and `free` now requires a
 Low pointer in all three checkers. A more realistic memory model produced a *new*
-information-flow rule, not a weaker guarantee. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+information-flow rule, not a weaker guarantee.
+
+Stage 1v repeated the exercise for heap *values*: `load` and `store` make the heap real,
+so row 6 covers what a pointer points at and not only whether it is live
+(`the_heap_is_live`, `wild_store_faults`). Memory safety extended for free — the
+separation invariant never mentioned heap contents — while row 1 again paid: the heap
+entered the observation and three flow rules appeared, with the absence of a `storeH`
+rule meaning **the heap is public** (`storing_a_secret_is_refused`). Per-address labels
+would lift that; they are a different design and are not claimed. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

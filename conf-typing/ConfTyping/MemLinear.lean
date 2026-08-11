@@ -390,6 +390,54 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
           · subst ha; exact hfr _ hxl
           · exact hfb a ha
 
+/-- **Loading through a live pointer is safe**, and the destination leaves the tracked
+    set: what came out of the heap is a value, not a pointer we have any claim about. -/
+theorem SepCert.load {V : List String} (d p : String) (hp : memStr p V = true) :
+    SepCert V (.hop .load d p) (dropStr d V) := by
+  constructor
+  intro n π s r hinv hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr
+      subst hr
+      obtain ⟨he, hv⟩ := hinv
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · have hd0 : s.dead = false := by simpa using hd
+        obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
+        have hl : memInt (s.store p) s.live = true := hlive p (memStr_mem hp)
+        simp only [if_neg hd, if_pos hl]
+        refine ⟨he, fun _ => ⟨?_, ?_, hfr, hdisj, hfb⟩⟩
+        · intro q hq
+          show memInt (upd s.store d (s.heap (s.store p)) q) s.live = true
+          simp only [upd, if_neg (dropStr_ne hq)]
+          exact hlive q (dropStr_mem hq)
+        · intro q hq y hy hne
+          show ¬ (upd s.store d (s.heap (s.store p)) q
+                = upd s.store d (s.heap (s.store p)) y)
+          simp only [upd, if_neg (dropStr_ne hq), if_neg (dropStr_ne hy)]
+          exact hinj q (dropStr_mem hq) y (dropStr_mem hy) hne
+
+/-- **Storing through a live pointer is safe**, and changes nothing the separation
+    invariant tracks — the heap's *contents* are not part of it. -/
+theorem SepCert.store {V : List String} (p v : String) (hp : memStr p V = true) :
+    SepCert V (.hop .store p v) V := by
+  constructor
+  intro n π s r hinv hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr
+      subst hr
+      obtain ⟨he, hv⟩ := hinv
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · have hd0 : s.dead = false := by simpa using hd
+        have hl : memInt (s.store p) s.live = true := (hv hd0).1 p (memStr_mem hp)
+        simp only [if_neg hd, if_pos hl]
+        exact ⟨he, fun _ => hv hd0⟩
+
 /-- String operations do not touch the heap, so the separation invariant rides
     through untouched. -/
 theorem SepCert.sop {V : List String} (op : SOp) (x : String) (e : SExpr) :
@@ -421,6 +469,8 @@ def slcheck : List String → UCmd → Option (List String)
   | V, .memop .deref x    => if memStr x V then some V else none
   | V, .memop .free x     => if memStr x V then some (dropStr x V) else none
   | _, .sop _ _ _         => none
+  | V, .hop .load d p     => if memStr p V then some (dropStr d V) else none
+  | V, .hop .store p _    => if memStr p V then some V else none
   | V, .seq c₁ c₂         => (slcheck V c₁).bind fun V₁ => slcheck V₁ c₂
   | V, .ite _ c₁ c₂       => match slcheck V c₁, slcheck V c₂ with
                              | some V₁, some V₂ => some (interStr V₁ V₂)
@@ -468,6 +518,20 @@ theorem slcheck_sound : ∀ (c : UCmd) (V V' : List String),
         · rw [e₁, e₂] at h
           simp only [Option.some.injEq] at h; subst h
           exact SepCert.ite (slcheck_sound c₁ V V₁ e₁) (slcheck_sound c₂ V V₂ e₂)
+  | .hop .load d p, V, V', h => by
+      simp only [slcheck] at h
+      by_cases hp : memStr p V = true
+      · rw [if_pos hp] at h
+        simp only [Option.some.injEq] at h; subst h
+        exact SepCert.load d p hp
+      · rw [if_neg hp] at h; simp at h
+  | .hop .store p v, V, V', h => by
+      simp only [slcheck] at h
+      by_cases hp : memStr p V = true
+      · rw [if_pos hp] at h
+        simp only [Option.some.injEq] at h; subst h
+        exact SepCert.store p v hp
+      · rw [if_neg hp] at h; simp at h
   | .loop _ _, _, _, h => by simp [slcheck] at h
 
 /-- **Memory safety, with deallocation.** A checked program never faults — no wild

@@ -703,6 +703,34 @@ landed.
   restriction and two invariant conjuncts, and nothing that had been proved became
   false.
 
+- **Stage 1v — the heap gets real `load` and `store`, and becomes public**
+  (`ConfTyping/HeapValue.lean`, plus `HOp`/`hop`/`updHU` in `Unified.lean`, two
+  `SepCert` rules, three `JSecTy` rules and a heap conjunct in `uLowEqA`). Stage 1t
+  found the `heap` field was never read or written, so memory safety meant the liveness
+  of addresses and nothing about stored values. Now `load d p` is `d := *p` and
+  `store p v` is `*p := v`, both faulting on a dead pointer. `the_heap_is_live` closes
+  the finding: allocate, write 42, read it back, 42 comes back.
+
+  **The two properties reacted very differently to the same change.** Memory safety
+  extended *for free* — the separation invariant never mentioned heap contents, so
+  `SepCert.load`/`SepCert.store` need the pointer tracked and nothing else
+  (`memory_safety_extended_for_free`). Noninterference did not: once a value travels
+  from the heap into the store, the heap is part of what an adversary sees. `uLowEqA`
+  gained `s.heap = s'.heap` and three rules appeared — `loadL` (Low pointer ⇒ Low
+  value), `loadH` (High pointer ⇒ the destination must be High, so secret pointers stay
+  usable without leaking), `storeL` (both operands Low).
+
+  **The absence of a `storeH` rule is the finding.** Making the whole heap
+  Low-observable is the simplest sound choice, and it makes the heap a **public
+  resource**: `storing_a_secret_is_refused` shows a secret value cannot be written at
+  any address. Lifting that needs a *label per address* — a heap of labelled cells, the
+  label read at the `load` and checked at the `store` — which changes the state and the
+  observation rather than adding a rule, so it is named and not attempted.
+  `wild_store_faults` with `wild_store_rejected` keeps the guarantee non-vacuous.
+
+  `heap_is_never_touched` is gone, being false now; `uexec_heap_fresh` is split into
+  `uexec_fresh_mono`, which is the half that survives.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**

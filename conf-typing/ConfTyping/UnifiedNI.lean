@@ -121,6 +121,7 @@ theorem usecTy_sound {P : Partition} :
     obtain ⟨hst, hrd, hdd⟩ := hle
     cases c with
     | sop _ _ _ => cases hc   -- `USecTy` has no rule for strings; see TaintCert
+    | hop _ _ _ => cases hc   -- nor for heap values; see HeapValue
     | memop op x =>
         cases hc with
         | allocH _ hy =>
@@ -242,6 +243,7 @@ def ucheckNI (P : Partition) : UCmd → Bool
   | .memop .alloc x => P x       -- stage 1j: High allocation is invisible
   | .memop _ _   => false        -- deref/free can fault: see `memops_not_yet_NI_typed`
   | .sop _ _ _   => false        -- stage 1o: the sink is not in the observation yet
+  | .hop _ _ _   => false        -- stage 1v: heap values; see HeapValue
 
 theorem ucheckNI_sound {P : Partition} :
     ∀ {c : UCmd}, ucheckNI P c = true → USecTy P c
@@ -266,6 +268,7 @@ theorem ucheckNI_sound {P : Partition} :
   | .memop .deref _, h => by simp [ucheckNI] at h
   | .memop .free _, h => by simp [ucheckNI] at h
   | .sop _ _ _, h => by simp [ucheckNI] at h
+  | .hop _ _ _, h => by simp [ucheckNI] at h
 
 /-- Noninterference from a Boolean. -/
 theorem uNI_of_check {P : Partition} {c : UCmd} (h : ucheckNI P c = true) :

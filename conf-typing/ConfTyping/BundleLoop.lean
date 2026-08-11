@@ -51,6 +51,8 @@ theorem uexec_dead_unchanged : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : US
           simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
       | sop op x e =>
           simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+      | hop op x y =>
+          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
       | skip => simp only [uexec, Option.some.injEq] at h; subst h; rfl
       | assign x e =>
           simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
@@ -129,6 +131,7 @@ def deadCost : UCmd → Nat
   | .loop _ _    => 1
   | .memop _ _   => 1
   | .sop _ _ _   => 1
+  | .hop _ _ _   => 1
 
 theorem uexec_dead_cost : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
     (r : UState × Nat × List Bool), s.dead = true → uexec n c π s = some r →
@@ -139,6 +142,8 @@ theorem uexec_dead_cost : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
       | memop op x =>
           simp only [uexec, Option.some.injEq] at h; subst h; simp [deadCost]
       | sop op x e =>
+          simp only [uexec, Option.some.injEq] at h; subst h; simp [deadCost]
+      | hop op x y =>
           simp only [uexec, Option.some.injEq] at h; subst h; simp [deadCost]
       | skip => simp only [uexec, Option.some.injEq] at h; subst h; simp [deadCost]
       | assign x e =>

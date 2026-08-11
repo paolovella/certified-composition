@@ -88,6 +88,9 @@ def jcheckW (P : Partition) : Nat → List String → UCmd → Option (List Stri
   | _ + 1, V, .memop .free x   => if memStr x V && !P x then some (dropStr x V) else none
   | _ + 1, V, .sop .set x e    => if P x || sexprLow P e then some V else none
   | _ + 1, V, .sop .emit _ e   => if sexprLow P e then some V else none
+  | _ + 1, V, .hop .load d p   => if memStr p V && (!P p || P d) then some (dropStr d V)
+                                  else none
+  | _ + 1, V, .hop .store p v  => if memStr p V && !P p && !P v then some V else none
   | k + 1, V, .seq c₁ c₂       => (jcheckW P k V c₁).bind fun V₁ => jcheckW P k V₁ c₂
   | k + 1, V, .ite e c₁ c₂     => if exprLow P e then
                                     match jcheckW P k V c₁, jcheckW P k V c₂ with
@@ -111,6 +114,27 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
   | succ k ih =>
     intro c V V' h
     cases c with
+    | hop op x y =>
+        cases op with
+        | load =>
+            simp only [jcheckW] at h
+            by_cases hx : (memStr y V && (!P y || P x)) = true
+            · rw [if_pos hx] at h
+              simp only [Option.some.injEq] at h; subst h
+              obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
+              rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
+              · exact .loadL V x y h1 (by simpa using h')
+              · exact .loadH V x y h1 h'
+            · rw [if_neg hx] at h; simp at h
+        | store =>
+            simp only [jcheckW] at h
+            by_cases hx : (memStr x V && !P x && !P y) = true
+            · rw [if_pos hx] at h
+              simp only [Option.some.injEq] at h; subst h
+              obtain ⟨h12, h3⟩ := Bool.and_eq_true _ _ |>.mp hx
+              obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp h12
+              exact .storeL V x y h1 (by simpa using h2) (by simpa using h3)
+            · rw [if_neg hx] at h; simp at h
     | sop op x e =>
         cases op with
         | set =>
@@ -196,7 +220,7 @@ theorem jcheckW_gives_both {P : Partition} {k : Nat} {c : UCmd} {V' : List Strin
   have hty := jcheckW_sound k c [] V' h
   refine ⟨fun n π σ σ' hσ => ?_, fun n π σ r hr => ?_⟩
   · exact uOptLowEqA.toLowEq (jsecTy_sound n c [] V' hty π (initU σ) (initU σ')
-      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl⟩)
+      SepInv.initU SepInv.initU ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl⟩)
   · exact (hty.toSepCert.safe n π (initU σ) r SepInv.initU hr).1
 
 /-! ## What widening buys -/

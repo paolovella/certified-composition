@@ -170,6 +170,10 @@ theorem PathCert.memop {fs : String} {C : TaintEnv} (op : MemOp) (x : String) :
     PathCert fs C (.memop op x) C :=
   PathCert.inert (StringInert.memop op x)
 
+theorem PathCert.hop {fs : String} {C : TaintEnv} (op : HOp) (x y : String) :
+    PathCert fs C (.hop op x y) C :=
+  PathCert.inert (StringInert.hop op x y)
+
 /-- Assignment only moves the environment; the sink is untouched. -/
 theorem PathCert.set {fs : String} {C : TaintEnv} (x : String) (e : SExpr) (k : Nat)
     (hk : scount C e = some k) :
@@ -332,6 +336,7 @@ def pcheck (fs : String) (C : TaintEnv) : UCmd → Option TaintEnv
   | .check _       => some C
   | .access _      => some C
   | .memop _ _     => some C
+  | .hop _ _ _     => some C
   | .sop .set x e  => match scount C e with
                       | some k => some ((x, k) :: dropPair x C)
                       | none   => some (dropPair x C)
@@ -358,6 +363,8 @@ theorem pcheck_sound (fs : String) : ∀ (c : UCmd) (C C' : TaintEnv),
       simp only [pcheck, Option.some.injEq] at h; subst h; exact PathCert.access q
   | .memop op x, C, C', h => by
       simp only [pcheck, Option.some.injEq] at h; subst h; exact PathCert.memop op x
+  | .hop op x y, C, C', h => by
+      simp only [pcheck, Option.some.injEq] at h; subst h; exact PathCert.hop op x y
   | .sop .set x e, C, C', h => by
       simp only [pcheck] at h
       rcases hk : scount C e with _ | k

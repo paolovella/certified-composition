@@ -270,6 +270,29 @@ theorem TaintCert.memop {C : TaintEnv} (op : MemOp) (x : String) :
     TaintCert C (.memop op x) C [] :=
   TaintCert.inert (StringInert.memop op x)
 
+theorem StringInert.hop (op : HOp) (x y : String) : StringInert (.hop op x y) := by
+  intro n π s r hr
+  cases n with
+  | zero => simp [uexec] at hr
+  | succ n =>
+      simp only [uexec, Option.some.injEq] at hr; subst hr
+      by_cases hd : s.dead = true
+      · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
+      · simp only [if_neg hd]
+        cases op with
+        | load =>
+            by_cases hl : memInt (s.store y) s.live = true
+            · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+            · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+        | store =>
+            by_cases hl : memInt (s.store x) s.live = true
+            · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+            · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+
+theorem TaintCert.hop {C : TaintEnv} (op : HOp) (x y : String) :
+    TaintCert C (.hop op x y) C [] :=
+  TaintCert.inert (StringInert.hop op x y)
+
 /-! ### The two string rules -/
 
 /-- Assigning to a string variable records its new count — or forgets the variable if
@@ -461,6 +484,7 @@ def tcheck (C : TaintEnv) : UCmd → Option (TaintEnv × List Nat)
   | .check _       => some (C, [])
   | .access _      => some (C, [])
   | .memop _ _     => some (C, [])
+  | .hop _ _ _     => some (C, [])
   | .sop .set x e  => match scount C e with
                       | some k => some ((x, k) :: dropPair x C, [])
                       | none   => some (dropPair x C, [])
@@ -491,6 +515,9 @@ theorem tcheck_sound : ∀ (c : UCmd) (C C' : TaintEnv) (Ks : List Nat),
   | .memop op x, C, C', Ks, h => by
       simp only [tcheck, Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h; exact TaintCert.memop op x
+  | .hop op x y, C, C', Ks, h => by
+      simp only [tcheck, Option.some.injEq, Prod.mk.injEq] at h
+      obtain ⟨rfl, rfl⟩ := h; exact TaintCert.hop op x y
   | .sop .set x e, C, C', Ks, h => by
       simp only [tcheck] at h
       rcases hk : scount C e with _ | k

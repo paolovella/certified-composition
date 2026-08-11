@@ -192,6 +192,7 @@ def tcheckW : Nat → TaintEnv → UCmd → Option (TaintEnv × List Nat)
   | _ + 1, C, .check _         => some (C, [])
   | _ + 1, C, .access _        => some (C, [])
   | _ + 1, C, .memop _ _       => some (C, [])
+  | _ + 1, C, .hop _ _ _       => some (C, [])
   | _ + 1, C, .sop .set x e    => match scount C e with
                                   | some k => some ((x, k) :: dropPair x C, [])
                                   | none   => some (dropPair x C, [])
@@ -237,6 +238,9 @@ theorem tcheckW_sound : ∀ (k : Nat) (c : UCmd) (C C' : TaintEnv) (Ks : List Na
     | memop op x =>
         simp only [tcheckW, Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl⟩ := h; exact TaintCert.memop op x
+    | hop op x y =>
+        simp only [tcheckW, Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl⟩ := h; exact TaintCert.hop op x y
     | sop op x e =>
         cases op with
         | set =>
@@ -303,6 +307,7 @@ def pcheckW (fs : String) : Nat → TaintEnv → UCmd → Option TaintEnv
   | _ + 1, C, .check _         => some C
   | _ + 1, C, .access _        => some C
   | _ + 1, C, .memop _ _       => some C
+  | _ + 1, C, .hop _ _ _       => some C
   | _ + 1, C, .sop .set x e    => match scount C e with
                                   | some k => some ((x, k) :: dropPair x C)
                                   | none   => some (dropPair x C)
@@ -334,6 +339,8 @@ theorem pcheckW_sound (fs : String) : ∀ (k : Nat) (c : UCmd) (C C' : TaintEnv)
         simp only [pcheckW, Option.some.injEq] at h; subst h; exact PathCert.access q
     | memop op x =>
         simp only [pcheckW, Option.some.injEq] at h; subst h; exact PathCert.memop op x
+    | hop op x y =>
+        simp only [pcheckW, Option.some.injEq] at h; subst h; exact PathCert.hop op x y
     | sop op x e =>
         cases op with
         | set =>

@@ -144,7 +144,7 @@ def secretStr' : UState :=
     live := [], fresh := 0, err := false, freed := [], sstore := fun _ => [], sink := [] }
 
 theorem secretStr_lowEqA : uLowEqA Psec secretStr secretStr' := by
-  refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl, rfl⟩
+  refine ⟨fun _ _ => rfl, rfl, rfl, rfl, ?_, rfl, rfl, rfl⟩
   intro y hy
   show (if y == "secret" then [UCh.quote] else []) = []
   have : ¬ (y == "secret") = true := by simpa [Psec] using hy
@@ -189,60 +189,70 @@ theorem secretTouching_NI_is_real :
 
 /-- **The heap is never touched, and the allocator never reuses.** One induction, two
     scope facts. -/
-theorem uexec_heap_fresh : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
-    (r : UState × Nat × List Bool), uexec n c π s = some r →
-    r.1.heap = s.heap ∧ s.fresh ≤ r.1.fresh
+theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
+    (r : UState × Nat × List Bool), uexec n c π s = some r → s.fresh ≤ r.1.fresh
   | 0,     _, _, _, _, h => by simp [uexec] at h
   | n + 1, c, π, s, r, h => by
       cases c with
-      | skip =>
-          simp only [uexec, Option.some.injEq] at h; subst h; exact ⟨by simp, by simp⟩
+      | skip => simp only [uexec, Option.some.injEq] at h; subst h; simp
       | assign x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact ⟨by simp, by simp⟩
-          · simp only [if_neg hd]; exact ⟨by simp, by simp⟩
+          · simp only [if_pos hd]; simp
+          · simp only [if_neg hd]; simp
       | check q =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact ⟨by simp, by simp⟩
+          · simp only [if_pos hd]; simp
           · simp only [if_neg hd]
             by_cases hp : π q = true
-            · simp only [if_pos hp]; exact ⟨by simp, by simp⟩
-            · simp only [if_neg hp]; exact ⟨by simp, by simp⟩
+            · simp only [if_pos hp]; simp
+            · simp only [if_neg hp]; simp
       | access q =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact ⟨by simp, by simp⟩
-          · simp only [if_neg hd]; exact ⟨by simp, by simp⟩
+          · simp only [if_pos hd]; simp
+          · simp only [if_neg hd]; simp
       | sop op x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact ⟨by simp, by simp⟩
+          · simp only [if_pos hd]; simp
+          · simp only [if_neg hd]; cases op with
+            | set  => simp
+            | emit => simp
+      | hop op x y =>
+          simp only [uexec, Option.some.injEq] at h; subst h
+          by_cases hd : s.dead = true
+          · simp only [if_pos hd]; simp
           · simp only [if_neg hd]
             cases op with
-            | set  => exact ⟨by simp, by simp⟩
-            | emit => exact ⟨by simp, by simp⟩
+            | load =>
+                by_cases hl : memInt (s.store y) s.live = true
+                · simp only [if_pos hl]; simp
+                · simp only [if_neg hl]; simp
+            | store =>
+                by_cases hl : memInt (s.store x) s.live = true
+                · simp only [if_pos hl]; simp
+                · simp only [if_neg hl]; simp
       | memop op x =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact ⟨by simp, by simp⟩
+          · simp only [if_pos hd]; simp
           · simp only [if_neg hd]
             cases op with
             | alloc =>
-                refine ⟨by simp, ?_⟩
                 show s.fresh ≤ bumpFresh s.freed s.fresh
                 cases s.freed with
                 | nil => show s.fresh ≤ s.fresh + 1; omega
                 | cons _ _ => exact Int.le_refl _
             | deref =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; exact ⟨by simp, by simp⟩
-                · simp only [if_neg hl]; exact ⟨by simp, by simp⟩
+                · simp only [if_pos hl]; simp
+                · simp only [if_neg hl]; simp
             | free =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; exact ⟨by simp, by simp⟩
-                · simp only [if_neg hl]; exact ⟨by simp, by simp⟩
+                · simp only [if_pos hl]; simp
+                · simp only [if_neg hl]; simp
       | seq c₁ c₂ =>
           rw [uexec_seq_eq] at h
           rcases e₁ : uexec n c₁ π s with _ | r₁
@@ -253,9 +263,8 @@ theorem uexec_heap_fresh : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
             · rw [e₂] at h
               simp only [Option.map_some, Option.some.injEq] at h
               subst h
-              obtain ⟨h₁, f₁⟩ := uexec_heap_fresh n c₁ π s r₁ e₁
-              obtain ⟨h₂, f₂⟩ := uexec_heap_fresh n c₂ π r₁.1 r₂ e₂
-              exact ⟨by rw [h₂, h₁], Int.le_trans f₁ f₂⟩
+              exact Int.le_trans (uexec_fresh_mono n c₁ π s r₁ e₁)
+                (uexec_fresh_mono n c₂ π r₁.1 r₂ e₂)
       | ite e c₁ c₂ =>
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
@@ -263,12 +272,12 @@ theorem uexec_heap_fresh : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
-              subst h; exact uexec_heap_fresh n c₁ π s r₁ e₁
+              subst h; exact uexec_fresh_mono n c₁ π s r₁ e₁
           · rw [if_neg hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             · rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
-              subst h; exact uexec_heap_fresh n c₂ π s r₂ e₂
+              subst h; exact uexec_fresh_mono n c₂ π s r₂ e₂
       | loop e c₀ =>
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
@@ -281,20 +290,17 @@ theorem uexec_heap_fresh : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
               · rw [e₂] at h
                 simp only [Option.map_some, Option.some.injEq] at h
                 subst h
-                obtain ⟨h₁, f₁⟩ := uexec_heap_fresh n c₀ π s r₁ e₁
-                obtain ⟨h₂, f₂⟩ := uexec_heap_fresh n (.loop e c₀) π r₁.1 r₂ e₂
-                exact ⟨by rw [h₂, h₁], Int.le_trans f₁ f₂⟩
+                exact Int.le_trans (uexec_fresh_mono n c₀ π s r₁ e₁)
+                  (uexec_fresh_mono n (.loop e c₀) π r₁.1 r₂ e₂)
           · rw [if_neg hg] at h
-            simp only [Option.some.injEq] at h; subst h
-            exact ⟨by simp, by simp⟩
+            simp only [Option.some.injEq] at h; subst h; simp
 
-/-- **Defect 2, as a theorem.** No command reads or writes the heap, so "memory safety"
-    on this machine means the *liveness of addresses* and says nothing about stored
-    values. That is exactly what `umcheck_no_fault` and `slcheck_no_fault` claim — but a
-    `heap` field in `UState` implies more, and the implication was never checked. -/
-theorem heap_is_never_touched (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
-    (r : UState × Nat × List Bool) (h : uexec n c π s = some r) : r.1.heap = s.heap :=
-  (uexec_heap_fresh n c π s r h).1
+/-! **Defect 2, and what became of it.** When this was written, `uexec` never read or
+    wrote the `heap` field, so "memory safety" meant the liveness of addresses and
+    nothing about stored values — a guarantee narrower than the field implied. Stage 1v
+    gave the heap real `load` and `store` operations, so the statement that used to sit
+    here ("the heap is never touched") is now **false**, and `HeapValue.the_heap_is_live`
+    is the witness. What the fix cost is recorded there. -/
 
 /-- **Defect 3, and what became of it.** When this was written the allocator only
     advanced a counter, so a freed address was never handed out again — a limitation
@@ -307,7 +313,7 @@ theorem heap_is_never_touched (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
     list becomes a channel. -/
 theorem fresh_counter_is_monotone (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
     (r : UState × Nat × List Bool) (h : uexec n c π s = some r) : s.fresh ≤ r.1.fresh :=
-  (uexec_heap_fresh n c π s r h).2
+  uexec_fresh_mono n c π s r h
 
 /-! ## The verdict
 
