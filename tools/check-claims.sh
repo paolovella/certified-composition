@@ -488,6 +488,15 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# stage 2a: two threads, and the obstruction.
+for thm in "theorem interleaving_breaks_memory_safety" "theorem both_threads_are_certified" \
+           "theorem budget_composes_across_threads" "theorem disjoint_threads_are_safe" \
+           "theorem addresses_depend_on_the_schedule"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Interleave.lean 2>/dev/null; then
+    echo "DRIFT: the interleaving stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+
 # stage 1z: retiring secret addresses.
 for thm in "theorem secretLifecycle_checks" "theorem free_has_no_level_condition" \
            "theorem public_is_recycled_secret_is_retired" \
@@ -765,7 +774,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

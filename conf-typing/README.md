@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Interleave.lean` | stage 2a | two threads on the unified machine: **memory safety does not compose** (two certified threads, one faulting interleaving) while the budget does |
 | `ConfTyping/HeapRetire.lean` | stage 1z | 1y's gap closed by **retiring** secret addresses instead of recycling them — one branch in the evaluator, one dropped hypothesis, no new invariant |
 | `ConfTyping/HeapAttack.lean` | stage 1y | attacking the labelled heap: the new guarantee is **not** vacuous, and two correct rules compose into one that is too strong — **a secret cell can never be freed** |
 | `ConfTyping/HeapSecret.lean` | stage 1x | the invariant spent: the observation becomes **per address** and `storeH` lets a secret live in the heap — the heap is now two-level rather than public |
@@ -1971,6 +1972,47 @@ The estimate is worth recording: three memory-model predictions in a row have be
 wrong — 1u cheaper, 1w dearer, 1z much cheaper. The pattern in the misses is usable
 though: the expensive changes touched the **observation** or an **invariant**; the cheap
 ones touched only the semantics.
+
+## Two threads (`Interleave.lean`) — stage 2a
+
+Brick 32 proved race freedom on its own small language and has never been brought onto
+`UCmd`; that is the largest remaining distance between sixteen bricks and one core.
+Following stage 1z's rule of thumb — changes touching the observation or an invariant
+are the expensive ones — the first step here is to find the obstruction, not to build
+the proof.
+
+`uexecPar` interleaves two threads at **command** granularity: a schedule picks a
+thread, and that thread's next command runs atomically. That is the granularity at
+which a check and its use can be torn apart, which is what makes it worth modelling.
+
+**Memory safety does not compose.** `interleaving_breaks_memory_safety` gives two
+threads *each individually certified* — one allocates and dereferences, certified from
+the empty tracked set; the other frees, certified given the pointer tracked — whose
+sequential run is clean and whose interleaving faults. Neither certificate is wrong: the
+tracked set is thread-local, and nothing makes one thread's set an obligation on the
+other. And by stage 1j's dependency the failure propagates — noninterference for `deref`
+*needs* the memory invariant, so the two properties cannot be rescued separately here.
+That is 1j doing work at a distance.
+
+**The budget composes.** `budget_composes_across_threads`: the interleaved and
+sequential runs cost the same. The one law that refused to compose over *loops*
+(stage 1n) composes over *threads* without a murmur, because cost is a property of the
+trace and cares about neither state nor order.
+
+**And the fix has a shape.** `disjoint_threads_are_safe` — two threads sharing no
+variable are fine at either schedule. That is ownership in the separation-logic sense:
+disjoint tracked sets, with freeing the owner's prerogative. On the evidence of 1j → 1k
+that means a new indexed judgment rather than a side condition, and on the evidence of
+1w → 1x an invariant stage before a rule stage.
+
+One scoping note kept as a theorem: `addresses_depend_on_the_schedule`. The allocator
+hands out different addresses under different schedules. The schedule is a *public*
+input here, demonic as in brick 32, so this is not a leak — but it would become one the
+moment a schedule could depend on a secret, which is an assumption a scheduler model
+would have to state.
+
+This stage claims a machine, one obstruction and one positive. It does **not** claim a
+race-freedom certificate on `UCmd`; brick 32's results stay where they are.
 
 ## §11 pre-mechanization checklist (framework doc)
 

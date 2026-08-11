@@ -393,7 +393,11 @@ never be freed**. Stage 1z then closed it far more cheaply than 1y predicted: a 
 **retired** rather than recycled, so freeing through a secret pointer perturbs only
 unobserved state and `free` needs no level condition. One branch in the evaluator, one
 dropped hypothesis, no new invariant. The price is that secret addresses are never
-reused — address-space consumption, not safety.
+reused — address-space consumption, not safety. Stage 2a then took the first step on
+concurrency: `uexecPar` interleaves two threads at command granularity, and
+**memory safety does not compose** — two individually certified threads have a faulting
+interleaving, because the tracked set is thread-local with no ownership discipline. The
+budget does compose. The fix has a shape (disjoint ownership) and is not attempted.
 
 ## Scope — what is *not* claimed
 

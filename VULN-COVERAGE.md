@@ -1526,7 +1526,14 @@ level), so **a secret cell can never be freed** and secret memory leaks by const
 row 6 — which is why stage 1z could close it by changing the *allocator* rather than
 either typing rule: a secret address is retired instead of recycled, so `free` needs no
 level condition and a secret cell now has a full lifecycle
-(`secretLifecycle_checks`). The price is that secret addresses are never reused. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
+(`secretLifecycle_checks`). The price is that secret addresses are never reused.
+
+Stage 2a brought **two threads** onto the unified machine (`uexecPar`, command-grained
+interleaving) and found the obstruction that row 8 will have to clear: memory safety is
+**thread-local** and does not compose. Two individually certified threads —
+`slcheck [] (alloc p; deref p)` and `slcheck ["p"] (free p)` — have a faulting
+interleaving. Row 1 inherits the failure through stage 1j's dependency. The budget
+composes across threads. Row 8 remains covered only by brick 32, on its own language. Stage 1p removed two of stage 1o's three limits. The sink is now **in** the
 noninterference observation — it is an output channel, and leaving it out had made every
 string operation trivially noninterferent (`emit_of_secret_rejected` is the leak now
 caught) — and every checker accepts string operations, so `fiveProg` carries all five

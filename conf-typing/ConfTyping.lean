@@ -69,3 +69,4 @@ import ConfTyping.HeapLabel
 import ConfTyping.HeapSecret
 import ConfTyping.HeapAttack
 import ConfTyping.HeapRetire
+import ConfTyping.Interleave

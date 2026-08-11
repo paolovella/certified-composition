@@ -851,6 +851,44 @@ landed.
   touched the **observation** or an **invariant**; the cheap ones touched only the
   semantics.
 
+- **Stage 2a — two threads on the unified machine** (`ConfTyping/Interleave.lean`).
+  Brick 32 proved race freedom on its own language and has never been brought onto
+  `UCmd`; that is the largest remaining distance between sixteen bricks and one core.
+  Following 1z's rule of thumb, the first step is to find the obstruction rather than
+  build the proof.
+
+  `uexecPar` interleaves two threads at **command** granularity — a schedule picks a
+  thread and its next command runs atomically, which is the granularity at which a check
+  and its use can be torn apart.
+
+  **Memory safety does not compose.** `interleaving_breaks_memory_safety`: two threads
+  *each individually certified* — one allocates and dereferences (certified from the
+  empty tracked set), one frees (certified given the pointer tracked) — with a clean
+  sequential run and a **faulting** interleaving. Neither certificate is wrong; the
+  tracked set is thread-local and nothing makes one thread's set an obligation on the
+  other. By stage 1j's dependency the failure propagates: noninterference for `deref`
+  needs that invariant, so the two properties cannot be rescued separately. 1j doing
+  work at a distance.
+
+  **The budget composes.** `budget_composes_across_threads` — interleaved and sequential
+  runs cost the same. The one law that refused to compose over *loops* (1n) composes
+  over *threads* without a murmur, because cost is a property of the trace and cares
+  about neither state nor order.
+
+  **The fix has a shape**: `disjoint_threads_are_safe` shows two threads sharing no
+  variable are fine at either schedule — ownership in the separation-logic sense, with
+  freeing the owner's prerogative. On the evidence of 1j → 1k that is a new indexed
+  judgment rather than a side condition; on the evidence of 1w → 1x, an invariant stage
+  before a rule stage. Not attempted here.
+
+  Scoping note kept as a theorem: `addresses_depend_on_the_schedule`. The allocator
+  hands out different addresses under different schedules. The schedule is a *public*
+  input, demonic as in brick 32, so this is not a leak — it becomes one the moment a
+  schedule can depend on a secret, which any scheduler model must state.
+
+  This stage claims a machine, one obstruction and one positive. It does **not** claim a
+  race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
+
 ## transport-calculus — the certified-morphism interface (mathlib-free)
 
 - **Set-theory research line, the independence program (notes §40–§52).**
