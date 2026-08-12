@@ -504,6 +504,22 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2c: the trusted base, computed from the program.
+for thm in "theorem no_access_no_reads" "theorem unwritten_sink_untouched" \
+           "theorem pureProg_needs_nothing" "theorem fiveProg_needs" \
+           "theorem fiveProg_owes_the_filesystem_nothing" "theorem needs_is_syntactic" \
+           "theorem an_fs_writer_is_charged" "theorem access_really_reads" \
+           "theorem discharged_covers_needs" "theorem fiveProg_ledger" \
+           "theorem pureProg_deployed_with_nothing" "theorem fiveProg_deployed_with_two"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Assumptions.lean 2>/dev/null; then
+    echo "DRIFT: the computed-trusted-base stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# and the reduction it advertises: fiveProg pays two entries, not three.
+if ! grep -q 'needsLedger D \[2\] "fs" fiveProg' conf-typing/ConfTyping/Assumptions.lean 2>/dev/null; then
+  echo "DRIFT: the two-entry ledger for fiveProg is cited but not stated"; fail=1
+fi
+
 # stage 2b: the ownership invariant.
 for thm in "theorem separation_is_not_conjunctive" "theorem union_gives_both" \
            "theorem alloc_frames_over_a_disjoint_set" "theorem free_is_the_obstruction" \
@@ -799,7 +815,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

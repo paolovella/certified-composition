@@ -71,3 +71,4 @@ import ConfTyping.HeapAttack
 import ConfTyping.HeapRetire
 import ConfTyping.Interleave
 import ConfTyping.Ownership
+import ConfTyping.Assumptions

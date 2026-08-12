@@ -915,6 +915,37 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2c — the trusted base, computed from the program**
+  (`ConfTyping/Assumptions.lean`). Stage 1s said the trusted base of a fully-certified
+  program is three lines: the policy author, the query parser, the filesystem. That was a
+  statement about the *language*, stated as a fixed `Discharged` record demanding all
+  three of every program. Three stages flagged the missing link to stage 1e's ledger
+  without making it.
+
+  The gap was not plumbing, it was **overcharging**. A program that never calls `access`
+  reads nothing, so "the deployed policy is the intended one" is not an assumption it
+  needs — it is a statement about nothing.
+
+  So the ledger is computed. `needs c` collects from the syntax exactly the obligations
+  the program can incur; `needsLedger` turns them into a stage-1e `Ledger` that composes
+  like any other. Two lemmas, both by fuel induction over every command, prove the
+  omitted entries are omitted for cause: `no_access_no_reads` (no `access`, no reads) and
+  `unwritten_sink_untouched` (a sink never written stays as it was).
+
+  What it buys: `pureProg_deployed_with_nothing` gives all three deployment-level
+  guarantees for a pure computation with the ledger **empty** — no policy author, no
+  parser, no filesystem trusted. Stage 1s could not state that, because
+  `deployment_reading` demanded a `Discharged` record and that is three assumptions
+  whether or not the program uses them. And `fiveProg_deployed_with_two` proves the
+  identical three conclusions from **two** entries instead of three, the filesystem
+  conclusion holding vacuously. `discharged_covers_needs` confirms the old hypothesis
+  always implies the new one, so nothing that held before stops holding.
+
+  The limit is a theorem, not a footnote: `needs` is syntactic, and `needs_is_syntactic`
+  shows an `access` in dead code is still charged. No reachability analysis is attempted
+  — over-charging the trusted base is the safe direction. `an_fs_writer_is_charged` and
+  `access_really_reads` negative-test the exemptions.
+
 - **Stage 2b — ownership: why thread-local certificates cannot compose**
   (`ConfTyping/Ownership.lean`). Stage 2a's counterexample was about *runs*, which
   leaves open where the reasoning fails. This pins it at the invariant.

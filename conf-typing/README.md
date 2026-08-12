@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Assumptions.lean` | stage 2c | the trusted base **computed from the program**: `needs` collects the entries a program can incur, two vacuity lemmas prove the omitted ones are omitted for cause, and `pureProg` gets all three deployment guarantees on an *empty* ledger |
 | `ConfTyping/Ownership.lean` | stage 2b | the failure pinned at the *invariant*: `SepInv` is **not conjunctive**, so two thread-local certificates say nothing about the pair — plus the frame rule's decomposition |
 | `ConfTyping/Interleave.lean` | stage 2a | two threads on the unified machine: **memory safety does not compose** (two certified threads, one faulting interleaving) while the budget does |
 | `ConfTyping/HeapRetire.lean` | stage 1z | 1y's gap closed by **retiring** secret addresses instead of recycling them — one branch in the evaluator, one dropped hypothesis, no new invariant |
@@ -2014,6 +2015,46 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## The trusted base, computed (`Assumptions.lean`) — stage 2c
+
+Stage 1s said the trusted base of a fully-certified program is three lines: the policy
+author, the query parser, the filesystem. That was a statement about the *language*, and
+it was stated as a fixed `Discharged` record demanding all three of every program. Three
+stages flagged the missing connection to stage 1e's ledger without making it.
+
+The gap was not plumbing. A fixed three-entry record **overcharges**: a program that
+never calls `access` reads nothing, so "the deployed policy is the intended one" is not
+an assumption it needs, it is a statement about nothing.
+
+So the ledger is computed. `needs c` collects, from the syntax, exactly the obligations
+the program can incur, and `needsLedger` turns them into a stage-1e `Ledger` that
+composes like any other. Two lemmas prove the omitted entries are omitted for cause:
+
+- **`no_access_no_reads`** — a program without `access` leaves `reads` untouched, so the
+  mediation guarantee holds with the policy entry absent;
+- **`unwritten_sink_untouched`** — a program that never emits to `q` adds nothing tagged
+  `q`, so that sink's entry is unnecessary too.
+
+Both are proved by fuel induction over every command, `free` and `deref` included, not
+by inspection.
+
+**What it buys.** `pureProg_deployed_with_nothing` gives all three deployment-level
+guarantees for a pure computation with the ledger **empty** — no policy author, no
+parser, no filesystem trusted. Stage 1s could not state that: `deployment_reading`
+demanded a `Discharged` record, and a `Discharged` record is three assumptions whether
+the program uses them or not. And `fiveProg_deployed_with_two` proves the identical
+three conclusions stage 1s's `fiveProg_deployed` proves, from **two** entries instead of
+three — the filesystem conclusion holding vacuously, because `fiveProg` never emits to
+`fs`. `discharged_covers_needs` confirms the old hypothesis always implies the new one,
+so nothing that held before stops holding.
+
+**The limit, as a theorem.** `needs` is syntactic and therefore conservative:
+`needs_is_syntactic` shows an `access` in dead code is still charged. Nothing here
+attempts reachability — over-charging the trusted base is the safe direction, and a
+reachability analysis is a different and worse trade. The negative tests
+`an_fs_writer_is_charged` and `access_really_reads` confirm the exemptions are earned by
+the syntax rather than built into `needs`.
 
 ## Ownership (`Ownership.lean`) — stage 2b
 
