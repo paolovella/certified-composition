@@ -610,6 +610,16 @@ and out of scope. So `ρ₃` is **separated**, and the standing picture is:
   `sup_β rank(α, B_α∩B_β) < ∞` cofinally, a condition on the rank. Salvaged: **Lemma W1**
   — for every `β₀`, some single `X =∗ B_{β₀}` equals `B_β ∩ β₀` for uncountably many `β`,
   with no hypothesis at all.)*
+  *(**A subadditive bar is available, notes §67.** Everything §50–§66 uses about the walk
+  is `ρ₁`'s 1.16(a) and 1.16(b). The same Handbook chapter carries, for `ρ` (2.1), which
+  **dominates** `ρ₁`: **subadditivity** `ρ(α,γ) ≤ max{ρ(α,β),ρ(β,γ)}` and
+  `ρ(α,β) ≤ max{ρ(α,γ),ρ(β,γ)}` (2.2(b),(c)); finer coherence (2.3); row-injectivity of
+  the stretching `ρ̄` (2.5(a)); and eventual monotonicity in the second variable (11.9).
+  Since `ρ ≥ ρ₁`, **(C2) with the `ρ`-bar implies (C2) with the `ρ₁`-bar**, so a
+  construction may target `ρ` and gain a triangle inequality — which is precisely what
+  propagates a bound between overlapping down-sets, and what §58's simultaneity residual
+  has lacked. One-directional: a negative for `ρ` says nothing about `ρ₁`. Open: is `ρ₁`
+  itself subadditive here?)*
   *(**The per-element constraint and the candidate rank, notes §63.** With
   `W(A) := {β>α : B_α ∩ B_β = A}` the coherence fibre of `(α,A)`, Lemma Z1 says exactly:
   for every `β ∈ W(A)`, either `α` is one of `β`'s finitely many exceptions or

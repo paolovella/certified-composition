@@ -106,7 +106,11 @@ The same accountancy appears at every level:
   finite-to-one?), ; §66 then **withdraws** §65's third claim — the tool is *not*
   blind to defects, the sample was two successor ordinals — and with it §64's
   reading of its own table, while confirming the review's prediction that
-  realized defects are extremely thin) — and the two-sided independence
+  realized defects are extremely thin; §67 is a source pass finding four
+  properties of `ρ` — **subadditivity** above all — pinned in the Handbook
+  and unused for sixteen sections, and `ρ ≥ ρ₁` makes the `ρ`-bar a
+  legitimate target carrying the triangle inequality the simultaneity
+  residual lacks) — and the two-sided independence
   program whose standing open problem is the canonical walk sequence ρ₃
   under CH), and the standalone problem statement for set theorists,
   [`PROBLEM-dip-schedulability.md`](transport-calculus/PROBLEM-dip-schedulability.md):

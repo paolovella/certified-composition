@@ -4190,3 +4190,64 @@ and every correction so far has come from the same place.
   the restricted candidate too.
 - **Tool**: the header caveat added in §65 is wrong and is replaced by the accurate one —
   defects are visible, they are thin, and sampling must be at **limit** levels.
+
+## 67. Source pass over §58–§66: the Handbook has a *subadditive* bar the program has never used, and ρ ≥ ρ₁ makes it a legitimate target — plus the second instance of a decisive tool sitting pinned and unread
+
+§62 found its instrument (`ρ₁` coherence) pinned in §51 and unused for eleven sections.
+That is a pattern worth testing rather than regretting, so §58–§66 were derived without a
+source pass and this section is the pass. It found something.
+
+**What is in the pinned source and has never been used.** All from Todorcevic, *Coherent
+Sequences*, Handbook ch. 1 (`coherent.pdf`), verified verbatim:
+
+- **2.1** defines `ρ(α,β) = max{|C_β ∩ α|, ρ(α, min(C_β \ α)), ρ(ξ,α) : ξ ∈ C_β ∩ α}` —
+  `ρ₁` (1.15) with an extra max over the *whole* of `C_β ∩ α`, not merely its size.
+  Consequently **`ρ ≥ ρ₁` pointwise** (stated at 11.5).
+- **2.2** For all `α<β<γ`: (a) rows finite, and — the point — **(b) `ρ(α,γ) ≤
+  max{ρ(α,β), ρ(β,γ)}`** and **(c) `ρ(α,β) ≤ max{ρ(α,γ), ρ(β,γ)}`**. `ρ` is
+  **subadditive**.
+- **2.3** "`ρ` has a considerably finer coherence property than `ρ₁`": if `ρ(α,β) >
+  ρ(β,γ)` then `ρ(α,γ) = ρ(α,β)`.
+- **2.5** The stretching `ρ̄` is subadditive *and* **row-injective**: `ρ̄(α,γ) ≠ ρ̄(β,γ)`.
+- **11.9** (at `κ⁺`, so `ω₁` for `κ = ω`): for limit `β` there is `β̄ < β` with
+  `ρ(α,γ) ≥ ρ(α,β)` for all `α ∈ [β̄, β)` — *eventual monotonicity in the second
+  variable*, the coordinate §61 had no handle on at all.
+
+Everything §50–§66 has used about the walk is `ρ₁`'s two properties: 1.16(a) rows
+finite-to-one and 1.16(b) coherence. Four further structural properties were available
+throughout, in the same file, for a function that dominates the one in play.
+
+> **Why subadditivity is the relevant one.** §58 reduced the residual to *simultaneity
+> across overlapping down-sets*, and §59–§66 attacked it with pigeonhole and freezing —
+> tools that fix data on one uncountable set at a time and say nothing about how two such
+> sets relate. Subadditivity is a **triangle inequality on the bars**: it propagates a
+> bound from one down-set to another along the order. That is exactly the missing move,
+> and `ρ₁` is not known to have it.
+
+**And the substitution is legitimate, in one direction.** Since `ρ ≥ ρ₁` pointwise, any
+rank dominating the `ρ`-bar dominates the `ρ₁`-bar, so **(C2) with bar `ρ` implies (C2)
+with bar `ρ₁`**. A construction may therefore target `ρ` and gain the triangle inequality.
+This is a *strengthening* of the target, not a free lunch: it is harder to satisfy, and a
+negative result for the `ρ`-bar says nothing about `ρ₁`. Stated explicitly because the
+direction is easy to get backwards and §59 already got a direction backwards once.
+
+**A question the pass raises but does not settle.** Is `ρ₁` *itself* subadditive for
+`(a),(c),(d),(e)`-conforming sequences? The Handbook proves it for `ρ` and is silent for
+`ρ₁`. A search over 90024 triples in the model finds **no counterexample** — but a search
+can only refute a universal, and §66 established that this model is degenerate in ways
+that are not visible from inside it. So: an open question, with a refutation test now
+standing in `tools/walk-check.py`, and **no** claim that `ρ₁` is subadditive.
+
+**Method note.** Second instance of the same failure: §62's tool was pinned eleven
+sections before it was used; these four were pinned before §50 and are unused sixteen
+sections later. The lesson is not "read more carefully" — the sources *were* read, and
+1.16 was quoted repeatedly from the very page that carries 2.2. It is that a derivation
+run of more than about five sections drifts onto the tools it started with. A source pass
+should be routine at that cadence, not a response to being stuck.
+
+**Status after §67.**
+- **New tools available** (cited, not yet applied): `ρ` subadditivity 2.2(b),(c); finer
+  coherence 2.3; `ρ̄` row-injectivity 2.5(a); second-variable monotonicity 11.9.
+- **Legitimate target**: the `ρ`-bar, sufficient for the `ρ₁`-bar by `ρ ≥ ρ₁`.
+- **New open question**: subadditivity of `ρ₁` under the program's conditions.
+- **(Q-spread): open**, with a propagation tool for the first time.

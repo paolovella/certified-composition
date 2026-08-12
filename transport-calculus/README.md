@@ -770,7 +770,21 @@ reading of its own table**: with one or two classes per level the "widest fibre"
 essentially all of `(α,ω₁)`, so "the fibre barely constrains the cost" says little more
 than "`ρ₁` takes many values". The table stands as data; the interpretation does not, and
 Lemma V1 is a proof and is unaffected. The repaired candidate (a per-level enumeration of
-defect classes) lands back inside Corollary Y2's simultaneity residual. Sixteen labelled verdict flips, plus
+defect classes) lands back inside Corollary Y2's simultaneity residual.
+
+**§67 is a source pass over §58–§66, and it found a tool.** Everything §50–§66 uses about
+the walk is `ρ₁`'s two properties — 1.16(a) rows finite-to-one, 1.16(b) coherence. The
+same Handbook chapter carries four more, for the function `ρ` (2.1) that **dominates**
+`ρ₁`: **subadditivity** (2.2(b),(c)), finer coherence (2.3), row-injectivity of the
+stretching `ρ̄` (2.5(a)), and eventual monotonicity in the *second* variable (11.9) — the
+coordinate §61 had no handle on. Subadditivity is the relevant one: §58's residual is
+simultaneity across overlapping down-sets, pigeonhole and freezing fix one uncountable set
+at a time, and a triangle inequality is what propagates a bound *between* them. Since
+`ρ ≥ ρ₁`, (C2) with the `ρ`-bar **implies** (C2) with the `ρ₁`-bar, so a construction may
+target `ρ` and gain the inequality — a strengthening, not a free lunch, and a negative for
+`ρ` would say nothing about `ρ₁`. Open question raised, not settled: is `ρ₁` subadditive
+under the program's conditions? No counterexample in 90024 triples, which given §66 is
+worth little; a refutation test now stands in the tool. Sixteen labelled verdict flips, plus
 two corrections of record (§55's witness search, §56's sufficiency claim), each forced by a
 proof or a refutation; all sources verified first-hand.
 

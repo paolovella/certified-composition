@@ -191,6 +191,21 @@ def run(seed, verbose=False):
     if tested_fib > 0 and fib_spread == 0:
         fails.append(("fibre-determines-cost", "section 63 claims it does not"))
 
+    # --- section 67: is rho1 subadditive? The Handbook proves it for rho (2.2(b),(c))
+    #     and rho >= rho1, but says nothing about rho1. A search can only REFUTE a
+    #     universal, so this asserts "no counterexample here" and nothing more; the
+    #     absence of one is not evidence of much, given the degeneracies of section 66.
+    tested_sub = 0
+    for al in range(1, N // 4):
+        for be in range(al + 1, min(al + 12, N)):
+            for ga in range(be + 1, min(be + 12, N)):
+                tested_sub += 1
+                ab, bg, ag = rho1(C, al, be), rho1(C, be, ga), rho1(C, al, ga)
+                if ag > max(ab, bg):
+                    fails.append(("rho1-subadd-b", al, be, ga, ab, bg, ag))
+                if ab > max(ag, bg):
+                    fails.append(("rho1-subadd-c", al, be, ga, ag, bg, ab))
+
     # --- rho1 coherence (used since section 51, load-bearing in section 62's Lemma
     #     W3a): for be < ga, {xi < be : rho1(xi,be) != rho1(xi,ga)} is finite. Over the
     #     truncated model, "finite" reads as "small and not growing with be" - we assert
@@ -275,14 +290,14 @@ def run(seed, verbose=False):
                 tested_M += 1
                 if (rho3(C, xi, be) == 1) != (rho3(C, xi, al) == 1 and rho1(C, xi, al) >= W):
                     fails.append(("M3", al, be, xi))
-    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2, tested_coh, tested_fib
+    return fails, tested_tf, tested_V, tested_M, tested_A4, tested_rows, tested_Z2, tested_coh, tested_fib, tested_sub
 
 if __name__ == "__main__":
-    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = tot_coh = tot_fib = 0
+    tot_tf = tot_V = tot_M = tot_A4 = tot_rows = tot_Z2 = tot_coh = tot_fib = tot_sub = 0
     allfails = []
     for seed in range(12):
-        f, a1, a2, a3, a4, a5, a6, a7, a8 = run(seed)
-        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6; tot_coh += a7; tot_fib += a8
+        f, a1, a2, a3, a4, a5, a6, a7, a8, a9 = run(seed)
+        tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6; tot_coh += a7; tot_fib += a8; tot_sub += a9
         allfails += [(seed,) + tuple(x) for x in f[:4]]
     # --- the measurement guard must actually fire (section 66's failure, mechanized).
     #     A census asked for at a successor level has to raise, not quietly return the
@@ -305,7 +320,7 @@ if __name__ == "__main__":
 
     print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}"
           f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2} | coh: {tot_coh}"
-          f" | fibres: {tot_fib}")
+          f" | fibres: {tot_fib} | subadd: {tot_sub}")
     if allfails:
         print(f"FAILURES ({len(allfails)}):")
         for x in allfails[:12]: print("  ", x)

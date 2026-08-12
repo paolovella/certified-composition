@@ -1194,6 +1194,35 @@ landed.
   The false caveat §65 added to the top of `tools/walk-check.py` is replaced by an accurate
   one: defects are visible, they are thin, and sampling must be at limit levels.
 
+- **Set-theory research line, notes §67 — a source pass, and it found a tool.** §62's
+  instrument was pinned eleven sections before it was used, so §58–§66 were derived
+  without consulting sources and this is the pass. Everything §50–§66 uses about the walk
+  is `ρ₁`'s two properties: 1.16(a) rows finite-to-one and 1.16(b) coherence. The same
+  Handbook chapter carries four more, for `ρ` (2.1), which **dominates** `ρ₁`:
+  **subadditivity** (2.2(b),(c)), finer coherence (2.3), row-injectivity of the stretching
+  `ρ̄` (2.5(a)), and eventual monotonicity in the *second* variable (11.9) — the
+  coordinate §61 had no handle on.
+
+  **Subadditivity is the relevant one.** §58's residual is simultaneity across overlapping
+  down-sets; pigeonhole and freezing fix data on one uncountable set at a time and say
+  nothing about how two relate. A triangle inequality on the bars is exactly what
+  propagates a bound between them, and `ρ₁` is not known to have one.
+
+  **The substitution is legitimate in one direction**: `ρ ≥ ρ₁` pointwise, so (C2) with the
+  `ρ`-bar *implies* (C2) with the `ρ₁`-bar. A construction may target `ρ` and gain the
+  inequality. That is a strengthening of the target, not a free lunch, and a negative
+  result for `ρ` would say nothing about `ρ₁` — stated explicitly because §59 already got
+  a direction backwards once.
+
+  **Raised, not settled**: is `ρ₁` itself subadditive under the program's conditions? No
+  counterexample in 90024 triples, which given §66's degeneracies is worth little; a
+  refutation test now stands in `tools/walk-check.py`, asserting only that none was found.
+
+  Method note: the sources *were* read — 1.16 was quoted repeatedly from the page carrying
+  2.2. The failure is that a derivation run longer than about five sections drifts onto
+  the tools it started with. A source pass belongs at that cadence, not at the point of
+  being stuck.
+
 - **Set-theory research line, the independence program (notes §40–§52).**
   The terminus decided (§49, sixteenth flip): tree-transport invariance
   retracted at its exact scope (the game's data — deviation sets, value
