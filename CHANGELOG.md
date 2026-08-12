@@ -915,6 +915,43 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2f — attacking the trace conjecture, and what it cost**
+  (`ConfTyping/SpecTrace.lean`). Stage 2e left exactly one question: is a certified
+  program's speculative trace a function of the Low part of its input? Attacking it did
+  two things, and the first is a correction.
+
+  **The conjecture was false, and speculation had nothing to do with it.** `deadS` — fail
+  a mediation `check`, then allocate a secret pointer and dereference it — passes
+  `xcheck`, all five certificates, and its trace at window **zero** was `[11]` against
+  `[77]` for two low-equivalent stores.
+
+  The defect was in stage 2d's trace, not in any certificate. A failed `check` sets
+  `dead`; `uexec` then makes every subsequent command a no-op, so `allocS` never runs and
+  `secret` keeps its *initial* value; and `touched` recorded an address anyway. A command
+  that does not execute does not issue a memory operation. `touched` is now conditioned on
+  `dead` — the same shape stage 1q needed for `TaintInv`, for the same reason — and
+  `touchedRaw` is kept, guarded, so the retracted definition can still be pointed at
+  instead of quietly disappearing. Everything stages 2d and 2e proved survives the fix
+  unchanged, because none of their witness states is ever halted. That is luck rather than
+  design, which is why the witness is on record.
+
+  **The invariant the repaired conjecture needs.** Every traced address is `s.store x` for
+  a tracked pointer, so what is wanted is `PtrLow V s s'`: every tracked pointer holds the
+  same address in both runs. It is **not** implied by `uLowEqA`, and
+  `ptrLow_is_not_implied_by_uLowEqA` proves it — `allcheck`'s `allocS` rule *requires*
+  `P x = true`, so a secret-*named* variable is a legitimate tracked pointer and
+  low-equivalence says nothing about its contents. The invariant holds anyway, for a
+  different reason: the allocator is driven by `fresh` and `freed`, which `uLowEqA` does
+  synchronise. Exactly the kind of fact that has to be carried rather than derived.
+
+  `ptrLow_step` proves it inductive over every atomic command — both allocators, both
+  faulting paths, the loop-exit case — and `touched_agrees` cashes it: two runs satisfying
+  the invariant touch the same addresses. Those are the two halves of stage 2g's step
+  case. What remains is the whole-program induction and the transient window.
+
+  Ten new drift guards plus two pinning the correction itself, each negative-tested. All
+  theorems audited: standard axioms only, and `ptrLow_initial` is axiom-free.
+
 - **Stage 2e — what speculation costs, and what it cannot touch**
   (`ConfTyping/SpecBudget.lean`). Stage 2d left one genuine unsoundness — the certified
   budget ignores transient work — and one positive so narrow it barely counted. Both are

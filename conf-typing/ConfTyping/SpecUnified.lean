@@ -72,14 +72,29 @@ namespace ConfTyping
 
 /-! ## The trace, and the transient window -/
 
-/-- The heap cells a single command touches. Recorded **regardless of liveness**: a
-    transient access to a dangling address still moves the address through the machine,
-    which is the entire reason a trace is not part of `UState`. -/
-def touched : UCmd → UState → List Int
+/-- The heap cells a single command touches, **ignoring whether the machine is
+    halted**. This was stage 2d's definition of `touched` and it is wrong; the corrected
+    one is below. Kept because stage 2f's `halted_machine_leaks_in_the_raw_model` needs
+    it to state what went wrong, and a retracted definition that no longer exists cannot
+    be pointed at. -/
+def touchedRaw : UCmd → UState → List Int
   | .memop .deref x, s => [s.store x]
   | .hop .load _ y,  s => [s.store y]
   | .hop .store x _, s => [s.store x]
   | _,               _ => []
+
+/-- The heap cells a single command touches.
+
+    Recorded **regardless of liveness**: a transient access to a dangling address still
+    moves that address through the machine, which is the entire reason a trace is not
+    part of `UState`. But **not** when the machine is halted — `uexec` makes every
+    command a no-op once `dead` is set, and a command that does not execute does not
+    issue a memory operation. Stage 2d missed that, and stage 2f found it by trying to
+    prove the trace conjecture; the omission was a real leak on a fully certified
+    program, not a technicality. Conditioning on `dead` is the same shape stage 1q
+    needed for `TaintInv`, for the same reason. -/
+def touched (c : UCmd) (s : UState) : List Int :=
+  if s.dead then [] else touchedRaw c s
 
 /-- Flatten a command into its sequence of steps. `seq` is transparent; everything else,
     including a nested `ite` or `loop`, is one step — nested speculation is out of scope

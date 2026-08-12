@@ -504,6 +504,25 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2f: attacking the trace conjecture.
+for thm in "theorem deadS_is_certified" "theorem halted_machine_leaks_in_the_raw_model" \
+           "theorem the_fix_closes_it" "theorem the_live_run_was_always_fine" \
+           "theorem ptrLow_initial" "theorem ptrLow_is_not_implied_by_uLowEqA" \
+           "theorem allocS_wants_a_secret_name" "theorem touched_agrees" \
+           "theorem uexec_keeps_dead" "theorem ptrLow_step"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/SpecTrace.lean 2>/dev/null; then
+    echo "DRIFT: the trace-conjecture stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the correction is the point of the stage: `touched` must stay conditioned on `dead`,
+# and `touchedRaw` must survive so the retracted definition can still be pointed at.
+if ! grep -q "if s.dead then \[\] else touchedRaw c s" conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+  echo "DRIFT: touched is cited as conditioned on dead but no longer is"; fail=1
+fi
+if ! grep -q "def touchedRaw" conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+  echo "DRIFT: the retracted touchedRaw is cited but has been deleted"; fail=1
+fi
+
 # stage 2e: what speculation costs, and what it cannot touch.
 for thm in "theorem rollback_is_complete" "theorem archcost_window_free" \
            "theorem four_of_five_are_immune" "theorem ni_transfers_to_speculation" \
@@ -858,7 +877,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

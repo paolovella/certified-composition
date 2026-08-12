@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/SpecTrace.lean` | stage 2f | the trace conjecture **was false**, and not because of speculation: a halted machine kept issuing memory operations. `touched` corrected, the defect kept on record, and `PtrLow` — the invariant the repaired conjecture needs — proved inductive |
 | `ConfTyping/SpecBudget.lean` | stage 2e | **rollback is complete** for every program and every window, so four of the five certificates are immune to speculation outright; the fifth — the budget — is bounded at `k * (1 + w)`. Only the trace is left open |
 | `ConfTyping/SpecUnified.lean` | stage 2d | speculation on the unified machine: the plan was a certified program that leaks, and **no such program exists** — `slcheck`'s load rule and the low-guard requirement already exclude both routes. What *is* broken is the budget |
 | `ConfTyping/Assumptions.lean` | stage 2c | the trusted base **computed from the program**: `needs` collects the entries a program can incur, two vacuity lemmas prove the omitted ones are omitted for cause, and `pureProg` gets all three deployment guarantees on an *empty* ledger |
@@ -2017,6 +2018,42 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## Attacking the trace conjecture (`SpecTrace.lean`) — stage 2f
+
+Stage 2e left one question: is a certified program's speculative trace a function of the
+Low part of its input? Attacking it did two things, and the first is a correction.
+
+**The conjecture was false, and speculation had nothing to do with it.** `deadS` — fail a
+mediation `check`, then allocate a secret pointer and dereference it — **passes
+`xcheck`**, all five certificates, and its trace at window **zero** was `[11]` against
+`[77]` for two low-equivalent stores.
+
+The defect was in stage 2d's trace, not in the certificates. A failed `check` sets
+`dead`; `uexec` then makes every command a no-op, so `allocS` never runs and `secret`
+keeps its *initial* value; and `touched` recorded an address anyway. A command that does
+not execute does not issue a memory operation. `touched` is now conditioned on `dead` —
+the same shape stage 1q needed for `TaintInv`, for the same reason — and `touchedRaw` is
+kept so the retracted definition can still be pointed at rather than quietly
+disappearing. `halted_machine_leaks_in_the_raw_model` and `the_fix_closes_it` are the two
+halves on record. Everything 2d and 2e proved survives unchanged, because none of their
+witness states is ever halted; that is luck, which is why the witness is worth keeping.
+
+**The invariant the repaired conjecture needs.** Every traced address is `s.store x` for
+a tracked pointer `x`, so what is needed is `PtrLow V s s'`: every tracked pointer holds
+the same address in both runs.
+
+It is **not** implied by `uLowEqA`, and `ptrLow_is_not_implied_by_uLowEqA` proves it.
+`allcheck`'s `allocS` rule *requires* `P x = true` — a secret-*named* variable is a
+legitimate tracked pointer (`allocS_wants_a_secret_name`) — and low-equivalence says
+nothing about its contents. The invariant holds anyway, for a different reason: the
+allocator is driven by `fresh` and `freed`, which `uLowEqA` does synchronise. That is
+exactly the kind of fact that has to be carried rather than derived.
+
+`ptrLow_step` proves it inductive over every atomic command, including both allocators
+and both faulting paths, and `touched_agrees` cashes it: two runs satisfying the
+invariant touch the same addresses. Those are the two halves of stage 2g's step case;
+what remains is the whole-program induction and the transient window.
 
 ## What speculation costs (`SpecBudget.lean`) — stage 2e
 

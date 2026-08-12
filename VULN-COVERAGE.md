@@ -593,6 +593,18 @@ recorded in the module so it can be attacked. What is left open is the **trace**
 the fifth is bounded, so speculation's whole remaining surface on this core is the
 address channel.
 
+**Stage 2f** attacked that last question and found the conjecture *false* — for a reason
+that had nothing to do with speculation. A program that fails its mediation check is
+halted, and stage 2d's trace kept recording memory operations for a machine that executes
+none, leaking a secret pointer's initial value at window zero on a fully certified
+program. `touched` is now conditioned on `dead` and the defect is kept on record
+(`halted_machine_leaks_in_the_raw_model`). With the trace repaired, the invariant the
+question needs is `PtrLow` — every tracked pointer holds the same address in both runs —
+which is *not* implied by low-equivalence, because `allocS` legitimately creates
+secret-named pointers. `ptrLow_step` proves it inductive per command and `touched_agrees`
+turns it into agreement of the traced addresses; the whole-program induction and the
+transient window are what remain.
+
 ### 3.10 Resource exhaustion — IN-WITH-MODEL (generated) on the bounded fragment; REDUCIBLE in general [proved]
 
 Brick 34 (`CostBound.lean`) proves what brick 1 asserted, and corrects the one part of
