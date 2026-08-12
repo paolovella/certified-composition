@@ -69,6 +69,14 @@ run_case "cited VULN theorem renamed" drift \
   bash -c 'sed -i "s/theorem medCheck_sound/theorem gone_away/" \
              conf-typing/ConfTyping/Mediation.lean'
 
+# stage 2i: the fused invariant is the stage's content - if it stops carrying the
+# memory-safety fields the trace theorem is no longer the one stage 2g asked for
+run_case "fused invariant drops SepInv" drift \
+  bash -c 'sed -i "s/^  sep  : SepInv/  sepx : SepInv/" conf-typing/ConfTyping/SpecFused.lean'
+
+run_case "trace theorem renamed" drift \
+  bash -c 'sed -i "s/theorem jcheck_strace/theorem gone_away/" conf-typing/ConfTyping/SpecFused.lean'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

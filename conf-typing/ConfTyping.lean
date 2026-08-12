@@ -77,3 +77,4 @@ import ConfTyping.SpecBudget
 import ConfTyping.SpecTrace
 import ConfTyping.SpecFactor
 import ConfTyping.BigHandler
+import ConfTyping.SpecFused

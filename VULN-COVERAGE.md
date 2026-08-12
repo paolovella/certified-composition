@@ -1324,6 +1324,26 @@ partitions), not a general-purpose language frontend.
   last OUT-OF-MODEL row enters the model, and the map now has no class whose channel
   is simply absent from every semantics in the repo.**
 
+- **Stage 2i — the row, on the core language** (`SpecFused.lean`). Brick 33 proved this
+  on its own small language, where a `fence` had to be added to get it. `SpecUnified.lean`
+  brought the transient machine onto `UCmd` — the language that carries the five
+  certificates — and could only record *two exclusions and a failure to find*, which is
+  not a theorem. It is a theorem now: **`certified_trace_is_low`**, for every program
+  `xcheck` accepts, at every misprediction window and every fuel, with no fence and no
+  new rule. What excludes the gadget is stage 1i's linearity rule (a loaded value leaves
+  the tracked set, so it can never become an address) and the flow certificate (no branch
+  on a secret), both written for other purposes. The proof is `jcheck_strace` over
+  `jcheck_ptrLow` and `transRun_agrees` — the transient window included, which is the
+  half that needed the work. Standard three axioms, no `sorry`. Non-vacuity is measured:
+  `bigHandler`'s trace is six addresses (stage 2h's twenty-one-operation program is under
+  the theorem), and `brWitness`'s trace grows from `[1]` to `[0, 1]` when the branch
+  mispredicts, so the window being covered is not an empty one.
+  `the_hypothesis_is_load_bearing` keeps the negative on record: `victimU` leaks and
+  `xcheck` refuses it. Scope is stage 2d's throughout — address granularity, one global
+  window, correctly-predicted loop guards, no nested speculation — and the *cost* half of
+  brick 33's row stays open: `transient_work_is_off_the_budget` is untouched, so the trace
+  is secret-independent while the count of transient commands remains off the certificate.
+
 ### Brick 34 ledger (resource exhaustion — the cost bound as a graded certificate)
 
 - `CostBound.lean` — row 10's [classified] reduction, proved, and one clause of it

@@ -504,6 +504,37 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2i: the fused induction, and the trace theorem.
+for thm in "theorem jcheck_ptrLow" "theorem transRun_agrees" "theorem jcheck_strace" \
+           "theorem allcheck_jcheck" "theorem certified_trace_is_low" \
+           "theorem bigHandler_trace_is_low" "theorem brWitness_trace_is_low" \
+           "theorem the_hypothesis_is_load_bearing" "theorem jcheck_flatten" \
+           "theorem uexecS_uexec" "theorem brWitness_window_grows"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/SpecFused.lean 2>/dev/null; then
+    echo "DRIFT: the trace-theorem stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the whole stage turns on the fused invariant carrying BOTH memory-safety fields, which
+# is what stage 2g's traceEq_is_not_inductive says is required. If either is dropped the
+# theorem may still be true, but it is no longer the theorem 2g asked for.
+for fld in "  sep  : SepInv" "  lab  : LabInv" "  low  : uLowEqA" "  ptr  : PtrLow"; do
+  if ! grep -q "$fld" conf-typing/ConfTyping/SpecFused.lean 2>/dev/null; then
+    echo "DRIFT: FusedInv is cited as carrying SepInv/LabInv/uLowEqA/PtrLow but '$fld' is gone"
+    fail=1
+  fi
+done
+# the headline measurements. The trace theorem is only worth stating because these two
+# say the traces it equates are non-empty and window-dependent.
+if ! grep -q 'straceU 60 0 bigHandler (fun _ => true) (initU σlo) = some \[0, 0, 1, 1, 0, 1\]' \
+     conf-typing/ConfTyping/SpecFused.lean 2>/dev/null; then
+  echo "DRIFT: bigHandler's six-address trace is cited but the stated measurement changed"; fail=1
+fi
+if ! grep -q 'straceU 20 1 brWitness (fun _ => true) (initU σlo) = some \[0, 1\]' \
+     conf-typing/ConfTyping/SpecFused.lean 2>/dev/null; then
+  echo "DRIFT: the transient window is cited as lengthening brWitness's trace but the measurement changed"
+  fail=1
+fi
+
 # stage 2h: the worked program at size.
 for thm in "theorem bigHandler_checks" "theorem bigHandler_five" \
            "theorem bigHandler_runs_clean" "theorem bigHandler_releases_everything" \
@@ -915,7 +946,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor BigHandler; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor BigHandler SpecFused; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

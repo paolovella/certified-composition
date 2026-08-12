@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/SpecFused.lean` | stage 2i | **the fused induction, and the trace theorem**: `PtrLow` is inductive over whole certified programs when — and only when — it travels with `SepInv`, `LabInv` and `uLowEqA`, and the speculative trace of a certified program is a function of the Low part of its input at every window. Stage 2d's conjecture, proved, and applied to `bigHandler` |
 | `ConfTyping/BigHandler.lean` | stage 2h | **a program worth the name**: twenty-one operations, all five certificates from one checker, budget 24 and tight. The trusted base is still two entries, the secret address is retired, and 2e's speculation bound does real work (26 real against 24 certified) |
 | `ConfTyping/SpecFactor.lean` | stage 2g | **the trace does not factor either**: the natural relation for stating trace agreement is not inductive, and `LabInv` is the missing hypothesis — so the trace proof must be *fused into* `jsecTy_sound`, not layered on it. Stage 1j's wall from a third direction |
 | `ConfTyping/SpecTrace.lean` | stage 2f | the trace conjecture **was false**, and not because of speculation: a halted machine kept issuing memory operations. `touched` corrected, the defect kept on record, and `PtrLow` — the invariant the repaired conjecture needs — proved inductive |
@@ -2020,6 +2021,71 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## The fused induction, and the trace theorem (`SpecFused.lean`) — stage 2i
+
+Stage 2d ended with a conjecture: *for every program `xcheck` accepts, the speculative
+address trace is a function of the Low part of the initial state, under every window.*
+Stage 2f attacked it, found it **false** in the model as it then stood, and repaired the
+model. Stage 2g showed the obvious way to prove the repaired version cannot work. This
+stage proves it.
+
+**The fused induction.** `jcheck_ptrLow` lifts stage 2f's `PtrLow` from one atomic command
+to whole certified programs — `seq`, `ite` and `loop` — carrying `SepInv`, `LabInv` and
+`uLowEqA` through every case. The hypothesis list *is* the result: stage 2g's
+`traceEq_is_not_inductive` proved a relation omitting the two memory-safety invariants
+breaks at its first step, so nothing lighter than this would do. `FusedInv` bundles the
+six, `FusedInv.step` moves them as one, and the four preservation theorems it composes
+come from four different stages (1i's `toSepCert`, 1w's `toLabInv`, 1x's `jsecTy_sound`,
+and `jcheck_ptrLow` itself).
+
+Worth saying precisely, because stage 2g named a *place*: the fusion is at the level of
+the invariant, not of the proof text. `jcheck_ptrLow` is a second induction over the same
+rules that *calls* `jsecTy_sound` at each step rather than an edit to it — `PtrLow` and
+`touched` are defined six modules downstream of `HeapJoint.lean`, and moving them up the
+import graph to fuse literally would buy nothing. What stage 2g's obstruction forbids is
+proving the conclusion from a *weaker frame*, and this frame is the full one. That
+layering over the invariant bundle works while layering over `TraceEq` does not is itself
+the sharpest statement of where the boundary lies.
+
+**The transient window is where it is earned.** `transRun_agrees` is the case the
+architectural argument does not cover and the one the whole stage is about: a mispredicted
+window is a certified run whose *state* is thrown away and whose trace is not, so
+`touched_agrees` fixes what each command contributes and `FusedInv.step` carries the
+invariant to the next. `jcheckList`/`jcheck_flatten` supply the small missing fact that a
+certified command flattens to a certified list.
+
+**The theorem.** `jcheck_strace`: two runs of a certified program from states satisfying
+the fused invariant produce the same speculative trace, at **every window and every fuel**.
+`allcheck_jcheck` — `allcheck` is `jcheck` rule for rule on the pointer component — turns
+that into `certified_trace_is_low`, stage 2d's conjecture in its own words.
+
+**No new rule was needed.** Brick 33 closed this on its own language with a `fence`. On
+`UCmd` the rules that exclude the gadget are stage 1i's linearity discipline (a loaded
+value leaves the tracked set, so it can never become an address) and the flow certificate
+(no branch on a secret) — both written long before speculation was in view. Stage 2d
+recorded that as "two exclusions and a failure to find, which is not a theorem"; this is
+the theorem. `the_hypothesis_is_load_bearing` keeps the converse on record: `victimU`
+leaks its secret through the trace, and `xcheck` refuses it.
+
+**Applied, not just stated.** `bigHandler_trace_is_low` puts stage 2h's twenty-one
+operation handler under the theorem, and `bigHandler_trace_is_not_empty` shows the trace it
+equates has six addresses in it. Stage 2h could not exhibit a program whose *transient*
+window lengthens the trace — `bigHandler`'s untaken branch happens to touch no memory — so
+`brWitness` supplies one: a certified program tracing `[1]` at window 0 and `[0, 1]` at
+window 1, whose trace agrees between two stores differing in a secret anyway.
+
+Limits, unchanged from stage 2d and restated in the module: addresses only, so no cache
+lines, eviction, timing or contention; one global window; loop guards always predicted
+correctly; nested speculation excluded by `flatten`. `allcheck` has no loop rule, so
+"every program `xcheck` accepts" means every loop-free one — but `jcheck_strace` and
+`jcheck_ptrLow` both handle `loop`, so that restriction belongs to the budget, not to the
+trace. And **the cost stays broken**: `transient_work_is_off_the_budget` is untouched by
+any of this. The trace is now proved secret-independent; the *number* of transient
+commands is still off the certificate.
+
+Standard three axioms, no `sorry`; `allcheck_jcheck`, the two checker runs and the two
+trace measurements use only `propext`.
 
 ## A program worth the name (`BigHandler.lean`) — stage 2h
 
