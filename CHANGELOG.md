@@ -915,6 +915,43 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2g — the trace does not factor either**
+  (`ConfTyping/SpecFactor.lean`). Stage 2f produced the two halves of a step case. The
+  obvious next move is to lift them by induction, layered on the noninterference proof the
+  repo already has. That does not work, and this stage says why as a theorem rather than
+  as a difficulty.
+
+  Write down the relation a trace argument visibly needs — low-equal stores for the branch
+  guards, equal `dead`, equal `fresh`/`freed` for the allocator, agreeing public cells,
+  and `PtrLow` for the addresses — and call it `TraceEq`. It omits `SepInv` and `LabInv`
+  because nothing in the *statement* of trace agreement mentions separation or heap
+  labels. `traceEq_is_not_inductive` shows one certified command breaks it: a `load`
+  through a **Low** pointer, which `jcheck` accepts whenever the source is tracked and
+  `!P p || P d`, so a Low pointer may load into a Low variable — and if the cell it points
+  at is secret the two runs then disagree in a Low variable.
+  `labInv_is_the_missing_hypothesis` names the exclusion, and `publicCell_labInv` confirms
+  the invariant is not vacuous.
+
+  So the trace conclusion belongs **inside** `jsecTy_sound`, which already threads
+  `SepInv`, `LabInv` and `uLowEqA` through every rule, with `PtrLow` as a fifth hypothesis
+  and `touched` agreement as a second conclusion. `traced_step_agrees` assembles 2f's
+  halves into exactly that step case; it is the frame that has to change, not the step.
+
+  This is **stage 1j one level up**. 1j showed noninterference and memory safety do not
+  factor. The entanglement now reaches the trace: the addresses a program touches cannot
+  be shown Low without the heap-label invariant, which is a memory-safety artefact. The
+  core has hit that wall from three directions, which makes it a design fact rather than
+  an observation about three proofs.
+
+  Honest limits kept in the module: `TraceEq` failing does not mean no lighter relation
+  works, only that the obvious one does not and for a structural reason; and the transient
+  window is untouched, since `transRun`'s inheritance from the fused induction is a lemma
+  nobody has written.
+
+  Six new drift guards plus two pinning the negative result — that `TraceEq` still exists
+  and still omits both invariants — each negative-tested, including by *adding* `LabInv`
+  to the structure and confirming the guard fires.
+
 - **Stage 2f — attacking the trace conjecture, and what it cost**
   (`ConfTyping/SpecTrace.lean`). Stage 2e left exactly one question: is a certified
   program's speculative trace a function of the Low part of its input? Attacking it did

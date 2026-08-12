@@ -75,3 +75,4 @@ import ConfTyping.Assumptions
 import ConfTyping.SpecUnified
 import ConfTyping.SpecBudget
 import ConfTyping.SpecTrace
+import ConfTyping.SpecFactor

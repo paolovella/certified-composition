@@ -504,6 +504,23 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2g: the trace does not factor either.
+for thm in "theorem secretCell_traceEq" "theorem the_load_is_certified" \
+           "theorem traceEq_is_not_inductive" "theorem labInv_is_the_missing_hypothesis" \
+           "theorem publicCell_labInv" "theorem traced_step_agrees"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/SpecFactor.lean 2>/dev/null; then
+    echo "DRIFT: the trace-factoring stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the stage turns on TraceEq deliberately OMITTING SepInv and LabInv. If either is ever
+# added to the structure the negative result becomes a statement about something else.
+if grep -qE "^  (labInv|sepInv)" conf-typing/ConfTyping/SpecFactor.lean 2>/dev/null; then
+  echo "DRIFT: TraceEq is cited as omitting SepInv/LabInv but now carries one"; fail=1
+fi
+if ! grep -q "structure TraceEq" conf-typing/ConfTyping/SpecFactor.lean 2>/dev/null; then
+  echo "DRIFT: TraceEq is cited but no longer defined"; fail=1
+fi
+
 # stage 2f: attacking the trace conjecture.
 for thm in "theorem deadS_is_certified" "theorem halted_machine_leaks_in_the_raw_model" \
            "theorem the_fix_closes_it" "theorem the_live_run_was_always_fine" \
@@ -877,7 +894,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

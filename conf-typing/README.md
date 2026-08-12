@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/SpecFactor.lean` | stage 2g | **the trace does not factor either**: the natural relation for stating trace agreement is not inductive, and `LabInv` is the missing hypothesis — so the trace proof must be *fused into* `jsecTy_sound`, not layered on it. Stage 1j's wall from a third direction |
 | `ConfTyping/SpecTrace.lean` | stage 2f | the trace conjecture **was false**, and not because of speculation: a halted machine kept issuing memory operations. `touched` corrected, the defect kept on record, and `PtrLow` — the invariant the repaired conjecture needs — proved inductive |
 | `ConfTyping/SpecBudget.lean` | stage 2e | **rollback is complete** for every program and every window, so four of the five certificates are immune to speculation outright; the fifth — the budget — is bounded at `k * (1 + w)`. Only the trace is left open |
 | `ConfTyping/SpecUnified.lean` | stage 2d | speculation on the unified machine: the plan was a certified program that leaks, and **no such program exists** — `slcheck`'s load rule and the low-guard requirement already exclude both routes. What *is* broken is the budget |
@@ -2018,6 +2019,46 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## The trace does not factor either (`SpecFactor.lean`) — stage 2g
+
+Stage 2f produced the two halves of a step case. The obvious next move is to lift them
+to whole programs by induction, layered on top of the noninterference proof the repo
+already has. **That does not work**, and this stage says why as a theorem rather than as
+a difficulty.
+
+Write down the relation a trace argument visibly needs: low-equal stores (branch guards),
+equal `dead`, equal `fresh` and `freed` (the allocator), agreeing public cells, and
+`PtrLow` (the addresses). Call it `TraceEq`. It omits `SepInv` and `LabInv`, because
+nothing in the *statement* of trace agreement mentions separation or heap labels.
+
+`traceEq_is_not_inductive` shows one certified command breaks it. The witness is a `load`
+through a **Low** pointer: `jcheck` accepts `load d p` when `p` is tracked and
+`!P p || P d`, so a Low pointer may load into a Low variable — and if the *cell* it
+points at is secret, the two runs disagree afterwards in a Low variable.
+`labInv_is_the_missing_hypothesis` names the exclusion: `LabInv P V s` says
+`s.hlab (s.store x) = P x`, so a Low tracked pointer never points at a secret cell, and
+the witness violates exactly that. `publicCell_labInv` confirms the invariant is not
+vacuous.
+
+So the trace conclusion has to be **fused into** `jsecTy_sound` — which already threads
+`SepInv`, `LabInv` and `uLowEqA` through every rule — with `PtrLow` added as a fifth
+hypothesis and `touched` agreement as a second conclusion. That is a statement about
+*where* the next proof goes, worth having before writing four hundred lines in the wrong
+place. `traced_step_agrees` assembles 2f's halves into precisely that step case, already
+proved; it is the frame around it that has to change.
+
+**This is stage 1j one level up.** 1j showed noninterference and memory safety do not
+factor, because the `deref` rule needs the memory invariant. The entanglement now reaches
+the trace: the addresses a program touches cannot be shown Low without the heap-label
+invariant, which is a memory-safety artefact. Three properties, one induction — and the
+core has now hit that wall from three directions, which makes it a design fact rather
+than an observation about three proofs.
+
+Two honest notes kept in the module. `TraceEq` failing does not mean *no* lighter
+relation works, only that the obvious one does not and for a structural reason. And the
+transient window is untouched by any of this — `transRun` will inherit whatever the fused
+induction proves, but that inheritance is a lemma nobody has written.
 
 ## Attacking the trace conjecture (`SpecTrace.lean`) — stage 2f
 
