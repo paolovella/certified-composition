@@ -579,14 +579,19 @@ the joint checker, so which branch mispredicts cannot depend on a secret either
 (`secret_guard_rejected`). Both rules were written for other purposes, stages before
 speculation was in view.
 
+**Stage 2e** then closes the cost half. `rollback_is_complete` — the architectural state
+after speculation is `uexec`'s, for every program and every window — makes four of the
+five certificates immune outright (`four_of_five_are_immune`,
+`ni_transfers_to_speculation`), since each is a predicate on the final `UState`. The
+fifth is bounded: `spec_cost_bound` gives `realCost ≤ archCost * (1 + w)` in any run, so a
+program certified at `k` really executes at most `k * (1 + w)` commands.
+
 That is **not** a closure of row 9 on `UCmd`. Two exclusions and an absence are not a
 theorem: the certificates are statements about `UState`, the trace is not in `UState`,
 and nothing proves a certified program's trace is secret-independent. The conjecture is
-recorded in the module so it can be attacked. What *is* proved on `UCmd`:
-`branch_free_is_inert` (no `ite` ⇒ window-independent, hence every architectural
-guarantee transfers under every misprediction, covering `fiveProg`), and one genuine
-unsoundness — `transient_work_is_off_the_budget`, a certified program whose bound of 2
-ignores a third command that really ran.
+recorded in the module so it can be attacked. What is left open is the **trace**, and only the trace: four certificates are immune and
+the fifth is bounded, so speculation's whole remaining surface on this core is the
+address channel.
 
 ### 3.10 Resource exhaustion — IN-WITH-MODEL (generated) on the bounded fragment; REDUCIBLE in general [proved]
 

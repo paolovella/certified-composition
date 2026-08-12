@@ -73,3 +73,4 @@ import ConfTyping.Interleave
 import ConfTyping.Ownership
 import ConfTyping.Assumptions
 import ConfTyping.SpecUnified
+import ConfTyping.SpecBudget

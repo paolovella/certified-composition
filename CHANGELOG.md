@@ -915,6 +915,47 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2e — what speculation costs, and what it cannot touch**
+  (`ConfTyping/SpecBudget.lean`). Stage 2d left one genuine unsoundness — the certified
+  budget ignores transient work — and one positive so narrow it barely counted. Both are
+  closed here, and the second turns out to have been the wrong statement of a much
+  stronger one.
+
+  **Rollback is complete.** `rollback_is_complete`: for every program and every window,
+  the architectural state after speculation is the state `uexec` reaches. Stage 2d proved
+  this only for branch-free programs, as a by-product of proving something stronger about
+  them. Generalising 2d's faithfulness lemma from `w = 0` to every `w` costs nothing — the
+  transient parts live in the two components that lemma projects away — and makes it a
+  corollary, and universal. Stage 2d's prose has been corrected accordingly in both the
+  module and the README: `spec_is_uexec_extended` now reads "at every window", and a guard
+  pins the general form so it cannot silently narrow again.
+
+  **Four of the five certificates are therefore immune.** `four_of_five_are_immune` and
+  `ni_transfers_to_speculation`: mediation, memory safety, structural integrity and
+  noninterference are predicates on the final `UState`, and a machine reaching the same
+  final state satisfies them identically. No rule changes, no side condition, no fence —
+  they were never at risk, and the reason is one line long.
+
+  That leaves the surface exactly two things wide: the cost and the trace.
+
+  **The cost, bounded.** `spec_cost_bound`: in any run, `realCost ≤ archCost * (1 + w)`.
+  The budget is not lost to speculation, it is scaled, and the multiplier is the
+  misprediction window. Stated within a single run, so it needs no two-run comparison.
+  `certified_cost_under_speculation` composes it with a certificate — a program checked at
+  bound `k` really executes at most `k * (1 + w)` commands, transient work included — and
+  `fiveProg_costs_six_even_speculating` covers the worked program, which being branch-free
+  pays nothing. `the_bound_is_not_vacuous` exhibits a certified program whose real cost
+  genuinely exceeds its certified one.
+
+  `uexecS` now carries both numbers, so stage 2d's finding is sharper than it was: the
+  same run reports architectural cost 2 and real cost 3.
+
+  Looseness stated rather than implied: the bound charges a full window to every *command*
+  rather than every *branch*, so `k * (1 + w)` sits far above the true
+  `k + w * (branches taken)`; tightening it needs a branch count in the judgment. And the
+  **trace** question is untouched — it remains stage 2d's conjecture, and separating the
+  stages is what makes clear which one moved.
+
 - **Stage 2d — speculation on the unified machine: the attack that does not land**
   (`ConfTyping/SpecUnified.lean`). Brick 33 put Spectre in the semantics and closed row
   9, but on its own small language; the five-certificate core lives on `UCmd`. This

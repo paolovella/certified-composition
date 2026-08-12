@@ -52,8 +52,11 @@
   thing.
 
   **The positive.** `branch_free_is_inert`: with no `ite`, `uexecS` is independent of
-  `w`, so every architectural guarantee transfers under *every* misprediction. That
-  covers the worked program — `fiveProg_is_speculatively_inert`.
+  `w` — trace and real cost included — so the machine is literally unchanged by
+  speculation. That covers the worked program (`fiveProg_is_speculatively_inert`). Stage
+  2e supersedes the *architectural* half of this for all programs: rollback is complete,
+  so the state agrees at every window whether or not the program branches. What stays
+  special about branch-free programs is that their trace and real cost agree too.
 
   **Scoping, stated rather than implied.** One global window applies at every branch
   rather than brick 33's per-branch schedule; that is a *stronger* attacker, so it
@@ -96,49 +99,113 @@ def transRun : Nat → List UCmd → MedPolicy → UState → List Int
                       | none   => []
                       | some r => transRun w cs π r.1)
 
+/-- How many commands the transient window actually ran. `transRun` records what they
+    touched; this records that they ran at all, which is the thing the budget misses. -/
+def transSteps : Nat → List UCmd → MedPolicy → UState → Nat
+  | 0,     _,       _, _ => 0
+  | _ + 1, [],      _, _ => 0
+  | w + 1, c :: cs, π, s =>
+      1 + (match uexec 30 c π s with
+           | none   => 0
+           | some r => transSteps w cs π r.1)
+
+/-- A transient window runs at most `w` commands. -/
+theorem transSteps_le : ∀ (w : Nat) (cs : List UCmd) (π : MedPolicy) (s : UState),
+    transSteps w cs π s ≤ w
+  | 0,     _,       _, _ => Nat.le_refl 0
+  | _ + 1, [],      _, _ => Nat.zero_le _
+  | w + 1, c :: cs, π, s => by
+      show 1 + (match uexec 30 c π s with
+                | none => 0
+                | some r => transSteps w cs π r.1) ≤ w + 1
+      rcases e : uexec 30 c π s with _ | r
+      · simp only [e]; omega
+      · simp only [e]
+        have := transSteps_le w cs π r.1
+        omega
+
 /-! ## The machine -/
 
 /-- `uexec` with an address trace and misprediction. At an `ite` the untaken branch runs
     for `w` commands with its state discarded and its trace kept. Cost is the
     architectural cost: transient commands are deliberately *not* counted, which is
     itself one of the findings below. -/
-def uexecS : Nat → Nat → UCmd → MedPolicy → UState → Option (UState × Nat × List Int)
+def uexecS : Nat → Nat → UCmd → MedPolicy → UState →
+    Option (UState × Nat × Nat × List Int)
   | 0,     _, _, _, _ => none
   | n + 1, w, c, π, s =>
       match c with
       | .seq c₁ c₂ =>
           (uexecS n w c₁ π s).bind fun r₁ =>
             (uexecS n w c₂ π r₁.1).map fun r₂ =>
-              (r₂.1, r₁.2.1 + r₂.2.1, r₁.2.2 ++ r₂.2.2)
+              (r₂.1, r₁.2.1 + r₂.2.1, r₁.2.2.1 + r₂.2.2.1, r₁.2.2.2 ++ r₂.2.2.2)
       | .ite e c₁ c₂ =>
           if evalE e s.store ≠ 0 then
             (uexecS n w c₁ π s).map fun r =>
-              (r.1, 1 + r.2.1, transRun w (flatten c₂) π s ++ r.2.2)
+              (r.1, 1 + r.2.1, 1 + transSteps w (flatten c₂) π s + r.2.2.1,
+               transRun w (flatten c₂) π s ++ r.2.2.2)
           else
             (uexecS n w c₂ π s).map fun r =>
-              (r.1, 1 + r.2.1, transRun w (flatten c₁) π s ++ r.2.2)
+              (r.1, 1 + r.2.1, 1 + transSteps w (flatten c₁) π s + r.2.2.1,
+               transRun w (flatten c₁) π s ++ r.2.2.2)
       | .loop e c₀ =>
           if evalE e s.store ≠ 0 then
             (uexecS n w c₀ π s).bind fun r₁ =>
               (uexecS n w (.loop e c₀) π r₁.1).map fun r₂ =>
-                (r₂.1, 1 + r₁.2.1 + r₂.2.1, r₁.2.2 ++ r₂.2.2)
-          else some (s, 1, [])
-      | c => (uexec 1 c π s).map fun r => (r.1, r.2.1, touched c s)
+                (r₂.1, 1 + r₁.2.1 + r₂.2.1, 1 + r₁.2.2.1 + r₂.2.2.1,
+                 r₁.2.2.2 ++ r₂.2.2.2)
+          else some (s, 1, 1, [])
+      | c => (uexec 1 c π s).map fun r => (r.1, r.2.1, r.2.1, touched c s)
 
 /-- The speculative trace, which is what an attacker sees. -/
 def straceU (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UState) : Option (List Int) :=
-  (uexecS n w c π s).map (fun r => r.2.2)
+  (uexecS n w c π s).map (fun r => r.2.2.2)
+
+/-- The **architectural** cost: what the certificate bounds. -/
+def acostU (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UState) : Option Nat :=
+  (uexecS n w c π s).map (fun r => r.2.1)
+
+/-- The **real** cost: architectural commands plus every transient one. -/
+def rcostU (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UState) : Option Nat :=
+  (uexecS n w c π s).map (fun r => r.2.2.1)
+
+/-- Unfolding lemmas, so proofs elsewhere need not restate the machine. -/
+theorem uexecS_ite_eq (n w : Nat) (e : Expr) (c₁ c₂ : UCmd) (π : MedPolicy) (s : UState) :
+    uexecS (n + 1) w (.ite e c₁ c₂) π s
+      = (if evalE e s.store ≠ 0 then
+           (uexecS n w c₁ π s).map fun r =>
+             (r.1, 1 + r.2.1, 1 + transSteps w (flatten c₂) π s + r.2.2.1,
+              transRun w (flatten c₂) π s ++ r.2.2.2)
+         else
+           (uexecS n w c₂ π s).map fun r =>
+             (r.1, 1 + r.2.1, 1 + transSteps w (flatten c₁) π s + r.2.2.1,
+              transRun w (flatten c₁) π s ++ r.2.2.2)) := rfl
+
+theorem uexecS_loop_eq (n w : Nat) (e : Expr) (c₀ : UCmd) (π : MedPolicy) (s : UState) :
+    uexecS (n + 1) w (.loop e c₀) π s
+      = (if evalE e s.store ≠ 0 then
+           (uexecS n w c₀ π s).bind fun r₁ =>
+             (uexecS n w (.loop e c₀) π r₁.1).map fun r₂ =>
+               (r₂.1, 1 + r₁.2.1 + r₂.2.1, 1 + r₁.2.2.1 + r₂.2.2.1,
+                r₁.2.2.2 ++ r₂.2.2.2)
+         else some (s, 1, 1, [])) := rfl
 
 /-! ## The extension is faithful -/
 
-/-- **At `w = 0` this is `uexec`.** State and cost agree command for command, so every
-    finding below is about speculation and not about a different machine having been
-    substituted. -/
-theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState),
-    (uexecS n 0 c π s).map (fun r => (r.1, r.2.1))
+/-- **This is `uexec`, on state and architectural cost, at every window.** Not merely at
+    `w = 0`: the transient parts live entirely in the two components this projection
+    drops, so nothing below is an artifact of a different machine having been
+    substituted, and the agreement is not conditional on there being no misprediction.
+
+    That is a stronger statement than stage 2d needed and it is what stage 2e builds on:
+    the state half is completeness of rollback, the cost half says the *architectural*
+    cost is window-free — which is exactly why the budget failed to notice the transient
+    work. -/
+theorem spec_is_uexec_extended : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UState),
+    (uexecS n w c π s).map (fun r => (r.1, r.2.1))
       = (uexec n c π s).map (fun r => (r.1, r.2.1))
-  | 0,     _, _, _ => rfl
-  | n + 1, c, π, s => by
+  | 0,     _, _, _, _ => rfl
+  | n + 1, w, c, π, s => by
       cases c with
       | skip => rfl
       | assign _ _ => rfl
@@ -148,9 +215,9 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
       | sop _ _ _ => rfl
       | hop _ _ _ => rfl
       | seq c₁ c₂ =>
-          show (Option.map _ ((uexecS n 0 c₁ π s).bind _)) = (Option.map _ ((uexec n c₁ π s).bind _))
-          have h₁ := spec_is_uexec_extended n c₁ π s
-          rcases e₁ : uexecS n 0 c₁ π s with _ | ⟨s₁, k₁, t₁⟩ <;> rw [e₁] at h₁
+          show (Option.map _ ((uexecS n w c₁ π s).bind _)) = (Option.map _ ((uexec n c₁ π s).bind _))
+          have h₁ := spec_is_uexec_extended n w c₁ π s
+          rcases e₁ : uexecS n w c₁ π s with _ | ⟨s₁, k₁, t₁⟩ <;> rw [e₁] at h₁
           · rcases e₁' : uexec n c₁ π s with _ | r₁' <;> rw [e₁'] at h₁
             · rfl
             · simp at h₁
@@ -160,8 +227,8 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
               obtain ⟨hst, hk⟩ := h₁
               subst hst; subst hk
               simp only [Option.bind_some]
-              have h₂ := spec_is_uexec_extended n c₂ π s₁
-              rcases e₂ : uexecS n 0 c₂ π s₁ with _ | ⟨s₂, k₂, t₂⟩ <;> rw [e₂] at h₂
+              have h₂ := spec_is_uexec_extended n w c₂ π s₁
+              rcases e₂ : uexecS n w c₂ π s₁ with _ | ⟨s₂, k₂, t₂⟩ <;> rw [e₂] at h₂
               · rcases e₂' : uexec n c₂ π s₁ with _ | r₂' <;> rw [e₂'] at h₂
                 · rfl
                 · simp at h₂
@@ -173,10 +240,10 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
                   rfl
       | ite e c₁ c₂ =>
           by_cases hg : evalE e s.store ≠ 0
-          · show (Option.map _ (if _ then (uexecS n 0 c₁ π s).map _ else _)) = _
+          · show (Option.map _ (if _ then (uexecS n w c₁ π s).map _ else _)) = _
             rw [if_pos hg, uexec_ite_eq, if_pos hg]
-            have h₁ := spec_is_uexec_extended n c₁ π s
-            rcases e₁ : uexecS n 0 c₁ π s with _ | r₁ <;> rw [e₁] at h₁
+            have h₁ := spec_is_uexec_extended n w c₁ π s
+            rcases e₁ : uexecS n w c₁ π s with _ | r₁ <;> rw [e₁] at h₁
             · rcases e₁' : uexec n c₁ π s with _ | r₁' <;> rw [e₁'] at h₁
               · rfl
               · simp at h₁
@@ -185,10 +252,10 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
               · simp only [Option.map_some, Option.some.injEq, Prod.mk.injEq] at h₁
                 simp only [Option.map_some, Option.some.injEq, Prod.mk.injEq, h₁.1, h₁.2,
                   true_and, and_self]
-          · show (Option.map _ (if _ then _ else (uexecS n 0 c₂ π s).map _)) = _
+          · show (Option.map _ (if _ then _ else (uexecS n w c₂ π s).map _)) = _
             rw [if_neg hg, uexec_ite_eq, if_neg hg]
-            have h₂ := spec_is_uexec_extended n c₂ π s
-            rcases e₂ : uexecS n 0 c₂ π s with _ | r₂ <;> rw [e₂] at h₂
+            have h₂ := spec_is_uexec_extended n w c₂ π s
+            rcases e₂ : uexecS n w c₂ π s with _ | r₂ <;> rw [e₂] at h₂
             · rcases e₂' : uexec n c₂ π s with _ | r₂' <;> rw [e₂'] at h₂
               · rfl
               · simp at h₂
@@ -199,10 +266,10 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
                   true_and, and_self]
       | loop e c₀ =>
           by_cases hg : evalE e s.store ≠ 0
-          · show (Option.map _ (if _ then (uexecS n 0 c₀ π s).bind _ else _)) = _
+          · show (Option.map _ (if _ then (uexecS n w c₀ π s).bind _ else _)) = _
             rw [if_pos hg, uexec_loop_eq, if_pos hg]
-            have h₁ := spec_is_uexec_extended n c₀ π s
-            rcases e₁ : uexecS n 0 c₀ π s with _ | ⟨s₁, k₁, t₁⟩ <;> rw [e₁] at h₁
+            have h₁ := spec_is_uexec_extended n w c₀ π s
+            rcases e₁ : uexecS n w c₀ π s with _ | ⟨s₁, k₁, t₁⟩ <;> rw [e₁] at h₁
             · rcases e₁' : uexec n c₀ π s with _ | r₁' <;> rw [e₁'] at h₁
               · rfl
               · simp at h₁
@@ -212,8 +279,8 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
                 obtain ⟨hst, hk⟩ := h₁
                 subst hst; subst hk
                 simp only [Option.bind_some]
-                have h₂ := spec_is_uexec_extended n (.loop e c₀) π s₁
-                rcases e₂ : uexecS n 0 (.loop e c₀) π s₁ with _ | ⟨s₂, k₂, t₂⟩ <;> rw [e₂] at h₂
+                have h₂ := spec_is_uexec_extended n w (.loop e c₀) π s₁
+                rcases e₂ : uexecS n w (.loop e c₀) π s₁ with _ | ⟨s₂, k₂, t₂⟩ <;> rw [e₂] at h₂
                 · rcases e₂' : uexec n (.loop e c₀) π s₁ with _ | r₂' <;> rw [e₂'] at h₂
                   · rfl
                   · simp at h₂
@@ -223,7 +290,7 @@ theorem spec_is_uexec_extended : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : 
                     obtain ⟨hst2, hk2⟩ := h₂
                     subst hst2; subst hk2
                     rfl
-          · show (Option.map _ (if _ then _ else some (s, 1, ([] : List Int)))) = _
+          · show (Option.map _ (if _ then _ else some (s, 1, 1, ([] : List Int)))) = _
             rw [if_neg hg, uexec_loop_eq, if_neg hg]; rfl
 
 /-! ## The machine can express the leak -/
@@ -336,9 +403,14 @@ def twoLive : UState :=
     the machine does. -/
 theorem transient_work_is_off_the_budget :
     xcheck Psec [] ["p", "q"] ["p", "q"] brLow = some ([], ["p", "q"], ["p", "q"], 2, [])
-  ∧ ((uexecS 12 0 brLow (fun _ => true) twoLive).map (fun r => r.2.1)) = some 2
-  ∧ ((uexecS 12 1 brLow (fun _ => true) twoLive).map (fun r => r.2.1)) = some 2
-  ∧ straceU 12 0 brLow (fun _ => true) twoLive = some [5]
+  ∧ acostU 12 0 brLow (fun _ => true) twoLive = some 2
+  ∧ rcostU 12 0 brLow (fun _ => true) twoLive = some 2
+  ∧ acostU 12 1 brLow (fun _ => true) twoLive = some 2
+  ∧ rcostU 12 1 brLow (fun _ => true) twoLive = some 3 := by decide
+
+/-- And the trace shows the third command was a real memory access, not bookkeeping. -/
+theorem the_extra_command_touches_memory :
+    straceU 12 0 brLow (fun _ => true) twoLive = some [5]
   ∧ straceU 12 1 brLow (fun _ => true) twoLive = some [3, 5] := by decide
 
 /-! ## The positive: branch-free programs are inert -/
@@ -383,8 +455,8 @@ theorem branch_free_is_inert : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : 
             · rfl
             · simp only [Option.bind_some,
                 branch_free_is_inert n w (.loop e c₀) π r₁.1 (by simp [hasIte, hc])]
-          · show (if _ then _ else some (s, 1, ([] : List Int)))
-                  = (if _ then _ else some (s, 1, ([] : List Int)))
+          · show (if _ then _ else some (s, 1, 1, ([] : List Int)))
+                  = (if _ then _ else some (s, 1, 1, ([] : List Int)))
             rw [if_neg hg, if_neg hg]
 
 /-- **The worked program is speculation-proof**, because it never branches. Narrow, but

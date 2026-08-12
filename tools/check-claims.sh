@@ -504,8 +504,32 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2e: what speculation costs, and what it cannot touch.
+for thm in "theorem rollback_is_complete" "theorem archcost_window_free" \
+           "theorem four_of_five_are_immune" "theorem ni_transfers_to_speculation" \
+           "theorem spec_cost_bound" "theorem certified_cost_under_speculation" \
+           "theorem fiveProg_costs_six_even_speculating" "theorem the_bound_is_not_vacuous"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/SpecBudget.lean 2>/dev/null; then
+    echo "DRIFT: the speculation-cost stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the headline constant. If the bound is ever weakened the prose must move with it.
+if ! grep -q "r.2.2.1 ≤ r.2.1 \* (1 + w)" conf-typing/ConfTyping/SpecBudget.lean 2>/dev/null; then
+  echo "DRIFT: the k*(1+w) speculation cost bound is cited but not stated"; fail=1
+fi
+# stage 2d's faithfulness lemma was GENERALISED to every window in stage 2e, and both
+# stages' prose now says so. Pin the general form so it cannot silently narrow again.
+if ! grep -q "theorem spec_is_uexec_extended : ∀ (n w : Nat)" conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+  echo "DRIFT: spec_is_uexec_extended is cited as holding at every window but no longer quantifies over w"; fail=1
+fi
+# and the machine must still carry both costs, or the budget finding is unstateable.
+if ! grep -q "def rcostU" conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null || \
+   ! grep -q "def acostU" conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+  echo "DRIFT: the architectural/real cost split is cited but one of acostU/rcostU is gone"; fail=1
+fi
+
 # stage 2d: speculation on the unified machine.
-for thm in "theorem spec_is_uexec_extended" "theorem victimU_leaks" \
+for thm in "theorem spec_is_uexec_extended" "theorem victimU_leaks" "theorem transSteps_le" \
            "theorem architecturally_indistinguishable_U" "theorem leak_needs_window_two_U" \
            "theorem gadget_rejected_by_memory_safety" "theorem secret_guard_rejected" \
            "theorem no_pointer_arithmetic_here" "theorem transient_work_is_off_the_budget" \
@@ -834,7 +858,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

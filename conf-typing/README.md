@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/SpecBudget.lean` | stage 2e | **rollback is complete** for every program and every window, so four of the five certificates are immune to speculation outright; the fifth — the budget — is bounded at `k * (1 + w)`. Only the trace is left open |
 | `ConfTyping/SpecUnified.lean` | stage 2d | speculation on the unified machine: the plan was a certified program that leaks, and **no such program exists** — `slcheck`'s load rule and the low-guard requirement already exclude both routes. What *is* broken is the budget |
 | `ConfTyping/Assumptions.lean` | stage 2c | the trusted base **computed from the program**: `needs` collects the entries a program can incur, two vacuity lemmas prove the omitted ones are omitted for cause, and `pureProg` gets all three deployment guarantees on an *empty* ledger |
 | `ConfTyping/Ownership.lean` | stage 2b | the failure pinned at the *invariant*: `SepInv` is **not conjunctive**, so two thread-local certificates say nothing about the pair — plus the frame rule's decomposition |
@@ -2017,6 +2018,44 @@ would have to state.
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
 
+## What speculation costs (`SpecBudget.lean`) — stage 2e
+
+Stage 2d left one genuine unsoundness — the certified budget ignores transient work —
+and one positive so narrow it barely counted. Both are closed here, and the second turns
+out to have been the wrong statement of a much stronger one.
+
+**Rollback is complete.** `rollback_is_complete`: for **every** program and **every**
+window, the architectural state after speculation is the state `uexec` reaches. Stage 2d
+proved this only for branch-free programs, as a by-product of proving something stronger
+about them. Generalising 2d's faithfulness lemma from `w = 0` to every `w` costs nothing
+— the transient parts live in the two components that lemma projects away — and makes it
+a corollary, and universal.
+
+**So four of the five certificates are immune.** `four_of_five_are_immune` and
+`ni_transfers_to_speculation`: mediation, memory safety, structural integrity and
+noninterference are all predicates on the final `UState`, and a machine reaching the same
+final state satisfies them identically. No rule changes, no side condition, no fence.
+They were never at risk, and the one-line reason is that transient state is discarded by
+construction.
+
+That leaves the surface exactly two things wide: the cost and the trace.
+
+**The cost, bounded.** `spec_cost_bound`: in any run, `realCost ≤ archCost * (1 + w)`.
+The budget is not lost to speculation, it is *scaled*, and the multiplier is the
+misprediction window. Stated within a single run, so it needs no two-run comparison.
+Composed with a certificate, `certified_cost_under_speculation` says a program checked at
+bound `k` really runs at most `k * (1 + w)` commands, transient work included —
+`fiveProg_costs_six_even_speculating` for the worked program, which being branch-free
+pays nothing. `the_bound_is_not_vacuous` exhibits a certified program whose real cost
+genuinely exceeds its certified one, so the scaling is doing work rather than restating
+the budget.
+
+Two looseness notes, stated rather than implied. The bound charges a full window to every
+*command* rather than to every *branch*, so `k * (1 + w)` sits far above the true
+`k + w * (branches taken)`; tightening it needs a branch count in the judgment. And the
+**trace** question is untouched — it is stage 2d's conjecture, and separating the stages
+is what makes clear which one moved.
+
 ## Speculation on the unified machine (`SpecUnified.lean`) — stage 2d
 
 Brick 33 put Spectre in the semantics and closed row 9, but on its own small language.
@@ -2026,8 +2065,11 @@ down.**
 
 `uexecS` is `uexec` with an **address trace** and **misprediction**: at an `ite` the
 untaken branch also runs, for a window of `w` commands, with its state discarded and its
-trace kept. `spec_is_uexec_extended` proves the extension faithful — at `w = 0` the
-state and cost are `uexec`'s — so nothing here is an artifact of a substituted machine.
+trace kept. `spec_is_uexec_extended` proves the extension faithful: the state and the
+*architectural* cost are `uexec`'s at **every** window, so nothing here is an artifact of
+a substituted machine. (It began as the `w = 0` statement; generalising it cost nothing,
+since the transient parts live in the two components the projection drops, and stage 2e
+runs on the general form.)
 And the model is not vacuous: `victimU_leaks` gives the textbook gadget with two heaps
 differing in one cell producing two different traces.
 
@@ -2058,8 +2100,10 @@ over *threads*. It fails here in a third and different way — not wrong about w
 counts, but counting the wrong thing.
 
 **The positive.** `branch_free_is_inert`: with no `ite`, the machine is independent of
-`w`, so every architectural guarantee transfers under every misprediction. That covers
-the worked program (`fiveProg_is_speculatively_inert`).
+`w` — trace and real cost included — so speculation changes nothing at all. That covers
+the worked program (`fiveProg_is_speculatively_inert`). Stage 2e supersedes the
+*architectural* half of this for every program; what stays special about branch-free ones
+is that their trace and real cost agree too.
 
 Scoping, stated rather than implied: one global window at every branch instead of brick
 33's per-branch schedule (a *stronger* attacker, so nothing here is weakened, and brick
