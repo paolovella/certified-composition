@@ -915,6 +915,53 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2d — speculation on the unified machine: the attack that does not land**
+  (`ConfTyping/SpecUnified.lean`). Brick 33 put Spectre in the semantics and closed row
+  9, but on its own small language; the five-certificate core lives on `UCmd`. This
+  stage brings the machine across and asks what the certificates survive. **The answer
+  was not the one the stage set out to write down** — the plan was to exhibit a
+  certified program that leaks, and no such program could be constructed.
+
+  `uexecS` is `uexec` with an address trace and misprediction: at an `ite` the untaken
+  branch also runs, for a window of `w` commands, state discarded and trace kept.
+  `spec_is_uexec_extended` proves the extension faithful at `w = 0`, so nothing below is
+  an artifact of a substituted machine, and `victimU_leaks` shows the model is not
+  vacuous — the textbook gadget, two heaps differing in one cell, two different traces.
+
+  **The core already rejects it, via rules written for other purposes.** `slcheck`'s
+  load rule requires the source to be tracked and *drops the destination*, so a loaded
+  value can never afterwards be dereferenced and the gadget has no derivation
+  (`gadget_rejected_by_memory_safety`) — that is stage 1i's linearity discipline. And a
+  branch on a secret is refused by the joint checker, so which branch mispredicts cannot
+  depend on a secret either (`secret_guard_rejected`); memory safety alone would have
+  allowed that, the flow certificate is what refuses. There is no pointer arithmetic
+  either, so the bounds-check-bypass half of Spectre-v1 has no analogue at all
+  (`no_pointer_arithmetic_here`) — an absence in the model, recorded so it does not read
+  as a result.
+
+  **This is not a closure of row 9 on `UCmd`, and is not claimed as one.** Two
+  exclusions and an absence are not a theorem: the certificates are about `UState`, the
+  trace is not in `UState`, so nothing proves a certified program's trace is
+  secret-independent. A search for a third route did not find one; that is a failure to
+  find and is recorded as such. The conjecture is written into the module so it can be
+  attacked rather than assumed.
+
+  **What is genuinely broken: the budget.** `transient_work_is_off_the_budget`, on a
+  program the core does certify — the bound is 2, the machine reports 2 at every window,
+  and at window 1 a third command really ran. Stage 1n found the budget would not
+  compose over *loops*; stage 2a found it was the one law that *did* compose over
+  *threads*. It fails here in a third and different way: not wrong about what it counts,
+  but counting the wrong thing.
+
+  Proved positive: `branch_free_is_inert` — no `ite` means window-independence, so every
+  architectural guarantee transfers under *every* misprediction, covering `fiveProg`.
+
+  Scoping stated rather than implied: one global window at every branch rather than
+  brick 33's per-branch schedule (a stronger attacker, so nothing here is weakened);
+  loop guards always predicted correctly; an address trace only, so no cache lines,
+  eviction, timing or contention; conditional-branch misprediction only. No fence rule
+  on `UCmd` — brick 33 has one on its language and porting it is the named follow-on.
+
 - **Stage 2c — the trusted base, computed from the program**
   (`ConfTyping/Assumptions.lean`). Stage 1s said the trusted base of a fully-certified
   program is three lines: the policy author, the query parser, the filesystem. That was a

@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/SpecUnified.lean` | stage 2d | speculation on the unified machine: the plan was a certified program that leaks, and **no such program exists** — `slcheck`'s load rule and the low-guard requirement already exclude both routes. What *is* broken is the budget |
 | `ConfTyping/Assumptions.lean` | stage 2c | the trusted base **computed from the program**: `needs` collects the entries a program can incur, two vacuity lemmas prove the omitted ones are omitted for cause, and `pureProg` gets all three deployment guarantees on an *empty* ledger |
 | `ConfTyping/Ownership.lean` | stage 2b | the failure pinned at the *invariant*: `SepInv` is **not conjunctive**, so two thread-local certificates say nothing about the pair — plus the frame rule's decomposition |
 | `ConfTyping/Interleave.lean` | stage 2a | two threads on the unified machine: **memory safety does not compose** (two certified threads, one faulting interleaving) while the budget does |
@@ -2015,6 +2016,57 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## Speculation on the unified machine (`SpecUnified.lean`) — stage 2d
+
+Brick 33 put Spectre in the semantics and closed row 9, but on its own small language.
+The five-certificate core lives on `UCmd`. This stage brings the machine across and asks
+what the certificates survive. **The answer was not the one the stage set out to write
+down.**
+
+`uexecS` is `uexec` with an **address trace** and **misprediction**: at an `ite` the
+untaken branch also runs, for a window of `w` commands, with its state discarded and its
+trace kept. `spec_is_uexec_extended` proves the extension faithful — at `w = 0` the
+state and cost are `uexec`'s — so nothing here is an artifact of a substituted machine.
+And the model is not vacuous: `victimU_leaks` gives the textbook gadget with two heaps
+differing in one cell producing two different traces.
+
+**But the core already rejects it.** `slcheck`'s load rule is `load d p => if memStr p V
+then some (dropStr d V) else none`: the source must be tracked and the destination is
+*dropped*, so a loaded value can never afterwards be dereferenced and the gadget has no
+derivation (`gadget_rejected_by_memory_safety`). And a branch on a secret is refused by
+the joint checker, so which branch mispredicts cannot depend on a secret either
+(`secret_guard_rejected`) — memory safety alone would have allowed that one; the flow
+certificate is what refuses. Both rules were written for other reasons, stages earlier.
+There is also no pointer arithmetic, so the bounds-check-bypass half of Spectre-v1 has
+no analogue at all (`no_pointer_arithmetic_here`) — an absence in the model, recorded so
+it does not read as a result.
+
+**What is not closed.** Two exclusions and an absence are not a theorem. The five
+certificates are statements about `UState`; the trace is not in `UState`; so nothing
+proves a certified program's trace is secret-independent. A search for a third route did
+not find one, and that is a failure to find, recorded as such. The conjecture is written
+into the module so it can be attacked: *for every program `xcheck` accepts, the
+speculative trace is a function of the Low part of the initial state, under every
+window.*
+
+**What is genuinely broken: the budget.** `transient_work_is_off_the_budget`, on a
+program the core does certify. The bound is 2, the machine reports 2 at every window,
+and at window 1 a third command really ran. Stage 1n found the budget was the law that
+would not compose over *loops*; stage 2a found it was the one law that *did* compose
+over *threads*. It fails here in a third and different way — not wrong about what it
+counts, but counting the wrong thing.
+
+**The positive.** `branch_free_is_inert`: with no `ite`, the machine is independent of
+`w`, so every architectural guarantee transfers under every misprediction. That covers
+the worked program (`fiveProg_is_speculatively_inert`).
+
+Scoping, stated rather than implied: one global window at every branch instead of brick
+33's per-branch schedule (a *stronger* attacker, so nothing here is weakened, and brick
+33 keeps the finer model); loop guards always predicted correctly; the
+microarchitectural state is an address trace, so no cache lines, eviction, timing or
+contention; conditional-branch misprediction only. No fence rule is proved on `UCmd` —
+that is the named follow-on, not a claim.
 
 ## The trusted base, computed (`Assumptions.lean`) — stage 2c
 

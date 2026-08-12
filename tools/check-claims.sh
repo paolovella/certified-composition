@@ -504,6 +504,25 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2d: speculation on the unified machine.
+for thm in "theorem spec_is_uexec_extended" "theorem victimU_leaks" \
+           "theorem architecturally_indistinguishable_U" "theorem leak_needs_window_two_U" \
+           "theorem gadget_rejected_by_memory_safety" "theorem secret_guard_rejected" \
+           "theorem no_pointer_arithmetic_here" "theorem transient_work_is_off_the_budget" \
+           "theorem branch_free_is_inert" "theorem fiveProg_is_speculatively_inert"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+    echo "DRIFT: the speculation-on-UCmd stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the stage's headline is a NEGATIVE result: the certified core rejects the gadget.
+# If that ever flips to an acceptance the prose becomes false, so pin both halves.
+if ! grep -q 'slcheck \["p"\] gadgetU = none' conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+  echo "DRIFT: 'the gadget is not certifiable' is cited but not stated"; fail=1
+fi
+if ! grep -q 'the conjecture worth trying next\|The conjecture worth trying next' conf-typing/ConfTyping/SpecUnified.lean 2>/dev/null; then
+  echo "DRIFT: the open conjecture is cited but no longer recorded in SpecUnified.lean"; fail=1
+fi
+
 # stage 2c: the trusted base, computed from the program.
 for thm in "theorem no_access_no_reads" "theorem unwritten_sink_untouched" \
            "theorem pureProg_needs_nothing" "theorem fiveProg_needs" \
@@ -815,7 +834,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

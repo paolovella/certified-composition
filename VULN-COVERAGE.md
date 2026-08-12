@@ -566,6 +566,28 @@ necessary*: `benign_rejected` with `benign_transient_is_constant` exhibits a bod
 rejects whose transient trace is provably constant, so lifting the rule to "no
 address-dependent load before the fence" is a named follow-on, not a soundness gap.
 
+
+**Stage 2d — the same question on the unified core (`SpecUnified.lean`).** Brick 33's
+result lives on its own small language; the five-certificate core lives on `UCmd`. Stage
+2d brings the machine across (`uexecS`, faithful to `uexec` at window zero by
+`spec_is_uexec_extended`) and asks what the certificates survive. The plan was to
+exhibit a certified program that leaks. **No such program could be constructed**, and
+the reason is worth recording: `slcheck`'s load rule drops the destination from the
+tracked set, so a loaded value can never afterwards be a pointer and the gadget has no
+derivation (`gadget_rejected_by_memory_safety`); and a branch on a secret is refused by
+the joint checker, so which branch mispredicts cannot depend on a secret either
+(`secret_guard_rejected`). Both rules were written for other purposes, stages before
+speculation was in view.
+
+That is **not** a closure of row 9 on `UCmd`. Two exclusions and an absence are not a
+theorem: the certificates are statements about `UState`, the trace is not in `UState`,
+and nothing proves a certified program's trace is secret-independent. The conjecture is
+recorded in the module so it can be attacked. What *is* proved on `UCmd`:
+`branch_free_is_inert` (no `ite` ⇒ window-independent, hence every architectural
+guarantee transfers under every misprediction, covering `fiveProg`), and one genuine
+unsoundness — `transient_work_is_off_the_budget`, a certified program whose bound of 2
+ignores a third command that really ran.
+
 ### 3.10 Resource exhaustion — IN-WITH-MODEL (generated) on the bounded fragment; REDUCIBLE in general [proved]
 
 Brick 34 (`CostBound.lean`) proves what brick 1 asserted, and corrects the one part of
