@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/BigHandler.lean` | stage 2h | **a program worth the name**: twenty-one operations, all five certificates from one checker, budget 24 and tight. The trusted base is still two entries, the secret address is retired, and 2e's speculation bound does real work (26 real against 24 certified) |
 | `ConfTyping/SpecFactor.lean` | stage 2g | **the trace does not factor either**: the natural relation for stating trace agreement is not inductive, and `LabInv` is the missing hypothesis — so the trace proof must be *fused into* `jsecTy_sound`, not layered on it. Stage 1j's wall from a third direction |
 | `ConfTyping/SpecTrace.lean` | stage 2f | the trace conjecture **was false**, and not because of speculation: a halted machine kept issuing memory operations. `touched` corrected, the defect kept on record, and `PtrLow` — the invariant the repaired conjecture needs — proved inductive |
 | `ConfTyping/SpecBudget.lean` | stage 2e | **rollback is complete** for every program and every window, so four of the five certificates are immune to speculation outright; the fifth — the budget — is bounded at `k * (1 + w)`. Only the trace is left open |
@@ -2019,6 +2020,45 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## A program worth the name (`BigHandler.lean`) — stage 2h
+
+Every worked example here has been small enough to read in one line. `fiveProg` is six
+operations, built to exercise one rule per certificate. Six is enough to show the
+certificates *compose*; it is not enough to show they compose at a size anyone would call
+a program — and four of the last five stages have been obstructions rather than artifacts.
+
+`bigHandler` is twenty-one operations: two authorization checks, two mediated reads, three
+allocations (one secret), pointer stores and loads, arithmetic, a sanitized query built
+and emitted, a branch, two dereferences, three frees. It carries **all five certificates
+from one run of one checker** at budget 24, and everything below is measured rather than
+asserted.
+
+- **The trusted base is still two entries.** Twenty-one operations, and stage 2c's `needs`
+  charges the policy author and the `db` parser and nothing else — no filesystem, because
+  the program never emits there. The base grew with what the program *does*, not with how
+  long it is, which is the point of computing it rather than fixing it.
+- **The secret address is retired, not recycled.** Three allocations, three frees, and
+  `freed` comes back `[0, 1]` — address 2, the `allocS` cell, has left circulation. Stage
+  1z's rule, introduced to close a two-line leak, as a fact about a real run.
+- **The budget is tight.** 24 certified, 24 spent.
+- **Stage 2e's speculation bound does real work, and is loose by a factor of three.**
+  `bigHandler` branches, so unlike `fiveProg` it is not inert: at window 2 it really runs
+  26 commands against a certified 24, and the bound allows 72. That gap is what "charges
+  a full window to every command rather than to every branch" costs on something concrete.
+- **Its trace does not grow under misprediction** — but only because the untaken branch
+  happens to touch no memory. Recorded as a measurement, explicitly *not* a theorem;
+  stage 2g is the reason no theorem is available.
+
+No new rule, no new obstruction, no new defect: everything held at three and a half times
+the previous example's size. After four consecutive obstruction stages that is worth
+writing down.
+
+Two limits. The program is loop-free, because `allcheck` has no loop rule — twenty-one
+operations means twenty-one operations, not a bounded iteration over them. And `decide`
+does the work throughout, so every measurement is a kernel computation on a closed term:
+the strongest evidence available, and also why this stage says nothing about programs it
+did not run.
 
 ## The trace does not factor either (`SpecFactor.lean`) — stage 2g
 

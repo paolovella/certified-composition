@@ -504,6 +504,27 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2h: the worked program at size.
+for thm in "theorem bigHandler_checks" "theorem bigHandler_five" \
+           "theorem bigHandler_runs_clean" "theorem bigHandler_releases_everything" \
+           "theorem the_secret_address_is_retired" "theorem bigHandler_emits_one_clean_query" \
+           "theorem bigHandler_trusted_base" "theorem bigHandler_owes_the_filesystem_nothing" \
+           "theorem bigHandler_is_not_inert" "theorem bigHandler_speculative_cost" \
+           "theorem bigHandler_cost_under_every_window" \
+           "theorem bigHandler_trace_happens_not_to_grow"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/BigHandler.lean 2>/dev/null; then
+    echo "DRIFT: the worked-program stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the headline numbers. If the program or the checker changes these move, and the prose
+# in four files quotes them.
+if ! grep -q '\[("q", 2)\], \["fs", "db"\], \[\], 24, \[2\]' conf-typing/ConfTyping/BigHandler.lean 2>/dev/null; then
+  echo "DRIFT: bigHandler is cited as checking at budget 24 but the stated result changed"; fail=1
+fi
+if ! grep -q "rcostU 60 2 bigHandler" conf-typing/ConfTyping/BigHandler.lean 2>/dev/null; then
+  echo "DRIFT: the real-vs-certified speculative cost measurement is cited but gone"; fail=1
+fi
+
 # stage 2g: the trace does not factor either.
 for thm in "theorem secretCell_traceEq" "theorem the_load_is_certified" \
            "theorem traceEq_is_not_inductive" "theorem labInv_is_the_missing_hypothesis" \
@@ -894,11 +915,19 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor BigHandler; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
   fi
+done
+
+# 1b. No stray Lean files at the repo root. Running `printf >> ConfTyping.lean` from the
+# wrong directory has created one four times; the module-import guard catches the missing
+# import but not the debris, so catch the debris here.
+for f in *.lean; do
+  [ -e "$f" ] || continue
+  echo "DRIFT: stray Lean file at the repo root: $f (a package root belongs in its subdir)"; fail=1
 done
 
 # 2. Every transport-kernel Lean module must be mentioned in its README.

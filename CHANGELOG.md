@@ -915,6 +915,44 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2h — a program worth the name** (`ConfTyping/BigHandler.lean`). Every worked
+  example so far has been small enough to read in one line, and four of the last five
+  stages were obstructions rather than artifacts. `bigHandler` is twenty-one operations —
+  two authorization checks, two mediated reads, three allocations (one secret), pointer
+  stores and loads, arithmetic, a sanitized query built and emitted, a branch, two
+  dereferences, three frees — carrying **all five certificates from one run of one
+  checker** at budget 24.
+
+  Measured, not asserted:
+
+  - the **trusted base is still two entries** at twenty-one operations, because stage 2c's
+    `needs` charges what the program does rather than how long it is;
+  - the **secret address is retired, not recycled** — three allocations, three frees, and
+    `freed = [0, 1]`, with the `allocS` cell gone from circulation. Stage 1z's rule,
+    introduced to close a two-line leak, as a fact about a real run;
+  - the budget is **tight**: 24 certified, 24 spent;
+  - stage 2e's **speculation bound does real work and is loose by a factor of three** —
+    `bigHandler` branches, so at window 2 it really runs 26 commands against a certified
+    24, and the bound allows 72. That is what "a full window per command rather than per
+    branch" costs on something concrete;
+  - its **trace does not grow** under misprediction, but only because the untaken branch
+    touches no memory — recorded as a measurement and explicitly not a theorem, since
+    stage 2g is the reason no theorem is available.
+
+  No new rule, no new obstruction, and no new defect: everything held at three and a half
+  times the previous example's size, which after four consecutive obstruction stages is
+  worth recording.
+
+  Limits kept in the module: the program is loop-free because `allcheck` has no loop rule,
+  and `decide` does the work throughout, so the evidence is kernel computation on closed
+  terms and says nothing about programs not run. Three of the measurements are
+  **axiom-free**.
+
+  Twelve new drift guards plus two pinning the headline numbers — the checker's result and
+  the real-versus-certified cost — each negative-tested. Also added: a guard against stray
+  Lean files at the repo root, after `printf >>` from the wrong directory created one four
+  times in one session.
+
 - **Stage 2g — the trace does not factor either**
   (`ConfTyping/SpecFactor.lean`). Stage 2f produced the two halves of a step case. The
   obvious next move is to lift them by induction, layered on the noninterference proof the
