@@ -450,6 +450,23 @@ proved) and `free` (impossible without an ownership hypothesis).
   to machine-checked theorems — is how the work was produced, not a validated
   methodology. It travels only if a second hand runs it.
 
+## Verification
+
+Everything the repo claims is checked by one script, and CI calls that script and nothing
+else — so what gates a push is exactly what a working session runs, and the two cannot
+drift:
+
+```
+tools/ci.sh          # all three packages, no-sorry, and every guard
+tools/ci.sh --fast   # skips the mathlib package, for the inner loop
+```
+
+The gates are: the three Lean packages build; no `sorry` in any tracked source;
+`check-claims` (drift between prose and theorem names, and now between CI and this
+script); `guard-selftest` (each guard family is mutated and must fire — a negative test
+that goes stale is worse than none); and `walk-check` (the numeric claims in the
+set-theory notes, with each measurement asserting its own preconditions).
+
 ## Building
 
 ```sh

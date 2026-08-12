@@ -4,6 +4,32 @@ Top-level arc across the three sub-projects. Each subdir keeps its own detailed
 `CHANGELOG.md`; this traces the line of work as a whole. Dates are when the work
 landed.
 
+## Repository verification
+
+- **CI, and a single entry point** (`tools/ci.sh`, `.github/workflows/ci.yml`). Until now
+  every check — 78 Lean modules across three packages, `check-claims`, `guard-selftest`,
+  `walk-check` — was run by hand at the end of a working session. A repo whose identity is
+  "machine-checked and guarded against drift" had nothing enforcing that on push.
+
+  The workflow calls `tools/ci.sh` and **nothing else**, so what gates a push is exactly
+  what a session runs; `check-claims` now enforces both halves of that — the workflow must
+  invoke the script, and the script must gate on every package, on `sorry`, and on all
+  three tools. `guard-selftest` gains two cases covering that guard and is now 14/14.
+
+- **Measurements assert their own preconditions** (`tools/walk-check.py`). Four
+  corrections in six notes sections (§60, §62, §65, §66) were failures in measurements or
+  their reading; none was in a proof. They were recorded as prose advice, which did not
+  prevent the next one.
+
+  `require()` and `PreconditionError` make the §66 failure structurally impossible:
+  `defect_census` refuses to run at a non-limit level, where `C_x = {x-1}` makes the
+  defect vacuously empty and silently biases the census toward the empty class. The census
+  is now a permanent measurement, so §66's corrected table regenerates rather than sitting
+  frozen in prose (`14:1 28:1 42:2 56:2 70:2 84:1`). A **canary** calls it at a successor
+  and fails the run if no error is raised — the guard-selftest discipline applied to the
+  measurement tool, and negative-tested: disabling the precondition makes `walk-check`
+  report the canary failure.
+
 ## conf-typing — the confidentiality-typing framework (mathlib-free)
 
 - **0.1 – 0.3** — mechanized the IMP timing instance: instrumented semantics +

@@ -82,6 +82,13 @@ run_case "no-interaction claim unqualified" drift \
   bash -c 'sed -i "s/ni_and_memory_do_not_factor/that other theorem/" \
              transport-calculus/TransportCalculus.lean'
 
+# CI and the local script must not drift
+run_case "CI workflow stops calling tools/ci.sh" drift \
+  bash -c 'sed -i "s#bash tools/ci.sh --fast#echo skip#" .github/workflows/ci.yml'
+
+run_case "tools/ci.sh drops a gate" drift \
+  bash -c 'sed -i "/walk-check.py/d" tools/ci.sh'
+
 # 1g. duplicate name in the flat namespace
 run_case "duplicate top-level name" drift \
   bash -c 'printf "\ntheorem medCheck_sound : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'

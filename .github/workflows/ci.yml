@@ -1,0 +1,57 @@
+name: CI
+
+# Runs the same script the repo is verified with locally, and nothing else, so what
+# gates a push is exactly what a working session runs: tools/ci.sh.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # The mathlib-free packages plus every guard. Fast, and the one that must always be
+  # green: it covers conf-typing, transport-calculus, check-claims, guard-selftest and
+  # walk-check.
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache Lean builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            conf-typing/.lake
+            transport-calculus/.lake
+          key: core-${{ runner.os }}-${{ hashFiles('**/lean-toolchain', '**/lakefile.*') }}
+      - name: tools/ci.sh --fast
+        run: bash tools/ci.sh --fast
+
+  # transport-kernel depends on mathlib, so it gets its own job and the olean cache.
+  # Kept separate because a mathlib cache miss is slow and must not mask a core failure.
+  kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache Lean builds
+        uses: actions/cache@v4
+        with:
+          path: transport-kernel/.lake
+          key: kernel-${{ runner.os }}-${{ hashFiles('transport-kernel/lean-toolchain', 'transport-kernel/lakefile.*') }}
+      - name: Fetch mathlib oleans
+        working-directory: transport-kernel
+        run: lake exe cache get || true
+      - name: Build
+        working-directory: transport-kernel
+        run: lake build

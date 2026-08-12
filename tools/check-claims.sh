@@ -488,6 +488,22 @@ if grep -q "Race.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
+# CI must run the same script a working session runs, or the two drift and the badge
+# stops meaning anything. The workflow may call tools/ci.sh and nothing else, and
+# tools/ci.sh must cover every gate.
+if [ ! -f .github/workflows/ci.yml ]; then
+  echo "DRIFT: no CI workflow"; fail=1
+elif ! grep -q "bash tools/ci.sh" .github/workflows/ci.yml; then
+  # the invocation, not a mention in a step name
+  echo "DRIFT: the CI workflow does not invoke tools/ci.sh"; fail=1
+fi
+for gate in "conf-typing" "transport-calculus" "transport-kernel" \
+            "check-claims.sh" "guard-selftest.sh" "walk-check.py" "sorry"; do
+  if ! grep -q "$gate" tools/ci.sh 2>/dev/null; then
+    echo "DRIFT: tools/ci.sh does not gate on '$gate'"; fail=1
+  fi
+done
+
 # stage 2b: the ownership invariant.
 for thm in "theorem separation_is_not_conjunctive" "theorem union_gives_both" \
            "theorem alloc_frames_over_a_disjoint_set" "theorem free_is_the_obstruction" \

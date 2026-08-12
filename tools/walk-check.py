@@ -16,6 +16,17 @@ import random, sys
 L, A, M = 3, 6, 14           # c < L, a < A, b < M
 N = L * A * M
 
+class PreconditionError(AssertionError):
+    """A measurement was asked for on inputs that do not instantiate its hypothesis."""
+
+def require(cond, msg):
+    """Measurements assert their own preconditions. Section 66 was a defect census run
+    on two SUCCESSOR ordinals, where the defect is vacuously empty; the wrong conclusion
+    that followed was reported as a property of the tool. Prose guidance did not prevent
+    it and would not have. This does."""
+    if not cond:
+        raise PreconditionError(msg)
+
 def dec(x):  return (x // (A*M), (x // M) % A, x % M)
 def enc(c,a,b): return c*A*M + a*M + b
 
@@ -29,6 +40,20 @@ def is_lim_of_lim(x):
 def limit_part(x):           # largest limit <= x  (0 if none)
     c,a,b = dec(x)
     return enc(c,a,0)
+
+def defect_census(C, Bfun, levels):
+    """Realized defect classes {B_al \\ B_be : be > al} at each level. PRECONDITION:
+    every level is a limit -- at a successor x the rule C_x = {x-1} makes the walk
+    trivial and the defect vacuously empty, so successors carry no information and
+    silently bias the census toward the empty class."""
+    for al in levels:
+        require(is_limit(al), f"defect_census: level {al} = {dec(al)} is not a limit "
+                              f"(successors have vacuously empty defect; see notes 66)")
+    out = {}
+    for al in levels:
+        Ba = Bfun(al)
+        out[al] = {frozenset(Ba - Bfun(be)) for be in range(al + 1, N)}
+    return out
 
 def build_C(seed):
     rng = random.Random(seed)
@@ -259,6 +284,25 @@ if __name__ == "__main__":
         f, a1, a2, a3, a4, a5, a6, a7, a8 = run(seed)
         tot_tf += a1; tot_V += a2; tot_M += a3; tot_A4 += a4; tot_rows += a5; tot_Z2 += a6; tot_coh += a7; tot_fib += a8
         allfails += [(seed,) + tuple(x) for x in f[:4]]
+    # --- the measurement guard must actually fire (section 66's failure, mechanized).
+    #     A census asked for at a successor level has to raise, not quietly return the
+    #     empty class. Same discipline as guard-selftest, applied to the tool itself.
+    C0 = build_C(0)
+    _bs = {}
+    def _B(b):
+        if b not in _bs: _bs[b] = frozenset(x for x in range(b) if rho3(C0, x, b) == 1)
+        return _bs[b]
+    succ = next(x for x in range(2, N) if not is_limit(x))
+    try:
+        defect_census(C0, _B, [succ])
+        allfails.append(("canary", "defect_census accepted a successor level", succ))
+    except PreconditionError:
+        pass
+    lims = [x for x in range(2, N // 2) if is_limit(x)][:6]
+    census = defect_census(C0, _B, lims)
+    print("defect census (limit levels only): " +
+          " ".join(f"{al}:{len(cl)}" for al, cl in sorted(census.items())))
+
     print(f"trace formula: {tot_tf} | Theorem V: {tot_V} | M(3): {tot_M} | A4: {tot_A4}"
           f" | 1.16(a) rows: {tot_rows} | Z2: {tot_Z2} | coh: {tot_coh}"
           f" | fibres: {tot_fib}")
