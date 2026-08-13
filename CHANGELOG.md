@@ -915,6 +915,47 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage D — the kill criterion, checked rather than assumed** (`conf-typing/ConfTyping/JasminCert.lean`,
+  `conf-typing/CertCompose.lean`, evidence in `conf-typing/corpus/jasmin/EMISSION.md`).
+  Stages B and C received both tools by **hand encoding**, which is exactly what stage D's
+  kill criterion is aimed at. So the first thing owed was an empirical answer about two real
+  tools, not a design. **It half-fires.**
+
+  **Jasmin emits a certificate.** Its SCT checker prints an inferred signature per function
+  — MSF-clobber flag, input type, output level, output corruption, constraints — and the
+  project checks that text into its own repo and diffs against it in CI. A tool that
+  regression-tests its own output has output stable enough to parse. `accept.expected` is
+  copied here verbatim, and `certcompose` reads it.
+
+  **CN does not.** Its JSON is a **timing log** — the reader CN ships opens with "for
+  reading the JSON (ish) timing output" and introduces its parser with "this next bit is a
+  total hack". Its Coq export emits proof *obligations* plus a support library, the opposite
+  direction from a guarantee to receive. Success is an exit code and console prose.
+
+  **The scope is therefore corrected rather than smoothed over:** a pipeline for Jasmin, a
+  hand encoding for CN, and **a composite of two *different* tools still cannot be built
+  from consumed artifacts alone**. That is a fact about what the ecosystem emits, not about
+  the algebra.
+
+  `compose_lvl_is_sctLvlGA` proves the level the combinator computes on consumed bytes is
+  exactly `sctLvlGA.mul`, so the parser feeds stage C's algebra rather than sitting beside
+  it. `--assembly` adds the compiler-preservation entry to the printed trusted base, because
+  a claim about the binary needs it and a claim about the source does not.
+
+  **Measured coverage: 20 of 57 (35%).** The other 37 certificates are polymorphic or
+  compound and have no image in `SLvl` — recorded as unreceived rather than flattened, for
+  the reason the CWE corpus recorded inexpressible tasks instead of adapting them.
+
+  **The parser runs on `List Char` because `String.startsWith`/`splitOn` do not reduce in
+  the kernel.** Testing over them would have required `native_decide`, which adds
+  `Lean.ofReduceBool` to the axiom set and appears nowhere in this repo. `String.toList`
+  does reduce, so it is the boundary, and every parser test is kernel reduction on real
+  emitted bytes. A guard fires if `native_decide` ever appears in tactic position — and it
+  had to be taught to tell prose from use, having first fired on the doc comment explaining
+  why it exists. Self-test 28/28 → **32/32**; `tools/ci.sh` gained a step that builds the
+  executable and runs it on the corpus, since the Lean samples cannot catch a parser that
+  stops parsing whole files.
+
 - **Stage C, second pass — the other tool already had a name for it**
   (`conf-typing/ConfTyping/JasminSCT.lean`, sources in `conf-typing/corpus/jasmin/SOURCES.md`).
   The first pass's second certificate was invented. This one is read out of Jasmin's own

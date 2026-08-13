@@ -25,6 +25,14 @@ step "conf-typing builds"          build conf-typing
 step "transport-calculus builds"   build transport-calculus
 [ "$FAST" = 0 ] && step "transport-kernel builds (mathlib)" build transport-kernel
 
+# The stage D combinator is an executable, so `lake build` on the library does not cover
+# it. Build it and run it on the emission corpus: a parser that stops parsing real bytes
+# is the one failure the Lean samples cannot catch.
+step "certcompose builds and consumes the emission" \
+     bash -c 'cd conf-typing && lake build certcompose >/dev/null 2>&1 &&
+              ./.lake/build/bin/certcompose corpus/jasmin/accept.expected \
+                | grep -q "^  SCT level:  #secret"'
+
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \

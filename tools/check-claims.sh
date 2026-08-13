@@ -659,6 +659,45 @@ if ! grep -q "ptr: transient, val: transient" conf-typing/corpus/jasmin/SOURCES.
   echo "DRIFT: the Jasmin transcription no longer shows fig3a's sct annotation"; fail=1
 fi
 
+# stage D: consuming an emitted certificate. The corpus file is REAL TOOL OUTPUT copied
+# verbatim; editing it would make the parser tests meaningless in the same way editing the
+# program corpus would.
+for thm in "theorem compose_lvl_is_sctLvlGA" "theorem compose_ledger" "theorem compose_modmsf" \
+           "theorem jasmin_base_strictly_smaller" "theorem baseLabels_length" \
+           "def parseEmission" "def scanCerts"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/JasminCert.lean 2>/dev/null; then
+    echo "DRIFT: the stage D combinator is cited but '$thm' is missing from JasminCert.lean"; fail=1
+  fi
+done
+for f in conf-typing/corpus/jasmin/accept.expected conf-typing/corpus/jasmin/EMISSION.md; do
+  if [ ! -f "$f" ]; then echo "DRIFT: stage D cites $f but it is missing"; fail=1; fi
+done
+n=$(grep -c "^\(no\)\?modmsf " conf-typing/corpus/jasmin/accept.expected 2>/dev/null || echo 0)
+if [ "$n" -ne 57 ]; then
+  echo "DRIFT: the Jasmin emission is cited as 57 certificates but holds $n"; fail=1
+fi
+# The measured coverage. If the parser or the corpus changes this silently, the 35% figure
+# in EMISSION.md and the README stops being true.
+if [ -x conf-typing/.lake/build/bin/certcompose ]; then
+  r=$(conf-typing/.lake/build/bin/certcompose conf-typing/corpus/jasmin/accept.expected 2>/dev/null \
+      | head -1 | grep -oE "[0-9]+ with a receivable" | grep -oE "^[0-9]+")
+  if [ -n "$r" ] && [ "$r" -ne 20 ]; then
+    echo "DRIFT: receivable-certificate count is $r, but 20 is the published figure"; fail=1
+  fi
+fi
+# This repo does not use native_decide anywhere: it would add Lean.ofReduceBool to the
+# axiom set of every parser test. The whole List Char design exists to avoid it.
+# Matches the TACTIC position only - JasminCert's header discusses native_decide by name,
+# and a guard that cannot tell prose from use fires on its own documentation.
+if grep -rqE "by native_decide|^[[:space:]]*native_decide[[:space:]]*$" \
+     --include=*.lean conf-typing/ConfTyping transport-calculus 2>/dev/null; then
+  echo "DRIFT: native_decide has appeared - parser tests would rest on Lean.ofReduceBool"; fail=1
+fi
+# CN emits no certificate; saying otherwise would misdescribe the stage D verdict.
+if ! grep -q "CN — no" conf-typing/corpus/jasmin/EMISSION.md 2>/dev/null; then
+  echo "DRIFT: EMISSION.md no longer records that CN emits no consumable certificate"; fail=1
+fi
+
 # stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
 # edited, every improvement claim measured against it becomes meaningless.
 for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do

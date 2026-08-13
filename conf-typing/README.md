@@ -2079,6 +2079,68 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## Consuming a certificate a tool actually emitted (`JasminCert.lean`, `certcompose`) — stage D, first pass
+
+Stages B and C received both tools' guarantees by **hand encoding**. Stage D's kill
+criterion is aimed exactly there — *if no external tool emits a machine-readable
+certificate we can consume, this reduces to a manual encoding exercise and should be
+scoped as such rather than sold as a pipeline* — so the first thing this stage owed was an
+**empirical answer**. It is in `corpus/jasmin/EMISSION.md`, with evidence, and **it is
+split**:
+
+- **Jasmin: yes.** Its SCT checker prints an inferred signature per function, and the
+  project checks that text into its own repo and diffs against it in CI
+  (`accept.expected`). A tool that regression-tests its own output has output stable
+  enough to parse. That file is copied here verbatim and is what the combinator reads.
+- **CN: no.** Its JSON is a **timing log** — the reader CN ships calls it "the JSON (ish)
+  timing output" and its parser "a total hack". Its Coq export emits proof *obligations*
+  plus a support library, which is the opposite direction: work to discharge, not a
+  guarantee to receive. Success is an exit code and console prose.
+
+**So the criterion half-fires**, and the scope is corrected rather than smoothed over: a
+pipeline for Jasmin, a hand encoding for CN. A composite of *two different tools* still
+cannot be built from consumed artifacts alone — a fact about what the ecosystem emits, not
+about the algebra.
+
+`certcompose` is the combinator, and deliberately **not** `certcheck` — that one is a
+checker for this repo's frozen toy language. It reads emitted bytes, reports what it found,
+composes two certificates and prints the result with its trusted base:
+
+```
+$ ./.lake/build/bin/certcompose corpus/jasmin/accept.expected
+corpus/jasmin/accept.expected: 57 certificates, 20 with a receivable level
+...
+=== composite certificate ===
+  functions:  f ; id3
+  SCT level:  #secret   (join of #secret and #public)
+  msf killed: true   (disjunction)
+=== trusted base ===
+  - Jasmin SCT type system is sound (S&P 2023)
+  - the speculative semantics models the hardware's misprediction behaviour
+```
+
+Passing `--assembly` adds the third entry — SCT preservation by compilation (POPL 2025) —
+because a claim about the *binary* needs it and a claim about the Jasmin source does not.
+That is `jasmin_base_strictly_smaller`, the computed base again, for the second tool.
+
+**20 of 57 (35%) is the honest coverage figure.** The other 37 certificates are
+polymorphic (`#poly = { n = k, s = k}`) or compound (`#[ptr = …, val = …]`) and have no
+image in `SLvl`; they are recorded as unreceived rather than flattened, for the reason the
+CWE corpus recorded inexpressible tasks instead of adapting them. The gap is a limitation
+of the receiving model, not of Jasmin.
+
+**The parser runs on `List Char`, and that is not a style choice.** `String.startsWith` and
+`String.splitOn` do not reduce in the kernel, so `decide` cannot see through them and every
+test would have to be `native_decide` — which adds `Lean.ofReduceBool` to the axiom set and
+appears nowhere in this repo. `String.toList` does reduce, so it is the boundary: the tests
+above are kernel reduction on real emitted bytes, and a drift guard fires if
+`native_decide` ever appears in tactic position.
+
+`compose_lvl_is_sctLvlGA` ties it back: the level the combinator computes on consumed input
+is exactly `sctLvlGA`'s `mul`, so the parser feeds the stage-C algebra rather than sitting
+beside it. `baseLabels_length` keeps the printed audit trail and the proved ledger from
+drifting apart.
+
 ## The other tool already had a name for it (`JasminSCT.lean`) — stage C, second pass
 
 The first pass's second certificate was invented. This one is read out of Jasmin's own SCT

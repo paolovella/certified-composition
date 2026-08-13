@@ -11,3 +11,7 @@ path = "../transport-calculus"
 [[lean_exe]]
 name = "certcheck"
 root = "Main"
+
+[[lean_exe]]
+name = "certcompose"
+root = "CertCompose"

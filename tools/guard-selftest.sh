@@ -132,6 +132,22 @@ run_case "Jasmin transcription loses fig3a annot" drift \
   bash -c 'sed -i "s/ptr: transient, val: transient/ptr: public, val: public/g" \
              conf-typing/corpus/jasmin/SOURCES.md'
 
+# stage D. The emitted corpus is real tool output; the coverage figure and the
+# no-native_decide rule are both things that would go quiet rather than loud.
+run_case "emitted corpus edited" drift \
+  bash -c 'printf "modmsf extra : #public ->\n#public\noutput corruption: #public\n constraints:\n" \
+             >> conf-typing/corpus/jasmin/accept.expected'
+
+run_case "stage D combinator theorem renamed" drift \
+  bash -c 'sed -i "s/theorem compose_lvl_is_sctLvlGA/theorem gone_away/" \
+             conf-typing/ConfTyping/JasminCert.lean'
+
+run_case "native_decide creeps in" drift \
+  bash -c 'printf "\nexample : 1 = 1 := by native_decide\n" >> conf-typing/ConfTyping/CNReceive.lean'
+
+run_case "EMISSION drops the CN verdict" drift \
+  bash -c 'sed -i "s/## CN — no/## CN/" conf-typing/corpus/jasmin/EMISSION.md'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

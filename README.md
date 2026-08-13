@@ -42,6 +42,14 @@ Two of those stages have since closed, neither by tripping its kill criterion:
   architectural state is **not enough**, shown by a bounds-check-bypass gadget that keeps
   its CN footprint architecturally and violates it transiently. The literature's
   intersections are the price of that ticket, not a defect in the algebra.
+- **Stage D — the kill criterion, checked** (`ConfTyping/JasminCert.lean`, `certcompose`).
+  Does any real tool actually *emit* a certificate? **Jasmin does** — its SCT checker prints
+  per-function signatures stable enough that the project diffs them in CI, and
+  `certcompose` reads those bytes, composes two, and prints the result with its trusted
+  base (20 of 57 receivable, measured). **CN does not** — its JSON is a timing log and its
+  Coq export is proof *obligations*. So the criterion **half-fires**: a pipeline for one
+  tool, a hand encoding for the other, and a composite across two *different* tools still
+  cannot be built from consumed artifacts alone.
 - **Stage C, second pass — the gap already had a name** (`ConfTyping/JasminSCT.lean`).
   Transcribing Jasmin's real SCT levels showed they are **pairs** — ⟨normal, speculative⟩ —
   and that a CN certificate carried into a speculative world lands on the middle one:
