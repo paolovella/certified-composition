@@ -16,6 +16,13 @@ mathlib olean cache (and compiles its Physlib dependency locally).
 | [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question, shipped to its community |
 | [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` (path) | tiers 1–5 done |
 
+## Where this stands
+
+[`PLAN-2026-08.md`](PLAN-2026-08.md) is the honest assessment: what is rigged in the
+current tests, what the checker's false-rejection rate is (unmeasured), where this sits
+against seL4, Jasmin, CN, Verasco and the IFC languages that failed to be adopted — and
+the staged plan that follows from it, with a kill criterion per stage.
+
 ## Running it
 
 The one thing here you can run without reading any Lean:
