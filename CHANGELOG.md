@@ -915,6 +915,27 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Corpus, and stage 2k — the first measured rule** (`conf-typing/corpus/`,
+  `ConfTyping/CountedLoop.lean`). The repo had no idea what its checkers reject. The corpus
+  fixes the method: a task list written first from ordinary handler patterns and CWE
+  categories, every program written before the checker was run once, and the tasks the
+  language *cannot express* counted rather than quietly dropped.
+
+  Baseline: 30 tasks, **5 inexpressible (17%)**; of the 25 expressible, 20 accepted, 3
+  correctly refused (unsanitized emit; `free` of a conditionally-allocated pointer; five
+  allocations and one `free`), **2 falsely refused (8%)**. Both false refusals were in one
+  rule — stage 2j's counted loop.
+
+  Stage 2k fixes one of them by *widening*, not weakening: `UCert.forU` now accepts a body
+  that **grows** the authorization set (`A ⊆ A'`) and still concludes `A`, since at zero
+  iterations the body never runs — `JSecTy.whileW`'s widening one component over, resting
+  on `UMedInv.mono`. False rejections **8% → 4%**, with the three correct refusals still
+  refused and `loopHandler_checks` unchanged at budget 40.
+
+  The remaining false rejection (nested counted loops) is left deliberately: driving a
+  25-program author-written corpus to zero would be re-rigging by a slower route. The
+  binding limitation is now the corpus, not the rule.
+
 - **Stage 3a — source text, and a tool** (`ConfTyping/Surface.lean`, `Main.lean`,
   `examples/`). Every certified program in this repo was a hand-built Lean AST, and
   nothing in the repo was runnable — no `lean_exe`, no `main`. So the guarantee attached

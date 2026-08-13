@@ -2079,6 +2079,26 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## Widening the counted loop (`CountedLoop.lean`) — stage 2k, and the first measured rule
+
+Stage 2j's `for` rule demanded the loop body return the mediation set **unchanged**. The
+corpus (`corpus/`) found that this refuses a retry loop that re-authorizes —
+`for i = 3 { check db ; access db }` — which is safe, and was the first false rejection
+this repo has ever *measured* rather than reasoned about.
+
+`UCert.forU` now takes `A ⊆ A'` and still concludes `A`: the body may **grow** the
+authorization set, and the loop's post-condition stays `A` because at zero iterations the
+body never runs. That is `JSecTy.whileW`'s widening, one component over, and it rests on
+`UMedInv.mono` — weakening `A` weakens the demand that everything in `A` was authorized.
+The checker tests `subStr A A₂` in place of `A₂ == A`.
+
+Nothing was relaxed on the soundness side: the three correct refusals in the corpus are
+still refused, and `loopHandler_checks` still `decide`s at budget 40. Measured effect:
+false rejections **2/25 → 1/25**. The remaining one is nested counted loops, which needs
+`bcheck` to recurse into the body — a fuel-indexed refactor of the checker's signature,
+since well-founded recursion would break the `decide`-based measurements. That is its own
+stage.
+
 ## The counted loop, natively (`CountedLoop.lean`) — stage 2j
 
 Every fully-certified program in this repo is straight-line, and the record says why:

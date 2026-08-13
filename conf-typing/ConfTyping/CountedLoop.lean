@@ -281,10 +281,21 @@ theorem countU_cost {i : String} {body : UCmd} {b : Nat}
 
 /-! ## The mediation half -/
 
-/-- The authorization set survives the loop: the body returns it unchanged by hypothesis
-    and the decrement is an assignment, which moves it nowhere. -/
-theorem countU_auth {i : String} {A : List String} {body : UCmd} {b : Nat}
-    (hcert : UCert A body A b) :
+/-- Weakening the authorization set: `UMedInv` demands that everything in `A` has been
+    authorized, so a *smaller* `A` is a weaker demand. -/
+theorem UMedInv.mono {π : MedPolicy} {A A' : List String} {s : UState}
+    (hsub : ∀ r ∈ A, r ∈ A') (h : UMedInv π A' s) : UMedInv π A s :=
+  ⟨h.1, h.2.1, fun hd r hr => h.2.2 hd r (hsub r hr)⟩
+
+/-- The authorization set survives the loop.
+
+    **Widened (stage 2k).** The body need not return `A` on the nose — it need only *grow*
+    it, which is what a `check` inside the loop does. The loop's post-condition stays `A`,
+    because at zero iterations the body never runs; that is the same shape as `JSecTy`'s
+    `whileW`, one component over. Corpus program 17 — a retry loop that re-authorizes —
+    is what forced this, and it was a false rejection, not a soundness question. -/
+theorem countU_auth {i : String} {A A' : List String} {body : UCmd} {b : Nat}
+    (hsub : ∀ r ∈ A, r ∈ A') (hcert : UCert A body A' b) :
     ∀ (n : Nat) (π : MedPolicy) (s : UState) (r : UState × Nat × List Bool),
       UMedInv π A s → uexec n (countU i body) π s = some r → UMedInv π A r.1
   | 0,     _, _, _, _,    h => by simp [uexec] at h
@@ -311,10 +322,11 @@ theorem countU_auth {i : String} {A : List String} {body : UCmd} {b : Nat}
               · rw [f₂] at e₁; simp at e₁
               rw [f₂] at e₁; simp only [Option.map_some, Option.some.injEq] at e₁
               rw [← e₁]
-              exact (UCert.assign (A := A) i (.add (.var i) (.num (-1)))).auth m π q₁.1 q₂
-                (hcert.auth m π s q₁ hinv f₁) f₂
+              exact UMedInv.mono hsub
+                ((UCert.assign (A := A') i (.add (.var i) (.num (-1)))).auth m π q₁.1 q₂
+                  (hcert.auth m π s q₁ hinv f₁) f₂)
         rw [← h]
-        exact countU_auth hcert n π r₁.1 r₂ hturn e₂
+        exact countU_auth hsub hcert n π r₁.1 r₂ hturn e₂
       · rw [if_neg hg] at h
         simp only [Option.some.injEq] at h
         rw [← h]; exact hinv
@@ -328,8 +340,9 @@ theorem countU_auth {i : String} {A : List String} {body : UCmd} {b : Nat}
     loop — and does not: the iteration bound is supplied syntactically by the constant the
     counter is initialised from, which is the "analysis of a different kind" that theorem
     names. What is new here is that `body` is an arbitrary `UCmd`. -/
-theorem UCert.forU {A : List String} {i : String} {k : Nat} {body : UCmd} {b : Nat}
-    (hnw : noWrite i body = true) (hcert : UCert A body A b) :
+theorem UCert.forU {A A' : List String} {i : String} {k : Nat} {body : UCmd} {b : Nat}
+    (hnw : noWrite i body = true) (hsub : ∀ r ∈ A, r ∈ A')
+    (hcert : UCert A body A' b) :
     UCert A (forU i k body) A (2 + k * (b + 2)) := by
   constructor
   · intro n π s r hr
@@ -393,7 +406,7 @@ theorem UCert.forU {A : List String} {i : String} {k : Nat} {body : UCmd} {b : N
         · rw [e₂] at hr; simp at hr
         rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
         rw [← hr]
-        exact countU_auth hcert m π r₁.1 r₂
+        exact countU_auth hsub hcert m π r₁.1 r₂
           ((UCert.assign (A := A) i (.num (k : Int))).auth m π s r₁ hinv e₁) e₂
 
 /-! ## The flow and memory halves -/
@@ -421,6 +434,14 @@ theorem JSecTy.forU {P : Partition} {V : List String} {i : String} {k : Nat} {bo
     (.whileW (.var i) hlowi (fun _ hx => hx) (.seq hbody hdec) (fun _ hx => hx))
 
 /-! ## Recognizing the idiom -/
+
+/-- Is every name in `A` also in `B`? -/
+def subStr (A B : List String) : Bool := A.all (fun r => memStr r B)
+
+theorem subStr_mem {A B : List String} (h : subStr A B = true) : ∀ r ∈ A, r ∈ B := by
+  intro r hr
+  exact memStr_mem (List.all_eq_true.mp h r hr)
+
 
 /-- The counted loop, as a *pattern*. A checker sees raw syntax, so the iteration bound
     has to be read off it: a constant-initialised counter, a guard that tests it, and a
@@ -478,7 +499,7 @@ def bcheck (P : Partition) :
           if !(P i) && noWrite i body then
             match allcheck P A (dropStr i V) body with
             | some (A₂, V₂, b) =>
-                if A₂ == A && V₂ == dropStr i V then
+                if subStr A A₂ && V₂ == dropStr i V then
                   some (A, dropStr i V, 2 + k * (b + 2))
                 else none
             | none => none
@@ -537,10 +558,10 @@ theorem bcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String) 
               simp only [Option.some.injEq, Prod.mk.injEq] at h
               obtain ⟨hA, hV, hk⟩ := h
               subst hA; subst hV; subst hk
-              have hq : allcheck P A (dropStr i V) body = some (A, dropStr i V, b) := by
-                rw [eb, hfix2.1, hfix2.2]
-              have hbody := allcheck_sound body A (dropStr i V) A (dropStr i V) b hq
-              exact ⟨UCert.forU hcond.2 hbody.bundle,
+              have hq : allcheck P A (dropStr i V) body = some (A₂, dropStr i V, b) := by
+                rw [eb, hfix2.2]
+              have hbody := allcheck_sound body A (dropStr i V) A₂ (dropStr i V) b hq
+              exact ⟨UCert.forU hcond.2 (subStr_mem hfix2.1) hbody.bundle,
                      JSecTy.forU (by simpa using hcond.1) hbody.joint⟩
             · cases h
           · cases h

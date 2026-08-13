@@ -559,6 +559,26 @@ if ! grep -q "statement layer is not proved" conf-typing/README.md 2>/dev/null; 
   echo "DRIFT: the parser's unproved statement layer is no longer stated in the README"; fail=1
 fi
 
+# stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
+# edited, every improvement claim measured against it becomes meaningless.
+for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do
+  if [ ! -f "$f" ]; then echo "DRIFT: the measured baseline cites $f but it is missing"; fail=1; fi
+done
+n=$(ls conf-typing/corpus/p/*.uc 2>/dev/null | wc -l)
+if [ "$n" -ne 25 ]; then
+  echo "DRIFT: the corpus is cited as 25 programs but holds $n - the baseline no longer compares"
+  fail=1
+fi
+for thm in "theorem UMedInv.mono" "def subStr" "theorem subStr_mem"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/CountedLoop.lean 2>/dev/null; then
+    echo "DRIFT: the stage-2k widening is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the widening must stay a widening: an equality test here would silently restore 2j.
+if grep -q 'if A₂ == A && V₂ == dropStr i V then' conf-typing/ConfTyping/CountedLoop.lean 2>/dev/null; then
+  echo "DRIFT: bcheck is back to demanding the mediation set be unchanged (stage 2k reverted)"; fail=1
+fi
+
 # stage 2j: the counted loop, natively.
 for thm in "theorem noWrite_preserves" "theorem countU_turn" "theorem countU_cost" \
            "theorem countU_auth" "theorem UCert.forU" "theorem JSecTy.forU" \

@@ -47,3 +47,37 @@ what the language has.
 
 `git` commit of this file is the baseline. Any later claim of improvement is measured
 against this table, on this corpus, with the corpus unchanged.
+
+---
+
+# After stage 2k — 2026-08-13, same corpus, unchanged
+
+The widening below was written *because* of program 17, not before it. The corpus was not
+touched.
+
+| | baseline | after 2k |
+|---|---|---|
+| accepted | 20/25 | **21/25** |
+| correct refusals | 3 | 3 |
+| **false refusals** | **2 (8%)** | **1 (4%)** |
+
+**What changed, and why it is not a weakening.** Stage 2j's `for` rule demanded the body
+return the mediation set *unchanged*. `UCert.forU` now takes `A ⊆ A'` and still concludes
+`A`: the body may *grow* the authorization set, and the loop's post-condition stays `A`
+because at zero iterations the body never runs. That is `JSecTy.whileW`'s widening, one
+component over, and it needs `UMedInv.mono` — weakening `A` weakens the demand that
+everything in `A` was authorized. The checker tests `subStr A A₂` instead of `A₂ == A`.
+
+The three correct refusals (09, 11, 21) are still refused. `loopHandler_checks` still
+`decide`s at budget 40. No soundness statement was touched.
+
+**What is still refused, and why it is not being fixed today.** Program 24, nested counted
+loops: `bcheck` checks the loop body with `allcheck`, which has no loop rule. Fixing it
+means `bcheck` recursing into the body, which is a fuel-indexed refactor of the checker's
+signature (well-founded recursion would break the `decide`-based measurements this repo
+relies on). That is a real change and it should be its own stage.
+
+**And the honest reason not to chase 0% here.** This corpus is 25 small programs written
+by the same person who wrote the rules. Driving it to zero would be re-rigging by a slower
+route. The number that matters next is on a corpus this author did not write — which is
+what §5 Stage A of `../PLAN-2026-08.md` should have said, and now does.
