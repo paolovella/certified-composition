@@ -559,6 +559,21 @@ if ! grep -q "statement layer is not proved" conf-typing/README.md 2>/dev/null; 
   echo "DRIFT: the parser's unproved statement layer is no longer stated in the README"; fail=1
 fi
 
+# the external corpus: transcribed, not authored here. Its value is that it was not
+# written to the rules, so editing it destroys the only unbiased measurement we have.
+n=$(ls conf-typing/corpus/ext/*.uc 2>/dev/null | wc -l)
+if [ "$n" -ne 12 ]; then
+  echo "DRIFT: the external corpus is cited as 12 programs but holds $n"; fail=1
+fi
+for f in conf-typing/corpus/ext/SOURCES.md conf-typing/corpus/ext/RESULTS.md; do
+  if [ ! -f "$f" ]; then echo "DRIFT: the external corpus cites $f but it is missing"; fail=1; fi
+done
+# the leak gap must stay stated in the coverage map, since nothing else states it.
+if ! grep -q "Leaks (CWE-401) are NOT detected" VULN-COVERAGE.md 2>/dev/null; then
+  echo "DRIFT: the leak scope-hole found by the external corpus is no longer stated in VULN-COVERAGE"
+  fail=1
+fi
+
 # stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
 # edited, every improvement claim measured against it becomes meaningless.
 for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do

@@ -25,7 +25,7 @@ Command: `certcheck p/NN.uc --secret pw,scopy`
 |---|---|---|---|
 | 09 | `emit db input` | **CORRECT** | unsanitized untrusted data reaching a sink — the injection this is for |
 | 11 | `if flag { alloc p } else { skip } ; free p` | **CORRECT** | on the `else` path `p` is never allocated, so `free p` frees a wild pointer |
-| 21 | `for i = 5 { alloc t } ; free t` | **CORRECT** | allocates five cells and frees one — a leak, and the tracked set genuinely is not a fixpoint |
+| 21 | `for i = 5 { alloc t } ; free t` | **CORRECT** | the tracked set is genuinely not a fixpoint. *(Reason corrected 2026-08-13: this was first recorded as "a leak", but no certificate here detects leaks — see `ext/RESULTS.md`. The refusal is right; the stated reason was not.)* |
 | 17 | `for i = 3 { check db ; access db }` | **FALSE** | a retry loop that re-authorizes. Refused because stage 2j's `for` rule demands the body return the mediation set *unchanged*, and `check` extends it |
 | 24 | `for i = 3 { for j = 3 { alloc t ; free t } }` | **FALSE** | nested counted loops. Refused because `bcheck`'s `for` rule checks the body with `allcheck`, which has no loop rule — recorded in stage 2j as "nesting is a follow-on, not a claim" |
 

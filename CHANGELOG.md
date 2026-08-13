@@ -915,6 +915,27 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The external corpus** (`conf-typing/corpus/ext/`). Twelve programs transcribed from
+  CWE demonstrative examples — code neither written by this repo nor for it — with the
+  cases the language cannot express recorded rather than adapted (CWE-862 ex.2 needs a
+  *subject*, which this model has none of; CWE-401 ex.1 needs an early return).
+
+  **Detection: 6 of 7 real vulnerabilities caught** — use-after-free through two
+  intervening allocations, conditional free then use, unauthorized protected read, query
+  built by concatenation, and both infinite loops. **One missed, and it is a scope hole
+  worth stating: no certificate here detects a memory leak.** The map now says so instead
+  of omitting it, and corpus A's program 21 has had its *reason* corrected — the refusal
+  was right, "because it leaks" was not why.
+
+  **Precision: 4 of 5 safe programs accepted. The one rejected is the fix CWE-835 tells
+  developers to write** — validate the rate up front, then loop. The good version is still
+  an unbounded `while`; what makes it terminate is the validation. Our counted-loop rule
+  takes its bound from a *syntactic constant*, so it refuses the recommended fix.
+
+  That defines the next rule by evidence rather than taste: the bound must be allowed to be
+  a **variable validated by a guard**, with the budget read off the guard — the first
+  value-dependent rule in this repo, and the shape Jasmin's type system already uses.
+
 - **Corpus, and stage 2k — the first measured rule** (`conf-typing/corpus/`,
   `ConfTyping/CountedLoop.lean`). The repo had no idea what its checkers reject. The corpus
   fixes the method: a task list written first from ordinary handler patterns and CWE

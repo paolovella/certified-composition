@@ -1,0 +1,1 @@
+check db ; access db
