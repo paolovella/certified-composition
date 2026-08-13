@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/Surface.lean` | stage 3a | **source text**: a surface syntax, lexer and recursive-descent parser for the language that carries the certificates, plus `certcheck` — the first thing in this repo a person outside it can run |
 | `ConfTyping/CountedLoop.lean` | stage 2j | **the counted loop, natively**: a uniform budget for a loop whose body is an arbitrary `UCmd` — heap, mediation and emission included — so `loopHandler` carries all five certificates *while iterating*. A dying loop diverges rather than overspending, which is what makes the bound provable |
 | `ConfTyping/SpecFused.lean` | stage 2i | **the fused induction, and the trace theorem**: `PtrLow` is inductive over whole certified programs when — and only when — it travels with `SepInv`, `LabInv` and `uLowEqA`, and the speculative trace of a certified program is a function of the Low part of its input at every window. Stage 2d's conjecture, proved, and applied to `bigHandler` |
 | `ConfTyping/BigHandler.lean` | stage 2h | **a program worth the name**: twenty-one operations, all five certificates from one checker, budget 24 and tight. The trusted base is still two entries, the secret address is retired, and 2e's speculation bound does real work (26 real against 24 certified) |
@@ -2022,6 +2023,61 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## Source text, and a tool (`Surface.lean`, `Main.lean`) — stage 3a
+
+Everything this package proves is a theorem about a `UCmd`, and until this stage a `UCmd`
+could only be written as a Lean term inside this repo. `bigHandler` is a hand-built AST;
+so is `loopHandler`; so is every certified program here. Brick 21 made exactly this
+complaint about the *query* language and answered it with a parser and a round trip
+(`parse_print`) so that "the injection guarantee attaches to source **text**, not a
+hand-built AST". The language that carries the five certificates never got the same
+treatment, and nothing in the repo was runnable: no `lean_exe`, no `main`.
+
+```
+lake build certcheck
+./.lake/build/bin/certcheck examples/handler.uc
+```
+
+```
+examples/handler.uc: ACCEPTED
+
+  cost budget          40   (over every input and every fuel)
+  requires authority   [db]
+  pointers still held  []
+  emitted delimiters   [2]
+```
+
+**The verdict is a theorem, not a report.** `source_certified` states the contract: if the
+file parses to `c` and `bcheck` accepts `c`, then `c` has a cost budget over every input
+and every fuel, reads only what the policy authorized, is noninterferent, and never faults
+on memory — by `bcheck_sound`, which is the same `FullCert` every earlier stage consumes.
+`examples/handler.uc` is `loopHandler` written as text, and the tool computes budget 40,
+the number `loopHandler_checks` pins in Lean.
+
+**What it rejects**, one file per class in `examples/rejected/`: an unmediated `access`,
+a use-after-free, an unsanitized `emit` (caught by the string checker, exit 3), a secret
+read into an emitted value, a branch on a secret, and an unbounded `while` — the last
+because no uniform budget exists for it, which is brick 34's `dos_unbounded` showing up as
+an exit code. Exit 0 accept, 2 parse error, 3 reject.
+
+**The honest residue, which is the parser.** `parseE_toksE` proves the round trip for the
+expression layer: the parser inverts the printer and consumes exactly the tokens the
+printer produced. The **statement layer is not proved yet**, and until it is, the
+`parseSource` hypothesis in `source_certified` carries no logical weight — the theorem is
+about the term the tool checks, and `parseSource` is what *defines* that term. That is a
+real gap, not a formality: a parser that mapped the text to some *other* well-typed
+program would satisfy every theorem here. Closing it needs two things, both known: the
+statement-layer round trip (with a right-nesting hypothesis, since `;` is right
+associative and a left-nested `seq` prints to the same text as its rebracketing), and the
+lexer round trip, which brick 22 already did once for the query language. `okName` is
+where the conditions live — an identifier may not be a keyword, look like a number, or
+contain a quote — and it is a hypothesis of the theorem rather than an assumption the
+parser makes silently.
+
+**And the language is still this language.** `UCmd` has no functions, no records, no
+arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
+object from a tool you can run on *your* file, and nothing here closes that.
 
 ## The counted loop, natively (`CountedLoop.lean`) — stage 2j
 

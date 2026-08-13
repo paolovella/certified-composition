@@ -16,6 +16,29 @@ mathlib olean cache (and compiles its Physlib dependency locally).
 | [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question, shipped to its community |
 | [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` (path) | tiers 1–5 done |
 
+## Running it
+
+The one thing here you can run without reading any Lean:
+
+```
+cd conf-typing
+lake build certcheck
+./.lake/build/bin/certcheck examples/handler.uc
+```
+
+It parses a source file into the language the certificates are about, runs the checker,
+and prints the certificate — a cost budget good for every input and every fuel, the
+authority the program requires, and the delimiter count of everything it emits.
+`examples/rejected/` has one file per failure class (unmediated access, use-after-free,
+unsanitized emit, secret leak, secret branch, unbounded loop); exit 0 accept, 2 parse
+error, 3 reject. `source_certified` is the verdict as a theorem.
+
+Two honest limits, both stated at more length in `conf-typing/README.md`: the parser's
+round trip is proved for the expression layer and **not** for the statement layer, so the
+link from your text to the checked term is not yet machine-checked; and the language is
+still this repo's `UCmd` — no functions, no records, no arrays.
+
+
 ## The through-line
 
 The same accountancy appears at every level:

@@ -915,6 +915,31 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 3a — source text, and a tool** (`ConfTyping/Surface.lean`, `Main.lean`,
+  `examples/`). Every certified program in this repo was a hand-built Lean AST, and
+  nothing in the repo was runnable — no `lean_exe`, no `main`. So the guarantee attached
+  to something nobody outside the repo could write, checked by a function nobody outside
+  Lean could run. Brick 21 made this complaint about the *query* language and answered it;
+  the language that carries the five certificates never got the same treatment.
+
+  `Surface.lean` gives it a syntax, a lexer, and a recursive-descent parser; `certcheck
+  FILE [--secret names]` parses a file, runs `bcheck` and `tcheckW`, prints the
+  certificate, and exits 0 / 2 / 3 for accept / parse error / reject.
+  **`source_certified`** is the contract as a theorem — file parses to `c`, checker accepts
+  `c`, therefore `c` has a uniform cost budget, mediated reads, noninterference and memory
+  safety. `examples/handler.uc` is `loopHandler` as text and checks at budget 40, the
+  number pinned in Lean. `examples/rejected/` holds one file per class: unmediated access,
+  use-after-free, unsanitized emit, secret leak, secret branch, unbounded loop.
+
+  **The residue is the parser, stated rather than glossed.** `parseE_toksE` proves the
+  round trip for the expression layer. The statement layer is not proved, so the
+  `parseSource` hypothesis in `source_certified` carries no logical weight yet — a parser
+  that mapped the text to a different well-typed program would satisfy every theorem here.
+  What closes it is known and named: the statement-layer round trip under a right-nesting
+  hypothesis, and the lexer round trip that brick 22 already did once. And `UCmd` is still
+  `UCmd` — no functions, no records, no arrays — so this is a tool you can run on a file,
+  not yet a tool you can run on *your* file.
+
 - **Stage 2j — the counted loop, natively** (`ConfTyping/CountedLoop.lean`). Every
   fully-certified program in this repo has been straight-line, and the reason is on the
   record: `only_the_budget_lacks_a_loop_rule` — five of six laws compose over loops, a

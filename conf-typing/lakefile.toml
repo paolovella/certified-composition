@@ -7,3 +7,7 @@ name = "ConfTyping"
 [[require]]
 name = "TransportCalculus"
 path = "../transport-calculus"
+
+[[lean_exe]]
+name = "certcheck"
+root = "Main"

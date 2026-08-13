@@ -82,12 +82,38 @@ fi
 #     name. The build does catch this — but only at root-import time, with a cryptic
 #     "environment already contains ..." after a per-module build has already
 #     succeeded. Catching it here names both sites.
-dups=$(grep -hoE '^(theorem|lemma|def|abbrev|structure|inductive) [A-Za-z_][^ :({[]*' \
-         conf-typing/ConfTyping/*.lean 2>/dev/null \
-       | awk '{print $2}' | sort | uniq -d)
+#     Stage 3a added the first NESTED namespace (`Src`), so the name a declaration
+#     actually occupies is its namespace path, not its bare identifier: `Src.parse` and
+#     `parse` are different declarations and the root build accepts both. The guard tracks
+#     the namespace stack rather than being relaxed, so a clash *inside* `Src` still fires.
+qualify() {
+  awk '
+    /^namespace [A-Za-z_]/ { stack[++depth] = $2; next }
+    /^end [A-Za-z_]/       { if (depth > 0 && stack[depth] == $2) depth--; next }
+    /^(theorem|lemma|def|abbrev|structure|inductive) [A-Za-z_]/ {
+      name = $2; sub(/[ :({[].*/, "", name)
+      path = ""
+      for (i = 1; i <= depth; i++) path = path stack[i] "."
+      print path name
+    }' "$1"
+}
+#     A declaration at depth 0 is in the ROOT namespace, not `ConfTyping` — which is what
+#     an edit appended past the closing `end` looks like. Lean accepts it silently (it does
+#     not clash with the namespaced name), so nothing else would catch it.
+outside=$(for f in conf-typing/ConfTyping/*.lean; do
+            qualify "$f" | grep -v '\.' | sed "s#^#$f: #"
+          done)
+if [ -n "$outside" ]; then
+  echo "$outside" | while read -r line; do
+    echo "DRIFT: declaration outside the ConfTyping namespace: $line"
+  done
+  fail=1
+fi
+dups=$(for f in conf-typing/ConfTyping/*.lean; do qualify "$f"; done | sort | uniq -d)
 if [ -n "$dups" ]; then
   for d in $dups; do
-    where=$(grep -lE "^(theorem|lemma|def|abbrev|structure|inductive) $d\b" \
+    bare=${d##*.}
+    where=$(grep -lE "^(theorem|lemma|def|abbrev|structure|inductive) $bare\b" \
               conf-typing/ConfTyping/*.lean | tr '\n' ' ')
     echo "DRIFT: duplicate top-level name '$d' in the flat ConfTyping namespace: $where"; fail=1
   done
@@ -503,6 +529,35 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
     echo "DRIFT: tools/ci.sh does not gate on '$gate'"; fail=1
   fi
 done
+
+# stage 3a: source text, and a tool.
+for thm in "theorem source_certified" "theorem parseE_toksE" "def parseSource" \
+           "def okName" "def toks " "def lex " "def parse " "def classify"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/Surface.lean 2>/dev/null; then
+    echo "DRIFT: the source-text stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the tool must exist and be wired up: the README tells people to run it.
+if ! grep -q 'name = "certcheck"' conf-typing/lakefile.toml 2>/dev/null; then
+  echo "DRIFT: certcheck is documented but conf-typing/lakefile.toml declares no such exe"; fail=1
+fi
+if [ ! -f conf-typing/Main.lean ]; then
+  echo "DRIFT: certcheck is documented but conf-typing/Main.lean is gone"; fail=1
+fi
+# the accepted example must stay the program the Lean side pins at budget 40.
+if [ ! -f conf-typing/examples/handler.uc ]; then
+  echo "DRIFT: examples/handler.uc is cited but missing"; fail=1
+fi
+for ex in unmediated use-after-free injection unbounded-loop secret-leak secret-branch; do
+  if [ ! -f "conf-typing/examples/rejected/$ex.uc" ]; then
+    echo "DRIFT: the rejected-example set is cited but $ex.uc is missing"; fail=1
+  fi
+done
+# the parser's residue is stated in two places; if the statement layer ever gets proved,
+# both must stop saying it is open.
+if ! grep -q "statement layer is not proved" conf-typing/README.md 2>/dev/null; then
+  echo "DRIFT: the parser's unproved statement layer is no longer stated in the README"; fail=1
+fi
 
 # stage 2j: the counted loop, natively.
 for thm in "theorem noWrite_preserves" "theorem countU_turn" "theorem countU_cost" \
