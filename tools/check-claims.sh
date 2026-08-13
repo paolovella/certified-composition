@@ -603,6 +603,31 @@ if ! grep -q "RW<unsigned int>" conf-typing/corpus/cn/SOURCES.md 2>/dev/null; th
   echo "DRIFT: the CN transcription no longer shows the RW<T> ownership syntax"; fail=1
 fi
 
+# stage C: heterogeneous composition. The finding is that the interaction term lives in
+# Bridge.pair's hmap, and it rests on a counterexample plus a sufficient condition. If
+# either half goes, the stage's conclusion is unsupported.
+for thm in "theorem arch_reconciliation_insufficient" "theorem touchesOnly_of_inert" \
+           "theorem bcb_not_touches" "theorem bcb_arch_touches" \
+           "theorem bcb_reconciles" "theorem bcb_not_trace_inert" \
+           "theorem hetero_bundle_componentwise" "theorem hetero_bundle_laws" \
+           "theorem cn_unions_sct_intersects" "theorem cn_reception_transfers" "def sctGA"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/HeteroCompose.lean 2>/dev/null; then
+    echo "DRIFT: stage C is cited but '$thm' is missing from HeteroCompose.lean"; fail=1
+  fi
+done
+# The two halves of the bundle must accumulate by DIFFERENT monoids. If sctGA's mul ever
+# becomes a union, the bundle stops being heterogeneous and hetero_bundle_laws still
+# proves - it just stops meaning anything.
+if ! grep -q "exact propext and_assoc" conf-typing/ConfTyping/HeteroCompose.lean 2>/dev/null; then
+  echo "DRIFT: sctGA no longer accumulates by intersection - the bundle is not heterogeneous"; fail=1
+fi
+# Stage C's second producer is modelled, not transcribed. Saying otherwise would claim a
+# Jasmin reception this repo has not done.
+if ! grep -q "modelled, not transcribed" conf-typing/ConfTyping/HeteroCompose.lean 2>/dev/null; then
+  echo "DRIFT: HeteroCompose no longer states that the SCT certificate is modelled, not transcribed"
+  fail=1
+fi
+
 # stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
 # edited, every improvement claim measured against it becomes meaningless.
 for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do

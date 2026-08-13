@@ -2079,6 +2079,51 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## Where the interaction term lives (`HeteroCompose.lean`) — stage C, first pass
+
+`Bridge.pair_comp_cert` says composing a bundle is **componentwise**: no interaction term,
+no side condition. The secure-compilation literature says composing distinct properties
+gives roughly the **intersection**. Stage C existed because both cannot be the whole story.
+
+**Both are right, on opposite sides of one hypothesis.** `Bridge.pair` demands
+`hmap : b₂.map = b₁.map` — the two certificates must be about the *same artifact*. Within
+one tool over one semantics that is `rfl` and invisible. Across two tools over *different*
+semantics it is the entire problem: a **semantic reconciliation obligation** the
+composition law neither performs nor mentions. Accumulation really is free — downstream of
+an admission ticket that is not. The literature's intersections are the price of the
+ticket, not a defect in the algebra.
+
+**The concrete instance.** CN certifies ownership over the *architectural* semantics of C
+and says nothing about speculation — that is CN's stated scope, not a gap. An SCT
+certificate is about a machine that mispredicts. So the footprint received in
+`CNReceive.lean` is a fact about a **different map** from the one an SCT certificate
+concerns, and bundling them requires transferring the first onto the second's semantics.
+
+`arch_reconciliation_insufficient` is the counterexample, and its content is that the
+obvious reconciliation is too weak: the bounds-check-bypass gadget agrees with its
+architectural counterpart **on the store under every schedule** — rollback is perfect —
+and keeps its CN footprint architecturally, and *still* touches memory outside that
+footprint transiently. State-level agreement does not transfer an ownership certificate;
+the residue is in the trace.
+
+`cn_reception_transfers` gives the condition that does suffice — store reconciliation plus
+trace inertness, the latter being `Speculate.lean`'s `spec_inert` at this altitude — and
+returns both halves: every schedule's store map is the same map (so `hmap` is discharged)
+and the footprint bounds the trace under every schedule.
+
+`hetero_bundle_laws` then shows the free half is genuinely heterogeneous: one artifact
+carrying a CN footprint that accumulates by **union** beside an SCT-shaped public set that
+accumulates by **intersection**, advanced by a single `Bridge.comp`, componentwise.
+
+**Scope.** The second producer is **modelled, not transcribed** — `sctGA` is SCT-*shaped*,
+chosen because intersection is a genuinely different monoid from CN's union. No Jasmin
+output is consumed and nothing here is transcribed from Jasmin; doing that the way
+`corpus/cn/SOURCES.md` transcribes CN is the second pass. The speculative machine is one
+schedule parameter and an address trace, deliberately coarser than `Speculate.lean`'s.
+The bundle witness and the counterexample are also *separate* results: the bundle
+demonstrates that composition is free once `hmap` holds, and does not itself run a
+transferred certificate through the speculative model.
+
 ## Receiving a foreign certificate (`CNReceive.lean`) — stage B, and the first one we did not prove
 
 Every `Bridge` before this one certified something this repo also proved. This one receives

@@ -915,6 +915,36 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage C — where the interaction term lives** (`conf-typing/ConfTyping/HeteroCompose.lean`).
+  `pair_comp_cert` says bundled certificates accumulate componentwise, with no interaction
+  term. The secure-compilation literature says composing distinct properties gives roughly
+  the intersection. This stage existed because both cannot be the whole story.
+
+  **Both are right, on opposite sides of one hypothesis.** `Bridge.pair` demands
+  `hmap : b₂.map = b₁.map`. Within one tool over one semantics that is `rfl` and invisible.
+  Across two tools over *different* semantics it is a **semantic reconciliation
+  obligation** the composition law neither performs nor mentions. Accumulation is free —
+  downstream of an admission ticket that is not. The intersections are the price of the
+  ticket, not a defect in the algebra.
+
+  **The counterexample rules out the obvious reconciliation.** CN certifies ownership
+  architecturally and says nothing about speculation; that is its stated scope. The
+  bounds-check-bypass gadget agrees with its architectural counterpart **on the store under
+  every schedule** — rollback is perfect — and keeps its CN footprint architecturally, and
+  **still touches memory outside that footprint transiently**. State-level agreement does
+  not transfer an ownership certificate; the residue is in the trace.
+
+  **The sufficient condition** (`cn_reception_transfers`) is store reconciliation *plus*
+  trace inertness — brick 33's `spec_inert` at this altitude — which discharges `hmap` and
+  carries the footprint to every schedule. `hetero_bundle_laws` then shows the free half is
+  genuinely heterogeneous: a footprint accumulating by **union** beside an SCT-shaped
+  public set accumulating by **intersection**, advanced by one `Bridge.comp`.
+
+  **Modelled, not transcribed**, and guarded as such: no Jasmin output is consumed, and the
+  bundle witness and the counterexample are separate results. A name clash with brick 33's
+  own `gadget` was caught by the flat-namespace guard on the first run. Self-test 21/21 →
+  **24/24**.
+
 - **Stage B — receiving CN's certificate** (`conf-typing/ConfTyping/CNReceive.lean`,
   sources in `conf-typing/corpus/cn/SOURCES.md`). Every `Bridge` until now certified
   something this repo also proved. This one **receives** a guarantee from CN — a

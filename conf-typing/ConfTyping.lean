@@ -81,3 +81,4 @@ import ConfTyping.SpecFused
 import ConfTyping.CountedLoop
 import ConfTyping.Surface
 import ConfTyping.CNReceive
+import ConfTyping.HeteroCompose

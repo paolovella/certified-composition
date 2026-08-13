@@ -101,6 +101,20 @@ run_case "CN transcription reverts to Owned<T>" drift \
   bash -c 'sed -i "s/RW<unsigned int>/Owned<unsigned int>/g" \
              conf-typing/corpus/cn/SOURCES.md'
 
+# stage C: the finding is a counterexample plus a sufficient condition, and a claim about
+# which producer was transcribed. All three are things that go quiet rather than loud.
+run_case "stage C counterexample renamed" drift \
+  bash -c 'sed -i "s/theorem arch_reconciliation_insufficient/theorem gone_away/" \
+             conf-typing/ConfTyping/HeteroCompose.lean'
+
+run_case "sctGA stops intersecting" drift \
+  bash -c 'sed -i "s/exact propext and_assoc/exact propext or_assoc/" \
+             conf-typing/ConfTyping/HeteroCompose.lean'
+
+run_case "stage C claims a Jasmin reception" drift \
+  bash -c 'sed -i "s/modelled, not transcribed/transcribed from Jasmin/" \
+             conf-typing/ConfTyping/HeteroCompose.lean'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

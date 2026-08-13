@@ -35,6 +35,13 @@ Two of those stages have since closed, neither by tripping its kill criterion:
   trusted base by append, and the composite's base comes out **strictly smaller** than the
   three entries every CN result would otherwise carry. The reception is an encoding done by
   hand and unchecked against CN — stated in the module, and guarded.
+- **Stage C — the interaction term, located** (`ConfTyping/HeteroCompose.lean`). Composing
+  a bundle really is free and componentwise; what costs is `Bridge.pair`'s `hmap`, the
+  hypothesis that both certificates are about the *same artifact*. Across two tools over
+  different semantics that is a semantic reconciliation obligation — and agreement on the
+  architectural state is **not enough**, shown by a bounds-check-bypass gadget that keeps
+  its CN footprint architecturally and violates it transiently. The literature's
+  intersections are the price of that ticket, not a defect in the algebra.
 
 ## Running it
 
