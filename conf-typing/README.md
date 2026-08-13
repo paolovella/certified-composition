@@ -2079,6 +2079,47 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## Receiving a foreign certificate (`CNReceive.lean`) — stage B, and the first one we did not prove
+
+Every `Bridge` before this one certified something this repo also proved. This one receives
+a guarantee from **CN** — a separation-logic refinement-type verifier for real C, built on
+the Cerberus C semantics (Pulte, Makwana, Sewell, Memarian, Sewell, Krishnaswami, POPL
+2023) — the way `Bridge.ofKernel` receives a Dobrushin coefficient. No C is verified here.
+
+**What is modelled is the ownership half of a CN spec, because that is the half that
+composes.** `take pv = RW<unsigned int>(p)` names the memory a function may touch, and its
+observable content is a modifies clause (`ModifiesOnly`). The grade is the **footprint**,
+grade composition is **union**, and `act_mul` is associativity of `∨` — which is the whole
+reason footprints accumulate with no interaction term. The ledger rides alongside as a
+phantom, exactly as in `LedgerBridge`.
+
+The anchor is the CN tutorial's own frame-rule exercise (`corpus/cn/SOURCES.md`), in which
+`incr_first` owns `p` but not `q`, and the caller's postcondition `qv_ == qv` is *derived
+by the frame rule* rather than proved in the body. `cn_untouched_outside` is that
+derivation, obtained from the composed certificate: compose two receptions and every
+location outside the union of the two footprints is provably untouched.
+
+The stage-B milestone sentence — *CN certifies f, CN certifies g, therefore the composite
+carries both with trusted base = ledger(f) ∪ ledger(g)* — is `cn_comp_footprint` and
+`cn_comp_ledger`, both `rfl`. `modifiesOnly_comp` proves independently that the union
+really is a modifies clause for `g ∘ f`, so the grade is the property and not bookkeeping.
+
+**The trusted base is computed, not fixed.** Every CN result rests on Cerberus's C
+semantics, CN's type system, and an SMT backend — three entries. But CN's obligations are
+engineered into a decidable fragment, and a purely structural ownership obligation never
+reaches the solver: `cn_base_strictly_smaller` exhibits a world where the solver is
+**unsound** and the frame certificate stands anyway, and `cn_comp_base_strictly_smaller`
+shows the saving survives composition. That is stage 2c's `needs` argument carried to a
+foreign tool.
+
+**What this is not.** Nothing here proves CN's `take` *implies* our `ModifiesOnly` — that
+is CN's soundness theorem over Cerberus's memory model, and restating it is not this
+repo's business. The encoding is by hand and unchecked against CN's implementation;
+`CStore` is a total map, so provenance, lifetime and alignment are all absent; and the
+functional postcondition (`pv_ == pv + 1u32`) is not modelled at all. Those four gaps are
+stated in the module header and in `corpus/cn/SOURCES.md`, and a drift guard fires if the
+caveat is ever deleted.
+
 ## Widening the counted loop (`CountedLoop.lean`) — stage 2k, and the first measured rule
 
 Stage 2j's `for` rule demanded the loop body return the mediation set **unchanged**. The

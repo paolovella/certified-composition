@@ -18,10 +18,23 @@ mathlib olean cache (and compiles its Physlib dependency locally).
 
 ## Where this stands
 
-[`PLAN-2026-08.md`](PLAN-2026-08.md) is the honest assessment: what is rigged in the
-current tests, what the checker's false-rejection rate is (unmeasured), where this sits
-against seL4, Jasmin, CN, Verasco and the IFC languages that failed to be adopted — and
-the staged plan that follows from it, with a kill criterion per stage.
+[`PLAN-2026-08.md`](PLAN-2026-08.md) is the honest assessment: what was rigged in the
+earlier tests, where this sits against seL4, Jasmin, CN, Verasco and the IFC languages that
+failed to be adopted — and the staged plan that follows from it, with a kill criterion per
+stage.
+
+Two of those stages have since closed, neither by tripping its kill criterion:
+
+- **Stage A — the false-rejection rate, now measured.** 4% on 25 author-written programs
+  (`conf-typing/corpus/`), and **6-of-7 detection with 1 false rejection in 5** on twelve
+  transcribed CWE examples (`conf-typing/corpus/ext/`) — code neither written by this repo
+  nor for it. The external pass also found a **scope hole**: no certificate here detects a
+  memory leak, and `VULN-COVERAGE.md` says so.
+- **Stage B — the first certificate this repo did not prove** (`ConfTyping/CNReceive.lean`).
+  CN's ownership clause, received as a graded action: footprints accumulate by union, the
+  trusted base by append, and the composite's base comes out **strictly smaller** than the
+  three entries every CN result would otherwise carry. The reception is an encoding done by
+  hand and unchecked against CN — stated in the module, and guarded.
 
 ## Running it
 

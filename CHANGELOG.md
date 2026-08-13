@@ -915,6 +915,42 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage B — receiving CN's certificate** (`conf-typing/ConfTyping/CNReceive.lean`,
+  sources in `conf-typing/corpus/cn/SOURCES.md`). Every `Bridge` until now certified
+  something this repo also proved. This one **receives** a guarantee from CN — a
+  separation-logic refinement-type verifier for real C, built on the Cerberus C semantics
+  (POPL 2023) — the way `Bridge.ofKernel` receives a Dobrushin coefficient. No C is
+  verified here.
+
+  **The ownership half of a CN spec is the half that composes.** `take pv = RW<unsigned
+  int>(p)` names the memory a function may touch; its observable content is a modifies
+  clause. Grade = footprint, `mul` = union, `act_mul` = associativity of `∨`. **The kill
+  criterion was that CN's guarantee might need an interaction term to state — it did not
+  need one, and none was invented.**
+
+  The milestone sentence — *CN certifies f, CN certifies g, therefore the composite carries
+  both with trusted base = ledger(f) ∪ ledger(g)* — is `cn_comp_footprint` and
+  `cn_comp_ledger`, both `rfl`, with `modifiesOnly_comp` proving independently that the
+  union really is a modifies clause for `g ∘ f`. The anchor is the CN tutorial's own frame
+  rule exercise, where `incr_first` owns `p` and not `q` and the caller gets `qv_ == qv`
+  *derived* rather than proved; `cn_untouched_outside` is that derivation, out of the
+  composed certificate.
+
+  **The trusted base is computed, and comes out strictly smaller.** CN rests on Cerberus,
+  its own type system, and an SMT backend — but its obligations are engineered into a
+  decidable fragment, and a purely structural ownership obligation never asks the solver
+  anything. `cn_base_strictly_smaller` exhibits a world where **the solver is unsound and
+  the frame certificate stands anyway**, and the saving survives composition.
+
+  **What it is not, guarded so it stays said.** The encoding is by hand and **unchecked
+  against CN's implementation**: nothing proves `take RW<T>(p)` implies `ModifiesOnly`,
+  which is CN's soundness theorem over Cerberus's memory model. `CStore` is a total map, so
+  provenance, lifetime and alignment are absent; the functional postcondition is not
+  modelled. Four new guard cases fire if the caveat is deleted, if `Bridge.ofCN` stops
+  demanding the modifies clause (which would make every downstream theorem vacuous while
+  still compiling), or if the transcription drifts back to the older `Owned<T>` spelling.
+  Guard self-test 17/17 → **21/21**.
+
 - **The external corpus** (`conf-typing/corpus/ext/`). Twelve programs transcribed from
   CWE demonstrative examples — code neither written by this repo nor for it — with the
   cases the language cannot express recorded rather than adapted (CWE-862 ex.2 needs a
@@ -935,6 +971,12 @@ landed.
   That defines the next rule by evidence rather than taste: the bound must be allowed to be
   a **variable validated by a guard**, with the budget read off the guard — the first
   value-dependent rule in this repo, and the shape Jasmin's type system already uses.
+
+  **Recorded, then deliberately not scheduled.** Written the same day, and reversed on
+  reading the plan back: a value-dependent rule on `UCmd`/`bcheck` is Option 1 work on a
+  component §4 rejects and the plan marks frozen. Driving an author-written corpus to zero
+  is re-rigging by a slower route. It stands as a known limitation, with leaks and nested
+  counted loops.
 
 - **Corpus, and stage 2k — the first measured rule** (`conf-typing/corpus/`,
   `ConfTyping/CountedLoop.lean`). The repo had no idea what its checkers reject. The corpus

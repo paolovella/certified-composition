@@ -574,6 +574,35 @@ if ! grep -q "Leaks (CWE-401) are NOT detected" VULN-COVERAGE.md 2>/dev/null; th
   fail=1
 fi
 
+# stage B: the CN reception. This is the first certificate in the repo produced by a
+# tool that is not this repo, so the guards here are mostly about NOT OVERCLAIMING it.
+for thm in "theorem cn_comp_ledger" "theorem cn_comp_footprint" "theorem modifiesOnly_comp" \
+           "theorem cn_untouched_outside" "theorem cn_base_strictly_smaller" \
+           "theorem cn_comp_base_strictly_smaller" "theorem cn_false_footprint_unreceivable" \
+           "theorem cn_frame_rule" "def cnGA" "def Bridge.ofCN"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/CNReceive.lean 2>/dev/null; then
+    echo "DRIFT: the CN reception is cited but '$thm' is missing from CNReceive.lean"; fail=1
+  fi
+done
+if [ ! -f conf-typing/corpus/cn/SOURCES.md ]; then
+  echo "DRIFT: the CN reception cites conf-typing/corpus/cn/SOURCES.md but it is missing"; fail=1
+fi
+# The reception is by hand and is NOT checked against CN. If that sentence ever leaves the
+# module, the stage starts reading as "we verified C", which it is not.
+if ! grep -q "not checked against CN's implementation" conf-typing/ConfTyping/CNReceive.lean 2>/dev/null; then
+  echo "DRIFT: CNReceive no longer states that the encoding is unchecked against CN"; fail=1
+fi
+# Bridge.ofCN must keep DEMANDING the modifies clause. If the hypothesis is ever dropped,
+# every downstream theorem still compiles and all of them become vacuous.
+if ! grep -q "(h : ModifiesOnly f F)" conf-typing/ConfTyping/CNReceive.lean 2>/dev/null; then
+  echo "DRIFT: Bridge.ofCN no longer demands ModifiesOnly - the reception would be free"; fail=1
+fi
+# CN's resource keyword is RW<T>; the older Owned<T> spelling would mean the transcription
+# was recalled rather than read.
+if ! grep -q "RW<unsigned int>" conf-typing/corpus/cn/SOURCES.md 2>/dev/null; then
+  echo "DRIFT: the CN transcription no longer shows the RW<T> ownership syntax"; fail=1
+fi
+
 # stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
 # edited, every improvement claim measured against it becomes meaningless.
 for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do

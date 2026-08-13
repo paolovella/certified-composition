@@ -81,6 +81,26 @@ run_case "fused invariant drops SepInv" drift \
 run_case "trace theorem renamed" drift \
   bash -c 'sed -i "s/theorem jcheck_strace/theorem gone_away/" conf-typing/ConfTyping/SpecFused.lean'
 
+# stage B: the CN reception. The first three cases guard the theorems; the last two
+# guard against the failure mode that actually matters here, which is not a broken
+# proof but an OVERCLAIM - dropping the "we did not check this against CN" sentence,
+# or dropping the hypothesis that makes the reception cost anything.
+run_case "CN reception theorem renamed" drift \
+  bash -c 'sed -i "s/theorem cn_comp_ledger/theorem gone_away/" \
+             conf-typing/ConfTyping/CNReceive.lean'
+
+run_case "CN reception caveat removed" drift \
+  bash -c 'sed -i "s/not checked against CN/checked against CN/" \
+             conf-typing/ConfTyping/CNReceive.lean'
+
+run_case "Bridge.ofCN stops demanding frame" drift \
+  bash -c 'sed -i "s/(h : ModifiesOnly f F)/(h : Frame f F)/" \
+             conf-typing/ConfTyping/CNReceive.lean'
+
+run_case "CN transcription reverts to Owned<T>" drift \
+  bash -c 'sed -i "s/RW<unsigned int>/Owned<unsigned int>/g" \
+             conf-typing/corpus/cn/SOURCES.md'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'
