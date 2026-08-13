@@ -1,0 +1,1 @@
+emit log "hello"
