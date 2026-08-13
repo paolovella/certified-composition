@@ -55,6 +55,7 @@ lake build          # builds all four layers
 | `ConfTyping/DecimalId.lean` | brick 28 / `VULN-COVERAGE.md` row 3 | decimal identifiers: a verified decimal codec (`ofDigits_toDigits`) + a maximal-munch decimal reader — closes brick 25's run-length residual |
 | `ConfTyping/LogInjection.lean` | brick 29 / `VULN-COVERAGE.md` row 3 | a third real sink: log injection / log forging (CWE-117) — the newline record-separator metacharacter, structured logging immune by construction |
 | `ConfTyping/AliasFix.lean` | brick 30 / `VULN-COVERAGE.md` row 6 | fixpoint may-alias: infers a coarsening loop invariant (`ALInv_coarsen`, `loopFix_correct`), accepting alias-maintaining loops brick 24's one-pass rule rejected |
+| `ConfTyping/CountedLoop.lean` | stage 2j | **the counted loop, natively**: a uniform budget for a loop whose body is an arbitrary `UCmd` — heap, mediation and emission included — so `loopHandler` carries all five certificates *while iterating*. A dying loop diverges rather than overspending, which is what makes the bound provable |
 | `ConfTyping/SpecFused.lean` | stage 2i | **the fused induction, and the trace theorem**: `PtrLow` is inductive over whole certified programs when — and only when — it travels with `SepInv`, `LabInv` and `uLowEqA`, and the speculative trace of a certified program is a function of the Low part of its input at every window. Stage 2d's conjecture, proved, and applied to `bigHandler` |
 | `ConfTyping/BigHandler.lean` | stage 2h | **a program worth the name**: twenty-one operations, all five certificates from one checker, budget 24 and tight. The trusted base is still two entries, the secret address is retired, and 2e's speculation bound does real work (26 real against 24 certified) |
 | `ConfTyping/SpecFactor.lean` | stage 2g | **the trace does not factor either**: the natural relation for stating trace agreement is not inductive, and `LabInv` is the missing hypothesis — so the trace proof must be *fused into* `jsecTy_sound`, not layered on it. Stage 1j's wall from a third direction |
@@ -2021,6 +2022,53 @@ would have to state.
 
 This stage claims a machine, one obstruction and one positive. It does **not** claim a
 race-freedom certificate on `UCmd`; brick 32's results stay where they are.
+
+## The counted loop, natively (`CountedLoop.lean`) — stage 2j
+
+Every fully-certified program in this repo is straight-line, and the record says why:
+`only_the_budget_lacks_a_loop_rule`. Five of six laws compose over loops; a cost bound
+needs an *iteration* bound; brick 34's `dos_unbounded` proves no uniform one exists in
+general. So `allcheck` returns `none` at every `.loop`.
+
+Stage 1f found one way past it. `UCert.ofEmbedded` budgets a loop whose body is a **pure
+store program embedded wholesale** from the `While` development — which is why
+`handlerBounded`'s loop body is `.skip`. An embedded `WCmd` has no heap, no strings, no
+`check` and no `access`, so the certified loop cannot touch memory, cannot be mediated,
+and cannot emit. The budget was available; the loop was not worth writing.
+
+**The native rule.** `forU i k body` initialises a counter from a constant and counts
+down, with `body` an arbitrary `UCmd`. `countU_cost` bounds the loop by `1 + v·(b+2)` in
+the counter's *value*; `UCert.forU` reads `v = k` off the initialiser and turns it into
+the uniform budget `2 + k·(b+2)`; `JSecTy.forU` supplies the flow and memory halves. The
+counter must be Low, so a loop whose *length* is secret is refused — stage 1b's timing
+channel, at the iteration level.
+
+**The case stage 1f's proof does not have.** A `WCmd` body cannot die; a `UCmd` body can.
+If the machine dies inside the loop, the decrement is a no-op, the guard never falls, and
+the loop runs forever (`a_dead_counted_loop_does_not_halt`, which is stage 1f's own
+`uexec_dead_loop_diverges` applied where it bites). The budget is therefore never
+violated — there is no halting run to violate it — and that is precisely what makes
+`countU_cost` provable. It is recorded as a defect of the *language*: a failed
+authorization check inside a loop should abort, not hang. The fix is a `dead`
+short-circuit in `uexec`'s loop rule, a semantics change every module below depends on,
+and it is named here rather than guessed at.
+
+**One checker.** `bcheck` is `allcheck` plus one clause; everything that is not a `seq` or
+an `ite` goes straight to `allcheck`, so every earlier result applies verbatim, and
+`asFor` reads the counted-loop idiom off raw syntax. The loop body is checked by
+`allcheck`, so it may not itself contain a loop — nesting is a follow-on, not a claim.
+
+**The artifact.** `loopHandler` carries **all five certificates while iterating**: budget
+40 over every input and every fuel, a mediated read *inside* the loop, noninterference,
+memory safety with a scratch cell allocated and freed on every turn, and a sanitized query
+emitted per turn with its delimiter count fixed. `allcheck_refuses_loopHandler` is the
+contrast — the previous checker returns `none` on it. Stage 2i's trace theorem covers it
+as well (`loopHandler_trace_is_low`), retiring 2i's note that its loop-free restriction
+was "the budget's, not the trace's".
+
+The boundary is unmoved. `unbounded_countdown_still_refused` keeps the DoS loop out, and
+`only_the_budget_lacks_a_loop_rule` stays true as written: there is still no rule for a
+general `.loop`, and brick 34 proves there cannot be. Standard three axioms, no `sorry`.
 
 ## The fused induction, and the trace theorem (`SpecFused.lean`) — stage 2i
 

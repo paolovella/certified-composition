@@ -69,6 +69,10 @@ run_case "cited VULN theorem renamed" drift \
   bash -c 'sed -i "s/theorem medCheck_sound/theorem gone_away/" \
              conf-typing/ConfTyping/Mediation.lean'
 
+# stage 2j: the counted loop's two headline measurements
+run_case "counted-loop budget changes" drift \
+  bash -c 'sed -i "s/some (\\[\"db\"\\], \\[\\], 40)/some ([\"db\"], [], 41)/" conf-typing/ConfTyping/CountedLoop.lean'
+
 # stage 2i: the fused invariant is the stage's content - if it stops carrying the
 # memory-safety fields the trace theorem is no longer the one stage 2g asked for
 run_case "fused invariant drops SepInv" drift \

@@ -504,6 +504,32 @@ for gate in "conf-typing" "transport-calculus" "transport-kernel" \
   fi
 done
 
+# stage 2j: the counted loop, natively.
+for thm in "theorem noWrite_preserves" "theorem countU_turn" "theorem countU_cost" \
+           "theorem countU_auth" "theorem UCert.forU" "theorem JSecTy.forU" \
+           "theorem asFor_eq" "theorem bcheck_sound" "theorem loopHandler_five" \
+           "theorem loopHandler_trace_is_low" "theorem allcheck_refuses_loopHandler" \
+           "theorem unbounded_countdown_still_refused" \
+           "theorem a_dead_counted_loop_does_not_halt"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/CountedLoop.lean 2>/dev/null; then
+    echo "DRIFT: the counted-loop stage is cited but '$thm' is missing"; fail=1
+  fi
+done
+# the stage's whole claim is that the OLD checker refuses this program and the new one
+# does not. If either measurement moves, the claim is about a different program.
+if ! grep -q 'bcheck Psec \[\] \[\] loopHandler = some (\["db"\], \[\], 40)' \
+     conf-typing/ConfTyping/CountedLoop.lean 2>/dev/null; then
+  echo "DRIFT: loopHandler is cited as checking at budget 40 but the stated result changed"; fail=1
+fi
+if ! grep -q 'allcheck Psec \[\] \[\] loopHandler = none' \
+     conf-typing/ConfTyping/CountedLoop.lean 2>/dev/null; then
+  echo "DRIFT: the contrast with allcheck is cited but the theorem is gone"; fail=1
+fi
+# brick 34's boundary must stay where it is: no rule for a general loop.
+if ! grep -q "theorem only_the_budget_lacks_a_loop_rule" conf-typing/ConfTyping/FullCert.lean 2>/dev/null; then
+  echo "DRIFT: stage 2j cites the standing record but it is gone"; fail=1
+fi
+
 # stage 2i: the fused induction, and the trace theorem.
 for thm in "theorem jcheck_ptrLow" "theorem transRun_agrees" "theorem jcheck_strace" \
            "theorem allcheck_jcheck" "theorem certified_trace_is_low" \
@@ -946,7 +972,7 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
     fi
   done
 fi
-for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor BigHandler SpecFused; do
+for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor BigHandler SpecFused CountedLoop; do
   if grep -q "$mod.lean" VULN-COVERAGE.md && \
      ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1

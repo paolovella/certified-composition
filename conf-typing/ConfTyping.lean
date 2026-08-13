@@ -78,3 +78,4 @@ import ConfTyping.SpecTrace
 import ConfTyping.SpecFactor
 import ConfTyping.BigHandler
 import ConfTyping.SpecFused
+import ConfTyping.CountedLoop

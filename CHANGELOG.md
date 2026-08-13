@@ -915,6 +915,42 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage 2j — the counted loop, natively** (`ConfTyping/CountedLoop.lean`). Every
+  fully-certified program in this repo has been straight-line, and the reason is on the
+  record: `only_the_budget_lacks_a_loop_rule` — five of six laws compose over loops, a
+  cost bound needs an *iteration* bound, and brick 34's `dos_unbounded` proves no uniform
+  one exists in general. Stage 1f found one way past it, `UCert.ofEmbedded`, which budgets
+  a loop whose body is a **pure store program embedded wholesale** from the `While`
+  development — which is why `handlerBounded`'s loop body is `.skip`. An embedded `WCmd`
+  has no heap, no strings, no `check` and no `access`, so no certified loop could touch
+  memory, be mediated, or emit.
+
+  `forU i k body` is the counted loop with a **native `UCmd` body**: `countU_cost` bounds
+  it by `1 + v·(b+2)` in the counter's value, `UCert.forU` turns a constant initialiser
+  into the uniform budget `2 + k·(b+2)`, and `JSecTy.forU` supplies the flow and memory
+  halves (the counter must be Low, so a loop whose *length* is secret is refused).
+
+  The proof has a case stage 1f's cannot: a `WCmd` body has no way to die, and a `UCmd`
+  body does. If the machine dies inside the loop the decrement is a no-op, the guard never
+  falls, and the loop runs forever — `a_dead_counted_loop_does_not_halt`. So the budget is
+  never violated because there is no halting run to violate it, and that is exactly what
+  makes `countU_cost` provable. Recorded as a defect of the *language*: the fix is a
+  `dead` short-circuit in `uexec`'s loop rule, which is a semantics change every module
+  below depends on, and is named rather than guessed at.
+
+  `bcheck` is `allcheck` plus one clause — everything that is not a `seq` or an `ite` goes
+  straight to `allcheck`, so every earlier result applies verbatim — and `asFor` reads the
+  iteration bound off the syntax. **`loopHandler` carries all five certificates while
+  iterating**: budget 40, mediated reads *inside* the loop, noninterference, memory safety
+  with a scratch cell allocated and freed each turn, and a sanitized query emitted per
+  turn. `allcheck_refuses_loopHandler` is the contrast — the old checker returns `none`.
+  Stage 2i's trace theorem covers it too (`loopHandler_trace_is_low`), which retires 2i's
+  note that its loop-free restriction "is the budget's, not the trace's".
+
+  The boundary is unmoved: `unbounded_countdown_still_refused`, and
+  `only_the_budget_lacks_a_loop_rule` stays true as written — there is still no rule for a
+  general `.loop`, and brick 34 proves there cannot be. Standard three axioms, no `sorry`.
+
 - **Stage 2i — the fused induction, and the trace theorem**
   (`ConfTyping/SpecFused.lean`). Stage 2d stated a conjecture: *for every program `xcheck`
   accepts, the speculative address trace is a function of the Low part of the initial
