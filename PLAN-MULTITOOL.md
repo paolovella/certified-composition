@@ -162,6 +162,31 @@ sufficient.
 - **Kill criterion:** if bounded composition turns out to be exactly `min` with no side
   condition and no interesting failure, this is a definition rather than a theorem. Say so
   in one paragraph and fold it into stage E.
+- **Done, first pass** (`conf-typing/ConfTyping/BoundedCert.lean`). **The kill criterion did
+  not fire, and the outcome is stronger than milestone (i).**
+  - **`min` is unsound, and totally.** `min_unsound`: `f x = x + 20`, `g` well-behaved only
+    below 10. Both parts correctly certified; the rule claims the composite safe below 11;
+    **the composite fails at every input, including 0.** No bound exists for which it is
+    safe. Neither certificate is wrong — the rule that combined them discarded the growth.
+  - **The grade is the pair `(bound, growth)`**, composing as
+    `bmul ⟨b₂,g₂⟩ ⟨b₁,g₁⟩ = ⟨min b₁ (b₂ - g₁), g₁ + g₂⟩`. Sound (`bounded_comp_sound`) with
+    **no side condition**, because the bound is stored strictly so the vacuous certificate
+    is `0` and truncated subtraction lands on it. Associative (`bmul_assoc`), and **tight**
+    (`bounded_comp_tight`) — safe below 8, broken at 8.
+  - **The unexpected result: `bounded_grade_does_not_factor`.** The composite bound is not a
+    function of the two bounds; it reads the inner growth. So a bounded certificate **cannot
+    be presented as a product of independent components**, and `Bridge.pair_comp_cert`'s
+    free componentwise composition does not cover it. Stage 1j found two properties that
+    cannot be independently *derived* while bundling stayed free; **this is the first grade
+    whose composition is itself coupled** — a real limit on the repo's central claim, found
+    by the first example not built to fit it.
+  - Method note: `min`'s unsoundness, the corrected law's soundness (1 803 random claims
+    against brute-force semantics) and its associativity (42 875 triples) were all
+    established by exhaustive search *before* anything was proved in Lean.
+- **Second pass, not done.** `GrowsBy` is a **constant** growth bound. Input-dependent
+  growth needs the grade to carry a monotone map — `universalGA`'s `Mono`, already in
+  `TransportCalculus`. And nothing is yet transcribed from Alloy or CBMC: connecting this to
+  real emitted bounds is stage E's job.
 
 ### Stage G — The cross-tool discharge, formalised. *(3–5 sessions. The highest-value one.)*
 

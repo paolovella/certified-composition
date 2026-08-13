@@ -148,6 +148,20 @@ run_case "native_decide creeps in" drift \
 run_case "EMISSION drops the CN verdict" drift \
   bash -c 'sed -i "s/## CN — no/## CN/" conf-typing/corpus/jasmin/EMISSION.md'
 
+# stage F. The negative result and the non-factorization are the stage; both would go
+# quiet rather than loud if deleted.
+run_case "min-unsoundness counterexample dropped" drift \
+  bash -c 'sed -i "s/theorem min_unsound/theorem gone_away/" \
+             conf-typing/ConfTyping/BoundedCert.lean'
+
+run_case "bmul stops subtracting growth" drift \
+  bash -c 'sed -i "s/min i.bound (o.bound - i.growth)/min i.bound o.bound/" \
+             conf-typing/ConfTyping/BoundedCert.lean'
+
+run_case "non-factorization result dropped" drift \
+  bash -c 'sed -i "s/theorem bounded_grade_does_not_factor/theorem gone_away/" \
+             conf-typing/ConfTyping/BoundedCert.lean'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

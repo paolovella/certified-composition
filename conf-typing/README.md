@@ -2079,6 +2079,69 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## Bounded guarantees, and the first grade that does not factor (`BoundedCert.lean`) — stage F
+
+Alloy's `check A for 4 AbacPolicy`, CBMC's unwinding depth, TLC's finite instance: three
+tools, one shape — **a guarantee quantified by a budget**. The assurance-case literature
+handles these by downgrading them to *confidence*. This asks the algebraic question.
+
+**The tempting rule is `min`, and `min` is unsound.** `min_unsound` exhibits `f x = x + 20`
+and a `g` well-behaved only below 10: both parts are correctly certified, the rule claims
+the composite is safe below 11, and **the composite fails at every input including 0**.
+There is no bound at all for which it is safe. Neither certificate is wrong and neither
+tool erred — the rule that combined them threw away the growth.
+
+So a bounded certificate's grade is not its bound. It is the pair `(bound, growth)`:
+
+```
+bmul ⟨b₂, g₂⟩ ⟨b₁, g₁⟩ = ⟨min b₁ (b₂ - g₁), g₁ + g₂⟩
+```
+
+`bounded_comp_sound` proves this sound **with no side condition**, which the encoding buys:
+the bound is stored *strictly* (`size x < b`), so `b = 0` is the vacuous certificate and
+Nat's truncated subtraction lands exactly on it when the growth overruns. A formulation
+with `Option Nat` and a `g₁ ≤ b₂` guard proves the same theorem with a hypothesis and eight
+case splits. `bmul_assoc` gives the monoid; the associativity was checked exhaustively over
+42 875 triples before it was proved, and the soundness against brute-force semantics on
+1 803 random claims.
+
+**The law is tight, not merely conservative.** `bounded_comp_tight` shows the composite is
+safe below 8 and broken at 8 on the counterexample's own machinery — a sound law that
+always answered "nothing certified" would be worthless, and this one isn't.
+
+### The finding
+
+**`bounded_grade_does_not_factor`.** The composite bound is provably *not a function of the
+two bounds* — it reads the inner certificate's growth. Same bounds, growth 0 versus 3,
+composite bounds 5 versus 2. So no `mulB : Nat → Nat → Nat` reproduces it, and a bounded
+certificate **cannot be carried as a product of an independent bound and an independent
+growth**.
+
+That matters because `Bridge.pair_comp_cert` is this repo's free-lunch theorem: bundle *n*
+guarantees, pay *n* independent accumulations, no interaction term. Stage 1j already found
+two properties that cannot be independently **derived** (`ni_and_memory_do_not_factor`)
+while insisting bundling the results stays free. **This is the other half**: the first
+grade whose *composition* is genuinely coupled, found by the first example that was not
+built to fit the algebra.
+
+The taxonomy now has three kinds of component:
+
+| kind | `act` uses it | `mul` reads other components | example |
+|---|---|---|---|
+| contracting | yes | no | Lipschitz, Dobrushin, cost, growth |
+| inert | no | no | the ledger (`ledger_act_phantom`) |
+| **coupled** | **no** | **yes** | **the bound** |
+
+`boundedGA` is still a lawful `GradedAction` — the action inflates a size by the growth and
+ignores the bound. `bounded_phantom_not_inert` is the distinction: the ledger is ignored by
+`act` *and* composes without reading anything else; the bound is ignored by `act` and does
+read the growth.
+
+**Scope.** `GrowsBy` is a *constant* growth bound; input-dependent growth needs the grade to
+carry a monotone map, which is `universalGA`'s `Mono`, already in `TransportCalculus`, and
+is the named follow-on. Nothing here is transcribed from Alloy or CBMC — this is the
+algebra, and `PLAN-MULTITOOL.md`'s stage E is what would connect it to real emitted bounds.
+
 ## Consuming a certificate a tool actually emitted (`JasminCert.lean`, `certcompose`) — stage D, first pass
 
 Stages B and C received both tools' guarantees by **hand encoding**. Stage D's kill

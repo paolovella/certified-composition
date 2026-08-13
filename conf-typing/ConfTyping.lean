@@ -84,3 +84,4 @@ import ConfTyping.CNReceive
 import ConfTyping.HeteroCompose
 import ConfTyping.JasminSCT
 import ConfTyping.JasminCert
+import ConfTyping.BoundedCert

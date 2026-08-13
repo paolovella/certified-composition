@@ -698,6 +698,28 @@ if ! grep -q "CN — no" conf-typing/corpus/jasmin/EMISSION.md 2>/dev/null; then
   echo "DRIFT: EMISSION.md no longer records that CN emits no consumable certificate"; fail=1
 fi
 
+# stage F: bounded guarantees as grades. The stage's content is a NEGATIVE result (min is
+# unsound) and a non-factorization, and both are the kind of claim that dies quietly.
+for thm in "theorem min_unsound" "theorem bounded_comp_sound" "theorem bmul_assoc" \
+           "theorem bounded_grade_does_not_factor" "theorem bounded_comp_tight" \
+           "theorem min_sound_when_nongrowing" "theorem bounded_phantom_not_inert" \
+           "def BSafe" "def GrowsBy" "def bmul"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/BoundedCert.lean 2>/dev/null; then
+    echo "DRIFT: stage F is cited but '$thm' is missing from BoundedCert.lean"; fail=1
+  fi
+done
+# bmul MUST subtract the inner certificate's growth. Without that term it degenerates to
+# exactly the min rule min_unsound refutes.
+if ! grep -q "min i.bound (o.bound - i.growth)" conf-typing/ConfTyping/BoundedCert.lean 2>/dev/null; then
+  echo "DRIFT: bmul no longer subtracts the inner growth - it has become the unsound min rule"
+  fail=1
+fi
+# BSafe must stay STRICT. With `<=` the vacuous certificate is unrepresentable, truncated
+# subtraction stops landing on it, and the no-side-condition soundness proof is wrong.
+if ! grep -q "size x < b" conf-typing/ConfTyping/BoundedCert.lean 2>/dev/null; then
+  echo "DRIFT: BSafe is no longer strict - the vacuous bound is no longer representable"; fail=1
+fi
+
 # stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
 # edited, every improvement claim measured against it becomes meaningless.
 for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do

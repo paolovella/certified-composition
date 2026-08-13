@@ -915,6 +915,42 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage F — bounded guarantees as grades, and the first grade that does not factor**
+  (`conf-typing/ConfTyping/BoundedCert.lean`). Alloy's `check … for 4 AbacPolicy`, CBMC's
+  unwinding depth, TLC's finite instance are one shape: a guarantee quantified by a budget.
+  The assurance-case literature downgrades these to *confidence*; this asks the algebraic
+  question.
+
+  **`min` is unsound, and not marginally.** `f x = x + 20`, `g` well-behaved only below 10 —
+  both correctly certified, the rule claims the composite safe below 11, and **the composite
+  fails at every input including 0**. No bound exists for which it is safe. Neither
+  certificate is wrong and neither tool erred: the rule that combined them threw away the
+  growth.
+
+  So the grade is the pair `(bound, growth)`, composing as
+  `⟨min b₁ (b₂ - g₁), g₁ + g₂⟩` — sound **with no side condition**, because the bound is
+  stored strictly, making `0` the vacuous certificate that truncated subtraction lands on
+  when the growth overruns. An `Option Nat` formulation with a `g₁ ≤ b₂` guard proves the
+  same theorem with a hypothesis and eight case splits; the shift removes both. Associative,
+  and **tight** — safe below 8, broken at 8, so the law is not buying soundness with
+  conservatism.
+
+  **The finding is `bounded_grade_does_not_factor`.** The composite bound is provably not a
+  function of the two bounds — it reads the inner certificate's growth (same bounds, growth
+  0 vs 3, composite 5 vs 2). A bounded certificate therefore **cannot be carried as a
+  product of an independent bound and an independent growth**, so `pair_comp_cert`'s
+  free-lunch componentwise composition does not cover it. Stage 1j found two properties that
+  cannot be independently *derived* while insisting bundling stayed free; **this is the
+  other half, and the first coupled grade in the repo** — a real limit on the central claim,
+  found by the first example that was not built to fit it. The component taxonomy gains a
+  third kind: contracting, inert, and now **coupled** — ignored by `act`, yet reading
+  another component in `mul` (`bounded_phantom_not_inert`).
+
+  Every result was established by exhaustive search before being proved: `min`'s
+  unsoundness, soundness over 1 803 random claims against brute-force semantics, and
+  associativity over 42 875 triples. Self-test 32/32 → **35/35**, including a case that
+  strips the growth subtraction from `bmul` — which silently restores the unsound rule.
+
 - **Stage D — the kill criterion, checked rather than assumed** (`conf-typing/ConfTyping/JasminCert.lean`,
   `conf-typing/CertCompose.lean`, evidence in `conf-typing/corpus/jasmin/EMISSION.md`).
   Stages B and C received both tools by **hand encoding**, which is exactly what stage D's
