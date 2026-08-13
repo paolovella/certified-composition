@@ -44,12 +44,18 @@
   without them.**
 
   ── Scope, stated before the theorems rather than after ──
-  * The second producer is **modelled, not transcribed.** `sctGA` is an
-    SCT-*shaped* certificate — a public set that accumulates by **intersection** —
-    chosen because it is a genuinely different monoid from CN's union, which is what
-    makes the bundle heterogeneous. Nothing here is transcribed from Jasmin, and no
-    Jasmin output is consumed. Transcribing a real SCT statement the way
-    `corpus/cn/SOURCES.md` transcribes CN is the second pass.
+  * **In this module** the second producer is **modelled, not transcribed.** `sctGA`
+    is an SCT-*shaped* certificate — a public set that accumulates by
+    **intersection** — chosen because it is a genuinely different monoid from CN's
+    union, which is what makes the bundle heterogeneous. Nothing in *this* file is
+    transcribed from Jasmin.
+
+    **`JasminSCT.lean` is the second pass and supersedes this choice**, with the
+    real level lattice read out of Jasmin's own test corpus
+    (`corpus/jasmin/SOURCES.md`). It found that Jasmin already has a name for the
+    gap this module constructs a counterexample to expose: `transient`. `sctGA` is
+    kept because it is what the first pass actually rested on, and retrofitting it
+    would hide that the structure was discovered rather than assumed.
   * The speculative machine here is **one schedule parameter and an address
     trace**, deliberately coarser than `Speculate.lean`'s. It carries exactly the
     asymmetry the argument needs — register effects roll back, touched addresses do

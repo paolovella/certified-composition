@@ -915,6 +915,35 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage C, second pass — the other tool already had a name for it**
+  (`conf-typing/ConfTyping/JasminSCT.lean`, sources in `conf-typing/corpus/jasmin/SOURCES.md`).
+  The first pass's second certificate was invented. This one is read out of Jasmin's own
+  SCT test corpus, and reading it changed the result.
+
+  **A Jasmin SCT level is a pair** — one level for normal execution, one for misspeculating
+  execution: `public` = ⟨L,L⟩, `transient` = ⟨L,H⟩, `secret` = ⟨H,H⟩. That was not what I
+  had from memory, and it is the whole point.
+
+  **`transient` is exactly what a CN certificate becomes when carried into a speculative
+  world.** Public normally, unconstrained under misspeculation. The first pass discovered
+  that gap and described it longhand, building a counterexample to show architectural
+  agreement is not enough; Jasmin had already named it, and named it as something *distinct
+  from* `public`. `bcb_footprint_is_transient` is that as a theorem, and
+  `protected_footprint_is_public` is `#protect` performing the upgrade — the first pass's
+  sufficient condition discharged by the mechanism Jasmin actually ships.
+
+  The anchor is `fig3a` from the S&P 2023 paper's own test file: a guarded load whose
+  *value* becomes the *address* of a second access, with `#protect` as the fix. **The first
+  pass had built that gadget abstractly before any Jasmin was read** — which is the best
+  evidence available that the seam was located rather than constructed.
+
+  Heterogeneity is now a fact about two real tools instead of a property of a witness built
+  to have it: **CN's footprints union, Jasmin's levels join**, one `Bridge.comp`.
+  `touchesOnly_imp_arch` earns the lattice's well-formedness — nothing sits at ⟨H, L⟩. The
+  invented `sctGA` is kept rather than retrofitted, so the record shows the structure was
+  discovered. Self-test 24/24 → **28/28**, including a case that collapses the level pair,
+  which leaves every theorem compiling and the finding silently gone.
+
 - **Stage C — where the interaction term lives** (`conf-typing/ConfTyping/HeteroCompose.lean`).
   `pair_comp_cert` says bundled certificates accumulate componentwise, with no interaction
   term. The secure-compilation literature says composing distinct properties gives roughly

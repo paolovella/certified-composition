@@ -82,3 +82,4 @@ import ConfTyping.CountedLoop
 import ConfTyping.Surface
 import ConfTyping.CNReceive
 import ConfTyping.HeteroCompose
+import ConfTyping.JasminSCT

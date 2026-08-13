@@ -628,6 +628,37 @@ if ! grep -q "modelled, not transcribed" conf-typing/ConfTyping/HeteroCompose.le
   fail=1
 fi
 
+# stage C second pass: Jasmin's level lattice, transcribed. The finding is that a CN
+# certificate carried into a speculative world sits at `transient`, which only means
+# anything while the level stays a PAIR and transient stays distinct from public.
+for thm in "theorem bcb_footprint_is_transient" "theorem protected_footprint_is_public" \
+           "theorem touchesOnly_imp_arch" "theorem bcbProtected_trace_inert" \
+           "theorem cn_unions_jasmin_joins" "theorem slvl_transient_ne_public" \
+           "def sctLvlGA" "def footprintLevel"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/JasminSCT.lean 2>/dev/null; then
+    echo "DRIFT: the Jasmin reception is cited but '$thm' is missing from JasminSCT.lean"; fail=1
+  fi
+done
+if [ ! -f conf-typing/corpus/jasmin/SOURCES.md ]; then
+  echo "DRIFT: the Jasmin reception cites conf-typing/corpus/jasmin/SOURCES.md but it is missing"
+  fail=1
+fi
+# The level must stay a PAIR. Collapse it to a single level and every theorem here still
+# compiles while the finding - that transient is not public - silently evaporates.
+if ! grep -q "structure SLvl where" conf-typing/ConfTyping/JasminSCT.lean 2>/dev/null || \
+   ! grep -q "  spec   : Lvl" conf-typing/ConfTyping/JasminSCT.lean 2>/dev/null; then
+  echo "DRIFT: SLvl is no longer a normal/speculative pair - the stage C finding is not statable"
+  fail=1
+fi
+# As with CN, the reception is by hand. Saying otherwise would claim a Jasmin integration.
+if ! grep -q "unchecked against the Jasmin checker" conf-typing/ConfTyping/JasminSCT.lean 2>/dev/null; then
+  echo "DRIFT: JasminSCT no longer states that the encoding is unchecked against Jasmin"; fail=1
+fi
+# The transcription must keep the paper's own annotation, or it was recalled not read.
+if ! grep -q "ptr: transient, val: transient" conf-typing/corpus/jasmin/SOURCES.md 2>/dev/null; then
+  echo "DRIFT: the Jasmin transcription no longer shows fig3a's sct annotation"; fail=1
+fi
+
 # stage 2k + corpus: the first measured rule. The corpus is the baseline; if it is
 # edited, every improvement claim measured against it becomes meaningless.
 for f in conf-typing/corpus/TASKS.md conf-typing/corpus/RESULTS.md; do

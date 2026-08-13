@@ -2079,6 +2079,39 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## The other tool already had a name for it (`JasminSCT.lean`) — stage C, second pass
+
+The first pass's second certificate was invented. This one is read out of Jasmin's own SCT
+test corpus (`corpus/jasmin/SOURCES.md`), and the reading changed the result.
+
+**A Jasmin SCT level is a pair**, one level for normal execution and one for misspeculating
+execution: `public` = ⟨L,L⟩, `transient` = ⟨L,H⟩, `secret` = ⟨H,H⟩. I did not have that
+right from memory, and it is the whole point.
+
+**`transient` is exactly what a CN certificate becomes when carried into a speculative
+world** — public normally, unconstrained under misspeculation. The first pass discovered
+that gap and had to describe it longhand, constructing a counterexample to show that
+architectural agreement is not enough. Jasmin had already named it, and named it as
+something *distinct from* `public`. `bcb_footprint_is_transient` is that sentence as a
+theorem; `protected_footprint_is_public` is Jasmin's `#protect` doing the upgrade, which is
+`cn_reception_transfers`'s hypothesis discharged by the mechanism Jasmin actually ships.
+
+The anchor is `fig3a` from the S&P 2023 paper's own test file — a guarded load `x = p[i]`
+whose *value* becomes the *address* of a second access `w[x] = 0`, with
+`x = #protect(x, ms)` as the fix. That is the same gadget the first pass had built
+abstractly before reading any Jasmin, which is why it is the right place to anchor.
+
+`sctLvlGA` accumulates by **componentwise join** — the IFC law, and Jasmin's. So the
+bundle's heterogeneity is now a fact about two real tools: **CN's footprints union,
+Jasmin's levels join**, and one `Bridge.comp` advances both
+(`cn_unions_jasmin_joins`). `touchesOnly_imp_arch` earns the lattice's own
+well-formedness: nothing sits at ⟨H, L⟩.
+
+**Scope.** No `.jazz` file is parsed and no Jasmin output is consumed; the encoding is by
+hand and unchecked against the Jasmin checker, exactly as with CN. `#protect`/MSF is
+modelled by its effect only. Value-dependence, arrays, the `ptr`/`val` split and
+`#update_msf` placement are not modelled — none bears on the composition law.
+
 ## Where the interaction term lives (`HeteroCompose.lean`) — stage C, first pass
 
 `Bridge.pair_comp_cert` says composing a bundle is **componentwise**: no interaction term,

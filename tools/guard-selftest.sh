@@ -115,6 +115,23 @@ run_case "stage C claims a Jasmin reception" drift \
   bash -c 'sed -i "s/modelled, not transcribed/transcribed from Jasmin/" \
              conf-typing/ConfTyping/HeteroCompose.lean'
 
+# stage C second pass. The level PAIR is the finding; collapsing it leaves everything
+# compiling and means nothing, which is the exact failure this suite exists for.
+run_case "SLvl collapses to one level" drift \
+  bash -c 'sed -i "/^  spec   : Lvl/d" conf-typing/ConfTyping/JasminSCT.lean'
+
+run_case "transient/public distinction dropped" drift \
+  bash -c 'sed -i "s/theorem slvl_transient_ne_public/theorem gone_away/" \
+             conf-typing/ConfTyping/JasminSCT.lean'
+
+run_case "Jasmin reception caveat removed" drift \
+  bash -c 'sed -i "s/unchecked against the Jasmin checker/checked by Jasmin/" \
+             conf-typing/ConfTyping/JasminSCT.lean'
+
+run_case "Jasmin transcription loses fig3a annot" drift \
+  bash -c 'sed -i "s/ptr: transient, val: transient/ptr: public, val: public/g" \
+             conf-typing/corpus/jasmin/SOURCES.md'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

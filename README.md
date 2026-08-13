@@ -42,6 +42,12 @@ Two of those stages have since closed, neither by tripping its kill criterion:
   architectural state is **not enough**, shown by a bounds-check-bypass gadget that keeps
   its CN footprint architecturally and violates it transiently. The literature's
   intersections are the price of that ticket, not a defect in the algebra.
+- **Stage C, second pass — the gap already had a name** (`ConfTyping/JasminSCT.lean`).
+  Transcribing Jasmin's real SCT levels showed they are **pairs** — ⟨normal, speculative⟩ —
+  and that a CN certificate carried into a speculative world lands on the middle one:
+  **`transient`**, which Jasmin distinguishes from `public` for exactly the reason the first
+  pass built a counterexample to expose. Heterogeneity is now a fact about two real tools:
+  CN's footprints **union**, Jasmin's levels **join**, one composition law.
 
 ## Running it
 
