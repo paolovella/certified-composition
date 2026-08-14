@@ -1,0 +1,4 @@
+00. check S1_BoundAssociative      0       UNSAT
+01. check S2_BoundIsMinOfBounds     0    1/1     SAT
+02. check S3_BoundFactors          0    1/1     SAT
+03. check S4_MinSoundWhenNonGrowing     0       UNSAT

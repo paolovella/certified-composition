@@ -756,6 +756,27 @@ if ! grep -q "Correction of record" conf-typing/corpus/estate/EMISSION.md 2>/dev
   echo "DRIFT: the census dropped the correction of record about Alloy's scope"; fail=1
 fi
 
+# stage H: Alloy as an independent adversary against stage F. Two of its four checks are
+# EXPECTED TO FAIL - that is what makes the model capable of refuting anything - and the
+# overflow lesson is the finding most likely to be lost.
+if [ ! -f cross-check/alloy/BoundedGrade.als ]; then
+  echo "DRIFT: stage H cites cross-check/alloy/BoundedGrade.als but it is missing"; fail=1
+fi
+if ! grep -q "pred small" cross-check/alloy/BoundedGrade.als 2>/dev/null; then
+  echo "DRIFT: the Alloy model no longer constrains against Int overflow - S1 will 'refute' a true theorem"
+  fail=1
+fi
+for a in S1_BoundAssociative S2_BoundIsMinOfBounds S3_BoundFactors S4_MinSoundWhenNonGrowing; do
+  if ! grep -q "$a" cross-check/alloy/BoundedGrade.als 2>/dev/null; then
+    echo "DRIFT: the Alloy model no longer contains assertion $a"; fail=1
+  fi
+done
+for f in alloy-boundedgrade.out alloy-boundedgrade-OVERFLOW-ARTIFACT.out; do
+  if [ ! -f "conf-typing/corpus/estate/captures/$f" ]; then
+    echo "DRIFT: stage H cites captures/$f but it is missing"; fail=1
+  fi
+done
+
 # stage F: bounded guarantees as grades. The stage's content is a NEGATIVE result (min is
 # unsound) and a non-factorization, and both are the kind of claim that dies quietly.
 for thm in "theorem min_unsound" "theorem bounded_comp_sound" "theorem bmul_assoc" \

@@ -188,6 +188,11 @@ run_case "Alloy receipt loses its scopes" drift \
   bash -c 'sed -i "s/scopes/bounds_removed/g" \
              conf-typing/corpus/estate/captures/alloy-receipt.json'
 
+# stage H. Dropping the overflow guard makes Alloy "refute" a proved theorem, which is the
+# most misleading failure available here.
+run_case "Alloy model drops overflow bound" drift \
+  bash -c 'sed -i "/^pred small/,/^}/d" cross-check/alloy/BoundedGrade.als'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

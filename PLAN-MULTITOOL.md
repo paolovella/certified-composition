@@ -1,26 +1,141 @@
-# The eight-tool estate, and the one thing that would be a breakthrough
+# Using the other six tools on *this* project
 
-*Written 2026-08-14, after `PLAN-2026-08.md` stages A–D closed.*
+*Written 2026-08-14. **Retargeted the same day** — see §0.*
 
-## 0. The concern, stated first
+## 0. What this plan was, and what it is
 
-**"Use all the tools" is the wrong objective function, and adopting it would repeat the
-mistake stage A was written to stop.** Eight shallow receptions — one `GradedAction` per
-tool, eight hand encodings, a README table with eight rows — would be *less* valuable than
-one machine-checked cross-tool discharge theorem, and would look like more. The repo has
-already measured what happens when breadth is chosen over evidence: 25 author-written
-programs found nothing, and twelve transcribed ones found the real defect immediately.
+The first version of this file planned to **integrate a different project's verification
+estate** (`sentinel/formal`) into this repo as a source of foreign certificates. That was a
+misreading of the request. The ask was to **use alloy, coq, kani, lean, tla and verus *for
+this project*** — as tools brought to bear on `certified-composition`'s own claims, not as
+producers whose output this repo consumes.
 
-The plan below is therefore organised around **the discharge relation between tools**, not
-around tool count. Tools enter the plan when they carry weight in a specific theorem, and
-`Stage E` exists to find out which ones can.
+Retargeted accordingly. What survives unchanged is **stage E**, the emission census: what
+each tool actually emits when you run it is worth knowing either way, and two of its
+findings (Kani's `unwind` annotation is not a bound; Alloy's scope lives in `receipt.json`)
+bear directly on the new plan. What is dropped is every stage framed around receiving
+sentinel's artifacts. Sentinel is not touched by this repo and is not a dependency of it.
 
-That said — the instinct behind the request is right, and better than it may look. The
-estate is real, and it contains the artifact this repo has been missing.
+The prior-art section (§2) is kept because it still bounds what a *claim* here could be.
+
+## 1. The point
+
+The repo is **Lean-only**, and its central claim is that certified programs exclude named
+vulnerability classes. Two things follow that no amount of further Lean can supply:
+
+1. **A proof is only as good as its model.** `leakSafe_sound` is a theorem about `uexec`.
+   If `uexec` is the wrong model, the theorem is true and beside the point — the repo has
+   its own name for this (`sequential_model_misses_races`). An **independent
+   implementation** searched exhaustively by a *different* tool is the only cheap way to
+   attack that.
+2. **A bulletproof framework needs a checker you can run**, and `certcheck` is currently
+   trusted extraction. A *verified implementation* is a different artifact.
+
+So the six tools are used here as **adversaries and as implementations**, in that order.
+
+## 2. The stages
+
+Same discipline: falsifiable milestone, kill criterion. Letters continue from F.
+
+### Stage G — Kani as an adversary against the newest theorem. *(1–2 sessions. First.)*
+
+`LeakCert.lean` is hours old and its soundness proof is the least battle-tested thing in
+the repo. Port `uexec`'s memory fragment and `lcheck` to Rust, and let Kani search
+exhaustively over symbolic programs for one the checker **accepts** that **leaks**.
+
+Note what this is *not*: it is not re-proving `leakSafe_sound`. It is attacking the gap
+between the theorem and the intent — a modelling error, which is the class of error Lean
+cannot see. Precedent: the `alloc p ; check r ; free p` hole was found **by hand** while
+writing the module; a model checker should have found it in seconds, and this stage is the
+test of whether it finds anything *else*.
+
+- **Milestone:** either a program Kani produces that `lcheck` accepts and that leaks — which
+  is a defect in `LeakCert.lean` and the best possible outcome — or an exhaustive
+  no-counterexample result at a stated program size, recorded with that size.
+- **Kill criterion:** if the Rust port has to diverge from `uexec` to be checkable, it is
+  testing a different semantics and proves nothing. Say so and stop.
+
+### Stage H — Alloy against the algebra. *(1–2 sessions.)*
+
+`GradedAction`'s laws and `bmul`'s composition are relational and small — Alloy's home
+ground. Model the grade monoid and its claimed laws, and search small scopes for
+counterexamples to associativity, to `bounded_comp_sound`, and to
+`bounded_grade_does_not_factor`.
+
+- **Milestone:** an Alloy model whose `check`s pass at a stated scope, with the scope
+  recorded — plus a deliberately broken variant that Alloy *does* refute, so the model is
+  known to have teeth.
+- **Kill criterion:** if the laws are so directly expressible that Alloy finds nothing and
+  could find nothing, this duplicates the Python search already done. Record and drop.
+- **Done, first pass** (`cross-check/alloy/BoundedGrade.als`). Four checks at `for 6 Int`,
+  two expected to pass and two expected to **fail** — a model in which everything passes has
+  not been shown able to refute anything.
+  - `S2_BoundIsMinOfBounds` and `S3_BoundFactors` are **refuted**, independently confirming
+    `min_unsound` and `bounded_grade_does_not_factor` from a tool with different arithmetic
+    and a different engine (sat4j). `S1_BoundAssociative` and `S4_MinSoundWhenNonGrowing`
+    find no counterexample, matching `bmul_assoc` and `min_sound_when_nongrowing`.
+  - **The finding is the first run, which was wrong.** Alloy initially reported a
+    counterexample to **associativity** — a theorem proved in Lean and brute-forced over
+    42 875 triples. It was an artifact of **Alloy's own wrapping integer arithmetic**:
+    `plus[g1,g2]` overflows bitwidth 6 and comes back negative. Constraining every value and
+    intermediate well inside the bitwidth turns S1 UNSAT.
+  - **That is the session's theme biting the method rather than the object.** A bounded model
+    finder used as an adversary will manufacture a false refutation out of its own bounds,
+    and the bound is not in the verdict — `SAT` said "counterexample", not "counterexample,
+    modulo my integers wrapping". Both runs are kept in `captures/`, the artifact one under
+    its own name, and a guard fires if the overflow constraint is removed.
+
+### Stage I — Coq for kernel diversity on the load-bearing theorem. *(2–3 sessions.)*
+
+Re-prove **one** theorem in Coq: the one the most claims rest on. Not a port of the repo —
+a second kernel's opinion on a single statement. ETB names "diversity" as a distinct kind
+of evidence, and this is the cheapest honest instance of it.
+
+- **Milestone:** the same statement, proved in Coq, with `Print Assumptions` showing what it
+  rests on — directly comparable to Lean's `#print axioms`.
+- **Kill criterion:** if the Coq statement has to be weakened to go through, that difference
+  *is* the finding; record it rather than papering over it.
+
+### Stage J — TLA+ for the discharge protocol. *(2–3 sessions.)*
+
+The ledger's lifecycle — assumptions accumulate, are discharged, must never be silently
+dropped — is a **protocol**, not an algebraic law, and TLC checks protocols. Model
+accumulate/discharge/compose and check that no reachable state discharges an assumption
+without a proof.
+
+- **Milestone:** `ledger_no_silent_discharge` as a TLC invariant, exhaustive over a stated
+  instance.
+- **Kill criterion:** if the protocol is a one-line invariant with no interesting state
+  space, fold it into stage I.
+
+### Stage K — Verus for a checker you can run. *(4–6 sessions. The real deliverable.)*
+
+`certcheck` is trusted extraction. A bulletproof framework needs an implementation whose
+correspondence to the spec is itself verified. Verus verifies real Rust.
+
+- **Milestone:** a Rust `lcheck` with a Verus proof that it agrees with the Lean
+  specification on a stated fragment, and a binary that runs.
+- **Kill criterion:** if the Verus spec is a transliteration of the Rust rather than of the
+  Lean, it proves the code equals itself. That is the failure mode to watch, and it kills
+  the stage.
+
+### Not scheduled
+
+**refinement** — the estate's `refinement/` was one markdown file, and this repo has no
+refinement-typed artifact. Nothing to use it on yet.
+
+## 3. What this plan does not claim
+
+- It does not claim six tools will be used. Stage G's result decides whether the adversarial
+  direction is worth continuing at all.
+- It does not claim any of this makes the language more expressive. The 17% of corpus tasks
+  that are inexpressible stay inexpressible; that is the freeze, and it holds.
+- It does not claim independent search is proof. An exhaustive Kani result at size *n* is a
+  statement about size *n*, which is exactly what stage F says to be careful about.
 
 ---
 
-## 1. What is actually there
+## 4. Appendix: the estate that prompted this (not a dependency)
 
 `/home/paolo/.vella-workspace/sentinel/formal` — measured 2026-08-14, not estimated:
 
@@ -69,7 +184,7 @@ than receiving all eight tools.
 
 ---
 
-## 2. The prior art, honestly
+## 5. Prior art, kept because it still bounds the claim
 
 This space is occupied. Pretending otherwise would be the same error `PLAN-2026-08.md` §2
 was written to correct.
@@ -123,7 +238,7 @@ source of instances for it does not.
 
 ---
 
-## 3. The plan
+## 6. The superseded stage list (kept for the stage E record)
 
 Same discipline as `PLAN-2026-08.md`: every stage has a falsifiable milestone and a kill
 criterion. Stage letters continue from D.

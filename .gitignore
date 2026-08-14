@@ -2,3 +2,6 @@
 *.olean
 build/
 .gstack/
+cross-check/**/target/
+cross-check/**/Cargo.lock
+cross-check/**/*.out
