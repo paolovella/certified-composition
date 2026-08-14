@@ -33,6 +33,14 @@ step "certcompose builds and consumes the emission" \
               ./.lake/build/bin/certcompose corpus/jasmin/accept.expected \
                 | grep -q "^  SCT level:  #secret"'
 
+# The cross-check crate is an independent re-implementation used as an adversary. Its
+# concrete witnesses are cheap and must not rot; the Kani harnesses are minutes-long and are
+# run by hand, not here. Skipped when cargo is absent so the Lean gates still run.
+if command -v cargo >/dev/null 2>&1; then
+  step "cross-check witnesses (independent Rust port)" \
+       bash -c 'cd cross-check/leak-kani && cargo test --quiet 2>&1 | grep -q "test result: ok"'
+fi
+
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \

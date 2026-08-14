@@ -1,0 +1,10 @@
+# accepted_programs_do_not_leak — the adversary. No counterexample.
+	 - Status: SUCCESS
+	 - Description: ""leakSafe accepted a program that leaks""
+	 - Location: src/lib.rs:235:13 in function attack::accepted_programs_do_not_leak
+
+Check 82: std::ptr::NonNull::<()>::as_mut::<'_>.safety_check.1
+SUMMARY:
+ ** 0 of 447 failed (8 unreachable)
+VERIFICATION:- SUCCESSFUL
+Verification Time: 877.3889s

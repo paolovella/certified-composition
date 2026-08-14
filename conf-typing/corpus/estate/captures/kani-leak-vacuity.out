@@ -1,0 +1,8 @@
+# accepted_programs_can_allocate — the vacuity test. FAILURE here is the good outcome:
+# Kani produced a program that leakSafe ACCEPTS, that COMPLETES, and that really ALLOCATES.
+Check 90: attack::accepted_programs_can_allocate.assertion.1
+	 - Status: FAILURE
+	 - Description: ""witness: an accepted program that allocates""
+ ** 1 of 447 failed (8 unreachable)
+VERIFICATION:- FAILED
+Verification Time: 1103.7476s

@@ -54,6 +54,29 @@ test of whether it finds anything *else*.
   no-counterexample result at a stated program size, recorded with that size.
 - **Kill criterion:** if the Rust port has to diverge from `uexec` to be checkable, it is
   testing a different semantics and proves nothing. Say so and stop.
+- **Done, first pass** (`cross-check/leak-kani/`). An independent Rust re-implementation of
+  `uexec`'s memory fragment and `lcheck`, written from the Lean and matching it rule for
+  rule on the modelled fragment.
+  - **No counterexample.** Over symbolic 5-node programs, 2 variables, 3 addresses and
+    symbolic branch decisions, Kani found no program that `leakSafe` accepts and that leaks
+    (447 checks, 0 failed, 877 s). The assertion is `SUCCESS`, not `UNREACHABLE`.
+  - **And the negative is not vacuous — checked, not assumed.** A second harness asserts
+    that no accepted program allocates; Kani **refutes** it, producing an accepted,
+    completing program that really does allocate (1104 s). A "no counterexample" result
+    without this beside it would be worth nothing.
+  - Two concrete witnesses run in CI: `alloc p ; free p` is accepted and allocates, and
+    `b06` is **refused by the independent port and really does leak** on the `skip` arm —
+    the Lean finding reproduced by code that shares nothing with it.
+  - **Kill criterion not tripped, and the divergences are argued rather than waved at.**
+    `assign`/`load` write a non-address where Lean writes a value: accepted programs never
+    free through an alias (a free requires the variable to be tracked, and tracking comes
+    only from `alloc` into it), so the difference cannot hide a leak. `hop .store`,
+    `deref`, `access` and `sop` are omitted because none touches `live` or the pointer
+    store. `pickAddr`'s reuse-before-fresh **is** modelled, since address reuse is exactly
+    where an ownership invariant could break.
+- **What it does not cover, and both are real.** The port is **loop-free**, so `lcheck`'s
+  fixpoint rule is untested by this. And 5 nodes / 2 variables / 3 addresses is a **bound** —
+  a clean run at size 5 is a statement about size 5, which is what stage F exists to say.
 
 ### Stage H — Alloy against the algebra. *(1–2 sessions.)*
 

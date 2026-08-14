@@ -236,6 +236,22 @@ mod attack {
         }
     }
 
+    /// **Teeth, part two — the one that matters.** `accepted_programs_do_not_leak`
+    /// would pass vacuously if `leakSafe` only ever accepted programs that never
+    /// allocate. Refuting this shows the accepted set contains programs that really
+    /// do allocate and complete: a witness is expected, so FAILURE here is success.
+    #[kani::proof]
+    #[kani::unwind(8)]
+    fn accepted_programs_can_allocate() {
+        let p: [Node; NN] = kani::any();
+        kani::assume(well_formed(&p));
+        kani::assume(leak_safe(&p));
+        let br: [bool; NN] = kani::any();
+        let mut st = St::new();
+        exec(&p, 0, &mut st, &br, NN);
+        assert!(st.dead || st.fresh == 0, "witness: an accepted program that allocates");
+    }
+
     /// Teeth: the search space really does contain leaking programs, so a passing
     /// run above is not vacuous.
     #[kani::proof]
@@ -248,5 +264,49 @@ mod attack {
         exec(&p, 0, &mut st, &br, NN);
         // refuted by a leaking witness, which is what we want to see
         assert!(st.dead || st.live == 0, "witness: a program that leaks");
+    }
+}
+
+#[cfg(test)]
+mod concrete {
+    use super::*;
+
+    fn skip() -> Node { Node { tag: T_SKIP, x: 0, l: 0, r: 0 } }
+
+    /// `alloc p ; free p` — the simplest program that allocates and is accepted.
+    #[test]
+    fn accepted_and_allocates() {
+        let p: [Node; NN] = [
+            Node { tag: T_SEQ, x: 0, l: 1, r: 2 },
+            Node { tag: T_ALLOC, x: 0, l: 0, r: 0 },
+            Node { tag: T_FREE, x: 0, l: 0, r: 0 },
+            skip(),
+            skip(),
+        ];
+        assert!(well_formed(&p));
+        assert!(leak_safe(&p), "alloc;free must be accepted");
+        let mut st = St::new();
+        exec(&p, 0, &mut st, &[false; NN], NN);
+        assert!(!st.dead, "must complete");
+        assert_eq!(st.fresh, 1, "must actually allocate");
+        assert_eq!(st.live, 0, "must not leak");
+    }
+
+    /// `b06`: alloc, then one arm frees and the other does not. Must be REFUSED.
+    #[test]
+    fn b06_is_refused() {
+        let p: [Node; NN] = [
+            Node { tag: T_SEQ, x: 0, l: 1, r: 2 },
+            Node { tag: T_ALLOC, x: 0, l: 0, r: 0 },
+            Node { tag: T_ITE, x: 0, l: 3, r: 4 },
+            skip(),
+            Node { tag: T_FREE, x: 0, l: 0, r: 0 },
+        ];
+        assert!(well_formed(&p));
+        assert!(!leak_safe(&p), "b06 must be refused");
+        // and it really does leak on the skip arm
+        let mut st = St::new();
+        exec(&p, 0, &mut st, &[true; NN], NN);
+        assert!(!st.dead && st.live != 0, "b06 leaks on the skip arm");
     }
 }

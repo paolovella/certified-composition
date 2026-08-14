@@ -756,6 +756,29 @@ if ! grep -q "Correction of record" conf-typing/corpus/estate/EMISSION.md 2>/dev
   echo "DRIFT: the census dropped the correction of record about Alloy's scope"; fail=1
 fi
 
+# stage G: Kani as an adversary against LeakCert. The result is a NEGATIVE (no
+# counterexample), which is worthless without the vacuity witness beside it - so both
+# harnesses and both captures are pinned.
+if [ ! -f cross-check/leak-kani/src/lib.rs ]; then
+  echo "DRIFT: stage G cites cross-check/leak-kani/src/lib.rs but it is missing"; fail=1
+fi
+for h in accepted_programs_do_not_leak accepted_programs_can_allocate some_program_leaks \
+         accepted_and_allocates b06_is_refused; do
+  if ! grep -q "fn $h" cross-check/leak-kani/src/lib.rs 2>/dev/null; then
+    echo "DRIFT: the cross-check crate no longer has harness/test '$h'"; fail=1
+  fi
+done
+for f in kani-leak-adversary.out kani-leak-vacuity.out; do
+  if [ ! -f "conf-typing/corpus/estate/captures/$f" ]; then
+    echo "DRIFT: stage G cites captures/$f but it is missing"; fail=1
+  fi
+done
+# The port must keep saying which fragment it models. Without the `loop` caveat the negative
+# result reads as covering the whole checker, which it does not.
+if ! grep -q "NOT modelled: .loop." cross-check/leak-kani/src/lib.rs 2>/dev/null; then
+  echo "DRIFT: the cross-check port no longer states that loops are unmodelled"; fail=1
+fi
+
 # stage H: Alloy as an independent adversary against stage F. Two of its four checks are
 # EXPECTED TO FAIL - that is what makes the model capable of refuting anything - and the
 # overflow lesson is the finding most likely to be lost.

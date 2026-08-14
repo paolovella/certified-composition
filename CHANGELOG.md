@@ -915,6 +915,41 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stages G and H — the other tools turned on this repo's own claims**
+  (`cross-check/leak-kani/`, `cross-check/alloy/BoundedGrade.als`). `PLAN-MULTITOOL.md` was
+  **retargeted** first: its previous version planned to integrate a different project's
+  verification estate, which misread the request. The tools are for *this* project, as
+  adversaries and implementations.
+
+  **Stage G — Kani against `leakSafe_sound`, the newest theorem in the repo.** An
+  independent Rust re-implementation of `uexec`'s memory fragment and `lcheck`, written from
+  the Lean, searched exhaustively over symbolic 5-node programs: **no program that
+  `leakSafe` accepts and that leaks** (447 checks, 0 failed, 877 s). This attacks the gap
+  Lean cannot see — a modelling error — rather than re-proving the theorem.
+
+  **The negative was checked for vacuity rather than assumed.** A second harness asserts
+  that no accepted program allocates, and Kani **refutes** it with an accepted, completing,
+  genuinely allocating program (1104 s). Two concrete witnesses run in CI: `alloc p ; free p`
+  is accepted and allocates, and **`b06` is refused by the independent port and really does
+  leak** on the `skip` arm — the Lean finding reproduced by code sharing nothing with it.
+  Divergences are argued, not waved at: accepted programs never free through an alias, so
+  modelling `assign` as writing a non-address cannot hide a leak. Loops are **not** modelled,
+  and 5 nodes is a **bound**.
+
+  **Stage H — Alloy against stage F's algebra, and Alloy was wrong first.** Four checks at
+  `for 6 Int`, two expected to fail. S2 and S3 are refuted, independently confirming
+  `min_unsound` and `bounded_grade_does_not_factor` from a different engine with different
+  arithmetic. But the first run reported a counterexample to **associativity** — proved in
+  Lean, brute-forced over 42 875 triples. It was an artifact of **Alloy's own wrapping
+  integers**: `plus[g1,g2]` overflows bitwidth 6 and returns negative.
+
+  **That is this session's theme biting the method instead of the object.** A bounded model
+  finder used as an adversary manufactures a false refutation out of its own bounds, and the
+  bound is not in the verdict — `SAT` said "counterexample", not "counterexample, modulo my
+  integers wrapping". Both runs are kept in `captures/`, the artifact under its own name.
+  Self-test 41/41 → **44/44**; `tools/ci.sh` gains a cross-check step, skipped when cargo is
+  absent.
+
 - **Stage E — the emission census, run rather than read**
   (`conf-typing/corpus/estate/EMISSION.md`, real bytes in `captures/`). Eight tools, and
   every row produced by **running the tool on the estate's own artifacts** on 2026-08-14.

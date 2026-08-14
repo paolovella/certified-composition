@@ -193,6 +193,14 @@ run_case "Alloy receipt loses its scopes" drift \
 run_case "Alloy model drops overflow bound" drift \
   bash -c 'sed -i "/^pred small/,/^}/d" cross-check/alloy/BoundedGrade.als'
 
+# stage G. A negative result whose vacuity witness has gone missing is the failure mode.
+run_case "vacuity witness harness removed" drift \
+  bash -c 'sed -i "s/fn accepted_programs_can_allocate/fn gone_away/" \
+             cross-check/leak-kani/src/lib.rs'
+
+run_case "cross-check drops the loop caveat" drift \
+  bash -c 'sed -i "s/NOT modelled: .loop./covers everything/" cross-check/leak-kani/src/lib.rs'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'
