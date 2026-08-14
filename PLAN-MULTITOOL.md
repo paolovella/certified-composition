@@ -27,11 +27,11 @@ estate is real, and it contains the artifact this repo has been missing.
 | tool | artifacts | guarantee shape |
 |---|---|---|
 | Verus | **59** `verified_*.rs` | unbounded proof, **axiom-carrying** |
-| Kani (CBMC) | **124** harnesses | **bounded** — unwinding/symbolic domain |
-| TLA+ | **48** specs + cfgs | TLC: **bounded** (finite instance); TLAPS: unbounded |
+| Kani (CBMC) | **124** harnesses | ~~bounded~~ → **unbounded here** (stage E: unwinding assertions on) |
+| TLA+ | **48** specs + cfgs | TLC: exhaustive **over a finite instance**, + a probabilistic caveat |
 | Coq | 8 `.v` | unbounded proof, axiom-carrying |
 | Lean | 6 `.lean` | unbounded proof, axiom-carrying |
-| Alloy | 2 `.als` | **bounded** — explicit scope (`for 4 AbacPolicy, 3 Attribute, …`) |
+| Alloy | 2 `.als` | **bounded** — explicit scope; **the only genuinely bounded one** (stage E) |
 | refinement | 1 `.md` | prose |
 | tools | 11 scripts | the glue, and the interesting part |
 
@@ -113,7 +113,13 @@ Nobody has a **machine-checked algebra** in which
    in an assurance argument.
 
 (1) and (2) exist here already (`Bridge.pair_comp_cert`, `needs`, `cn_base_strictly_smaller`).
-**(3) does not exist anywhere I can find, and the estate is full of it.**
+**(3) does not exist anywhere I can find.**
+
+*Amended after stage E ran:* "and the estate is full of it" was **wrong**, and was written
+before any tool was run. Kani's results here are unbounded, TLC's are exhaustive over a
+finite instance, and Coq/Lean are proofs. **Alloy is the only genuinely bounded producer in
+the estate** — two models. The claim in (3) stands; the claim that this estate is a rich
+source of instances for it does not.
 
 ---
 
@@ -139,6 +145,29 @@ statement itself.
 - **Kill criterion:** if fewer than three tools emit consumable artifacts, the multi-tool
   pipeline is a manual encoding exercise at eight times the cost, and stages F–H should be
   rescoped to the tools that do emit.
+- **Done** (`conf-typing/corpus/estate/EMISSION.md`, real bytes in `captures/`). Every row was
+  produced by **running the tool on the estate's own artifacts**, not by reading docs.
+  **Six of eight emit something consumable — the criterion did not fire.**
+  - **Coq and Lean are the best reception targets in the estate**, and that was a surprise.
+    `Print Assumptions` / `#print axioms` emit *exactly* the object `Ledger`/`needs` is
+    about, per theorem, already computed. "Does not depend on any axioms" is
+    `condBoundary_nil` in the tool's own output.
+  - **Kani: the `unwind(N)` annotation is not the bound.** It is a search parameter; the
+    epistemic status is a separate check (`.unwind.N`), and with unwinding assertions on —
+    the default — an insufficient bound makes verification **FAIL** rather than silently
+    return a bounded result. Both cases were run. **The estate disables unwinding checks
+    nowhere, so all 124 of its harnesses carry *unbounded* guarantees** and stage F's bound
+    gap does not touch them. The naive reading is wrong here.
+  - **Alloy is the genuinely bounded one, and its certificate is split across two files**:
+    the verdict on stdout, the scope in `receipt.json`. Neither half is a certificate alone,
+    and **the estate's own wrapper discards both**, reducing the run to a boolean. That is
+    the seam stage H would have to change.
+  - **TLC** is exhaustive over a finite instance (`0 states left on queue`) and emits a
+    **numeric** soundness caveat — the probability a state was skipped through a fingerprint
+    collision. **`Ledger = List Prop` has nowhere to put a probability.** New gap, found by
+    running.
+  - **Verus** was not assessed: not on `PATH` in this environment. Recorded as unassessed
+    rather than guessed.
 
 ### Stage F — Bounded guarantees as grades. *(3–5 sessions. The novel one.)*
 

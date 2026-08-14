@@ -1,0 +1,3 @@
+Axioms:
+trusted_fs : forall n : nat, n + 0 = n
+Closed under the global context

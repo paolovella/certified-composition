@@ -915,6 +915,45 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage E — the emission census, run rather than read**
+  (`conf-typing/corpus/estate/EMISSION.md`, real bytes in `captures/`). Eight tools, and
+  every row produced by **running the tool on the estate's own artifacts** on 2026-08-14.
+  **Six of eight emit something consumable; the kill criterion (fewer than three) did not
+  fire.**
+
+  **Coq and Lean turned out to be the best reception targets**, which was not the
+  expectation. `Print Assumptions` and `#print axioms` emit *exactly* the object
+  `Ledger`/`needs` is about — per theorem, already computed — and "does not depend on any
+  axioms" is `condBoundary_nil` printed by the tool itself. Closer to this repo's machinery
+  than CN or Jasmin.
+
+  **Kani: the `unwind(N)` annotation is not the bound.** It is a search parameter. The
+  epistemic status is a separate check (`.unwind.N`), and with unwinding assertions on —
+  the default — an insufficient bound makes verification **FAIL** rather than quietly
+  return a bounded result. Both cases were run. **The estate disables unwinding checks
+  nowhere, so all 124 of its harnesses carry unbounded guarantees**, and stage F's bound gap
+  does not touch them. The naive reading — bounded model checker, therefore bounded results
+  — is wrong here, and would have been believed if this census had been written from
+  documentation.
+
+  **Alloy is the only genuinely bounded producer in the estate, and its certificate is split
+  across two files**: the verdict on stdout (`UNSAT`), the scope in a `receipt.json` written
+  beside the model. Neither half is a certificate alone — `UNSAT` with the scope elided is
+  exactly the reading `min_unsound` punishes — and **the estate's own wrapper discards
+  both**, reducing the run to a boolean.
+
+  **TLC emits a numeric soundness caveat**: the probability a reachable state was skipped
+  through a fingerprint collision (6.9E-7 optimistic, 2.6E-9 actual on the spec run).
+  **`Ledger = List Prop` has nowhere to put a probability** — a new gap in the *receiving*
+  machinery, found by running rather than reasoning.
+
+  Verus was not on `PATH` here and is recorded as **unassessed** rather than guessed. Two
+  corrections of record: the census first reported that Alloy emits no scope (read off
+  stdout before the receipt was found), and `PLAN-MULTITOOL.md`'s own table called Kani
+  bounded and said the estate was "full of" bounded instances — both written before any tool
+  was run, both now amended in place. Nothing in the sentinel estate was modified; the
+  output directory Alloy creates was removed afterwards. Self-test 39/39 → **41/41**.
+
 - **The leak gap, closed — the map's one admitted false accept**
   (`conf-typing/ConfTyping/LeakCert.lean`). Row 6 of `VULN-COVERAGE.md` had said since the
   external corpus landed that leaks (CWE-401) are **not** detected, with `corpus/ext/b06` —

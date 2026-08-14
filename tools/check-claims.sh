@@ -731,6 +731,31 @@ for thm in "ConfTyping.min_unsound" "ConfTyping.bounded_grade_does_not_factor"; 
   fi
 done
 
+# stage E: the emission census. Every row was produced by RUNNING a tool; the captures are
+# real bytes and the two counter-intuitive findings are the ones that would quietly rot.
+if [ ! -f conf-typing/corpus/estate/EMISSION.md ]; then
+  echo "DRIFT: stage E cites conf-typing/corpus/estate/EMISSION.md but it is missing"; fail=1
+fi
+for f in alloy-receipt.json alloy-stdout.out kani-unbounded.out tlc.out \
+         coq-print-assumptions.out lean-print-axioms.out; do
+  if [ ! -f "conf-typing/corpus/estate/captures/$f" ]; then
+    echo "DRIFT: the emission census cites captures/$f but it is missing"; fail=1
+  fi
+done
+# The Kani finding inverts the naive reading, so it is the one most likely to be "corrected"
+# back to the wrong thing by someone skimming.
+if ! grep -q "unwind annotation is not the bound" conf-typing/corpus/estate/EMISSION.md 2>/dev/null; then
+  echo "DRIFT: the census no longer records that Kani's unwind annotation is not the bound"; fail=1
+fi
+# Alloy's scope lives in receipt.json. If that stops being said, UNSAT reads as unconditional.
+if ! grep -q "scopes" conf-typing/corpus/estate/captures/alloy-receipt.json 2>/dev/null; then
+  echo "DRIFT: the Alloy receipt capture no longer carries its scopes"; fail=1
+fi
+# The correction of record must stay: the first pass got Alloy wrong.
+if ! grep -q "Correction of record" conf-typing/corpus/estate/EMISSION.md 2>/dev/null; then
+  echo "DRIFT: the census dropped the correction of record about Alloy's scope"; fail=1
+fi
+
 # stage F: bounded guarantees as grades. The stage's content is a NEGATIVE result (min is
 # unsound) and a non-factorization, and both are the kind of claim that dies quietly.
 for thm in "theorem min_unsound" "theorem bounded_comp_sound" "theorem bmul_assoc" \

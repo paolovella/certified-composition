@@ -179,6 +179,15 @@ run_case "LeakFree drops the completing-run limit" drift \
 run_case "row 6 forgets the leak restriction" drift \
   bash -c 'sed -i "s/may still leak/is fine/" VULN-COVERAGE.md'
 
+# stage E. The captures are real tool output; the Kani finding inverts the naive reading.
+run_case "Kani unwind finding reverted" drift \
+  bash -c 'sed -i "s/unwind annotation is not the bound/unwind annotation is the bound/" \
+             conf-typing/corpus/estate/EMISSION.md'
+
+run_case "Alloy receipt loses its scopes" drift \
+  bash -c 'sed -i "s/scopes/bounds_removed/g" \
+             conf-typing/corpus/estate/captures/alloy-receipt.json'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

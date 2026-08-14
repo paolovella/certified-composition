@@ -1,0 +1,20 @@
+	 - Status: SUCCESS
+	 - Description: "unreachable code"
+	 - Status: SUCCESS
+	 - Description: "attempt to add with overflow"
+	 - Status: SUCCESS
+	 - Description: "assertion failed: s < 3"
+	 - Status: SUCCESS
+	 - Description: "caller_location is not currently supported by Kani. Please post your example at https://github.com/model-checking/kani/issues/374"
+	 - Status: SUCCESS
+	 - Description: "call to foreign "Rust" function `_RNvCs1hStedNDpZ2_7___rustc17rust_begin_unwind` is not currently supported by Kani. Please post your example at https://github.com/model-checking/kani/issues/new/choose"
+	 - Status: SUCCESS
+	 - Description: "attempt to compute `unchecked_add` which would overflow"
+	 - Status: UNREACHABLE
+	 - Description: "attempt to shift left with overflow"
+	 - Status: SUCCESS
+	 - Description: "dereference failure: pointer NULL"
+	 - Status: SUCCESS
+	 - Description: "dereference failure: pointer invalid"
+	 - Status: SUCCESS
+	 - Description: "dereference failure: deallocated dynamic object"

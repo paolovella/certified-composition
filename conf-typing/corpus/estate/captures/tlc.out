@@ -1,0 +1,7 @@
+Progress(8) at 2026-08-14 13:13:58: 2,582,268 states generated (2,582,268 s/min), 496,377 distinct states found (496,377 ds/min), 404,153 states left on queue.
+Model checking completed. No error has been found.
+  Estimates of the probability that TLC did not check all reachable states
+  calculated (optimistic):  val = 6.9E-7
+  based on the actual fingerprints:  val = 2.6E-9
+19193917 states generated, 685497 distinct states found, 0 states left on queue.
+The depth of the complete state graph search is 9.

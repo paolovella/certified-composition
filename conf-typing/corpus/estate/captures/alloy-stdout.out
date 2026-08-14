@@ -1,0 +1,5 @@
+
+00. check S7_ForbidDominance       0       UNSAT
+01. check S8_ForbidIgnoresPriority     0       UNSAT
+02. check S9_PermitRequiresNoForbid     0       UNSAT
+03. check S10_NoMatchNoMatch       0       UNSAT
