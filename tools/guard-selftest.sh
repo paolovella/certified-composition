@@ -167,6 +167,18 @@ run_case "non-factorization result dropped" drift \
   bash -c 'sed -i "s/theorem bounded_grade_does_not_factor/theorem gone_away/" \
              conf-typing/ConfTyping/BoundedCert.lean'
 
+# The leak certificate closed the map's one admitted false-accept. Both the certificate
+# and its restriction are things that would go quiet rather than loud.
+run_case "leak certificate theorem renamed" drift \
+  bash -c 'sed -i "s/theorem leakSafe_sound/theorem gone_away/" \
+             conf-typing/ConfTyping/LeakCert.lean'
+
+run_case "LeakFree drops the completing-run limit" drift \
+  bash -c 'sed -i "s/dead = false/dead = maybe/g" conf-typing/ConfTyping/LeakCert.lean'
+
+run_case "row 6 forgets the leak restriction" drift \
+  bash -c 'sed -i "s/may still leak/is fine/" VULN-COVERAGE.md'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

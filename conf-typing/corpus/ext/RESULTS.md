@@ -3,7 +3,7 @@
 12 programs transcribed from CWE demonstrative examples (`SOURCES.md`), all written before
 the checker was run once. Command: `certcheck ext/bNN.uc`.
 
-## Detection: 6 of 7 real vulnerabilities caught
+## Detection: 6 of 7 real vulnerabilities caught — now 7 of 7
 
 | id | CWE | what it is | verdict | |
 |---|---|---|---|---|
@@ -13,7 +13,13 @@ the checker was run once. Command: `certcheck ext/bNN.uc`.
 | b07 | 89 | query built by concatenating untrusted input | REJECT | ✅ caught |
 | b09 | 835 | retry loop with no exit bound | REJECT | ✅ caught |
 | b11 | 835 | loop whose counter never decreases when the input is zero | REJECT | ✅ caught |
-| b06 | 401 | allocation not freed on the error path | **ACCEPT** | ❌ **missed** |
+| b06 | 401 | allocation not freed on the error path | REJECT | ✅ **caught since 2026-08-14** (was ACCEPT) |
+
+**Update, 2026-08-14 — the miss is closed.** `ConfTyping/LeakCert.lean` adds the leak
+certificate the paragraph below said did not exist; `b06` is now refused and its repair
+accepted. **The original finding is left standing rather than rewritten**, because the
+point of this corpus is what it found when it was run, and a measurement edited after the
+fact stops being one. What follows is the state on 2026-08-13.
 
 **The miss is a scope hole, not a soundness bug.** The memory certificate covers
 use-after-free, double-free and wild dereference. **It says nothing about leaks**, and

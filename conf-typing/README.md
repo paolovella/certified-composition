@@ -2079,6 +2079,41 @@ parser makes silently.
 arrays, and no I/O beyond `emit`. A tool you can run on a file is a different kind of
 object from a tool you can run on *your* file, and nothing here closes that.
 
+## The leak gap, closed (`LeakCert.lean`) — the map's one admitted false accept
+
+Row 6 of `VULN-COVERAGE.md` said, from the day the external corpus was transcribed:
+*"use-after-free, double-free and wild dereference only. **Leaks (CWE-401) are NOT
+detected**"*, with `corpus/ext/b06` as the witness — a CWE-401 demonstrative example this
+framework **accepted**:
+
+```
+alloc buf ; if fail { skip } else { store buf v ; free buf }
+```
+
+This is the missing certificate, added under the **scoped property exception** recorded in
+`PLAN-2026-08.md`: no construct is added to `UCmd`, nothing is made easier to write, and
+the exception may only be invoked by citing a map row that admits a gap.
+
+`LeakFree` says a completed run leaves nothing allocated that was not allocated before —
+`live` was already in the state, which is why the gap could be closed without touching the
+language. `lcheck` tracks the variables holding an unfreed allocation, and its three
+teeth are the rules that refuse to *lose a handle*: writing over a tracked variable
+(`assign`, `load`) is refused, both arms of a branch must end with the same tracked set,
+and a loop body must be a fixpoint. `leakSafe_sound` is the soundness theorem, via an
+ownership invariant (`Owned`) that survives an abort.
+
+`b06_rejected` and `b06fixed_accepted` are the result: the CWE-401 example is refused and
+its repair accepted. `loop_alloc_rejected` covers `while c { alloc x }`; `overwrite_rejected`
+covers dropping the only pointer.
+
+**The restriction is real and witnessed.** `LeakFree` covers runs that *complete*. A run
+that aborts on a refused `check` may still leak, and `allocThenCheck_accepted` is the
+witness: `alloc p ; check r ; free p` is **accepted** and leaks whenever the policy refuses
+`r`. That is why the theorem says what it says — on the refusal path the program has
+already failed the mediation certificate, and rejecting every allocation that precedes a
+`check` would refuse most real handlers to buy a guarantee about a path that has already
+aborted. Stated here, in row 6, and guarded.
+
 ## Bounded guarantees, and the first grade that does not factor (`BoundedCert.lean`) — stage F
 
 Alloy's `check A for 4 AbacPolicy`, CBMC's unwinding depth, TLC's finite instance: three

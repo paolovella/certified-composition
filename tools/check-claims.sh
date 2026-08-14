@@ -568,9 +568,26 @@ fi
 for f in conf-typing/corpus/ext/SOURCES.md conf-typing/corpus/ext/RESULTS.md; do
   if [ ! -f "$f" ]; then echo "DRIFT: the external corpus cites $f but it is missing"; fail=1; fi
 done
-# the leak gap must stay stated in the coverage map, since nothing else states it.
-if ! grep -q "Leaks (CWE-401) are NOT detected" VULN-COVERAGE.md 2>/dev/null; then
-  echo "DRIFT: the leak scope-hole found by the external corpus is no longer stated in VULN-COVERAGE"
+# the leak gap was CLOSED on 2026-08-14 under the plan's scoped property exception. The
+# certificate and, just as important, its restriction must both stay stated.
+for thm in "theorem leakSafe_sound" "theorem lcheck_owned" "theorem b06_rejected" \
+           "theorem b06fixed_accepted" "theorem loop_alloc_rejected" \
+           "theorem overwrite_rejected" "theorem allocThenCheck_accepted" \
+           "def lcheck" "def leakSafe"; do
+  if ! grep -q "$thm" conf-typing/ConfTyping/LeakCert.lean 2>/dev/null; then
+    echo "DRIFT: the leak certificate is cited but '$thm' is missing from LeakCert.lean"; fail=1
+  fi
+done
+if ! grep -q "leaks (CWE-401), closed" VULN-COVERAGE.md 2>/dev/null; then
+  echo "DRIFT: row 6 no longer records that the leak gap was closed"; fail=1
+fi
+# LeakFree covers COMPLETING runs only. An aborted run may still leak, and a certificate
+# that quietly dropped that restriction would be claiming more than it proves.
+if ! grep -q "may still leak" VULN-COVERAGE.md 2>/dev/null; then
+  echo "DRIFT: row 6 no longer states the aborted-run restriction on LeakFree"; fail=1
+fi
+if ! grep -q "s'.dead = false" conf-typing/ConfTyping/LeakCert.lean 2>/dev/null; then
+  echo "DRIFT: LeakFree no longer restricts to completing runs - the witness allocThenCheck refutes it"
   fail=1
 fi
 

@@ -915,6 +915,37 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The leak gap, closed — the map's one admitted false accept**
+  (`conf-typing/ConfTyping/LeakCert.lean`). Row 6 of `VULN-COVERAGE.md` had said since the
+  external corpus landed that leaks (CWE-401) are **not** detected, with `corpus/ext/b06` —
+  a CWE-401 demonstrative example — **accepted** by this framework. That was the one
+  vulnerability class the map admitted it missed.
+
+  Closed under a **scoped exception** now written into `PLAN-2026-08.md`: the freeze's
+  rationale is that growing `UCmd` toward *writability* is the Jif path §2.4 shows lost,
+  which is a different thing from closing a named vulnerability class. Property coverage is
+  permitted; functions, arrays, records and early return remain forbidden, as does driving
+  the author-written corpus's false-rejection rate to zero. The exception may only be
+  invoked by citing the map row that admits the gap.
+
+  No construct was added to the language. `live` was already in the state, so `LeakFree` —
+  a completed run leaves nothing allocated that it did not start with — is statable as it
+  stands. `lcheck` tracks variables holding an unfreed allocation, and its teeth are the
+  rules that refuse to **lose a handle**: writing over a tracked variable, branches whose
+  arms disagree, and loop bodies that are not a fixpoint. `leakSafe_sound` is the soundness
+  theorem, through an ownership invariant that survives an abort.
+
+  `b06_rejected` + `b06fixed_accepted`: the example is refused, the repair accepted.
+  **In-model missed vulnerability classes: 1 → 0.**
+
+  **The restriction is real, and witnessed rather than asserted.** `LeakFree` covers runs
+  that *complete*; `allocThenCheck_accepted` shows `alloc p ; check r ; free p` is accepted
+  and leaks when the policy refuses `r`. Rejecting every allocation before a `check` would
+  refuse most real handlers to buy a guarantee about an already-aborted path. Row 6 states
+  it, and a guard fires if either the certificate or the restriction leaves the map.
+  `corpus/ext/RESULTS.md` records the change **without rewriting the original measurement** —
+  a corpus result edited after the fact stops being one. Self-test 36/36 → **39/39**.
+
 - **Stage F — bounded guarantees as grades, and the first grade that does not factor**
   (`conf-typing/ConfTyping/BoundedCert.lean`). Alloy's `check … for 4 AbacPolicy`, CBMC's
   unwinding depth, TLC's finite instance are one shape: a guarantee quantified by a budget.

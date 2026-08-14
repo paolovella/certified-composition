@@ -85,3 +85,4 @@ import ConfTyping.HeteroCompose
 import ConfTyping.JasminSCT
 import ConfTyping.JasminCert
 import ConfTyping.BoundedCert
+import ConfTyping.LeakCert
