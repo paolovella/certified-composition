@@ -13,7 +13,7 @@ Rigor grades, house style: **[proved]** — a Lean theorem is cited by name;
 placement only, no new mathematics; **[to prove]** — precise statement given,
 scheduled (no row currently carries it).
 
-## 0. The claim template — and its three irreducible gaps
+## 0. The claim template — and its four irreducible gaps
 
 The only honest form of "no vulnerabilities" is:
 
@@ -23,7 +23,10 @@ The only honest form of "no vulnerabilities" is:
 > composition** (the conformance gate `confidential_transport`, and `Bridge.comp`
 > certificate accumulation).
 
-Three gaps are irreducible and are *named*, not hidden:
+Four gaps are irreducible and are *named*, not hidden. **The fourth was added on
+2026-08-14 because stage F proved it**, and it bears on the template's own last clause —
+"the exclusion survives composition" — which was, as written, an overclaim in one direction
+the framework is actively growing:
 
 - **Model gap.** A proof excludes leaks through channels *in* the model. The
   instrumented IMP semantics carries store, cost, and branch-trace outcomes
@@ -43,6 +46,24 @@ Three gaps are irreducible and are *named*, not hidden:
 - **TCB.** Lean's kernel and the three standard axioms (`propext`,
   `Classical.choice`, `Quot.sound` — the central meta-theorems use none), plus
   compilation and hardware below the model. Nothing here shrinks that; it is stated.
+- **Bound gap** *(added 2026-08-14, proved)*. "The exclusion survives composition" is true
+  of every certificate **this** framework generates, because they are all unbounded: `needs`
+  and `CostAtMost` quantify over every input and every fuel, and the speculative results
+  quantify over every schedule. It is **not** true in general. A *bounded* certificate —
+  Alloy's `check … for 4 AbacPolicy`, CBMC/Kani's unwinding depth, TLC's finite instance —
+  does not compose by intersecting bounds: `ConfTyping.min_unsound` exhibits two correctly
+  certified components whose `min`-composed certificate claims safety on a region where the
+  composite **fails at every point**. The grade of a bounded guarantee is the pair
+  `(bound, growth)`, and `ConfTyping.bounded_grade_does_not_factor` proves it cannot be
+  carried as two independent components — so `Bridge.pair_comp_cert`'s componentwise
+  freedom, which the template leans on, does not extend to it.
+
+  **Why this is named here rather than left in the stage notes.** The framework's route to
+  wider coverage is now *receiving* other tools' certificates (`CNReceive`, `JasminCert`),
+  and the tools with the widest reach over real code — Kani, Alloy, TLC — are exactly the
+  bounded ones. The moment a coverage row is justified by a bounded external result, this
+  gap is load-bearing, and the composition rule that looks obvious is unsound. No row
+  currently relies on one; `PLAN-MULTITOOL.md` stage E is where that would change.
 
 ## 1. The classification machinery (already proved — the map applies it)
 
@@ -789,7 +810,8 @@ partitions), not a general-purpose language frontend.
 ## 5. Session ledger
 
 - **Session 1 (this document):** all twelve classifications placed; engine table;
-  claim template with the three gaps; rubric. Grades as marked.
+  claim template with the four gaps (the bound gap added 2026-08-14, proved by stage F);
+  rubric. Grades as marked.
 - **Session 2 (done):** T1 and T2 landed in `conf-typing/ConfTyping/Integrity.lean`
   (mathlib-free, `no sorry`). Axiom audit: `taint_is_JNI`, `Jtaint_postproc`,
   `Jtaint_separable`, `sanitize_const_is_taint`, `value_predicate_not_admissible`,

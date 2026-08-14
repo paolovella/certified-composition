@@ -148,6 +148,11 @@ run_case "native_decide creeps in" drift \
 run_case "EMISSION drops the CN verdict" drift \
   bash -c 'sed -i "s/## CN — no/## CN/" conf-typing/corpus/jasmin/EMISSION.md'
 
+# The claim template's gap list. Dropping a gap makes the bulletproof claim STRONGER
+# looking and weaker in fact, which is the direction errors actually travel.
+run_case "bound gap leaves the claim template" drift \
+  bash -c 'sed -i "s/^- \*\*Bound gap\*\*/- **Bounded note**/" VULN-COVERAGE.md'
+
 # stage F. The negative result and the non-factorization are the stage; both would go
 # quiet rather than loud if deleted.
 run_case "min-unsoundness counterexample dropped" drift \

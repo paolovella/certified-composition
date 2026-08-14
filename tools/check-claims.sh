@@ -698,6 +698,22 @@ if ! grep -q "CN — no" conf-typing/corpus/jasmin/EMISSION.md 2>/dev/null; then
   echo "DRIFT: EMISSION.md no longer records that CN emits no consumable certificate"; fail=1
 fi
 
+# The bulletproof claim template is the goal-facing artifact. Its gap list is the whole
+# honesty of the claim: a gap that quietly leaves the list turns the template into the
+# slogan it exists to replace.
+if ! grep -q "four irreducible gaps" VULN-COVERAGE.md 2>/dev/null; then
+  echo "DRIFT: the claim template no longer says four irreducible gaps"; fail=1
+fi
+if ! grep -q "Bound gap" VULN-COVERAGE.md 2>/dev/null; then
+  echo "DRIFT: the bound gap has left the claim template - 'survives composition' overclaims again"
+  fail=1
+fi
+for thm in "ConfTyping.min_unsound" "ConfTyping.bounded_grade_does_not_factor"; do
+  if ! grep -q "$thm" VULN-COVERAGE.md 2>/dev/null; then
+    echo "DRIFT: the bound gap is stated but no longer cites '$thm'"; fail=1
+  fi
+done
+
 # stage F: bounded guarantees as grades. The stage's content is a NEGATIVE result (min is
 # unsound) and a non-factorization, and both are the kind of claim that dies quietly.
 for thm in "theorem min_unsound" "theorem bounded_comp_sound" "theorem bmul_assoc" \
