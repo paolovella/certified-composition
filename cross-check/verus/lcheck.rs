@@ -29,6 +29,7 @@ pub const T_LOAD: u8 = 4;
 pub const T_CHECK: u8 = 5;
 pub const T_SEQ: u8 = 6;
 pub const T_ITE: u8 = 7;
+pub const T_LOOP: u8 = 8;
 
 // ---------------------------------------------------------------- the two sides
 
@@ -222,6 +223,7 @@ pub open spec fn tree_wf(p: Seq<Node>) -> bool {
         &&& (#[trigger] p[i]).x < NV
         &&& (p[i].tag == T_SEQ || p[i].tag == T_ITE ==>
                 p[i].l < p.len() && p[i].r < p.len())
+        &&& (p[i].tag == T_LOOP ==> p[i].l < p.len())
     }
 }
 
@@ -243,6 +245,14 @@ pub open spec fn spec_tree(p: Seq<Node>, i: int, o: Set<nat>, fuel: nat) -> Opti
                 None => None,
                 Some(b) => if a =~= b { Some(a) } else { None },
             },
+        }
+    } else if p[i].tag == T_LOOP {
+        // `ConfTyping.lcheck`'s loop rule: the body must be a FIXPOINT of the
+        // outstanding set. A body that ends holding more than it started with is
+        // refused, which is `while c { alloc x }`.
+        match spec_tree(p, p[i].l as int, o, (fuel - 1) as nat) {
+            None => None,
+            Some(o1) => if o1 =~= o { Some(o) } else { None },
         }
     } else {
         spec_step(p[i].tag, p[i].x as nat, o)
@@ -298,6 +308,21 @@ pub fn tree_impl(p: &Vec<Node>, i: usize, m: u8, fuel: usize) -> (r: Option<u8>)
                     }
                 }
             },
+        }
+    } else if n.tag == T_LOOP {
+        match tree_impl(p, n.l, m, fuel - 1) {
+            None => None,
+            Some(m1) => {
+                if m1 == m {
+                    proof { assert(word_set(m1) =~= word_set(m)); }
+                    Some(m)
+                } else {
+                    proof {
+                        if word_set(m1) =~= word_set(m) { word_set_inj(m1, m); }
+                    }
+                    None
+                }
+            }
         }
     } else {
         step_impl(n.tag, n.x, m)
@@ -356,6 +381,7 @@ pub fn tree_wf_check(p: &Vec<Node>) -> (r: bool)
                 &&& (#[trigger] p@[i]).x < NV
                 &&& (p@[i].tag == T_SEQ || p@[i].tag == T_ITE ==>
                         p@[i].l < p@.len() && p@[i].r < p@.len())
+                &&& (p@[i].tag == T_LOOP ==> p@[i].l < p@.len())
             },
         decreases p.len() - k,
     {
@@ -366,6 +392,10 @@ pub fn tree_wf_check(p: &Vec<Node>) -> (r: bool)
         }
         if (n.tag == T_SEQ || n.tag == T_ITE) && (n.l >= p.len() || n.r >= p.len()) {
             assert(!tree_wf(p@)) by { assert(p@[k as int].tag == T_SEQ || p@[k as int].tag == T_ITE); }
+            return false;
+        }
+        if n.tag == T_LOOP && n.l >= p.len() {
+            assert(!tree_wf(p@)) by { assert(p@[k as int].tag == T_LOOP); }
             return false;
         }
         k = k + 1;
@@ -415,6 +445,21 @@ fn main() {
     ];
     println!("{:<38} {}", "b06 (CWE-401)", verdict_tree(&b06));
     println!("{:<38} {}", "b06, repaired", verdict_tree(&b06_fixed));
+
+    // while c { alloc x } — the unbounded leak. The body is not a fixpoint.
+    let loop_leak: Vec<Node> = vec![
+        Node { tag: 8, x: 0, l: 1, r: 0 },
+        Node { tag: 1, x: 0, l: 0, r: 0 },
+    ];
+    // while c { alloc x ; free x } — balanced, so the body IS a fixpoint.
+    let loop_ok: Vec<Node> = vec![
+        Node { tag: 8, x: 0, l: 1, r: 0 },
+        Node { tag: 6, x: 0, l: 2, r: 3 },
+        Node { tag: 1, x: 0, l: 0, r: 0 },
+        Node { tag: 2, x: 0, l: 0, r: 0 },
+    ];
+    println!("{:<38} {}", "while c { alloc x }", verdict_tree(&loop_leak));
+    println!("{:<38} {}", "while c { alloc x ; free x }", verdict_tree(&loop_ok));
 }
 
 fn verdict_tree(p: &Vec<Node>) -> &'static str {

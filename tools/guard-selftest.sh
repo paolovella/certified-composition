@@ -198,8 +198,9 @@ run_case "vacuity witness harness removed" drift \
   bash -c 'sed -i "s/fn accepted_programs_can_allocate/fn gone_away/" \
              cross-check/leak-kani/src/lib.rs'
 
-run_case "cross-check drops the loop caveat" drift \
-  bash -c 'sed -i "s/NOT modelled: .loop./covers everything/" cross-check/leak-kani/src/lib.rs'
+run_case "cross-check drops the loop bound caveat" drift \
+  bash -c 'sed -i "s/loop. IS modelled, bounded/loops are fully covered/" \
+             cross-check/leak-kani/src/lib.rs'
 
 # stage K. Making the spec talk about the machine word is the transliteration trap the
 # stage's kill criterion names, and it would still verify.

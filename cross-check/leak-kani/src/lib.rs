@@ -13,8 +13,10 @@
 //!     read or written by the `live` transitions, so none can change whether an
 //!     address is allocated. `hop .store` and `memop .deref` are omitted for the
 //!     same reason — they touch `heap` and `dead`, never `live` or the pointer store.
-//!   * NOT modelled: `loop`. This search covers the loop-free fragment, and says
-//!     nothing about `lcheck`'s fixpoint rule.
+//!   * `loop` IS modelled, bounded: the body runs 0..MAXITER times, chosen
+//!     symbolically. `uexec` recurses on fuel and terminates when the guard is
+//!     false; here the number of iterations is a symbolic value the adversary
+//!     picks, which covers every run `uexec` could take up to that bound.
 
 pub const NN: usize = 5; // program nodes
 pub const NV: usize = 2; // variables
@@ -28,6 +30,7 @@ pub const T_LOAD: u8 = 4;
 pub const T_CHECK: u8 = 5;
 pub const T_SEQ: u8 = 6;
 pub const T_ITE: u8 = 7;
+pub const T_LOOP: u8 = 8;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
@@ -43,7 +46,7 @@ pub fn well_formed(p: &[Node; NN]) -> bool {
     let mut i = 0;
     while i < NN {
         let n = p[i];
-        if n.tag > T_ITE {
+        if n.tag > T_LOOP {
             return false;
         }
         if (n.x as usize) >= NV {
@@ -53,6 +56,12 @@ pub fn well_formed(p: &[Node; NN]) -> bool {
             let l = n.l as usize;
             let r = n.r as usize;
             if l <= i || l >= NN || r <= i || r >= NN {
+                return false;
+            }
+        }
+        if n.tag == T_LOOP {
+            let l = n.l as usize;
+            if l <= i || l >= NN {
                 return false;
             }
         }
@@ -97,13 +106,20 @@ pub fn lcheck(p: &[Node; NN], i: usize, o: u8, fuel: usize) -> Option<u8> {
             Some(o1) => lcheck(p, n.r as usize, o1, fuel - 1),
             None => None,
         },
-        _ => {
-            // ITE: both arms must end with the same tracked set
+        T_ITE => {
+            // both arms must end with the same tracked set
             match (
                 lcheck(p, n.l as usize, o, fuel - 1),
                 lcheck(p, n.r as usize, o, fuel - 1),
             ) {
                 (Some(a), Some(b)) if a == b => Some(a),
+                _ => None,
+            }
+        }
+        _ => {
+            // LOOP: the body must be a fixpoint of the tracked set
+            match lcheck(p, n.l as usize, o, fuel - 1) {
+                Some(o1) if o1 == o => Some(o),
                 _ => None,
             }
         }
@@ -148,8 +164,10 @@ fn pick_addr(st: &St) -> Option<u8> {
     }
 }
 
-/// `uexec`'s memory fragment. `br` supplies the branch decisions.
-pub fn exec(p: &[Node; NN], i: usize, st: &mut St, br: &[bool; NN], fuel: usize) {
+pub const MAXITER: u8 = 3;
+
+/// `uexec`'s memory fragment. `br` supplies branch decisions, `iters` loop counts.
+pub fn exec(p: &[Node; NN], i: usize, st: &mut St, br: &[bool; NN], iters: &[u8; NN], fuel: usize) {
     if fuel == 0 || i >= NN {
         return;
     }
@@ -198,14 +216,22 @@ pub fn exec(p: &[Node; NN], i: usize, st: &mut St, br: &[bool; NN], fuel: usize)
             }
         }
         T_SEQ => {
-            exec(p, n.l as usize, st, br, fuel - 1);
-            exec(p, n.r as usize, st, br, fuel - 1);
+            exec(p, n.l as usize, st, br, iters, fuel - 1);
+            exec(p, n.r as usize, st, br, iters, fuel - 1);
+        }
+        T_ITE => {
+            if br[i] {
+                exec(p, n.l as usize, st, br, iters, fuel - 1);
+            } else {
+                exec(p, n.r as usize, st, br, iters, fuel - 1);
+            }
         }
         _ => {
-            if br[i] {
-                exec(p, n.l as usize, st, br, fuel - 1);
-            } else {
-                exec(p, n.r as usize, st, br, fuel - 1);
+            // LOOP: run the body `iters[i]` times, a symbolic count.
+            let mut t = 0u8;
+            while t < iters[i] && t < MAXITER {
+                exec(p, n.l as usize, st, br, iters, fuel - 1);
+                t += 1;
             }
         }
     }
@@ -229,7 +255,8 @@ mod attack {
 
         let br: [bool; NN] = kani::any();
         let mut st = St::new();
-        exec(&p, 0, &mut st, &br, NN);
+        let iters: [u8; NN] = kani::any();
+        exec(&p, 0, &mut st, &br, &iters, NN);
 
         if !st.dead {
             assert!(st.live == 0, "leakSafe accepted a program that leaks");
@@ -248,7 +275,8 @@ mod attack {
         kani::assume(leak_safe(&p));
         let br: [bool; NN] = kani::any();
         let mut st = St::new();
-        exec(&p, 0, &mut st, &br, NN);
+        let iters: [u8; NN] = kani::any();
+        exec(&p, 0, &mut st, &br, &iters, NN);
         assert!(st.dead || st.fresh == 0, "witness: an accepted program that allocates");
     }
 
@@ -261,7 +289,8 @@ mod attack {
         kani::assume(well_formed(&p));
         let br: [bool; NN] = kani::any();
         let mut st = St::new();
-        exec(&p, 0, &mut st, &br, NN);
+        let iters: [u8; NN] = kani::any();
+        exec(&p, 0, &mut st, &br, &iters, NN);
         // refuted by a leaking witness, which is what we want to see
         assert!(st.dead || st.live == 0, "witness: a program that leaks");
     }
@@ -286,10 +315,43 @@ mod concrete {
         assert!(well_formed(&p));
         assert!(leak_safe(&p), "alloc;free must be accepted");
         let mut st = St::new();
-        exec(&p, 0, &mut st, &[false; NN], NN);
+        exec(&p, 0, &mut st, &[false; NN], &[0u8; NN], NN);
         assert!(!st.dead, "must complete");
         assert_eq!(st.fresh, 1, "must actually allocate");
         assert_eq!(st.live, 0, "must not leak");
+    }
+
+    /// `while c { alloc x }` — the unbounded leak. Must be REFUSED, and it really
+    /// does leak when the body runs at least once.
+    #[test]
+    fn loop_alloc_is_refused() {
+        let mut p: [Node; NN] = [skip(); NN];
+        p[0] = Node { tag: T_LOOP, x: 0, l: 1, r: 0 };
+        p[1] = Node { tag: T_ALLOC, x: 0, l: 0, r: 0 };
+        assert!(well_formed(&p));
+        assert!(!leak_safe(&p), "while-loop that only allocates must be refused");
+        let mut st = St::new();
+        let mut iters = [0u8; NN];
+        iters[0] = 1;
+        exec(&p, 0, &mut st, &[false; NN], &iters, NN);
+        assert!(!st.dead && st.live != 0, "and it really leaks");
+    }
+
+    /// `while c { alloc x ; free x }` — balanced, so the body is a fixpoint.
+    #[test]
+    fn loop_balanced_is_accepted() {
+        let mut p: [Node; NN] = [skip(); NN];
+        p[0] = Node { tag: T_LOOP, x: 0, l: 1, r: 0 };
+        p[1] = Node { tag: T_SEQ, x: 0, l: 2, r: 3 };
+        p[2] = Node { tag: T_ALLOC, x: 0, l: 0, r: 0 };
+        p[3] = Node { tag: T_FREE, x: 0, l: 0, r: 0 };
+        assert!(well_formed(&p));
+        assert!(leak_safe(&p), "balanced loop must be accepted");
+        let mut st = St::new();
+        let mut iters = [0u8; NN];
+        iters[0] = 2;
+        exec(&p, 0, &mut st, &[false; NN], &iters, NN);
+        assert!(!st.dead && st.live == 0, "and it does not leak");
     }
 
     /// `b06`: alloc, then one arm frees and the other does not. Must be REFUSED.
@@ -306,7 +368,7 @@ mod concrete {
         assert!(!leak_safe(&p), "b06 must be refused");
         // and it really does leak on the skip arm
         let mut st = St::new();
-        exec(&p, 0, &mut st, &[true; NN], NN);
+        exec(&p, 0, &mut st, &[true; NN], &[0u8; NN], NN);
         assert!(!st.dead && st.live != 0, "b06 leaks on the skip arm");
     }
 }

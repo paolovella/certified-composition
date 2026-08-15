@@ -792,11 +792,20 @@ for f in kani-leak-adversary.out kani-leak-vacuity.out; do
     echo "DRIFT: stage G cites captures/$f but it is missing"; fail=1
   fi
 done
-# The port must keep saying which fragment it models. Without the `loop` caveat the negative
-# result reads as covering the whole checker, which it does not.
-if ! grep -q "NOT modelled: .loop." cross-check/leak-kani/src/lib.rs 2>/dev/null; then
-  echo "DRIFT: the cross-check port no longer states that loops are unmodelled"; fail=1
+# The port must keep saying what its bounds are. Loops ARE modelled since 2026-08-15, but
+# only up to MAXITER iterations - without that caveat the negative result reads as covering
+# unbounded loops, which it does not.
+if ! grep -q "loop. IS modelled, bounded" cross-check/leak-kani/src/lib.rs 2>/dev/null; then
+  echo "DRIFT: the cross-check port no longer states that its loop modelling is bounded"; fail=1
 fi
+if ! grep -q "MAXITER" cross-check/leak-kani/src/lib.rs 2>/dev/null; then
+  echo "DRIFT: the cross-check port no longer bounds loop iterations"; fail=1
+fi
+for h in loop_alloc_is_refused loop_balanced_is_accepted; do
+  if ! grep -q "fn $h" cross-check/leak-kani/src/lib.rs 2>/dev/null; then
+    echo "DRIFT: the cross-check crate no longer has loop witness '$h'"; fail=1
+  fi
+done
 
 # stage H: Alloy as an independent adversary against stage F. Two of its four checks are
 # EXPECTED TO FAIL - that is what makes the model capable of refuting anything - and the
