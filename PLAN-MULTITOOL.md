@@ -74,9 +74,17 @@ test of whether it finds anything *else*.
     `deref`, `access` and `sop` are omitted because none touches `live` or the pointer
     store. `pickAddr`'s reuse-before-fresh **is** modelled, since address reuse is exactly
     where an ownership invariant could break.
-- **What it does not cover, and both are real.** The port is **loop-free**, so `lcheck`'s
-  fixpoint rule is untested by this. And 5 nodes / 2 variables / 3 addresses is a **bound** —
-  a clean run at size 5 is a statement about size 5, which is what stage F exists to say.
+- **Loops added 2026-08-15, and the exhaustive search over them has NOT completed.**
+  The port now models loops (symbolic iteration count, bounded by `MAXITER`), and two
+  concrete witnesses pass: the allocating loop is refused and really leaks, the balanced one
+  is accepted and does not. But the **symbolic** run with loops in scope **timed out at
+  3600 s without reaching the solver**. So the fixpoint rule is covered by witnesses and by
+  Verus, and is **not** covered by exhaustive search. Recorded rather than rounded up.
+  - A bug was found while adding them: `well_formed` still capped tags at `T_ITE`, so every
+    loop program was being **silently discarded as malformed**. The concrete witnesses caught
+    it; the search would have passed vacuously and looked identical to success.
+- **The bound is real.** 5 nodes / 2 variables / 3 addresses / `MAXITER` iterations — a clean
+  run at that size is a statement about that size, which is what stage F exists to say.
 
 ### Stage H — Alloy against the algebra. *(1–2 sessions.)*
 

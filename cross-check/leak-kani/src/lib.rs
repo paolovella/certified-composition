@@ -164,7 +164,7 @@ fn pick_addr(st: &St) -> Option<u8> {
     }
 }
 
-pub const MAXITER: u8 = 3;
+pub const MAXITER: u8 = 2;
 
 /// `uexec`'s memory fragment. `br` supplies branch decisions, `iters` loop counts.
 pub fn exec(p: &[Node; NN], i: usize, st: &mut St, br: &[bool; NN], iters: &[u8; NN], fuel: usize) {
