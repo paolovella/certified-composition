@@ -915,6 +915,36 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Stage K — a leak checker whose agreement with its spec is verified, not extracted**
+  (`cross-check/verus/lcheck.rs`, 23 verified / 0 errors, and a binary that runs).
+  `certcheck` has always been trusted extraction: the Lean says one thing and the binary is
+  believed to say the same. This is the other kind of artifact.
+
+  **The kill criterion was designed against rather than avoided.** It was: *if the Verus spec
+  is a transliteration of the Rust, the stage proves the code equals itself.* So the sides are
+  built on different objects — the specification tracks outstanding allocations as a
+  mathematical `Set<nat>`, its rules `ConfTyping.lcheck`'s clause for clause; the
+  implementation carries a `u8` machine word. `word_set` is the bridge and the theorem is
+  that the word always *denotes* the set. A guard fires if the spec's signature stops being
+  set-valued, and the self-test performs exactly that swap — worth guarding because **the
+  transliterated version would still verify**, it would just stop meaning anything.
+
+  **Branches, and the fact they rest on.** Lifting the branch-agreement rule — both arms must
+  end with the same outstanding set — needed `word_set_inj`: distinct well-formed words
+  denote distinct sets. The spec compares sets, the code compares words, and those are the
+  same test only because of that lemma.
+
+  **The verified binary decides `b06`.** `REFUSE` for the CWE-401 example, `ACCEPT` for its
+  repair, matching `b06_rejected` and `b06fixed_accepted` in Lean — so the finding that
+  started this line of work is now carried by a Lean proof, an exhaustive Kani search, and a
+  verified Rust implementation that agree. Both verdicts pinned in CI.
+
+  `ops_valid` and `tree_wf_check` discharge the preconditions at runtime, so both entry
+  points are total — a verified function with an unchecked precondition is one you cannot
+  safely call. **`loop` remains Lean-only**: the fixpoint rule is in neither the verified
+  implementation nor the Kani search, and is currently the one part of the checker resting on
+  a single tool.
+
 - **Stages G and H — the other tools turned on this repo's own claims**
   (`cross-check/leak-kani/`, `cross-check/alloy/BoundedGrade.als`). `PLAN-MULTITOOL.md` was
   **retargeted** first: its previous version planned to integrate a different project's

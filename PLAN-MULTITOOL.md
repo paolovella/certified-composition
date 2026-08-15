@@ -156,9 +156,19 @@ correspondence to the spec is itself verified. Verus verifies real Rust.
   - CI verifies the file and runs the binary whenever Verus is present, and a guard fires if
     the spec's signature stops being set-valued — which is exactly the transliteration the
     kill criterion names, and which would still verify.
-- **Not done.** The verified fragment is **straight-line**: `seq` is a fold, and `ite`/`loop`
-  are Lean-only. The branch-agreement rule — the one that catches `b06` — is therefore *not*
-  in the verified implementation, and that is the next pass, not a detail.
+- **Done, second pass — branches** (23 verified / 0 errors). `spec_tree` and `tree_impl`
+  cover `seq` and `ite`, and the branch rule needed one new fact: **`word_set` is injective
+  on well-formed words** (`word_set_inj`). The specification compares *sets*, the code
+  compares *machine words*, and those are the same test only because no two distinct words
+  denote the same set. That lemma is the whole content of lifting the branch rule.
+  - **The verified binary now decides `b06`.** `b06 (CWE-401) REFUSE`, `b06, repaired
+    ACCEPT` — matching `b06_rejected` and `b06fixed_accepted` in Lean. Both verdicts are
+    pinned in CI.
+  - `tree_wf_check` discharges the tree precondition at runtime, so the branch entry point
+    is total like the straight-line one.
+- **Still not done.** `loop` remains Lean-only, so `lcheck`'s **fixpoint rule is not in the
+  verified implementation** — and that is also the rule the Kani search does not cover, so
+  loops are currently the one part of the checker with a Lean proof and nothing else.
 
 ### Not scheduled
 

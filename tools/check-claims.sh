@@ -762,6 +762,7 @@ if [ ! -f cross-check/verus/lcheck.rs ]; then
   echo "DRIFT: stage K cites cross-check/verus/lcheck.rs but it is missing"; fail=1
 fi
 for n in "spec fn spec_step" "spec fn spec_lcheck" "spec fn word_set" \
+         "spec fn spec_tree" "proof fn word_set_inj" "fn tree_impl" "fn tree_leak_safe" \
          "fn step_impl" "fn lcheck_impl" "fn leak_safe" "fn leak_safe_total"; do
   if ! grep -q "$n" cross-check/verus/lcheck.rs 2>/dev/null; then
     echo "DRIFT: the verified checker no longer has '$n'"; fail=1

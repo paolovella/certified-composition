@@ -48,8 +48,11 @@ if [ -x "$VERUS_BIN" ]; then
   step "verus lcheck verifies and runs" \
        bash -c 'cd cross-check/verus && "'"$VERUS_BIN"'" --compile lcheck.rs -o lcheck-bin 2>&1 \
                   | grep -q "0 errors" &&
-                ./lcheck-bin | grep -q "^alloc p ; free p .*ACCEPT" &&
-                ./lcheck-bin | grep -q "^alloc p  *REFUSE"'
+                ./lcheck-bin > /tmp/lcheck-verdicts.txt &&
+                grep -q "^alloc p ; free p .*ACCEPT" /tmp/lcheck-verdicts.txt &&
+                grep -q "^alloc p  *REFUSE"          /tmp/lcheck-verdicts.txt &&
+                grep -q "^b06 (CWE-401) *REFUSE"     /tmp/lcheck-verdicts.txt &&
+                grep -q "^b06, repaired *ACCEPT"     /tmp/lcheck-verdicts.txt'
 fi
 
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
