@@ -201,6 +201,12 @@ run_case "vacuity witness harness removed" drift \
 run_case "cross-check drops the loop caveat" drift \
   bash -c 'sed -i "s/NOT modelled: .loop./covers everything/" cross-check/leak-kani/src/lib.rs'
 
+# stage K. Making the spec talk about the machine word is the transliteration trap the
+# stage's kill criterion names, and it would still verify.
+run_case "Verus spec becomes a transliteration" drift \
+  bash -c 'sed -i "s/spec_step(tag: u8, x: nat, o: Set<nat>) -> Option<Set<nat>>/spec_step(tag: u8, x: nat, o: u8) -> Option<u8>/" \
+             cross-check/verus/lcheck.rs'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

@@ -141,6 +141,24 @@ correspondence to the spec is itself verified. Verus verifies real Rust.
 - **Kill criterion:** if the Verus spec is a transliteration of the Rust rather than of the
   Lean, it proves the code equals itself. That is the failure mode to watch, and it kills
   the stage.
+- **Done, first pass** (`cross-check/verus/lcheck.rs`, 15 verified / 0 errors, and a binary
+  that runs).
+  - **The kill criterion was designed against, not merely avoided.** The specification tracks
+    outstanding allocations as a mathematical `Set<nat>` with `insert`/`remove`/`contains`,
+    and its rules are `ConfTyping.lcheck`'s clause for clause. The implementation carries a
+    `u8` machine word. `word_set` is the bridge, and the theorem is that the word always
+    *denotes* the set — a refinement between two different objects, not an identity.
+  - **It agrees with Lean.** The compiled binary and `ConfTyping.leakSafe` return the same
+    verdict on all four demonstration programs (`alloc p ; free p` accept, `alloc p` refuse,
+    `alloc p ; assign p` refuse, two-allocation accept), checked both ways.
+  - `ops_valid` discharges the precondition at runtime, so the binary has a total entry
+    point rather than an assumed one.
+  - CI verifies the file and runs the binary whenever Verus is present, and a guard fires if
+    the spec's signature stops being set-valued — which is exactly the transliteration the
+    kill criterion names, and which would still verify.
+- **Not done.** The verified fragment is **straight-line**: `seq` is a fold, and `ite`/`loop`
+  are Lean-only. The branch-agreement rule — the one that catches `b06` — is therefore *not*
+  in the verified implementation, and that is the next pass, not a detail.
 
 ### Not scheduled
 

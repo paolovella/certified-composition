@@ -41,6 +41,17 @@ if command -v cargo >/dev/null 2>&1; then
        bash -c 'cd cross-check/leak-kani && cargo test --quiet 2>&1 | grep -q "test result: ok"'
 fi
 
+# Stage K's verified checker. Verus is not assumed present (it is not on PATH by default
+# here); when it is, the file must verify and the binary must still decide correctly.
+VERUS_BIN="${VERUS:-/home/paolo/verus/verus-bin/verus-x86-linux/verus}"
+if [ -x "$VERUS_BIN" ]; then
+  step "verus lcheck verifies and runs" \
+       bash -c 'cd cross-check/verus && "'"$VERUS_BIN"'" --compile lcheck.rs -o lcheck-bin 2>&1 \
+                  | grep -q "0 errors" &&
+                ./lcheck-bin | grep -q "^alloc p ; free p .*ACCEPT" &&
+                ./lcheck-bin | grep -q "^alloc p  *REFUSE"'
+fi
+
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \

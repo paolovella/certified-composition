@@ -756,6 +756,24 @@ if ! grep -q "Correction of record" conf-typing/corpus/estate/EMISSION.md 2>/dev
   echo "DRIFT: the census dropped the correction of record about Alloy's scope"; fail=1
 fi
 
+# stage K: the verified checker. Its whole value is that the SPEC and the IMPL are
+# different objects; if the spec starts talking about u8 the stage proves code == code.
+if [ ! -f cross-check/verus/lcheck.rs ]; then
+  echo "DRIFT: stage K cites cross-check/verus/lcheck.rs but it is missing"; fail=1
+fi
+for n in "spec fn spec_step" "spec fn spec_lcheck" "spec fn word_set" \
+         "fn step_impl" "fn lcheck_impl" "fn leak_safe" "fn leak_safe_total"; do
+  if ! grep -q "$n" cross-check/verus/lcheck.rs 2>/dev/null; then
+    echo "DRIFT: the verified checker no longer has '$n'"; fail=1
+  fi
+done
+# The specification must stay set-valued. `Set<nat>` in spec_step's signature is the
+# anti-transliteration guard: swap it for u8 and the refinement becomes an identity.
+if ! grep -q "spec_step(tag: u8, x: nat, o: Set<nat>) -> Option<Set<nat>>" cross-check/verus/lcheck.rs 2>/dev/null; then
+  echo "DRIFT: the Verus spec is no longer set-valued - the refinement has become an identity"
+  fail=1
+fi
+
 # stage G: Kani as an adversary against LeakCert. The result is a NEGATIVE (no
 # counterexample), which is worthless without the vacuity witness beside it - so both
 # harnesses and both captures are pinned.
