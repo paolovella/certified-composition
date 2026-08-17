@@ -958,13 +958,30 @@ landed.
   neither `fiveProg` nor any conclusion. `sink_assumption_is_load_bearing` two lines above
   does the full job. `policy_entry_load_bearing` is the missing half.
 
-  **Not claimed.** Minimality holds for two programs and one goal, by hand-built witnesses
-  in the `fiveProg` case. There is no general theorem that `needs` yields minimal bases and
-  there cannot be an unconditional one: `needs_is_syntactic` already proves an `access` in
-  dead code is charged, and that base is *not* minimal. The next lemma is the middle
-  one — if the syntax never touches resource `R`, no entry about `R` can bear — which is
-  `no_access_no_reads` and `unwritten_sink_untouched` upgraded from vacuity to
-  *anti*-load-bearing.
+  **The middle lemma, and the case it was written for.** `fiveProg` is minimality by
+  hand-built witnesses, one per entry — correct, and it does not scale. `pureProg` is
+  minimality by a general lemma, but only because *everything* about it is unconditional.
+  Between them sits the case that matters: a program with a real load-bearing entry
+  **and** a candidate entry inert for a reason the checker can see.
+
+  `emitProg` is `fiveProg` with the mediated read deleted. Its computed base is one
+  entry, and that entry bears. The policy entry `toLedger` would charge it is **inert by
+  syntax**: `hasAccess emitProg = false` is a `decide`, `medGoal_of_no_access` turns it
+  into unconditionality of the mediation conclusion, and `not_loadBearingAt_of_suffices`
+  finishes. No hostile deployment had to be invented for it.
+
+  That is `no_access_no_reads` and `unwritten_sink_untouched` upgraded from **vacuity**
+  (an omitted entry is safe to omit) to **anti-load-bearing** (a charged entry about an
+  untouched resource cannot bear, in *any* base whatsoever). It also re-derives
+  `pureGoal_unconditional` from syntax alone, so the general lemmas demonstrably subsume
+  the special case rather than merely sitting beside it. Every inertness result in the
+  module now routes through `not_loadBearingAt_of_suffices` — axiom-free — rather than
+  the docstring claiming they do.
+
+  **Not claimed.** Three programs, one goal shape. There is still no general theorem that
+  `needs` yields minimal bases, and there cannot be an unconditional one:
+  `needs_is_syntactic` already proves an `access` in dead code is charged, and that base
+  is *not* minimal. Closing that needs reachability, which is a different analysis.
 
 - **Stage K — a leak checker whose agreement with its spec is verified, not extracted**
   (`cross-check/verus/lcheck.rs`, 23 verified / 0 errors, and a binary that runs).

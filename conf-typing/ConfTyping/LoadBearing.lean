@@ -31,6 +31,24 @@
     a trivially-true entry breaks it (`padded_base_not_load_bearing`), and the proof is
     `fiveProg_deployed_with_two` — the theorem that the base *suffices* is exactly the
     theorem that junk cannot hide in it.
+  * `pureProg` is **complete, not merely trivial**: its goal is unconditional, so the
+    empty base is the *only* minimal one (`pureProg_admits_no_other_minimal`) and all
+    three of `toLedger`'s entries are inert with no `Sat` hypothesis at all.
+
+  ── The middle case, and where the method stops being by hand ──
+  `fiveProg` is minimality by hand-built witnesses, one per entry; that does not scale.
+  `pureProg` is minimality by a general lemma, but only because *everything* is
+  unconditional. Between them: `emitProg` (`fiveProg` with the mediated read deleted)
+  carries one entry that bears, and the policy entry `toLedger` would charge it is inert
+  **by syntax** — `hasAccess emitProg = false` is a `decide`, `medGoal_of_no_access`
+  turns it into unconditionality of the mediation conclusion, and
+  `not_loadBearingAt_of_suffices` finishes. No hostile deployment had to be invented.
+
+  That is `no_access_no_reads` and `unwritten_sink_untouched` upgraded from *vacuity*
+  (an omitted entry is safe to omit) to *anti-load-bearing* (a charged entry about an
+  untouched resource cannot bear, in any base whatsoever) — and it re-derives
+  `pureGoal_unconditional` from syntax alone (`pureGoal_unconditional_from_syntax`),
+  so the general lemmas demonstrably subsume the special case.
 
   ── One thing this exposed, recorded rather than fixed ──
   `policy_assumption_is_load_bearing` (Deploy.lean) does not prove what its docstring
@@ -60,6 +78,15 @@ def LoadBearingAt (mkΓ : Deployment → Ledger) (goal : Deployment → Prop) (i
     The converse of `condBoundary_weaken`, which the ledger's shape cannot supply. -/
 def LoadBearing (mkΓ : Deployment → Ledger) (goal : Deployment → Prop) (n : Nat) : Prop :=
   ∀ i, i < n → LoadBearingAt mkΓ goal i
+
+/-- **The general reason an entry is inert**: the remaining entries already deliver the
+    goal, so no world is left in which to fail. Every inertness result below is an
+    instance of this, including the two syntactic ones. Axiom-free. -/
+theorem not_loadBearingAt_of_suffices {mkΓ : Deployment → Ledger}
+    {goal : Deployment → Prop} {i : Nat}
+    (h : ∀ D, Sat ((mkΓ D).eraseIdx i) → goal D) : ¬ LoadBearingAt mkΓ goal i := by
+  rintro ⟨D, hsat, hgoal⟩
+  exact hgoal (h D hsat)
 
 /-! ## The goal
 
@@ -165,11 +192,11 @@ def paddedBase (D : Deployment) : Ledger := True :: fiveBase D
     *suffices* — so no world satisfies the remainder and fails the goal, and entry 0
     is not load-bearing. The proof is `fiveProg_deployed_with_two`: the theorem that
     the base is enough is the theorem that junk cannot hide in it. -/
-theorem padded_base_not_load_bearing : ¬ LoadBearing paddedBase fiveGoal 3 := by
-  intro h
-  obtain ⟨D, hsat, hgoal⟩ := h 0 (by decide)
-  exact hgoal ⟨(fiveProg_deployed_with_two D hsat).1,
-               (fiveProg_deployed_with_two D hsat).2.1⟩
+theorem padded_base_not_load_bearing : ¬ LoadBearing paddedBase fiveGoal 3 := fun h =>
+  not_loadBearingAt_of_suffices
+    (fun D hsat => ⟨(fiveProg_deployed_with_two D hsat).1,
+                    (fiveProg_deployed_with_two D hsat).2.1⟩)
+    (h 0 (by decide))
 
 /-- **And the fixed base is caught, which is the point of the exercise.** Stage 1s
     charged every program three entries; for `fiveProg` the filesystem entry is inert,
@@ -177,12 +204,13 @@ theorem padded_base_not_load_bearing : ¬ LoadBearing paddedBase fiveGoal 3 := b
     fails `LoadBearing` exactly where `needsLedger` passes it — the reduction from
     three entries to two, as a property rather than as a pair of examples. -/
 theorem toLedger_not_load_bearing :
-    ¬ LoadBearing (fun D => toLedger D [2]) fiveGoal 3 := by
-  intro h
-  obtain ⟨D, hsat, hgoal⟩ := h 2 (by decide)
-  refine hgoal ⟨(fiveProg_deployed_with_two D ?_).1, (fiveProg_deployed_with_two D ?_).2.1⟩ <;>
-    · rw [fiveProg_ledger]
-      exact ⟨hsat.1, hsat.2.1, trivial⟩
+    ¬ LoadBearing (fun D => toLedger D [2]) fiveGoal 3 := fun h =>
+  not_loadBearingAt_of_suffices
+    (fun D hsat => by
+      refine ⟨(fiveProg_deployed_with_two D ?_).1, (fiveProg_deployed_with_two D ?_).2.1⟩ <;>
+        · rw [fiveProg_ledger]
+          exact ⟨hsat.1, hsat.2.1, trivial⟩)
+    (h 2 (by decide))
 
 /-! ## A hole in the predicate, found by trying the degenerate case
 
@@ -254,9 +282,8 @@ theorem pureProg_base_is_minimal : Minimal pureBase pureGoal 0 :=
     whatsoever bears weight for it — there is no world left in which to fail. -/
 theorem no_entry_bears_of_unconditional {goal : Deployment → Prop}
     (h : ∀ D, goal D) (mkΓ : Deployment → Ledger) (i : Nat) :
-    ¬ LoadBearingAt mkΓ goal i := by
-  rintro ⟨D, -, hgoal⟩
-  exact hgoal (h D)
+    ¬ LoadBearingAt mkΓ goal i :=
+  not_loadBearingAt_of_suffices (fun D _ => h D)
 
 /-- **So the empty base is the *only* minimal base for `pureProg`.** Every entry of
     every candidate base is inert — this is the strongest form the reduction takes, and
@@ -273,6 +300,134 @@ theorem toLedger_all_junk_for_pureProg :
     ∀ i, ¬ LoadBearingAt (fun D => toLedger D [2]) pureGoal i :=
   ⟨pureProg_admits_no_other_minimal _ 3 (by omega),
    no_entry_bears_of_unconditional pureGoal_unconditional _⟩
+
+/-! ## The two conclusions, per program
+
+Splitting the goal makes the syntactic lemmas below statable: an entry about a
+resource is inert when the *conclusion* about that resource is unconditional. -/
+
+/-- Mediation in the specification's terms. -/
+def MedGoal (c : UCmd) (D : Deployment) : Prop :=
+  ∀ (n : Nat) (σ : Store) (r : UState × Nat × List Bool),
+    uexec n c D.policy (initU σ) = some r → ∀ q ∈ r.1.reads, D.intended q = true
+
+/-- Every emitted string is one the parser accepts. -/
+def AcceptGoal (c : UCmd) (D : Deployment) : Prop :=
+  ∀ (n : Nat) (π : MedPolicy) (σ : Store) (r : UState × Nat × List Bool),
+    uexec n c π (initU σ) = some r → ∀ t ∈ r.1.sink, D.accepts t.2
+
+/-- The goals used above are exactly these two, conjoined. -/
+theorem fiveGoal_split (D : Deployment) :
+    fiveGoal D ↔ (MedGoal fiveProg D ∧ AcceptGoal fiveProg D) := Iff.rfl
+
+/-! ## The middle lemmas: syntax makes a conclusion unconditional
+
+`no_access_no_reads` and `unwritten_sink_untouched` prove that an untouched resource
+stays untouched. That is *vacuity* — it says an omitted entry is safe to omit. Read one
+step further it says something stronger: the corresponding conclusion holds in **every**
+world, so an entry about that resource cannot bear weight **in any base whatsoever**.
+That upgrade is what turns the `fiveProg` filesystem argument from a hand-built witness
+into a consequence of the program's syntax. -/
+
+/-- **No `access`, no mediation obligation.** A program that reads nothing satisfies the
+    mediation conclusion in every deployment — so a policy entry charged to it is inert,
+    whatever else the base contains. -/
+theorem medGoal_of_no_access {c : UCmd} (h : hasAccess c = false) (D : Deployment) :
+    MedGoal c D := by
+  intro n σ r hr q hq
+  rw [no_access_no_reads n c D.policy (initU σ) r h hr] at hq
+  simp [initU] at hq
+
+/-- **No sinks, no parser obligation.** Likewise for emission. -/
+theorem acceptGoal_of_no_sinks {c : UCmd} (h : sinksOf c = []) (D : Deployment) :
+    AcceptGoal c D := by
+  intro n π σ r hr t ht
+  have := unwritten_sink_untouched n c π (initU σ) r t.1 (by simp [h, memStr]) hr t ht rfl
+  simp [initU] at this
+
+/-- **`pureProg`'s unconditionality, re-derived from syntax alone.** `pureGoal_unconditional`
+    reads it off `pureProg_deployed_with_nothing`; this obtains the same thing from
+    `hasAccess` and `sinksOf`, so the general lemmas really do subsume the special case. -/
+theorem pureGoal_unconditional_from_syntax : ∀ D, pureGoal D := fun D =>
+  ⟨medGoal_of_no_access (by decide) D, acceptGoal_of_no_sinks (by decide) D⟩
+
+/-! ## The middle case: one entry, and the other one inert by syntax
+
+`fiveProg` is minimality by hand-built witnesses, one per entry — correct, and it does
+not scale. `pureProg` is minimality by a general lemma, but only because its goal is
+unconditional outright. Between them sits the case that matters: a program with a real,
+load-bearing entry **and** a candidate entry that is inert for a reason the checker can
+see. `emitProg` is `fiveProg` with the mediated read deleted. -/
+
+/-- Build a sanitised query and emit it. No `check`, no `access`. -/
+def emitProg : UCmd :=
+  .seq (.sop .set "q" (.cat (.lit [.ord, .quote])
+                        (.cat (.san (.var "input")) (.lit [.quote]))))
+       (.sop .emit "db" (.var "q"))
+
+theorem emitProg_checks :
+    xcheck Psec [] [] [] emitProg = some ([("q", 2)], [], [], 2, [2]) := by decide
+
+/-- **One entry, computed** — the parser, and nothing about a policy author. -/
+theorem emitProg_needs : needs emitProg = [Assume.sinkHonest "db"] := by decide
+
+theorem emitProg_ledger (D : Deployment) :
+    needsLedger D [2] "fs" emitProg = [(∀ t, qcount t ∈ [2] → D.accepts t)] := by
+  show (needs emitProg).map (entryProp D [2] "fs") = _
+  rw [emitProg_needs]
+  simp only [List.map_cons, List.map_nil, entryProp, if_neg (by decide : ¬ ("db" = "fs"))]
+
+def emitBase (D : Deployment) : Ledger := needsLedger D [2] "fs" emitProg
+
+def emitGoal (D : Deployment) : Prop := MedGoal emitProg D ∧ AcceptGoal emitProg D
+
+/-- The one entry suffices: mediation holds by syntax, emission by the entry. -/
+theorem emitProg_deployed_with_one (D : Deployment)
+    (hΓ : Sat (needsLedger D [2] "fs" emitProg)) : emitGoal D := by
+  rw [emitProg_ledger] at hΓ
+  obtain ⟨hacc, -⟩ := hΓ
+  exact ⟨medGoal_of_no_access (by decide) D,
+         fun n π σ r hr t ht =>
+           hacc t.2 ((xcheck_gives_five emitProg_checks).2.2.2.2 n π σ r hr t ht)⟩
+
+/-- And it bears: `hostileSink` accepts nothing, and `emitProg` really does emit. -/
+theorem emit_sink_entry_load_bearing : LoadBearingAt emitBase emitGoal 0 := by
+  refine ⟨hostileSink, ?_, ?_⟩
+  · show Sat ((needsLedger hostileSink [2] "fs" emitProg).eraseIdx 0)
+    rw [emitProg_ledger]; exact trivial
+  · rintro ⟨-, hacc⟩
+    exact hacc 15 (fun _ => true) (fun _ => 0) _ rfl
+            ("db", [UCh.ord, UCh.quote, UCh.quote]) (by decide)
+
+theorem emitBase_size : LedgerSize emitBase 1 := by
+  intro D; show (needsLedger D [2] "fs" emitProg).length = 1
+  rw [emitProg_ledger]; rfl
+
+/-- **The computed base for `emitProg` is minimal** — one entry, and it bears. -/
+theorem emitProg_base_is_minimal : Minimal emitBase emitGoal 1 :=
+  ⟨emitBase_size, fun i hi => by
+    match i with
+    | 0     => exact emit_sink_entry_load_bearing
+    | _ + 1 => exact absurd hi (by omega)⟩
+
+/-- The same base with a policy entry charged to it — what `toLedger` would do. -/
+def emitBasePlusPolicy (D : Deployment) : Ledger :=
+  (∀ r, D.policy r = D.intended r) :: emitBase D
+
+/-- **And the policy entry is inert — by syntax, not by a hand-built witness.** This is
+    the middle result: `hasAccess emitProg = false` is a decidable fact about the
+    program, `medGoal_of_no_access` turns it into unconditionality of the mediation
+    conclusion, and the entry falls out redundant. No hostile deployment had to be
+    invented for it. -/
+theorem policy_entry_inert_for_emitProg :
+    ¬ LoadBearingAt emitBasePlusPolicy emitGoal 0 :=
+  not_loadBearingAt_of_suffices (fun D hsat => emitProg_deployed_with_one D hsat)
+
+/-- So charging `emitProg` a policy author breaks minimality, and the proof is a
+    `decide` on its syntax. -/
+theorem emitBasePlusPolicy_not_minimal :
+    ¬ Minimal emitBasePlusPolicy emitGoal 2 :=
+  fun h => policy_entry_inert_for_emitProg (h.2 0 (by omega))
 
 /-! ## What this establishes, and what it does not
 
