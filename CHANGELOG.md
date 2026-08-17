@@ -915,6 +915,57 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The trusted base gets a minimality property** (`ConfTyping/LoadBearing.lean`,
+  axiom-clean, no `sorry`). `needs` computes a base from a program's syntax and two
+  vacuity lemmas prove the entries a program *omits* are genuinely not needed. Nothing
+  said the other direction: that the entries it *carries* all bear weight.
+
+  **The gap is structural, not an oversight.** `condBoundary_weaken` and
+  `condBoundary_of_unconditional` prove any assumption may be added to any ledger and any
+  unconditional certificate holds relative to any base — so `Sat Γ → X` can only ever
+  **over-approximate**. There is a `condBoundary_weaken`; there was no
+  `condBoundary_no_junk`. "Omissions are earned" rested on *exhibited* smaller bases
+  (`cn_base_strictly_smaller`, `pureProg_deployed_with_nothing`), never on a property a
+  certificate carries.
+
+  `LoadBearingAt mkΓ goal i` is the shape the repo already writes by hand: some world
+  satisfies **every other** entry and still fails the goal, so entry `i` cannot be
+  dropped. `Minimal` pairs it with `LedgerSize`.
+
+  **The computed base for `fiveProg` is minimal and the fixed base provably is not.**
+  Both computed entries bear — `permissivePolicy` (deploys `true`, intends `false`)
+  satisfies the parser entry and mediation fails anyway; `hostileSink` satisfies the
+  policy entry and the emitted query is rejected. Erase the filesystem entry from
+  `toLedger` and the remaining two still deliver the goal, so
+  `toLedger_not_minimal`. **The three-entries-to-two reduction is now a property rather
+  than a pair of examples.** Padding is caught the same way, and the proof of both
+  no-goes is `fiveProg_deployed_with_two`: the theorem that a base *suffices* is the
+  theorem that junk cannot hide in it.
+
+  **`pureProg` is complete, not merely trivial.** Its goal holds with nothing assumed, so
+  `no_entry_bears_of_unconditional` (**axiom-free**) gives
+  `pureProg_admits_no_other_minimal` — the empty base is the **only** minimal base, and
+  all three of `toLedger`'s entries are inert with no `Sat` hypothesis at all.
+
+  **The degenerate case broke the first definition, which is why it was worth running.**
+  `LoadBearing mkΓ goal 0` is vacuously true for *any* `mkΓ`, including a three-entry
+  one, because the bound was supplied separately from the ledger. `LedgerSize` ties them;
+  without it, `Minimal pureBase pureGoal 0` was true only by accident of the chosen bound.
+
+  **Found on the way, recorded rather than fixed:**
+  `policy_assumption_is_load_bearing` (`Deploy.lean`) does not prove its docstring. Its
+  statement is `¬ (∀ r, true = false)` — the assumption is *falsifiable* — and it mentions
+  neither `fiveProg` nor any conclusion. `sink_assumption_is_load_bearing` two lines above
+  does the full job. `policy_entry_load_bearing` is the missing half.
+
+  **Not claimed.** Minimality holds for two programs and one goal, by hand-built witnesses
+  in the `fiveProg` case. There is no general theorem that `needs` yields minimal bases and
+  there cannot be an unconditional one: `needs_is_syntactic` already proves an `access` in
+  dead code is charged, and that base is *not* minimal. The next lemma is the middle
+  one — if the syntax never touches resource `R`, no entry about `R` can bear — which is
+  `no_access_no_reads` and `unwritten_sink_untouched` upgraded from vacuity to
+  *anti*-load-bearing.
+
 - **Stage K — a leak checker whose agreement with its spec is verified, not extracted**
   (`cross-check/verus/lcheck.rs`, 23 verified / 0 errors, and a binary that runs).
   `certcheck` has always been trusted extraction: the Lean says one thing and the binary is
