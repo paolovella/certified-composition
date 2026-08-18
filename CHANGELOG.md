@@ -915,6 +915,46 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The duplication is fixable for exactly one of the four bases, and it is ours**
+  (`ConfTyping/LedgerDedup.lean`). The previous entry recorded that `List Prop` cannot be
+  deduplicated computably. That was right about `List Prop` and **wrong about this
+  repo** — a base built by mapping an *index* into `Prop` can be deduplicated at the
+  index. Surveying the four:
+
+  | base | index | `DecidableEq` | dedupable |
+  |---|---|---|---|
+  | `needsLedger` (ours) | **`Assume`** | **derived** | **yes** |
+  | `JasminTrust.needs` | none — `List Prop` built directly | — | no |
+  | `CNTrust.needs` | none | — | no |
+  | `toLedger` (Deploy) | none | — | no |
+
+  Jasmin's `baseLabels` is the nearest thing elsewhere and it is a **parallel list tied
+  only by length** — you cannot recover which proposition a label names, so it cannot
+  drive a deduplication.
+
+  **The measurement that prompted the fix.** `needs_seq_duplicates`: composing `fiveProg`
+  with itself gives `[policyIntended, sinkHonest "db", sinkHonest "db"]`. The **policy
+  entry is already deduplicated by construction** — `hasAccess` on a `seq` is an `||`, so
+  it contributes one entry however many reads there are — while `sinksOf` appends and
+  duplicates. `needs` was half-right by accident of how its two clauses were written, and
+  neither half had been noticed.
+
+  **The fix is invisible to the guarantee.** `sat_iff_forall_mem` shows `Sat` sees a
+  ledger as a set; `sat_map_eraseDups` then proves deduplicating the index changes
+  nothing about what is assumed, so every conditional certificate holds against
+  `needsLedgerD` exactly as against `needsLedger`. Only the accounting moves — which is
+  precisely what `Minimal` measures and `Sat` cannot see.
+
+  **And it delivers.** `seqBase_not_minimal` — the three-entry composite base has a dead
+  entry. `seqBaseD_eq_fiveBase` — deduplicated, the base of `fiveProg ; fiveProg` *is*
+  `fiveProg`'s own, so composing a program with itself adds nothing to the bill. Hence
+  `seqBaseD_minimal` by transport from `fiveProg_base_is_load_bearing`.
+
+  **Not retrofitted.** `needsLedger` is unchanged and every existing theorem still speaks
+  about it; `needsLedgerD` sits beside it with the equivalence proved. Switching over is a
+  separate decision, and making it silently would hide that the accounting was wrong for
+  as long as it was.
+
 - **Composition destroys minimality, and the ledger cannot fix it**
   (`ConfTyping/JasminLedger.lean`, choice-free). The two Jasmin bases above are minimal.
   Their **composite is not**, and not marginally: `jcomp_every_entry_inert` proves *every
