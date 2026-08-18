@@ -915,6 +915,37 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The other bases get the index, and the junk composite closes**
+  (`ConfTyping/IndexedBases.lean`, choice-free). `LedgerDedup` left three bases building
+  `List Prop` directly, so `jcomp_every_entry_inert` — two Jasmin certificates composing
+  to four entries with no work in any of them — had a diagnosis and no repair. The index
+  is three constructors, and the repair follows.
+
+  `JAssume` and `CNAssume` factor the two foreign bases as `(idx : List ι).map interp`
+  with `DecidableEq ι`, and `jNeedsI_eq` / `cnNeedsI_eq` prove the indexed forms **equal**
+  the originals — so nothing downstream moves and the equality is checked rather than
+  asserted. Neither `JasminTrust.needs` nor `CNTrust.needs` is modified.
+
+  **The defect closes.** `jcompBaseD_eq_jbase`: deduplicated, the composite base of two
+  source-level Jasmin certificates *is* the component base. Hence `jcompD_minimal`, and
+  `dedup_repairs_the_composite` states the before and after in one theorem. A supply
+  chain of components verified by one tool is now charged that tool's assumptions
+  **once**, which is what the accumulation was always supposed to be saying.
+  `sat_jcompBaseD_iff` confirms the repair is invisible to what is assumed.
+
+  **CN is the deliberate asymmetry.** Indexed, dedupable, printable — and **no minimality
+  follows**, because `ofCN_ledger_inert_for_its_own_guarantee` is a property of a
+  reception that takes its hypothesis unconditionally, not of the representation.
+  `cn_dedup_without_minimality` carries both halves in one statement so the limit travels
+  with the fix. **Indexing is necessary for a truthful bill and is not sufficient for a
+  minimal one.**
+
+  Method note: the printability claim is carried by `deriving Repr` on the datatype, not
+  by a theorem pinning `repr`'s output — that would have made a guard out of the
+  pretty-printer. `jNeedsIdx_distinguishable` states what deduplication actually needs
+  instead, and `native_decide` was removed on sight, since it would have put
+  `Lean.ofReduceBool` in the axiom list of a module about trusted bases.
+
 - **The duplication is fixable for exactly one of the four bases, and it is ours**
   (`ConfTyping/LedgerDedup.lean`). The previous entry recorded that `List Prop` cannot be
   deduplicated computably. That was right about `List Prop` and **wrong about this

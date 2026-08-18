@@ -90,3 +90,4 @@ import ConfTyping.LoadBearing
 import ConfTyping.CNLedger
 import ConfTyping.JasminLedger
 import ConfTyping.LedgerDedup
+import ConfTyping.IndexedBases
