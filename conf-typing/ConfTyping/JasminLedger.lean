@@ -214,6 +214,72 @@ theorem composeComputed_source_avoids_preservation (T : JasminTrust) (a b : Jasm
     (composeComputed T false false a b).ledger
       = [T.typeSystem, T.specSem, T.typeSystem, T.specSem] := rfl
 
+/-! ## Composition destroys minimality, and the ledger cannot fix it
+
+The two bases above are minimal. Their **composite is not** — and not marginally: every
+one of its entries is inert. `Γa ++ Γb` duplicates whatever the two components share,
+and a duplicated assumption makes both copies redundant, since erasing either leaves the
+other to discharge the goal.
+
+This is the same shape as `bounded_grade_does_not_factor`: a property that holds of the
+parts fails of the composite. It is a real limit on "the trusted base composes by the
+same law as the guarantee" — the law is right, the *result* accumulates junk.
+
+**And it is the common case, not a corner.** Both sides here carry the same `JasminTrust`,
+which is what two functions verified by one installation of one tool actually have.
+Cross-*tool* composition — a CN base beside a Jasmin base — shares nothing and duplicates
+nothing; it is the ordinary within-toolchain case that degenerates, and it degenerates
+completely rather than partially. A supply chain of `n` components verified by one tool
+carries `n` copies of that tool's base, of which one is doing the work. -/
+
+/-- The composite base of two source-level Jasmin certificates, as a ledger-maker. -/
+def jcompBase (a b : JasminCert) (w : JWorld) : Ledger :=
+  (composeComputed w.trust false false a b).ledger
+
+theorem jcompBase_is_four (a b : JasminCert) (w : JWorld) :
+    jcompBase a b w
+      = [w.trust.typeSystem, w.trust.specSem, w.trust.typeSystem, w.trust.specSem] := rfl
+
+theorem jcompBase_size (a b : JasminCert) : LedgerSize (jcompBase a b) 4 := fun _ => rfl
+
+/-- **Every entry of the composite base is inert.** Whichever one is erased, a full copy
+    of the component base survives in the remainder and forces the source claim. Four
+    entries, none of them doing any work. -/
+theorem jcomp_every_entry_inert (a b : JasminCert) (i : Nat) (hi : i < 4) :
+    ¬ LoadBearingAt (jcompBase a b) sourceGoal i := by
+  match i with
+  | 0 => exact not_loadBearingAt_of_suffices fun w hsat =>
+           w.reading.source_of_typeSystem hsat.2.1 hsat.1
+  | 1 => exact not_loadBearingAt_of_suffices fun w hsat =>
+           w.reading.source_of_typeSystem hsat.1 hsat.2.2.1
+  | 2 => exact not_loadBearingAt_of_suffices fun w hsat =>
+           w.reading.source_of_typeSystem hsat.1 hsat.2.1
+  | 3 => exact not_loadBearingAt_of_suffices fun w hsat =>
+           w.reading.source_of_typeSystem hsat.1 hsat.2.1
+  | _ + 4 => exact absurd hi (by omega)
+
+/-- **So minimality is not preserved by composition.** Both components carry minimal
+    bases (`jasmin_src_base_is_minimal`); the composite carries four entries and is
+    maximally non-minimal. -/
+theorem composition_destroys_minimality (a b : JasminCert) :
+    Minimal (jbase false) sourceGoal 2 ∧ ¬ Minimal (jcompBase a b) sourceGoal 4 :=
+  ⟨jasmin_src_base_is_minimal, fun h => jcomp_every_entry_inert a b 0 (by omega) (h.2 0 (by omega))⟩
+
+/-- And the obstruction is not laziness: **`Ledger = List Prop` cannot be deduplicated
+    where it matters.** `List.dedup` needs `DecidableEq`, and while `Classical.decEq`
+    supplies one for any type, it is **noncomputable** — so a deduplicated ledger could
+    be *stated* and never *emitted*. The ledger is the SBOM; an SBOM that cannot be
+    printed is not one.
+
+    The repo already has the shape that would work. `baseLabels` is the printable shadow
+    of Jasmin's base, and `String` has a decidable equality that runs. Deduplication
+    belongs there, and `baseLabels_length` — currently the only thing tying the two — is
+    exactly the equation that would have to become a correspondence rather than a length
+    check. Recorded as the next gap rather than closed here. -/
+theorem labels_dedup_but_the_ledger_cannot (a b : JasminCert) (w : JWorld) :
+    (baseLabels false ++ baseLabels false).eraseDups = baseLabels false
+  ∧ (jcompBase a b w).length = 4 := ⟨by decide, rfl⟩
+
 /-! ## What this establishes, and what it does not
 
     **Establishes.** A computed trusted base belonging to a *foreign* tool is minimal for

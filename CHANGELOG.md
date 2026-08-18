@@ -915,6 +915,37 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Composition destroys minimality, and the ledger cannot fix it**
+  (`ConfTyping/JasminLedger.lean`, choice-free). The two Jasmin bases above are minimal.
+  Their **composite is not**, and not marginally: `jcomp_every_entry_inert` proves *every
+  one* of its four entries can be dropped. `Γa ++ Γb` duplicates whatever the two
+  components share, and a duplicated assumption makes both copies redundant — erase
+  either and the other still discharges the goal.
+
+  **It is the common case, not a corner.** Both sides carry the same `JasminTrust`, which
+  is what two functions verified by one installation of one tool actually have.
+  Cross-*tool* composition shares nothing and duplicates nothing; it is the ordinary
+  within-toolchain case that degenerates, and it degenerates completely. A supply chain
+  of `n` components verified by one tool carries `n` copies of that tool's base, of which
+  one is doing the work.
+
+  Same shape as `bounded_grade_does_not_factor`: a property holding of the parts fails of
+  the composite. A real limit on "the trusted base composes by the same law as the
+  guarantee" — the law is right, the *result* accumulates junk. `LedgerBridge`'s "SBOM as
+  a theorem" is a theorem about *accumulation*, and accumulation is not minimality.
+
+  **The obstruction is not laziness.** `List.dedup` needs `DecidableEq`, and while
+  `Classical.decEq` supplies one for any type it is **noncomputable** — so a deduplicated
+  `List Prop` could be stated and never emitted. The ledger *is* the SBOM; an SBOM that
+  cannot be printed is not one.
+
+  The repo already has the shape that would work: `baseLabels` is the printable shadow of
+  Jasmin's base and `String` has an equality that runs
+  (`labels_dedup_but_the_ledger_cannot` deduplicates the labels and leaves the four-entry
+  ledger beside them). Deduplication belongs there, and `baseLabels_length` — currently
+  the only thing tying the two — is the equation that would have to become a
+  correspondence rather than a length check. Recorded as the next gap.
+
 - **The first computed base proved minimal, and it belongs to a foreign tool**
   (`ConfTyping/JasminLedger.lean`, choice-free). `LoadBearing` had produced positives
   about our own programs and a negative about our own plumbing. Jasmin is where it says
