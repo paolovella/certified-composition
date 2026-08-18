@@ -71,22 +71,22 @@ namespace ConfTyping
 /-- **Entry `i` is load-bearing**: some world satisfies every *other* entry of the
     base and still fails the goal. Dropping it is therefore unsound, in the shape
     `ledger_no_silent_discharge` and `sink_assumption_is_load_bearing` use by hand. -/
-def LoadBearingAt (mkΓ : Deployment → Ledger) (goal : Deployment → Prop) (i : Nat) : Prop :=
-  ∃ D : Deployment, Sat ((mkΓ D).eraseIdx i) ∧ ¬ goal D
+def LoadBearingAt {W : Type} (mkΓ : W → Ledger) (goal : W → Prop) (i : Nat) : Prop :=
+  ∃ w : W, Sat ((mkΓ w).eraseIdx i) ∧ ¬ goal w
 
 /-- **No junk**: every one of the base's `n` entries is load-bearing for the goal.
     The converse of `condBoundary_weaken`, which the ledger's shape cannot supply. -/
-def LoadBearing (mkΓ : Deployment → Ledger) (goal : Deployment → Prop) (n : Nat) : Prop :=
+def LoadBearing {W : Type} (mkΓ : W → Ledger) (goal : W → Prop) (n : Nat) : Prop :=
   ∀ i, i < n → LoadBearingAt mkΓ goal i
 
 /-- **The general reason an entry is inert**: the remaining entries already deliver the
     goal, so no world is left in which to fail. Every inertness result below is an
     instance of this, including the two syntactic ones. Axiom-free. -/
-theorem not_loadBearingAt_of_suffices {mkΓ : Deployment → Ledger}
-    {goal : Deployment → Prop} {i : Nat}
-    (h : ∀ D, Sat ((mkΓ D).eraseIdx i) → goal D) : ¬ LoadBearingAt mkΓ goal i := by
-  rintro ⟨D, hsat, hgoal⟩
-  exact hgoal (h D hsat)
+theorem not_loadBearingAt_of_suffices {W : Type} {mkΓ : W → Ledger}
+    {goal : W → Prop} {i : Nat}
+    (h : ∀ w, Sat ((mkΓ w).eraseIdx i) → goal w) : ¬ LoadBearingAt mkΓ goal i := by
+  rintro ⟨w, hsat, hgoal⟩
+  exact hgoal (h w hsat)
 
 /-! ## The goal
 
@@ -223,11 +223,11 @@ ledger and nothing ties them together. So `LoadBearing` alone cannot be read as
 `pureProg` case below is exactly where the unsound reading would have been taken. -/
 
 /-- The base has the same length in every world — so the index range is well defined. -/
-def LedgerSize (mkΓ : Deployment → Ledger) (n : Nat) : Prop :=
-  ∀ D, (mkΓ D).length = n
+def LedgerSize {W : Type} (mkΓ : W → Ledger) (n : Nat) : Prop :=
+  ∀ w, (mkΓ w).length = n
 
 /-- **Minimal**: `n` really is the base's length, and all `n` entries bear weight. -/
-def Minimal (mkΓ : Deployment → Ledger) (goal : Deployment → Prop) (n : Nat) : Prop :=
+def Minimal {W : Type} (mkΓ : W → Ledger) (goal : W → Prop) (n : Nat) : Prop :=
   LedgerSize mkΓ n ∧ LoadBearing mkΓ goal n
 
 theorem fiveBase_size : LedgerSize fiveBase 2 := by
@@ -280,10 +280,10 @@ theorem pureProg_base_is_minimal : Minimal pureBase pureGoal 0 :=
 
 /-- **The general no-go.** If a goal holds unconditionally, no entry of any base
     whatsoever bears weight for it — there is no world left in which to fail. -/
-theorem no_entry_bears_of_unconditional {goal : Deployment → Prop}
-    (h : ∀ D, goal D) (mkΓ : Deployment → Ledger) (i : Nat) :
+theorem no_entry_bears_of_unconditional {W : Type} {goal : W → Prop}
+    (h : ∀ w, goal w) (mkΓ : W → Ledger) (i : Nat) :
     ¬ LoadBearingAt mkΓ goal i :=
-  not_loadBearingAt_of_suffices (fun D _ => h D)
+  not_loadBearingAt_of_suffices (fun w _ => h w)
 
 /-- **So the empty base is the *only* minimal base for `pureProg`.** Every entry of
     every candidate base is inert — this is the strongest form the reduction takes, and

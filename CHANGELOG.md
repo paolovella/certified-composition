@@ -915,6 +915,51 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The reception's ledger had no teeth, and now the computed base is what it carries**
+  (`ConfTyping/CNLedger.lean`, axiom-clean). Stage B computes CN's trusted base from the
+  proof's own features (`CNTrust.needs`) and exhibits a world where the solver is unsound
+  and the frame certificate stands anyway (`cn_base_strictly_smaller`). Both are real.
+  What connected them was nothing: **`Bridge.ofCN f F Γ h` accepts any `Γ` whatsoever**
+  — its `contracts` field never mentions the ledger — and **`CNTrust.needs` had zero call
+  sites**, the one CN Bridge in the repo being built with an arbitrary ledger parameter.
+
+  **The diagnosis is a theorem, not a complaint.**
+  `ofCN_ledger_inert_for_its_own_guarantee` (axiom-free): for a received CN certificate,
+  **no entry of any ledger bears weight for the guarantee the Bridge asserts** — `ofCN`
+  takes `ModifiesOnly` unconditionally, so `Frame` holds in every world and none is left
+  in which to fail. Hence `ofCN_admits_no_minimal_nonempty_base`, the CN analogue of
+  `pureProg_admits_no_other_minimal`. `ofCN_ignores_its_ledger` spells out the cause:
+  two receptions of one artifact with *different* bases are the same certified map.
+
+  **The fix is the shape that already had teeth.** `Bridge.ofReleaseL` is the one
+  constructor in the repo whose ledger is load-bearing — a conditional certificate plus
+  `Sat Γ`, so the base cannot be minted without discharge. `Bridge.ofCNComputed` is that
+  for CN with the base **computed rather than declared**: the hypothesis is
+  `CondModifiesOnly f F (T.needs pf)` and `T.needs pf` is what the Bridge carries, by
+  construction. `ofCNComputed_comp_ledger` shows composition still accumulates, with both
+  sides of the append now things a tool computed rather than things a caller asserted.
+
+  **The payoff promotes `cn_base_strictly_smaller` from lists to artifacts.**
+  `cn_computed_reception_exists_where_fixed_does_not`: in a world where the SMT backend
+  is unsound, the frame-only reception **exists** — carrying its computed base and
+  certifying a concrete map — while a reception demanding `fixedBase` could not be minted
+  at all. The three-entries-to-two reduction is the difference between having a
+  certificate and not having one.
+
+  **Not retrofitted, deliberately.** `Bridge.ofCN` stays and `HeteroCompose.clear5CN`
+  still uses it; stage C's results rest on the unconditional form, and rewriting them
+  would hide that the gap was found rather than designed around — the same reason
+  `HeteroCompose` keeps `sctGA` after `JasminSCT` superseded it.
+
+  **Not closed.** Whether `[cerberus, vcgen]` is *minimal* for `ModifiesOnly` is not
+  provable from inside this repo: it is a question about CN's own soundness theorem, and
+  `CNReceive.lean`'s division of labour puts it on CN's side. What is proved is that the
+  unconditional reception can **never** have a minimal base and the conditional one can.
+
+  `LoadBearing` was generalised over the world type to make this statable — `Deployment`
+  was never load-bearing in the predicate, and instantiating at `CNTrust` needed no
+  change to any existing proof.
+
 - **The trusted base gets a minimality property** (`ConfTyping/LoadBearing.lean`,
   axiom-clean, no `sorry`). `needs` computes a base from a program's syntax and two
   vacuity lemmas prove the entries a program *omits* are genuinely not needed. Nothing
