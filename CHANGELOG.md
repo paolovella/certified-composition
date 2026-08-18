@@ -915,6 +915,43 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The first computed base proved minimal, and it belongs to a foreign tool**
+  (`ConfTyping/JasminLedger.lean`, choice-free). `LoadBearing` had produced positives
+  about our own programs and a negative about our own plumbing. Jasmin is where it says
+  something affirmative about somebody else's trusted base — and *why* it can is the
+  finding.
+
+  **`CNTrust.needs` keys on `usesArith`** — how a proof was discharged. Saying what the
+  solver's soundness *does* would be restating CN's soundness theorem, so minimality
+  there is not ours to prove. **`JasminTrust.needs` keys on `aboutAssembly`** — what the
+  guarantee is *about*, source or emitted assembly. That is expressible in one
+  implication, because the entire content of the third assumption is that it carries a
+  source-level claim to the compiled artifact, and POPL 2025 *is* an implication.
+
+  `JasminReading` writes that down as a parameter in the same style as `JasminTrust`
+  itself: the type system plus the speculative semantics give the source claim,
+  preservation carries it to the assembly. Nothing is asserted; four worlds built from
+  `True`/`False` do the rest.
+
+  **Both settings of the switch are exactly right.** `jasmin_asm_base_is_minimal` — all
+  three entries of an assembly-level base bear weight. `jasmin_src_base_is_minimal` —
+  both entries of a source-level base bear. And `preservation_inert_for_source`
+  (**axiom-free**) upgrades `jasmin_base_strictly_smaller` from *a smaller base is
+  satisfiable* to *the larger base contains an entry that does nothing*, so
+  `jasmin_fixed_base_not_minimal_for_source`.
+
+  **The asymmetry is recorded rather than glossed.** `JasminReading` constrains the
+  claims only from below, so a world may set a claim false whenever its antecedents
+  fail — which makes the three affirmative witnesses cheap. The substance is the
+  negative: `preservation_inert_for_source` *cannot* be witnessed, because the reading
+  forces the source claim out of the other two entries. What `Minimal` measures here is
+  the reading's implication structure, which is the right target precisely because the
+  tool's internals are out of scope.
+
+  `composeComputed` ties `JasminCert.compose`'s two ledger parameters to computed bases,
+  as `Bridge.ofCNComputed` did for the reception; a source-level composite is charged
+  four entries and pays for no preservation theorem.
+
 - **The reception's ledger had no teeth, and now the computed base is what it carries**
   (`ConfTyping/CNLedger.lean`, axiom-clean). Stage B computes CN's trusted base from the
   proof's own features (`CNTrust.needs`) and exhibits a world where the solver is unsound

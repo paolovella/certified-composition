@@ -88,3 +88,4 @@ import ConfTyping.BoundedCert
 import ConfTyping.LeakCert
 import ConfTyping.LoadBearing
 import ConfTyping.CNLedger
+import ConfTyping.JasminLedger
