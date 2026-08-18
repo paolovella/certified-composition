@@ -91,3 +91,4 @@ import ConfTyping.CNLedger
 import ConfTyping.JasminLedger
 import ConfTyping.LedgerDedup
 import ConfTyping.IndexedBases
+import ConfTyping.MinimalCompose

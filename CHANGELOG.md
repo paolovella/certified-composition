@@ -915,6 +915,40 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **Minimality composes across independent tools, free — and that inverts the expected
+  difficulty** (`ConfTyping/MinimalCompose.lean`, choice-free). `jcomp_every_entry_inert`
+  showed composition destroying minimality when two components are verified under the
+  *same* assumptions. The case never asked is the one the repo's central claim is about:
+  two components certified by **different** tools, whose bases share nothing.
+
+  `minimal_pair` — over independent worlds `W₁ × W₂`, with base `Γ₁ ++ Γ₂` and goal
+  `G₁ ∧ G₂`, two minimal bases compose to a minimal base. **No interaction term**, no
+  side condition beyond each base holding in *some* world.
+
+  So the pair is complete, and it is worth reading together:
+
+  * `Bridge.pair_comp_cert` — bundled **guarantees** accumulate componentwise, free.
+  * `minimal_pair` — bundled **trusted bases** stay minimal componentwise, free, when the
+    worlds are independent.
+  * `jcomp_every_entry_inert` — and both degenerate inside a *single* world, where the
+    bases coincide, until deduplication repairs it (`jcompD_minimal`).
+
+  **The inversion is the finding.** Stage C found heterogeneous composition free in the
+  algebra and costly only at `hmap`. The bill behaves identically: *different* tools
+  compose for nothing, and it is the *same* tool applied twice that needs work. The
+  intuition this programme began from — that heterogeneity is the hard case — is wrong in
+  both layers, for one structural reason.
+
+  **The satisfiability hypotheses are not decoration.** `pair_needs_satisfiability`
+  exhibits two minimal bases whose composite is not minimal, for no reason but that one
+  holds in no world — the predicate applied to its own hypothesis.
+
+  **Not claimed.** `pairBase` puts the bases over a *product* of worlds, which is the
+  formal content of "the tools' assumptions are independent". Two tools sharing an
+  assumption — both trusting the same C semantics, say — are not independent in this
+  sense and the theorem says nothing about them. That case is `jcomp`'s, and its repair is
+  deduplication over a common index, which two tools do not yet share.
+
 - **The other bases get the index, and the junk composite closes**
   (`ConfTyping/IndexedBases.lean`, choice-free). `LedgerDedup` left three bases building
   `List Prop` directly, so `jcomp_every_entry_inert` — two Jasmin certificates composing
