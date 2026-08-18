@@ -92,3 +92,4 @@ import ConfTyping.JasminLedger
 import ConfTyping.LedgerDedup
 import ConfTyping.IndexedBases
 import ConfTyping.MinimalCompose
+import ConfTyping.CrossToolIndex

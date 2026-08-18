@@ -232,6 +232,10 @@ run_case "tools/ci.sh drops a gate" drift \
 run_case "duplicate top-level name" drift \
   bash -c 'printf "\ntheorem medCheck_sound : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'
 
+# cross-tool tripwire must not vanish silently
+run_case "cross-tool tripwire renamed" drift \
+  bash -c 'sed -i "s/cn_jasmin_obligations_disjoint/RENAMED_X/g" conf-typing/ConfTyping/CrossToolIndex.lean'
+
 # transport-kernel module must be mentioned in its README
 run_case "kernel module undocumented" drift \
   bash -c 'sed -i "s/OmegaOneCoherent.lean/OTHER.lean/g" transport-kernel/README.md'

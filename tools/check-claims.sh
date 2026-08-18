@@ -1378,5 +1378,16 @@ for f in transport-kernel/NOTES-*.md; do
   fi
 done
 
+# 5. The cross-tool tripwire. `minimal_pair`'s independence hypothesis is applicable to a
+#    CN-beside-Jasmin composite only while the two obligation vocabularies stay disjoint,
+#    and CrossToolIndex.lean is what checks that. If the theorems go, the check goes with
+#    them silently and a composite would keep citing a theorem that no longer applies.
+for name in cn_jasmin_obligations_disjoint crossIdx_dedup_is_identity \
+            cross_tool_composition_is_the_independent_case; do
+  if ! grep -q "$name" conf-typing/ConfTyping/CrossToolIndex.lean 2>/dev/null; then
+    echo "DRIFT: cross-tool tripwire $name missing from CrossToolIndex.lean"; fail=1
+  fi
+done
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

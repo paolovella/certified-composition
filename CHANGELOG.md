@@ -915,6 +915,44 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The shared obligation vocabulary: proposed, measured, and mostly killed**
+  (`ConfTyping/CrossToolIndex.lean`, choice-free). `minimal_pair` needs the tools'
+  worlds independent. The gap recorded beside it was the realistic-looking case — two
+  tools sharing an assumption, both trusting the same C semantics say — which neither
+  `minimal_pair` nor `jcompD_minimal` covers. The proposed repair was a common obligation
+  datatype across foreign tools.
+
+  **The measurement came first and it killed the mechanism.** Embedding both encoded
+  foreign bases into one vocabulary and checking for collisions: **there are none.** Four
+  obligations compose to four, six to six; `cn_jasmin_obligations_disjoint` proves no CN
+  obligation is any Jasmin obligation, and both embeddings are injective so the count is
+  not the encoding collapsing entries.
+
+  The intuition — everyone rests on a solver, everyone rests on a C semantics — is wrong
+  for the two tools actually encoded. CN rests on *Cerberus's* C semantics and *CN's*
+  type system; Jasmin on *its own* speculative semantics and *its own* type system; and
+  the one plausible common entry, the SMT backend, is charged by CN and **not** by
+  Jasmin, whose SCT checker is a type system rather than a solver call. So cross-tool
+  composition is the *independent* case, `minimal_pair` applies verbatim, and the
+  deduplication mechanism would have had nothing to act on.
+
+  **What is kept is the tripwire, not the mechanism.** `crossIdx_dedup_is_identity` is a
+  decidable fact that holds today and stops holding the moment a third tool's obligation
+  is mapped onto an existing one — at which point a composite would still be citing
+  `minimal_pair` whose independence hypothesis had quietly stopped applying. Guarded in
+  `check-claims` with a negative case in `guard-selftest` (45 → **46**), because a
+  tripwire nobody checks is the failure mode that script exists for.
+
+  **Recorded as absent rather than guessed:** `KaniTrust` and `VerusTrust` do not exist,
+  so the cross-check tools are not in the vocabulary. Stages G and K each record a
+  correspondence assumption in prose — the Rust port models `uexec`; the Verus spec
+  transliterates the Lean rather than the Rust — and those are different assumptions about
+  different artifacts, so they would not have collided either. Encoding them would mean
+  inventing two trust records the repo has not measured.
+
+  Cost of finding out: one datatype and two `decide`s. A stage that tripped its own kill
+  criterion.
+
 - **Minimality composes across independent tools, free — and that inverts the expected
   difficulty** (`ConfTyping/MinimalCompose.lean`, choice-free). `jcomp_every_entry_inert`
   showed composition destroying minimality when two components are verified under the
