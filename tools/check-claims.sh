@@ -1417,5 +1417,40 @@ for name in cn_jasmin_obligations_disjoint crossIdx_dedup_is_identity \
   fi
 done
 
+# The process itself (PLAN-2026-10 s10, WI-001). Every piece below exists because its absence
+# caused a mishap here; a process nobody checks rots exactly like the loop-rule sentence did.
+# (a) The session protocol and plan of record exist and point at each other.
+if ! grep -q "PLAN-2026-10.md" CLAUDE.md 2>/dev/null || [ ! -f PLAN-2026-10.md ]; then
+  echo "DRIFT: CLAUDE.md missing or no longer names the plan of record PLAN-2026-10.md"; fail=1
+fi
+# (b) The kill switch holds one of its three values; anything else must not be read as "full".
+if ! grep -qxE 'full|cells-only|off' AUTONOMY 2>/dev/null; then
+  echo "DRIFT: AUTONOMY is missing or not one of full|cells-only|off"; fail=1
+fi
+# (c) Every backlog item carries the fields STATE.md and agents read; an item without a status
+#     or acceptance criterion is a wish, not a work item.
+for f in backlog/*.md; do
+  [ -e "$f" ] || continue
+  for k in id title tier status acceptance kill; do
+    if ! grep -q "^$k: " "$f"; then
+      echo "DRIFT: backlog item $f has no '$k:' field"; fail=1
+    fi
+  done
+  if ! grep -qE '^status: (planned|in-progress|blocked|done|killed)$' "$f"; then
+    echo "DRIFT: backlog item $f has an unknown status"; fail=1
+  fi
+done
+# (d) The hooks named in .claude/settings.json exist; a hook pointing at a missing script fails
+#     open and silently, which is the failure mode the hooks exist to prevent.
+for h in session-start pre-bash stop; do
+  if ! grep -q "tools/hooks/$h.sh" .claude/settings.json 2>/dev/null || [ ! -x "tools/hooks/$h.sh" ]; then
+    echo "DRIFT: hook $h is not wired in .claude/settings.json or tools/hooks/$h.sh is missing"; fail=1
+  fi
+done
+# (e) Long jobs leave receipts; the wrapper and the renderer that reports open jobs must stay.
+if ! grep -q '\.end' tools/run-job.sh 2>/dev/null || ! grep -q 'no end receipt' tools/render-state.sh 2>/dev/null; then
+  echo "DRIFT: job receipts (tools/run-job.sh) or their report in tools/render-state.sh are gone"; fail=1
+fi
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

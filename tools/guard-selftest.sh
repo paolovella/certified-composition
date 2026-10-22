@@ -256,6 +256,25 @@ run_case "cross-tool tripwire renamed" drift \
 run_case "kernel module undocumented" drift \
   bash -c 'sed -i "s/OmegaOneCoherent.lean/OTHER.lean/g" transport-kernel/README.md'
 
+# the process guards (PLAN-2026-10 s10): each one is broken the way it would rot
+run_case "CLAUDE.md loses the plan of record" drift \
+  bash -c 'sed -i "s/PLAN-2026-10.md/PLAN-OLD.md/g" CLAUDE.md'
+
+run_case "kill switch set to a bogus value" drift \
+  bash -c 'echo yolo > AUTONOMY'
+
+run_case "backlog item loses its status" drift \
+  bash -c 'sed -i "/^status: /d" backlog/P0-01.md'
+
+run_case "backlog item gets an unknown status" drift \
+  bash -c 'sed -i "s/^status: planned$/status: someday/" backlog/P0-01.md'
+
+run_case "hook script deleted" drift \
+  bash -c 'rm tools/hooks/stop.sh'
+
+run_case "job receipts dropped from run-job" drift \
+  bash -c 'sed -i "s/\.end/.fin/g" tools/run-job.sh'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

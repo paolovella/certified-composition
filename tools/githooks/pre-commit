@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# pre-commit: the cheap checks that must never be skipped, run before every commit.
+# Enabled per clone by: git config core.hooksPath tools/githooks
+# The full gate is tools/ci.sh; this hook only catches what should never reach a commit at all.
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)"
+fail=0
+
+# 1. Banned proof tokens in staged Lean files (CLAUDE.md house rules): each one either leaves a
+#    hole (sorry) or adds a trusted-compiler axiom (native_decide, bv_decide).
+staged_lean=$(git diff --cached --name-only --diff-filter=ACM -- '*.lean')
+if [ -n "$staged_lean" ]; then
+  if git diff --cached -U0 -- $staged_lean | grep -E '^\+' | grep -v '^+++' \
+       | grep -nE '\bsorry\b|by native_decide|^\+[[:space:]]*native_decide|\bbv_decide\b|^\+[[:space:]]*axiom '; then
+    echo "pre-commit: banned token in a staged Lean change (sorry / native_decide / bv_decide / axiom)"
+    fail=1
+  fi
+fi
+
+# 2. Drift guards. If they are dirty, the commit would record a claim the repo does not support.
+if ! bash tools/check-claims.sh | tail -1 | grep -q '^check-claims: clean$'; then
+  echo "pre-commit: tools/check-claims.sh is not clean; run it to see the DRIFT lines"
+  fail=1
+fi
+
+# 3. STATE.md is generated: refresh it so a commit never carries a stale snapshot.
+bash tools/render-state.sh >/dev/null && git add STATE.md
+
+exit $fail

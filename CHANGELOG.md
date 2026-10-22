@@ -6,6 +6,39 @@ landed.
 
 ## Repository verification
 
+- **The plan moved into the repo, and the process is now guarded like a theorem**
+  (2026-10-23; `PLAN-2026-10.md`, `CLAUDE.md`, `backlog/`, `STATE.md`, `tools/hooks/`,
+  `tools/githooks/`, `tools/run-job.sh`, `incidents/`, `research/2026-10/`). The direction
+  changed: **L**, a self-evolving AI-native secure language whose compiler carries every
+  certificate to RISC-V bytes, extended by many agents on a small frozen core (Ring 0) that
+  only the user's key can change. The plan, and the ten research threads behind it, now live
+  in the repo instead of in a session's scratchpad.
+
+  **What the session found about the repo before planning anything:**
+  - about 235 "axiom-free / choice-free" claims in the docs, none checked by CI;
+  - CI runs the PR's own `tools/ci.sh`, so a change can rewrite the gate that judges it;
+  - the Verus and Kani steps skip silently when the tool is absent, so cloud CI has never
+    run them;
+  - the stage G loop search died in August and left only a truncated file (`I-0001`).
+
+  None of these is fixed by this commit. Each is now a backlog item with an acceptance
+  criterion and a kill criterion (P0-01, P0-06, P0-08).
+
+  **What this commit does is make the mishaps mechanical rather than remembered.**
+  - SessionStart prints a generated `STATE.md`, so a session starts from what is actually
+    there: dirty tree, jobs with no end receipt, backlog.
+  - A PreToolUse hook refuses heredoc-edit-plus-commit in one command. That is the shape
+    behind the changelog edits that failed while their commits landed.
+  - Stop warns on uncommitted work. Long jobs run through `run-job.sh` and leave start and
+    end receipts.
+  - A tracked pre-commit hook rejects `sorry` / `native_decide` / `bv_decide` / new axioms
+    and runs check-claims.
+  - The process files are themselves guarded: plan of record, kill-switch value, backlog
+    fields, hook wiring and receipts. Self-test 50 → **56**, one case per way each could rot.
+
+  `AUTONOMY` is `off`. The user chose full autonomy on green, but the gates that would make
+  that safe (PLAN-2026-10 §7) do not exist yet, and a PR can still rewrite its own CI.
+
 - **CI, and a single entry point** (`tools/ci.sh`, `.github/workflows/ci.yml`). Until now
   every check — 78 Lean modules across three packages, `check-claims`, `guard-selftest`,
   `walk-check` — was run by hand at the end of a working session. A repo whose identity is

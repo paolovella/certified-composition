@@ -5,3 +5,10 @@ build/
 cross-check/**/target/
 cross-check/**/Cargo.lock
 cross-check/**/*.out
+
+# run-job.sh logs: large; receipts (.start/.end) are the tracked evidence
+tools/receipts/*.log
+# local scratch output of cross-check runs; evidence that matters goes to conf-typing/corpus/estate/captures/
+cross-check/*/captures/
+# personal Claude Code permissions; the shared hooks live in .claude/settings.json
+.claude/settings.local.json
