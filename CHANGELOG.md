@@ -915,6 +915,38 @@ landed.
   This stage claims a machine, one obstruction and one positive. It does **not** claim a
   race-freedom certificate on `UCmd`; brick 32's results stay on their own language.
 
+- **The loop rule was verified six days before the plan stopped denying it**
+  (`PLAN-MULTITOOL.md` stage K, `ConfTyping/LeakCert.lean`, `tools/`). Stage K's plan
+  entry read "**Still not done** — `loop` remains Lean-only, so `lcheck`'s fixpoint rule
+  is not in the verified implementation." It had been false since 2026-08-15: `spec_tree`
+  and `tree_impl` carry the fixpoint clause, `tree_wf_check` range-checks a loop's body
+  index, and the verified binary has been printing both verdicts all along.
+
+  **The drift is the finding, and its mechanism is worth naming.** The commit that closed
+  the gap did not touch the plan; the commit *after* it corrected only the stage G half of
+  the same sentence. Nothing in `check-claims` referred to the claim, so nothing could
+  notice — in a repo whose stated identity is that claims do not rot, the one claim that
+  rotted was a claim about the repo rather than about a theorem. Guarded now in both
+  directions: the Verus loop clause must exist, and the plan must not deny it while it
+  does.
+
+  **A vacuity gap fell out of looking.** Lean pinned `loop_alloc_rejected` — the
+  unbounded-leak loop is refused — with no acceptance beside it, and a checker that
+  rejected *every* loop would satisfy it. `loop_balanced_accepted` is the missing half:
+  `while c { alloc x ; free x }` is accepted, so the fixpoint rule discriminates rather
+  than refuses. That is the `b06`/`b06fixed` discipline, applied to the rule that had only
+  been half-witnessed — and it is exactly the pairing stage G already insisted on for its
+  own negative result.
+
+  Both loop verdicts are now pinned in `tools/ci.sh` beside `b06`'s, so the three
+  implementations — Lean `lcheck`, the Verus checker, the Kani port's concrete witnesses —
+  are checked to agree on both cases rather than believed to. Self-test 46 → **50**,
+  the four new cases covering the code half and the document half separately.
+
+  **What is still open is the search, not the rule.** Two independent implementations
+  agree on the fixpoint clause; no adversary has yet looked for a loop program it accepts
+  that leaks. Stage G's exhaustive run with loops in scope has not completed.
+
 - **The shared obligation vocabulary: proposed, measured, and mostly killed**
   (`ConfTyping/CrossToolIndex.lean`, choice-free). `minimal_pair` needs the tools'
   worlds independent. The gap recorded beside it was the realistic-looking case — two

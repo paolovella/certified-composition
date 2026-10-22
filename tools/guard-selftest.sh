@@ -208,6 +208,22 @@ run_case "Verus spec becomes a transliteration" drift \
   bash -c 'sed -i "s/spec_step(tag: u8, x: nat, o: Set<nat>) -> Option<Set<nat>>/spec_step(tag: u8, x: nat, o: u8) -> Option<u8>/" \
              cross-check/verus/lcheck.rs'
 
+# stage K, the loop rule. This is the one claim that went stale in the DOCUMENT while the
+# code was right, so the document half is tested as well as the code half.
+run_case "Verus loses the loop fixpoint clause" drift \
+  bash -c 'sed -i "s/p\[i\].tag == T_LOOP/p[i].tag == T_NEVER/" cross-check/verus/lcheck.rs'
+
+run_case "plan re-denies the verified loop rule" drift \
+  bash -c 'sed -i "s/^- \*\*Done, third pass — the loop rule\*\*/- **Still not done.** the fixpoint rule is not in the verified implementation/" \
+             PLAN-MULTITOOL.md'
+
+run_case "loop body index stops being checked" drift \
+  bash -c 'sed -i "s/n.tag == T_LOOP \&\& n.l >= p.len()/false/" cross-check/verus/lcheck.rs'
+
+run_case "accepted-loop witness removed" drift \
+  bash -c 'sed -i "s/theorem loop_balanced_accepted/theorem gone_away/" \
+             conf-typing/ConfTyping/LeakCert.lean'
+
 # module-import guard
 run_case "brick module not imported" drift \
   bash -c 'sed -i "/import ConfTyping.Mediation/d" conf-typing/ConfTyping.lean'

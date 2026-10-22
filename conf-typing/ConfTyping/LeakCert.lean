@@ -562,6 +562,14 @@ theorem b06fixed_accepted : leakSafe b06fixed = true := by decide
 theorem loop_alloc_rejected :
     leakSafe (.loop (.var "c") (.memop .alloc "x")) = false := by decide
 
+/-- And the balanced loop is **accepted**, so the fixpoint rule is not merely
+    refusing every loop. The pair is the `b06`/`b06fixed` discipline applied to
+    the rule that had only its negative witnessed: a refusal on its own is
+    satisfied by a checker that rejects the whole construct. -/
+theorem loop_balanced_accepted :
+    leakSafe (.loop (.var "c")
+      (.seq (.memop .alloc "x") (.memop .free "x"))) = true := by decide
+
 /-- Overwriting the only handle to a live allocation is refused. -/
 theorem overwrite_rejected :
     leakSafe (.seq (.memop .alloc "p") (.assign "p" (.num 0))) = false := by decide

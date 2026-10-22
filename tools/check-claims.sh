@@ -775,6 +775,34 @@ if ! grep -q "spec_step(tag: u8, x: nat, o: Set<nat>) -> Option<Set<nat>>" cross
   fail=1
 fi
 
+# The loop rule is the one stage K claim that went stale in the document rather than in the
+# code: it landed 2026-08-15 and PLAN-MULTITOOL.md went on calling it absent for six days,
+# because the commit that closed it did not touch the plan and nothing checked the sentence.
+# Both directions are guarded now - the rule must be there, and the plan must not deny it.
+if ! grep -q "p\[i\].tag == T_LOOP" cross-check/verus/lcheck.rs 2>/dev/null; then
+  echo "DRIFT: the Verus specification no longer has the loop fixpoint clause"; fail=1
+else
+  if grep -q "fixpoint rule is not in the" PLAN-MULTITOOL.md 2>/dev/null; then
+    echo "DRIFT: lcheck.rs verifies the loop rule but PLAN-MULTITOOL.md still calls it absent"
+    fail=1
+  fi
+fi
+# A loop body index is a runtime input like any other; if tree_wf_check stops range-checking
+# it, the entry point stops being total and the precondition goes back to being assumed.
+if ! grep -q "n.tag == T_LOOP && n.l >= p.len()" cross-check/verus/lcheck.rs 2>/dev/null; then
+  echo "DRIFT: tree_wf_check no longer range-checks a loop's body index"; fail=1
+fi
+# The refusal witness alone is satisfied by a checker that rejects every loop. The pair is
+# what makes the rule non-vacuous, on both sides, which is why both are pinned.
+for thm in loop_alloc_rejected loop_balanced_accepted; do
+  if ! grep -q "theorem $thm" conf-typing/ConfTyping/LeakCert.lean 2>/dev/null; then
+    echo "DRIFT: LeakCert no longer pins loop witness '$thm'"; fail=1
+  fi
+done
+if ! grep -q "while c { alloc x ; free x }" cross-check/verus/lcheck.rs 2>/dev/null; then
+  echo "DRIFT: the verified binary no longer runs the accepted-loop witness"; fail=1
+fi
+
 # stage G: Kani as an adversary against LeakCert. The result is a NEGATIVE (no
 # counterexample), which is worthless without the vacuity witness beside it - so both
 # harnesses and both captures are pinned.

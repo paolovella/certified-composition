@@ -174,9 +174,25 @@ correspondence to the spec is itself verified. Verus verifies real Rust.
     pinned in CI.
   - `tree_wf_check` discharges the tree precondition at runtime, so the branch entry point
     is total like the straight-line one.
-- **Still not done.** `loop` remains Lean-only, so `lcheck`'s **fixpoint rule is not in the
-  verified implementation** — and that is also the rule the Kani search does not cover, so
-  loops are currently the one part of the checker with a Lean proof and nothing else.
+- **Done, third pass — the loop rule** (24 verified / 0 errors). `spec_tree` and
+  `tree_impl` gain the fixpoint clause: check the body from `O`, accept only if it comes
+  back equal to `O`. The soundness argument is the branch rule's — `word_set_inj` — because
+  comparing the body's result to `O` is again comparing *machine words* where the
+  specification compares *sets*. `tree_wf_check` was extended so a loop's body index is
+  range-checked at runtime rather than assumed.
+  - **The verified binary decides both loop cases**: `while c { alloc x }` **REFUSE**,
+    `while c { alloc x ; free x }` **ACCEPT**, matching `loop_alloc_rejected` and
+    `loop_balanced_accepted` in Lean. Both verdicts are pinned in CI.
+  - **Correction of record.** This bullet read "**Still not done** — `loop` remains
+    Lean-only" from 2026-08-15 to 2026-08-21, six days after the commit that closed it.
+    The commit that added the rule did not touch this document, and the follow-up commit
+    corrected only the stage G half. Nothing guarded the sentence, so nothing caught it;
+    a guard now does, and `loop_balanced_accepted` was added at the same time because the
+    Lean side had pinned the loop refusal without an acceptance beside it.
+- **What the fixpoint rule still lacks is a *search*.** Two independent implementations
+  agree on it — Lean's `lcheck` and the Verus one — and stage G's exhaustive run with
+  loops in scope has not completed (see above), so no adversary has looked for a loop
+  program the rule accepts and that leaks. That is the open cell, not the implementation.
 
 ### Not scheduled
 

@@ -52,7 +52,9 @@ if [ -x "$VERUS_BIN" ]; then
                 grep -q "^alloc p ; free p .*ACCEPT" /tmp/lcheck-verdicts.txt &&
                 grep -q "^alloc p  *REFUSE"          /tmp/lcheck-verdicts.txt &&
                 grep -q "^b06 (CWE-401) *REFUSE"     /tmp/lcheck-verdicts.txt &&
-                grep -q "^b06, repaired *ACCEPT"     /tmp/lcheck-verdicts.txt'
+                grep -q "^b06, repaired *ACCEPT"     /tmp/lcheck-verdicts.txt &&
+                grep -q "^while c { alloc x } *REFUSE"          /tmp/lcheck-verdicts.txt &&
+                grep -q "^while c { alloc x ; free x } *ACCEPT" /tmp/lcheck-verdicts.txt'
 fi
 
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
