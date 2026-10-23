@@ -405,8 +405,8 @@ it survives composition.
 | result | Lean | axioms | content |
 |---|---|---|---|
 | composed certificate | `certified_pipeline` | choice-free | a Closure-checked then Policy-checked pair composes into one `BoundaryReleases` certificate, computed — no semantic reasoning about the composite |
-| **the product** | `certified_pipeline_bridge`, `certified_pipeline_reconstruction` | choice-free / standard 3 | the pipeline is a Bridge in the transport interface, and the *generic* `Bridge.comp` reconstructs its seam certificate — security composition by the same law that composes contraction estimates |
-| concrete demo | `demo_pipeline`, `demo_pipeline_bridge` | choice-free | `P_ok` then `P_leak`: the whole stack certified from two `decide`s |
+| **the product** | `certified_pipeline_bridge`, `certified_pipeline_reconstruction` | standard 3 / standard 3 | *(correction of record 2026-10-23: the bridge's footprint was stated as the certificate's; `certified_pipeline` is choice-free, but its `Bridge.ofRelease` packaging is classical)* the pipeline is a Bridge in the transport interface, and the *generic* `Bridge.comp` reconstructs its seam certificate — security composition by the same law that composes contraction estimates |
+| concrete demo | `demo_pipeline`, `demo_pipeline_bridge` | choice-free / standard 3 (corrected 2026-10-23, same cause) | `P_ok` then `P_leak`: the whole stack certified from two `decide`s |
 
 ## The assumption ledger (`Ledger.lean`) — the trusted base as a composable certificate
 

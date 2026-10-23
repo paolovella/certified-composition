@@ -1402,7 +1402,7 @@ partitions), not a general-purpose language frontend.
   correctness; false of the thing CWE-285 and CWE-306 actually name. **Missing
   mediation** — a path reaching the protected operation without the check — is a
   program property, all-paths, decidable. `Mediated p` quantifies over every policy and
-  every path. `med_victim_bypasses` (axiom-free): the unguarded branch reads a resource
+  every path. `med_victim_bypasses` (propext-only; corrected 2026-10-23, was ~~axiom-free~~): the unguarded branch reads a resource
   the policy denies, while `victim_guarded_path_is_fine` shows the other branch aborts
   cleanly — the defect is the *route*, not the check. `medCheck` (flow-sensitive,
   intersecting at joins) plus `medCheck_sound` generate the guarantee, on a three-part

@@ -256,6 +256,23 @@ run_case "cross-tool tripwire renamed" drift \
 run_case "kernel module undocumented" drift \
   bash -c 'sed -i "s/OmegaOneCoherent.lean/OTHER.lean/g" transport-kernel/README.md'
 
+# the axiom manifest (P0-01): a footprint change must reach the doc claim, and a non-standard
+# axiom must never pass, however it got into the build
+run_case "claimed choice-free theorem gains choice" drift \
+  bash -c 'sed -i "s/^\(ConfTyping\.wsecTy_sound\t[^\t]*\t\).*/\1Classical.choice,Quot.sound,propext/" tools/axioms.expected'
+
+run_case "axiom-free claim on a propext theorem" drift \
+  bash -c 'sed -i "s/\`med_victim_bypasses\` (propext-only;/\`med_victim_bypasses\` (axiom-free;/" VULN-COVERAGE.md'
+
+run_case "sorryAx appears in the manifest" drift \
+  bash -c 'sed -i "s/^\(ConfTyping\.uexec_seq_eq\t[^\t]*\t\).*/\1sorryAx/" tools/axioms.expected'
+
+run_case "manifest deleted" drift \
+  bash -c 'rm tools/axioms.expected'
+
+run_case "module claim breaks" drift \
+  bash -c 'sed -i "0,/^ConfTyping\.[^\t]*\tConfTyping\.MinimalCompose\t/s/^\(ConfTyping\.[^\t]*\tConfTyping\.MinimalCompose\t\).*/\1Classical.choice/" tools/axioms.expected'
+
 # the process guards (PLAN-2026-10 s10): each one is broken the way it would rot
 run_case "CLAUDE.md loses the plan of record" drift \
   bash -c 'sed -i "s/PLAN-2026-10.md/PLAN-OLD.md/g" CLAUDE.md'
@@ -267,7 +284,7 @@ run_case "backlog item loses its status" drift \
   bash -c 'sed -i "/^status: /d" backlog/P0-01.md'
 
 run_case "backlog item gets an unknown status" drift \
-  bash -c 'sed -i "s/^status: planned$/status: someday/" backlog/P0-01.md'
+  bash -c 'sed -i "s/^status: .*/status: someday/" backlog/P0-01.md'
 
 run_case "hook script deleted" drift \
   bash -c 'rm tools/hooks/stop.sh'

@@ -6,6 +6,54 @@ landed.
 
 ## Repository verification
 
+- **The axiom claims, checked for the first time: 185 hold, 3 did not** (2026-10-23, P0-01;
+  `conf-typing/AxiomManifest.lean`, `tools/axioms.expected`, `tools/axioms.sh`,
+  `tools/axiom-claims.py`). The docs say "axiom-free" / "choice-free" / "propext-only" about
+  specific theorems and modules over two hundred times. Each was checked once, by hand, when it
+  was written, and never again; the repo's "axiom-audited" status was a description, not a
+  check.
+
+  **The manifest.** A metaprogram walks the environment and writes every theorem and definition
+  of both mathlib-free packages with its exact `collectAxioms` set. That is 3433 declarations,
+  generated lemmas excluded. CI regenerates it from the build and fails on any diff.
+  `check-claims` rejects any axiom outside the standard three. That makes it the first
+  `sorry`/`native_decide` check that sees the proof terms rather than grepping the source:
+  `sorryAx` or `ofReduceBool` would show up there however they got in.
+
+  **The resolver.** `axiom-claims.py` binds each keyword to a name by deliberately narrow rules:
+  - table cells, positionally for `X / Y` cells;
+  - the nearest preceding backticked name in prose, including a claim wrapped onto the next line;
+  - a backticked `Module.lean`, which claims every declaration in that module.
+
+  Anything it cannot bind is counted and printed, never dropped, so "185 confirmed" cannot be
+  read as "every sentence confirmed". The current count is 31 unbound uses and 5 unresolved
+  names, all prose words such as `sorry`.
+
+  **Corrections of record.** Each was true of something nearby and false of what it named:
+  - `med_victim_bypasses` was called ~~axiom-free~~ in VULN-COVERAGE and in this changelog. Its
+    proof uses `propext`, so it is propext-only.
+  - `certified_pipeline_bridge` and `demo_pipeline_bridge` were called ~~choice-free~~ in
+    conf-typing/README. The certificate `certified_pipeline` is choice-free. The bridge built
+    from it goes through `Bridge.ofRelease`, which is classical, so the claim gave the
+    certificate's footprint to its packaging.
+  - The five whole-module claims (CrossToolIndex, MinimalCompose, IndexedBases, JasminLedger
+    ×2) all hold, across 13–52 declarations each.
+
+  **Bugs the self-test found in the new guard before it landed.**
+  - The resolver used `git ls-files`, which fails in the self-test's non-git export, so the
+    pristine case went red.
+  - It treated one violating declaration in a claimed module as "ambiguous" rather than a
+    contradiction, so a broken module claim passed.
+  - A case written against `status: planned` went vacuous the moment the item moved to
+    `in-progress`.
+
+  All three are fixed. Self-test 56 → **61**.
+
+  **A convention fell out of writing this entry.** Its first draft said that a theorem "was
+  called" axiom-free. The resolver read that as a claim and failed. It was right to: a
+  correction that repeats the old wording asserts it again. Retracted claims are now quoted in
+  strikethrough, which the checker skips (CLAUDE.md, house rules).
+
 - **The plan moved into the repo, and the process is now guarded like a theorem**
   (2026-10-23; `PLAN-2026-10.md`, `CLAUDE.md`, `backlog/`, `STATE.md`, `tools/hooks/`,
   `tools/githooks/`, `tools/run-job.sh`, `incidents/`, `research/2026-10/`). The direction
@@ -136,7 +184,7 @@ landed.
   actual defect, and CWE-306's, is almost never "the policy was wrong"; it is
   **missing mediation**: some path reaches the protected operation without the
   check. That is a program property, all-paths, decidable. `med_victim_bypasses`
-  (axiom-free): the unguarded branch reads a resource the policy denies, while
+  (propext-only; this entry said ~~axiom-free~~ until the 2026-10-23 manifest showed `propext`): the unguarded branch reads a resource the policy denies, while
   `victim_guarded_path_is_fine` shows the other branch aborts cleanly — the
   defect is the *route*, not the check. `medCheck` (flow-sensitive, intersecting
   at joins) with `medCheck_sound` generates the guarantee on every path and under

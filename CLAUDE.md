@@ -40,7 +40,10 @@ Until `l-core/` exists, Ring 0 means: `tools/`, `.github/`, `CLAUDE.md`, `.claud
 
 - **Claims are checked, not asserted.** Never write "proved/verified/axiom-free X" unless a guard
   or manifest checks X. If you find a stale or wrong claim, record a *correction of record*
-  (what it said, from when to when, why it was wrong). Never edit it away silently.
+  (what it said, from when to when, why it was wrong). Never edit it away silently. Quote a
+  retracted claim in ~~strikethrough~~: the claim checkers skip struck text, so recording a
+  correction never re-asserts the claim. Footprint words (axiom-free / choice-free /
+  propext-only) next to a backticked name are checked against `tools/axioms.expected`.
 - **Docs move with code.** A commit that changes the status of a theorem or stage updates every
   document that states that status, and adds a guard so the sentence cannot rot. The loop rule
   stayed "not done" in the plan for six days after it was done.

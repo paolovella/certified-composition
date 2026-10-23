@@ -58,6 +58,7 @@ if [ -x "$VERUS_BIN" ]; then
 fi
 
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
+step "axiom manifest is current"   bash tools/axioms.sh --check
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \
      bash -c 'bash tools/guard-selftest.sh | tail -1 | grep -qE "^guard self-test: [0-9]+ passed, 0 failed$"'

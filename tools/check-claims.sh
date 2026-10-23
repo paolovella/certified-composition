@@ -1417,6 +1417,24 @@ for name in cn_jasmin_obligations_disjoint crossIdx_dedup_is_identity \
   fi
 done
 
+# The axiom manifest (P0-01). tools/axioms.expected lists every theorem and definition of the
+# two mathlib-free packages with its exact axiom set; ci.sh keeps it current against the build.
+# (a) Nothing outside the standard three. This is the real "no sorry, no native_decide" check:
+#     sorryAx and Lean.ofReduceBool show up here however they got in, unlike a grep.
+if [ ! -s tools/axioms.expected ]; then
+  echo "DRIFT: tools/axioms.expected is missing or empty"; fail=1
+elif cut -f3 tools/axioms.expected | tr ',' '\n' | grep -v '^$' \
+       | grep -vxE 'propext|Classical.choice|Quot.sound' | sort -u | grep -q .; then
+  echo "DRIFT: the manifest lists a non-standard axiom: $(cut -f3 tools/axioms.expected | tr ',' '\n' | grep -v '^$' | grep -vxE 'propext|Classical.choice|Quot.sound' | sort -u | tr '\n' ' ')"
+  fail=1
+fi
+# (b) Every "axiom-free / choice-free / propext-only" claim in the docs agrees with it.
+if ! python3 -I tools/axiom-claims.py > /tmp/axiom-claims.$$ 2>&1; then
+  grep '^DRIFT' /tmp/axiom-claims.$$ || echo "DRIFT: tools/axiom-claims.py failed: $(tail -1 /tmp/axiom-claims.$$)"
+  fail=1
+fi
+rm -f /tmp/axiom-claims.$$
+
 # The process itself (PLAN-2026-10 s10, WI-001). Every piece below exists because its absence
 # caused a mishap here; a process nobody checks rots exactly like the loop-rule sentence did.
 # (a) The session protocol and plan of record exist and point at each other.
