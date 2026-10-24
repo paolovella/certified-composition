@@ -1,0 +1,4 @@
+started: 2026-10-23T21:19:04+02:00
+head: fdcb1a4
+command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/cbe1e5c5-1c8d-4aa0-b648-aecd0fe50c94/scratchpad/s435/conf-typing && lake check --paranoid
+log: tools/receipts/s435-lakecheck.log

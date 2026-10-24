@@ -292,6 +292,9 @@ run_case "hook script deleted" drift \
 run_case "job receipts dropped from run-job" drift \
   bash -c 'sed -i "s/\.end/.fin/g" tools/run-job.sh'
 
+run_case "run-job loses its signal trap" drift \
+  bash -c 'sed -i "/^for sig in TERM INT HUP; do$/,/^done$/d" tools/run-job.sh'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

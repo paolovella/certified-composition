@@ -1,0 +1,4 @@
+ended: 2026-10-23T21:30:13+02:00
+exit: killed
+seconds: unknown
+note: written by hand. The operator stopped the sweep on purpose (parse cost dominated, see backlog/S-KERNEL.md); the pkill pattern also matched this wrapper, which died before writing its receipt. Incident I-0002.

@@ -1,0 +1,4 @@
+started: 2026-10-23T21:32:23+02:00
+head: fdcb1a4
+command: python3 bench/kernel/run.py /tmp/claude-1000/-home-paolo-certified-composition/cbe1e5c5-1c8d-4aa0-b648-aecd0fe50c94/scratchpad/kb2-kernel --only (__kernel$)|(^(ext_b01|p_05|scale002|scale032)__(parse|bcheckT|compileT)__decide$)
+log: tools/receipts/skernel2-kernel.log

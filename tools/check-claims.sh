@@ -1469,6 +1469,22 @@ done
 if ! grep -q '\.end' tools/run-job.sh 2>/dev/null || ! grep -q 'no end receipt' tools/render-state.sh 2>/dev/null; then
   echo "DRIFT: job receipts (tools/run-job.sh) or their report in tools/render-state.sh are gone"; fail=1
 fi
+# (f) ...and a job that is killed still leaves its .end receipt (I-0002). Behavioural, not a
+#     grep: a job is started, sent TERM, and the receipt it must leave is read back. The
+#     accepted witness is the same wrapper run to completion, which must record exit 0.
+rj=$(mktemp -d)
+if RUNJOB_ROOT="$rj" bash tools/run-job.sh selftest-ok -- true >/dev/null 2>&1 \
+   && grep -q '^exit: 0$' "$rj/tools/receipts/selftest-ok.end" 2>/dev/null; then :; else
+  echo "DRIFT: tools/run-job.sh does not record a completed job"; fail=1
+fi
+RUNJOB_ROOT="$rj" bash tools/run-job.sh selftest-term -- sleep 30 >/dev/null 2>&1 &
+rjpid=$!
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -f "$rj/tools/receipts/selftest-term.start" ] && break; sleep 0.2; done
+sleep 0.3; kill -TERM "$rjpid" 2>/dev/null; wait "$rjpid" 2>/dev/null
+if ! grep -q '^exit: signal TERM$' "$rj/tools/receipts/selftest-term.end" 2>/dev/null; then
+  echo "DRIFT: a job killed with TERM leaves no .end receipt (tools/run-job.sh, I-0002)"; fail=1
+fi
+rm -rf "$rj"
 
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

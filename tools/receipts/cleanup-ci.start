@@ -1,0 +1,4 @@
+started: 2026-10-24T17:42:39+02:00
+head: fdcb1a4
+command: bash tools/ci.sh
+log: tools/receipts/cleanup-ci.log
