@@ -1,0 +1,4 @@
+started: 2026-10-24T18:02:04+02:00
+head: 24c5961
+command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/conf-typing && lake env leanexport ConfTyping > /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/ctA.ndjson && ls -la /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/ctA.ndjson && cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/transport-calculus && lake check --paranoid --from-export=/tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/ctA.ndjson
+log: tools/receipts/s435b-export-ct.log

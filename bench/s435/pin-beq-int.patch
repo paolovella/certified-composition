@@ -1,0 +1,13 @@
+--- conf-typing/ConfTyping/Imp.lean	2026-06-28 01:24:33.078545823 +0200
++++ ctB/ConfTyping/Imp.lean	2026-10-24 18:00:29.814684331 +0200
+@@ -8,6 +8,10 @@
+ 
+ namespace ConfTyping
+ 
++/-- S-435 experiment: Lean 4.35 resolves `BEq Int` through `Int.instLinearOrderPackage`, which
++    depends on `Classical.choice`. Pin the 4.31 instance. -/
++instance (priority := high) intBEqOfDecEq : BEq Int := instBEqOfDecidableEq
++
+ /-! ## §1 Language -/
+ 
+ inductive Expr where

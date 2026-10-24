@@ -1,0 +1,11 @@
+--- conf-typing/ConfTyping/Pleak.lean	2026-06-28 19:14:02.086719360 +0200
++++ conf-typing/ConfTyping/Pleak.lean	2026-10-24 17:59:34.563232620 +0200
+@@ -22,7 +22,7 @@
+ 
+ theorem wall_const : ∀ σ, (eval Pleak σ).2.1 = 2 := by
+   intro σ
+-  simp only [Pleak, eval, evalE]
++  simp only [Pleak, eval]
+   split <;> rfl
+ 
+ theorem wall_closure : J_NI Pleak wall Phigh := by

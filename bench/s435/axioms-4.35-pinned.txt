@@ -1,0 +1,3420 @@
+ConfTyping.A3_coarsen	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.A3_factors_kernel	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.ACh.c.elim	ConfTyping.CmdInjection	
+ConfTyping.ACh.c.noConfusion	ConfTyping.CmdInjection	
+ConfTyping.ACh.casesOn	ConfTyping.CmdInjection	
+ConfTyping.ACh.ctorElim	ConfTyping.CmdInjection	
+ConfTyping.ACh.ctorElimType	ConfTyping.CmdInjection	
+ConfTyping.ACh.ctorIdx	ConfTyping.CmdInjection	
+ConfTyping.ACh.noConfusion	ConfTyping.CmdInjection	
+ConfTyping.ACh.noConfusionType	ConfTyping.CmdInjection	
+ConfTyping.ACh.recOn	ConfTyping.CmdInjection	
+ConfTyping.ACh.sep.elim	ConfTyping.CmdInjection	
+ConfTyping.ACmd.access.elim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.access.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.ACmd.alloc.elim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.alloc.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.ACmd.below	ConfTyping.AliasSafe	
+ConfTyping.ACmd.brecOn	ConfTyping.AliasSafe	
+ConfTyping.ACmd.brecOn.eq	ConfTyping.AliasSafe	
+ConfTyping.ACmd.brecOn.go	ConfTyping.AliasSafe	
+ConfTyping.ACmd.casesOn	ConfTyping.AliasSafe	
+ConfTyping.ACmd.copy.elim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.copy.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.ACmd.ctorElim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.ctorElimType	ConfTyping.AliasSafe	
+ConfTyping.ACmd.ctorIdx	ConfTyping.AliasSafe	
+ConfTyping.ACmd.data.elim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.data.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.ACmd.free.elim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.free.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.ACmd.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.ACmd.noConfusionType	ConfTyping.AliasSafe	
+ConfTyping.ACmd.recOn	ConfTyping.AliasSafe	
+ConfTyping.ACmd.seq.elim	ConfTyping.AliasSafe	
+ConfTyping.ACmd.seq.noConfusion	ConfTyping.AliasSafe	
+ConfTyping.AInv	ConfTyping.AliasSafe	
+ConfTyping.ALCmd.access.elim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.access.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.alloc.elim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.alloc.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.below	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.brecOn	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.brecOn.eq	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.brecOn.go	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.casesOn	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.copy.elim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.copy.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.ctorElim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.ctorElimType	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.ctorIdx	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.free.elim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.free.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.loop.elim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.loop.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.noConfusionType	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.recOn	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.seq.elim	ConfTyping.AliasLoop	
+ConfTyping.ALCmd.seq.noConfusion	ConfTyping.AliasLoop	
+ConfTyping.ALInv	ConfTyping.AliasLoop	
+ConfTyping.ALInv_coarsen	ConfTyping.AliasFix	
+ConfTyping.ALInv_of_setSub	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.ALInv_of_sub	ConfTyping.AliasLoop	
+ConfTyping.ALInv_s0	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.AState	ConfTyping.AliasSafe	
+ConfTyping.AStr	ConfTyping.CmdInjection	
+ConfTyping.A_chain	ConfTyping.Obs	propext
+ConfTyping.A_local	ConfTyping.Obs	
+ConfTyping.A_local_sub_OO	ConfTyping.Typing	propext
+ConfTyping.A_physical	ConfTyping.Obs	
+ConfTyping.A_remote	ConfTyping.Obs	
+ConfTyping.AcceptGoal	ConfTyping.LoadBearing	
+ConfTyping.Addr	ConfTyping.Speculate	
+ConfTyping.AliasFreeLoop	ConfTyping.AliasLoop	
+ConfTyping.AliasOK	ConfTyping.AliasSafe	
+ConfTyping.AliasUAF	ConfTyping.AliasSafe	
+ConfTyping.AliasUAFLoop	ConfTyping.AliasLoop	
+ConfTyping.AllocFreeLoop	ConfTyping.FreeLoop	
+ConfTyping.ArchTouchesOnly	ConfTyping.HeteroCompose	
+ConfTyping.Assume.casesOn	ConfTyping.Assumptions	
+ConfTyping.Assume.ctorElim	ConfTyping.Assumptions	
+ConfTyping.Assume.ctorElimType	ConfTyping.Assumptions	
+ConfTyping.Assume.ctorIdx	ConfTyping.Assumptions	
+ConfTyping.Assume.noConfusion	ConfTyping.Assumptions	
+ConfTyping.Assume.noConfusionType	ConfTyping.Assumptions	
+ConfTyping.Assume.policyIntended.elim	ConfTyping.Assumptions	
+ConfTyping.Assume.recOn	ConfTyping.Assumptions	
+ConfTyping.Assume.sinkHonest.elim	ConfTyping.Assumptions	
+ConfTyping.Assume.sinkHonest.noConfusion	ConfTyping.Assumptions	
+ConfTyping.Atom.casesOn	ConfTyping.ParseSource	
+ConfTyping.Atom.cat.elim	ConfTyping.ParseSource	
+ConfTyping.Atom.cat.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Atom.const.elim	ConfTyping.ParseSource	
+ConfTyping.Atom.const.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Atom.ctorElim	ConfTyping.ParseSource	
+ConfTyping.Atom.ctorElimType	ConfTyping.ParseSource	
+ConfTyping.Atom.ctorIdx	ConfTyping.ParseSource	
+ConfTyping.Atom.emit.elim	ConfTyping.ParseSource	
+ConfTyping.Atom.emit.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Atom.input.elim	ConfTyping.ParseSource	
+ConfTyping.Atom.input.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Atom.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Atom.noConfusionType	ConfTyping.ParseSource	
+ConfTyping.Atom.recOn	ConfTyping.ParseSource	
+ConfTyping.BGrade.bound	ConfTyping.BoundedCert	
+ConfTyping.BGrade.casesOn	ConfTyping.BoundedCert	
+ConfTyping.BGrade.ctorIdx	ConfTyping.BoundedCert	
+ConfTyping.BGrade.growth	ConfTyping.BoundedCert	
+ConfTyping.BGrade.mk.noConfusion	ConfTyping.BoundedCert	
+ConfTyping.BGrade.noConfusion	ConfTyping.BoundedCert	
+ConfTyping.BGrade.noConfusionType	ConfTyping.BoundedCert	
+ConfTyping.BGrade.recOn	ConfTyping.BoundedCert	
+ConfTyping.BSafe	ConfTyping.BoundedCert	
+ConfTyping.Biz	ConfTyping.SupplyChain	
+ConfTyping.BoundaryNI	ConfTyping.Compose	
+ConfTyping.BoundaryReleases	ConfTyping.Compose	
+ConfTyping.BoundaryReleases.ofBoundaryNI	ConfTyping.Pipeline	
+ConfTyping.Bridge.ofCN	ConfTyping.CNReceive	Classical.choice,Quot.sound,propext
+ConfTyping.Bridge.ofCNComputed	ConfTyping.CNLedger	Classical.choice,Quot.sound,propext
+ConfTyping.Bridge.ofComponent	ConfTyping.FlowBridge	
+ConfTyping.Bridge.ofComponentL	ConfTyping.LedgerBridge	
+ConfTyping.Bridge.ofRelease	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
+ConfTyping.Bridge.ofReleaseL	ConfTyping.LedgerBridge	Classical.choice,Quot.sound,propext
+ConfTyping.Bridge.ofWComponent	ConfTyping.WhileBridge	
+ConfTyping.CLoc	ConfTyping.CNReceive	
+ConfTyping.CNAssume.casesOn	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.cerberus.elim	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.ctorElim	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.ctorElimType	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.ctorIdx	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.embed	ConfTyping.CrossToolIndex	
+ConfTyping.CNAssume.noConfusion	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.noConfusionType	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.recOn	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.smt.elim	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.trustedSpec.elim	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.trustedSpec.noConfusion	ConfTyping.IndexedBases	
+ConfTyping.CNAssume.vcgen.elim	ConfTyping.IndexedBases	
+ConfTyping.CNProof.casesOn	ConfTyping.CNReceive	
+ConfTyping.CNProof.ctorIdx	ConfTyping.CNReceive	
+ConfTyping.CNProof.mk.noConfusion	ConfTyping.CNReceive	
+ConfTyping.CNProof.noConfusion	ConfTyping.CNReceive	
+ConfTyping.CNProof.noConfusionType	ConfTyping.CNReceive	
+ConfTyping.CNProof.recOn	ConfTyping.CNReceive	
+ConfTyping.CNProof.trustedSpecs	ConfTyping.CNReceive	
+ConfTyping.CNProof.usesArith	ConfTyping.CNReceive	
+ConfTyping.CNTrust.casesOn	ConfTyping.CNReceive	
+ConfTyping.CNTrust.cerberus	ConfTyping.CNReceive	
+ConfTyping.CNTrust.ctorIdx	ConfTyping.CNReceive	
+ConfTyping.CNTrust.fixedBase	ConfTyping.CNReceive	
+ConfTyping.CNTrust.interp	ConfTyping.IndexedBases	
+ConfTyping.CNTrust.mk.noConfusion	ConfTyping.CNReceive	
+ConfTyping.CNTrust.needs	ConfTyping.CNReceive	
+ConfTyping.CNTrust.needsI	ConfTyping.IndexedBases	
+ConfTyping.CNTrust.noConfusion	ConfTyping.CNReceive	
+ConfTyping.CNTrust.noConfusionType	ConfTyping.CNReceive	
+ConfTyping.CNTrust.recOn	ConfTyping.CNReceive	
+ConfTyping.CNTrust.smt	ConfTyping.CNReceive	
+ConfTyping.CNTrust.trusted	ConfTyping.CNReceive	
+ConfTyping.CNTrust.vcgen	ConfTyping.CNReceive	
+ConfTyping.CState	ConfTyping.AliasSafe	
+ConfTyping.CStore	ConfTyping.CNReceive	
+ConfTyping.Ch.c.elim	ConfTyping.InjectionReal	
+ConfTyping.Ch.c.noConfusion	ConfTyping.InjectionReal	
+ConfTyping.Ch.casesOn	ConfTyping.InjectionReal	
+ConfTyping.Ch.ctorElim	ConfTyping.InjectionReal	
+ConfTyping.Ch.ctorElimType	ConfTyping.InjectionReal	
+ConfTyping.Ch.ctorIdx	ConfTyping.InjectionReal	
+ConfTyping.Ch.noConfusion	ConfTyping.InjectionReal	
+ConfTyping.Ch.noConfusionType	ConfTyping.InjectionReal	
+ConfTyping.Ch.q.elim	ConfTyping.InjectionReal	
+ConfTyping.Ch.recOn	ConfTyping.InjectionReal	
+ConfTyping.Cmd.assign.elim	ConfTyping.Imp	
+ConfTyping.Cmd.assign.noConfusion	ConfTyping.Imp	
+ConfTyping.Cmd.below	ConfTyping.Imp	
+ConfTyping.Cmd.brecOn	ConfTyping.Imp	
+ConfTyping.Cmd.brecOn.eq	ConfTyping.Imp	
+ConfTyping.Cmd.brecOn.go	ConfTyping.Imp	
+ConfTyping.Cmd.casesOn	ConfTyping.Imp	
+ConfTyping.Cmd.ctorElim	ConfTyping.Imp	
+ConfTyping.Cmd.ctorElimType	ConfTyping.Imp	
+ConfTyping.Cmd.ctorIdx	ConfTyping.Imp	
+ConfTyping.Cmd.ite.elim	ConfTyping.Imp	
+ConfTyping.Cmd.ite.noConfusion	ConfTyping.Imp	
+ConfTyping.Cmd.noConfusion	ConfTyping.Imp	
+ConfTyping.Cmd.noConfusionType	ConfTyping.Imp	
+ConfTyping.Cmd.recOn	ConfTyping.Imp	
+ConfTyping.Cmd.seq.elim	ConfTyping.Imp	
+ConfTyping.Cmd.seq.noConfusion	ConfTyping.Imp	
+ConfTyping.Cmd.skip.elim	ConfTyping.Imp	
+ConfTyping.Coarsens	ConfTyping.AliasFix	
+ConfTyping.Coarsens_collapse	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.Coarsens_mergeOne	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.Coarsens_trans	ConfTyping.AliasFix	
+ConfTyping.Composite.casesOn	ConfTyping.JasminCert	
+ConfTyping.Composite.ctorIdx	ConfTyping.JasminCert	
+ConfTyping.Composite.fns	ConfTyping.JasminCert	
+ConfTyping.Composite.ledger	ConfTyping.JasminCert	
+ConfTyping.Composite.lvl	ConfTyping.JasminCert	
+ConfTyping.Composite.mk.noConfusion	ConfTyping.JasminCert	
+ConfTyping.Composite.modmsf	ConfTyping.JasminCert	
+ConfTyping.Composite.noConfusion	ConfTyping.JasminCert	
+ConfTyping.Composite.noConfusionType	ConfTyping.JasminCert	
+ConfTyping.Composite.recOn	ConfTyping.JasminCert	
+ConfTyping.CondBoundary	ConfTyping.Ledger	
+ConfTyping.CondModifiesOnly	ConfTyping.CNLedger	
+ConfTyping.CondReleases	ConfTyping.Ledger	
+ConfTyping.Confidential	ConfTyping.Typing	
+ConfTyping.Conform	ConfTyping.Typing	
+ConfTyping.Contained	ConfTyping.PathTraversal	
+ConfTyping.CostAtMost	ConfTyping.CostBound	
+ConfTyping.CostAtMost.mono	ConfTyping.CostBound	
+ConfTyping.CrossFlow	ConfTyping.LatticeFlow	
+ConfTyping.Cx	ConfTyping.Ledger	
+ConfTyping.DCh.casesOn	ConfTyping.DecimalId	
+ConfTyping.DCh.ctorElim	ConfTyping.DecimalId	
+ConfTyping.DCh.ctorElimType	ConfTyping.DecimalId	
+ConfTyping.DCh.ctorIdx	ConfTyping.DecimalId	
+ConfTyping.DCh.ddig.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.ddig.noConfusion	ConfTyping.DecimalId	
+ConfTyping.DCh.dsemi.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.dsp.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.la.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.lc.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.le.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.li.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.lm.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.ln.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.lo.elim	ConfTyping.DecimalId	
+ConfTyping.DCh.noConfusion	ConfTyping.DecimalId	
+ConfTyping.DCh.noConfusionType	ConfTyping.DecimalId	
+ConfTyping.DCh.recOn	ConfTyping.DecimalId	
+ConfTyping.DCmd.below	ConfTyping.DbInjection	
+ConfTyping.DCmd.brecOn	ConfTyping.DbInjection	
+ConfTyping.DCmd.brecOn.eq	ConfTyping.DbInjection	
+ConfTyping.DCmd.brecOn.go	ConfTyping.DbInjection	
+ConfTyping.DCmd.casesOn	ConfTyping.DbInjection	
+ConfTyping.DCmd.concat.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.concat.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.ctorElim	ConfTyping.DbInjection	
+ConfTyping.DCmd.ctorElimType	ConfTyping.DbInjection	
+ConfTyping.DCmd.ctorIdx	ConfTyping.DbInjection	
+ConfTyping.DCmd.dbread.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.dbread.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.dbwrite.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.dbwrite.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.emitC.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.emitC.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.emitP.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.emitP.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.input.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.input.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.lit.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.lit.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DCmd.noConfusionType	ConfTyping.DbInjection	
+ConfTyping.DCmd.recOn	ConfTyping.DbInjection	
+ConfTyping.DCmd.seq.elim	ConfTyping.DbInjection	
+ConfTyping.DCmd.seq.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DState.casesOn	ConfTyping.QueryEscape	
+ConfTyping.DState.ctorElim	ConfTyping.QueryEscape	
+ConfTyping.DState.ctorElimType	ConfTyping.QueryEscape	
+ConfTyping.DState.ctorIdx	ConfTyping.QueryEscape	
+ConfTyping.DState.inn.elim	ConfTyping.QueryEscape	
+ConfTyping.DState.noConfusion	ConfTyping.QueryEscape	
+ConfTyping.DState.noConfusionType	ConfTyping.QueryEscape	
+ConfTyping.DState.ofNat	ConfTyping.QueryEscape	
+ConfTyping.DState.ofNat_ctorIdx	ConfTyping.QueryEscape	
+ConfTyping.DState.out.elim	ConfTyping.QueryEscape	
+ConfTyping.DState.qq.elim	ConfTyping.QueryEscape	
+ConfTyping.DState.recOn	ConfTyping.QueryEscape	
+ConfTyping.DbRel	ConfTyping.DbInjection	
+ConfTyping.DbState.casesOn	ConfTyping.DbInjection	
+ConfTyping.DbState.ctorIdx	ConfTyping.DbInjection	
+ConfTyping.DbState.db	ConfTyping.DbInjection	
+ConfTyping.DbState.mk.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DbState.noConfusion	ConfTyping.DbInjection	
+ConfTyping.DbState.noConfusionType	ConfTyping.DbInjection	
+ConfTyping.DbState.out	ConfTyping.DbInjection	
+ConfTyping.DbState.recOn	ConfTyping.DbInjection	
+ConfTyping.DbState.store	ConfTyping.DbInjection	
+ConfTyping.Deployment.accepts	ConfTyping.Deploy	
+ConfTyping.Deployment.casesOn	ConfTyping.Deploy	
+ConfTyping.Deployment.ctorIdx	ConfTyping.Deploy	
+ConfTyping.Deployment.inside	ConfTyping.Deploy	
+ConfTyping.Deployment.intended	ConfTyping.Deploy	
+ConfTyping.Deployment.mk.noConfusion	ConfTyping.Deploy	
+ConfTyping.Deployment.noConfusion	ConfTyping.Deploy	
+ConfTyping.Deployment.noConfusionType	ConfTyping.Deploy	
+ConfTyping.Deployment.policy	ConfTyping.Deploy	
+ConfTyping.Deployment.recOn	ConfTyping.Deploy	
+ConfTyping.Derivable	ConfTyping.Joint	
+ConfTyping.Discharge.casesOn	ConfTyping.Typing	
+ConfTyping.Discharge.recOn	ConfTyping.Typing	
+ConfTyping.Discharged.casesOn	ConfTyping.Deploy	
+ConfTyping.Discharged.fsInside	ConfTyping.Deploy	
+ConfTyping.Discharged.policyIntended	ConfTyping.Deploy	
+ConfTyping.Discharged.recOn	ConfTyping.Deploy	
+ConfTyping.Discharged.sinkAccepts	ConfTyping.Deploy	
+ConfTyping.Dmd.bot.elim	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.casesOn	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.ctorElim	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.ctorElimType	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.ctorIdx	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.la.elim	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.lb.elim	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.noConfusion	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.noConfusionType	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.ofNat	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.ofNat_ctorIdx	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.recOn	ConfTyping.LatticeFlow	
+ConfTyping.Dmd.top.elim	ConfTyping.LatticeFlow	
+ConfTyping.DoubleFreeLoop	ConfTyping.FreeLoop	
+ConfTyping.DoubleFreeLoopA	ConfTyping.AliasLoop	
+ConfTyping.EscImmune	ConfTyping.QueryEscape	
+ConfTyping.EvKind.attest.elim	ConfTyping.Typing	
+ConfTyping.EvKind.casesOn	ConfTyping.Typing	
+ConfTyping.EvKind.ctorElim	ConfTyping.Typing	
+ConfTyping.EvKind.ctorElimType	ConfTyping.Typing	
+ConfTyping.EvKind.ctorIdx	ConfTyping.Typing	
+ConfTyping.EvKind.noConfusion	ConfTyping.Typing	
+ConfTyping.EvKind.noConfusionType	ConfTyping.Typing	
+ConfTyping.EvKind.ofNat	ConfTyping.Typing	
+ConfTyping.EvKind.ofNat_ctorIdx	ConfTyping.Typing	
+ConfTyping.EvKind.policy.elim	ConfTyping.Typing	
+ConfTyping.EvKind.proof.elim	ConfTyping.Typing	
+ConfTyping.EvKind.recOn	ConfTyping.Typing	
+ConfTyping.Expr.add.elim	ConfTyping.Imp	
+ConfTyping.Expr.add.noConfusion	ConfTyping.Imp	
+ConfTyping.Expr.below	ConfTyping.Imp	
+ConfTyping.Expr.brecOn	ConfTyping.Imp	
+ConfTyping.Expr.brecOn.eq	ConfTyping.Imp	
+ConfTyping.Expr.brecOn.go	ConfTyping.Imp	
+ConfTyping.Expr.casesOn	ConfTyping.Imp	
+ConfTyping.Expr.ctorElim	ConfTyping.Imp	
+ConfTyping.Expr.ctorElimType	ConfTyping.Imp	
+ConfTyping.Expr.ctorIdx	ConfTyping.Imp	
+ConfTyping.Expr.noConfusion	ConfTyping.Imp	
+ConfTyping.Expr.noConfusionType	ConfTyping.Imp	
+ConfTyping.Expr.num.elim	ConfTyping.Imp	
+ConfTyping.Expr.num.noConfusion	ConfTyping.Imp	
+ConfTyping.Expr.recOn	ConfTyping.Imp	
+ConfTyping.Expr.var.elim	ConfTyping.Imp	
+ConfTyping.Expr.var.noConfusion	ConfTyping.Imp	
+ConfTyping.FCmd.alloc.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.alloc.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.assign.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.assign.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.below	ConfTyping.MemFree	
+ConfTyping.FCmd.brecOn	ConfTyping.MemFree	
+ConfTyping.FCmd.brecOn.eq	ConfTyping.MemFree	
+ConfTyping.FCmd.brecOn.go	ConfTyping.MemFree	
+ConfTyping.FCmd.casesOn	ConfTyping.MemFree	
+ConfTyping.FCmd.ctorElim	ConfTyping.MemFree	
+ConfTyping.FCmd.ctorElimType	ConfTyping.MemFree	
+ConfTyping.FCmd.ctorIdx	ConfTyping.MemFree	
+ConfTyping.FCmd.free.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.free.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.ite.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.ite.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.load.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.load.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.noConfusionType	ConfTyping.MemFree	
+ConfTyping.FCmd.recOn	ConfTyping.MemFree	
+ConfTyping.FCmd.seq.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.seq.noConfusion	ConfTyping.MemFree	
+ConfTyping.FCmd.skip.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.store.elim	ConfTyping.MemFree	
+ConfTyping.FCmd.store.noConfusion	ConfTyping.MemFree	
+ConfTyping.FInv	ConfTyping.MemFree	
+ConfTyping.FLCmd.access.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.access.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.alloc.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.alloc.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.below	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.brecOn	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.brecOn.eq	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.brecOn.go	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.casesOn	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.ctorElim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.ctorElimType	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.ctorIdx	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.data.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.data.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.free.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.free.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.ite.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.ite.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.loop.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.loop.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.noConfusionType	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.recOn	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.seq.elim	ConfTyping.FreeLoop	
+ConfTyping.FLCmd.seq.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLInv	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.FLInv_mono	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.FLRes.bind	ConfTyping.FreeLoop	
+ConfTyping.FLRes.casesOn	ConfTyping.FreeLoop	
+ConfTyping.FLRes.ctorElim	ConfTyping.FreeLoop	
+ConfTyping.FLRes.ctorElimType	ConfTyping.FreeLoop	
+ConfTyping.FLRes.ctorIdx	ConfTyping.FreeLoop	
+ConfTyping.FLRes.err.elim	ConfTyping.FreeLoop	
+ConfTyping.FLRes.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLRes.noConfusionType	ConfTyping.FreeLoop	
+ConfTyping.FLRes.ok.elim	ConfTyping.FreeLoop	
+ConfTyping.FLRes.ok.noConfusion	ConfTyping.FreeLoop	
+ConfTyping.FLRes.recOn	ConfTyping.FreeLoop	
+ConfTyping.FLRes.to.elim	ConfTyping.FreeLoop	
+ConfTyping.FLState	ConfTyping.FreeLoop	
+ConfTyping.FPdouble	ConfTyping.MemFree	
+ConfTyping.FPsafe	ConfTyping.MemFree	
+ConfTyping.FPuaf	ConfTyping.MemFree	
+ConfTyping.FState	ConfTyping.MemFree	
+ConfTyping.Footprint	ConfTyping.CNReceive	
+ConfTyping.Frame	ConfTyping.CNReceive	
+ConfTyping.FullCert.bundle	ConfTyping.FullCert	
+ConfTyping.FullCert.casesOn	ConfTyping.FullCert	
+ConfTyping.FullCert.joint	ConfTyping.FullCert	
+ConfTyping.FullCert.recOn	ConfTyping.FullCert	
+ConfTyping.FusedInv.casesOn	ConfTyping.SpecFused	
+ConfTyping.FusedInv.initU	ConfTyping.SpecFused	propext
+ConfTyping.FusedInv.lab	ConfTyping.SpecFused	
+ConfTyping.FusedInv.lab'	ConfTyping.SpecFused	
+ConfTyping.FusedInv.low	ConfTyping.SpecFused	
+ConfTyping.FusedInv.ptr	ConfTyping.SpecFused	
+ConfTyping.FusedInv.recOn	ConfTyping.SpecFused	
+ConfTyping.FusedInv.run	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.FusedInv.sep	ConfTyping.SpecFused	
+ConfTyping.FusedInv.sep'	ConfTyping.SpecFused	
+ConfTyping.FusedInv.step	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.GCh.c.elim	ConfTyping.LogInjection	
+ConfTyping.GCh.c.noConfusion	ConfTyping.LogInjection	
+ConfTyping.GCh.casesOn	ConfTyping.LogInjection	
+ConfTyping.GCh.ctorElim	ConfTyping.LogInjection	
+ConfTyping.GCh.ctorElimType	ConfTyping.LogInjection	
+ConfTyping.GCh.ctorIdx	ConfTyping.LogInjection	
+ConfTyping.GCh.nl.elim	ConfTyping.LogInjection	
+ConfTyping.GCh.noConfusion	ConfTyping.LogInjection	
+ConfTyping.GCh.noConfusionType	ConfTyping.LogInjection	
+ConfTyping.GCh.recOn	ConfTyping.LogInjection	
+ConfTyping.Gen	ConfTyping.Obs	
+ConfTyping.GenJoint	ConfTyping.Joint	
+ConfTyping.GrowsBy	ConfTyping.BoundedCert	
+ConfTyping.HCmd.assign.elim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.assign.noConfusion	ConfTyping.HeapFlow	
+ConfTyping.HCmd.below	ConfTyping.HeapFlow	
+ConfTyping.HCmd.brecOn	ConfTyping.HeapFlow	
+ConfTyping.HCmd.brecOn.eq	ConfTyping.HeapFlow	
+ConfTyping.HCmd.brecOn.go	ConfTyping.HeapFlow	
+ConfTyping.HCmd.casesOn	ConfTyping.HeapFlow	
+ConfTyping.HCmd.ctorElim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.ctorElimType	ConfTyping.HeapFlow	
+ConfTyping.HCmd.ctorIdx	ConfTyping.HeapFlow	
+ConfTyping.HCmd.ite.elim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.ite.noConfusion	ConfTyping.HeapFlow	
+ConfTyping.HCmd.load.elim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.load.noConfusion	ConfTyping.HeapFlow	
+ConfTyping.HCmd.noConfusion	ConfTyping.HeapFlow	
+ConfTyping.HCmd.noConfusionType	ConfTyping.HeapFlow	
+ConfTyping.HCmd.recOn	ConfTyping.HeapFlow	
+ConfTyping.HCmd.seq.elim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.seq.noConfusion	ConfTyping.HeapFlow	
+ConfTyping.HCmd.skip.elim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.store.elim	ConfTyping.HeapFlow	
+ConfTyping.HCmd.store.noConfusion	ConfTyping.HeapFlow	
+ConfTyping.HLCmd.access.elim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.access.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.alloc.elim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.alloc.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.below	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.brecOn	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.brecOn.eq	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.brecOn.go	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.casesOn	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.ctorElim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.ctorElimType	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.ctorIdx	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.data.elim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.data.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.ite.elim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.ite.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.loop.elim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.loop.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.noConfusionType	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.recOn	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.seq.elim	ConfTyping.HeapLoop	
+ConfTyping.HLCmd.seq.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.casesOn	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.ctorElim	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.ctorElimType	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.ctorIdx	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.lit.elim	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.lit.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.noConfusionType	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.recOn	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.var.elim	ConfTyping.HeapLoop	
+ConfTyping.HLExpr.var.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HLInv	ConfTyping.HeapLoop	
+ConfTyping.HLState	ConfTyping.HeapLoop	
+ConfTyping.HLoc	ConfTyping.HeapLoop	
+ConfTyping.HOp.casesOn	ConfTyping.Unified	
+ConfTyping.HOp.ctorElim	ConfTyping.Unified	
+ConfTyping.HOp.ctorElimType	ConfTyping.Unified	
+ConfTyping.HOp.ctorIdx	ConfTyping.Unified	
+ConfTyping.HOp.load.elim	ConfTyping.Unified	
+ConfTyping.HOp.noConfusion	ConfTyping.Unified	
+ConfTyping.HOp.noConfusionType	ConfTyping.Unified	
+ConfTyping.HOp.ofNat	ConfTyping.Unified	
+ConfTyping.HOp.ofNat_ctorIdx	ConfTyping.Unified	
+ConfTyping.HOp.recOn	ConfTyping.Unified	
+ConfTyping.HOp.store.elim	ConfTyping.Unified	
+ConfTyping.HPleak	ConfTyping.HeapFlow	
+ConfTyping.HPsafe	ConfTyping.HeapFlow	
+ConfTyping.HRes.bind	ConfTyping.HeapLoop	
+ConfTyping.HRes.casesOn	ConfTyping.HeapLoop	
+ConfTyping.HRes.ctorElim	ConfTyping.HeapLoop	
+ConfTyping.HRes.ctorElimType	ConfTyping.HeapLoop	
+ConfTyping.HRes.ctorIdx	ConfTyping.HeapLoop	
+ConfTyping.HRes.err.elim	ConfTyping.HeapLoop	
+ConfTyping.HRes.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HRes.noConfusionType	ConfTyping.HeapLoop	
+ConfTyping.HRes.ok.elim	ConfTyping.HeapLoop	
+ConfTyping.HRes.ok.noConfusion	ConfTyping.HeapLoop	
+ConfTyping.HRes.recOn	ConfTyping.HeapLoop	
+ConfTyping.HRes.to.elim	ConfTyping.HeapLoop	
+ConfTyping.HSecTy.below.casesOn	ConfTyping.HeapFlow	
+ConfTyping.HSecTy.brecOn	ConfTyping.HeapFlow	
+ConfTyping.HSecTy.casesOn	ConfTyping.HeapFlow	
+ConfTyping.HSecTy.recOn	ConfTyping.HeapFlow	
+ConfTyping.Heap	ConfTyping.MemSafe	
+ConfTyping.IHeap	ConfTyping.HeapFlow	
+ConfTyping.IState	ConfTyping.HeapFlow	
+ConfTyping.InfluencedAtMost	ConfTyping.Integrity	
+ConfTyping.Inv	ConfTyping.MemSafe	
+ConfTyping.JAssume.casesOn	ConfTyping.IndexedBases	
+ConfTyping.JAssume.ctorElim	ConfTyping.IndexedBases	
+ConfTyping.JAssume.ctorElimType	ConfTyping.IndexedBases	
+ConfTyping.JAssume.ctorIdx	ConfTyping.IndexedBases	
+ConfTyping.JAssume.embed	ConfTyping.CrossToolIndex	
+ConfTyping.JAssume.noConfusion	ConfTyping.IndexedBases	
+ConfTyping.JAssume.noConfusionType	ConfTyping.IndexedBases	
+ConfTyping.JAssume.ofNat	ConfTyping.IndexedBases	
+ConfTyping.JAssume.ofNat_ctorIdx	ConfTyping.IndexedBases	
+ConfTyping.JAssume.preservation.elim	ConfTyping.IndexedBases	
+ConfTyping.JAssume.recOn	ConfTyping.IndexedBases	
+ConfTyping.JAssume.specSem.elim	ConfTyping.IndexedBases	
+ConfTyping.JAssume.typeSystem.elim	ConfTyping.IndexedBases	
+ConfTyping.JNI_is_rel	ConfTyping.TwoSafety	
+ConfTyping.JNI_postproc	ConfTyping.Obs	
+ConfTyping.JNI_separable	ConfTyping.Obs	
+ConfTyping.JSecTy.below.casesOn	ConfTyping.HeapJoint	
+ConfTyping.JSecTy.brecOn	ConfTyping.HeapJoint	
+ConfTyping.JSecTy.casesOn	ConfTyping.HeapJoint	
+ConfTyping.JSecTy.forU	ConfTyping.CountedLoop	propext
+ConfTyping.JSecTy.recOn	ConfTyping.HeapJoint	
+ConfTyping.JSecTy.toLabInv	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.JSecTy.toSepCert	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.JTy	ConfTyping.Obs	
+ConfTyping.JWorld.casesOn	ConfTyping.JasminLedger	
+ConfTyping.JWorld.claim	ConfTyping.JasminLedger	
+ConfTyping.JWorld.ctorIdx	ConfTyping.JasminLedger	
+ConfTyping.JWorld.mk.noConfusion	ConfTyping.JasminLedger	
+ConfTyping.JWorld.noConfusion	ConfTyping.JasminLedger	
+ConfTyping.JWorld.noConfusionType	ConfTyping.JasminLedger	
+ConfTyping.JWorld.reading	ConfTyping.JasminLedger	
+ConfTyping.JWorld.recOn	ConfTyping.JasminLedger	
+ConfTyping.JWorld.trust	ConfTyping.JasminLedger	
+ConfTyping.J_NI	ConfTyping.Obs	
+ConfTyping.J_pred	ConfTyping.Integrity	
+ConfTyping.J_rel	ConfTyping.TwoSafety	
+ConfTyping.J_rel3	ConfTyping.TwoSafety	
+ConfTyping.J_taint	ConfTyping.Integrity	
+ConfTyping.JasminCert.casesOn	ConfTyping.JasminCert	
+ConfTyping.JasminCert.corruption	ConfTyping.JasminCert	
+ConfTyping.JasminCert.ctorIdx	ConfTyping.JasminCert	
+ConfTyping.JasminCert.fn	ConfTyping.JasminCert	
+ConfTyping.JasminCert.mk.noConfusion	ConfTyping.JasminCert	
+ConfTyping.JasminCert.modmsf	ConfTyping.JasminCert	
+ConfTyping.JasminCert.noConfusion	ConfTyping.JasminCert	
+ConfTyping.JasminCert.noConfusionType	ConfTyping.JasminCert	
+ConfTyping.JasminCert.outLvl	ConfTyping.JasminCert	
+ConfTyping.JasminCert.recOn	ConfTyping.JasminCert	
+ConfTyping.JasminClaim.asmSCT	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.casesOn	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.ctorIdx	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.mk.noConfusion	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.noConfusion	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.noConfusionType	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.recOn	ConfTyping.JasminLedger	
+ConfTyping.JasminClaim.sourceSCT	ConfTyping.JasminLedger	
+ConfTyping.JasminReading.asm_of_preservation	ConfTyping.JasminLedger	
+ConfTyping.JasminReading.casesOn	ConfTyping.JasminLedger	
+ConfTyping.JasminReading.recOn	ConfTyping.JasminLedger	
+ConfTyping.JasminReading.source_of_typeSystem	ConfTyping.JasminLedger	
+ConfTyping.JasminTrust.casesOn	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.ctorIdx	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.fixedBase	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.interp	ConfTyping.IndexedBases	
+ConfTyping.JasminTrust.mk.noConfusion	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.needs	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.needsI	ConfTyping.IndexedBases	
+ConfTyping.JasminTrust.noConfusion	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.noConfusionType	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.preservation	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.recOn	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.specSem	ConfTyping.JasminCert	
+ConfTyping.JasminTrust.typeSystem	ConfTyping.JasminCert	
+ConfTyping.Jtaint_postproc	ConfTyping.Integrity	
+ConfTyping.Jtaint_separable	ConfTyping.Integrity	
+ConfTyping.LCh.casesOn	ConfTyping.LexSource	
+ConfTyping.LCh.cc.elim	ConfTyping.LexSource	
+ConfTyping.LCh.cd.elim	ConfTyping.LexSource	
+ConfTyping.LCh.cd.noConfusion	ConfTyping.LexSource	
+ConfTyping.LCh.ce.elim	ConfTyping.LexSource	
+ConfTyping.LCh.ci.elim	ConfTyping.LexSource	
+ConfTyping.LCh.csemi.elim	ConfTyping.LexSource	
+ConfTyping.LCh.csp.elim	ConfTyping.LexSource	
+ConfTyping.LCh.ct.elim	ConfTyping.LexSource	
+ConfTyping.LCh.ctorElim	ConfTyping.LexSource	
+ConfTyping.LCh.ctorElimType	ConfTyping.LexSource	
+ConfTyping.LCh.ctorIdx	ConfTyping.LexSource	
+ConfTyping.LCh.noConfusion	ConfTyping.LexSource	
+ConfTyping.LCh.noConfusionType	ConfTyping.LexSource	
+ConfTyping.LCh.recOn	ConfTyping.LexSource	
+ConfTyping.LSecTy.below.casesOn	ConfTyping.LatticeFlow	
+ConfTyping.LSecTy.brecOn	ConfTyping.LatticeFlow	
+ConfTyping.LSecTy.casesOn	ConfTyping.LatticeFlow	
+ConfTyping.LSecTy.recOn	ConfTyping.LatticeFlow	
+ConfTyping.LabInv	ConfTyping.HeapJoint	
+ConfTyping.LabInv.initU	ConfTyping.HeapJoint	propext
+ConfTyping.LabInv.mono	ConfTyping.HeapJoint	
+ConfTyping.LabStable	ConfTyping.HeapJoint	
+ConfTyping.LeakFree	ConfTyping.LeakCert	
+ConfTyping.Leaky	ConfTyping.Pipeline	
+ConfTyping.Ledger	ConfTyping.Ledger	
+ConfTyping.LedgerSize	ConfTyping.LoadBearing	
+ConfTyping.LoadBearing	ConfTyping.LoadBearing	
+ConfTyping.LoadBearingAt	ConfTyping.LoadBearing	
+ConfTyping.Loc	ConfTyping.DbInjection	
+ConfTyping.Log	ConfTyping.SupplyChain	
+ConfTyping.LogStr	ConfTyping.LogInjection	
+ConfTyping.LoopAlloc	ConfTyping.HeapLoop	
+ConfTyping.LoopWild	ConfTyping.HeapLoop	
+ConfTyping.LowQuery	ConfTyping.FlowBridge	
+ConfTyping.Lvl.casesOn	ConfTyping.JasminSCT	
+ConfTyping.Lvl.ctorElim	ConfTyping.JasminSCT	
+ConfTyping.Lvl.ctorElimType	ConfTyping.JasminSCT	
+ConfTyping.Lvl.ctorIdx	ConfTyping.JasminSCT	
+ConfTyping.Lvl.join	ConfTyping.JasminSCT	
+ConfTyping.Lvl.join_assoc	ConfTyping.JasminSCT	
+ConfTyping.Lvl.noConfusion	ConfTyping.JasminSCT	
+ConfTyping.Lvl.noConfusionType	ConfTyping.JasminSCT	
+ConfTyping.Lvl.ofNat	ConfTyping.JasminSCT	
+ConfTyping.Lvl.ofNat_ctorIdx	ConfTyping.JasminSCT	
+ConfTyping.Lvl.pub.elim	ConfTyping.JasminSCT	
+ConfTyping.Lvl.recOn	ConfTyping.JasminSCT	
+ConfTyping.Lvl.sec.elim	ConfTyping.JasminSCT	
+ConfTyping.MCmd.alloc.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.alloc.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MCmd.assign.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.assign.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MCmd.below	ConfTyping.MemSafe	
+ConfTyping.MCmd.brecOn	ConfTyping.MemSafe	
+ConfTyping.MCmd.brecOn.eq	ConfTyping.MemSafe	
+ConfTyping.MCmd.brecOn.go	ConfTyping.MemSafe	
+ConfTyping.MCmd.casesOn	ConfTyping.MemSafe	
+ConfTyping.MCmd.ctorElim	ConfTyping.MemSafe	
+ConfTyping.MCmd.ctorElimType	ConfTyping.MemSafe	
+ConfTyping.MCmd.ctorIdx	ConfTyping.MemSafe	
+ConfTyping.MCmd.ite.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.ite.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MCmd.load.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.load.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MCmd.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MCmd.noConfusionType	ConfTyping.MemSafe	
+ConfTyping.MCmd.recOn	ConfTyping.MemSafe	
+ConfTyping.MCmd.seq.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.seq.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MCmd.skip.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.store.elim	ConfTyping.MemSafe	
+ConfTyping.MCmd.store.noConfusion	ConfTyping.MemSafe	
+ConfTyping.MPsafe	ConfTyping.MemSafe	
+ConfTyping.MPwild	ConfTyping.MemSafe	
+ConfTyping.MState	ConfTyping.MemSafe	
+ConfTyping.MaintainLoop	ConfTyping.AliasFix	
+ConfTyping.MedBase.access.elim	ConfTyping.Mediation	
+ConfTyping.MedBase.access.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedBase.casesOn	ConfTyping.Mediation	
+ConfTyping.MedBase.check.elim	ConfTyping.Mediation	
+ConfTyping.MedBase.check.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedBase.ctorElim	ConfTyping.Mediation	
+ConfTyping.MedBase.ctorElimType	ConfTyping.Mediation	
+ConfTyping.MedBase.ctorIdx	ConfTyping.Mediation	
+ConfTyping.MedBase.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedBase.noConfusionType	ConfTyping.Mediation	
+ConfTyping.MedBase.pub.elim	ConfTyping.Mediation	
+ConfTyping.MedBase.recOn	ConfTyping.Mediation	
+ConfTyping.MedGoal	ConfTyping.LoadBearing	
+ConfTyping.MedInstr.base.elim	ConfTyping.Mediation	
+ConfTyping.MedInstr.base.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedInstr.branch.elim	ConfTyping.Mediation	
+ConfTyping.MedInstr.branch.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedInstr.casesOn	ConfTyping.Mediation	
+ConfTyping.MedInstr.ctorElim	ConfTyping.Mediation	
+ConfTyping.MedInstr.ctorElimType	ConfTyping.Mediation	
+ConfTyping.MedInstr.ctorIdx	ConfTyping.Mediation	
+ConfTyping.MedInstr.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedInstr.noConfusionType	ConfTyping.Mediation	
+ConfTyping.MedInstr.recOn	ConfTyping.Mediation	
+ConfTyping.MedInv	ConfTyping.Mediation	
+ConfTyping.MedPolicy	ConfTyping.Mediation	
+ConfTyping.MedState.auth	ConfTyping.Mediation	
+ConfTyping.MedState.casesOn	ConfTyping.Mediation	
+ConfTyping.MedState.ctorIdx	ConfTyping.Mediation	
+ConfTyping.MedState.dead	ConfTyping.Mediation	
+ConfTyping.MedState.mk.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedState.noConfusion	ConfTyping.Mediation	
+ConfTyping.MedState.noConfusionType	ConfTyping.Mediation	
+ConfTyping.MedState.reads	ConfTyping.Mediation	
+ConfTyping.MedState.recOn	ConfTyping.Mediation	
+ConfTyping.Mediated	ConfTyping.Mediation	
+ConfTyping.Mem	ConfTyping.Speculate	
+ConfTyping.MemCert.access	ConfTyping.MemCert	propext
+ConfTyping.MemCert.alloc	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.MemCert.allocS	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.MemCert.assign	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.MemCert.casesOn	ConfTyping.MemCert	
+ConfTyping.MemCert.check	ConfTyping.MemCert	propext
+ConfTyping.MemCert.deref	ConfTyping.MemCert	propext
+ConfTyping.MemCert.ite	ConfTyping.MemCert	propext
+ConfTyping.MemCert.recOn	ConfTyping.MemCert	
+ConfTyping.MemCert.safe	ConfTyping.MemCert	
+ConfTyping.MemCert.seq	ConfTyping.MemCert	propext
+ConfTyping.MemCert.skip	ConfTyping.MemCert	propext
+ConfTyping.MemInv	ConfTyping.MemCert	
+ConfTyping.MemOp.alloc.elim	ConfTyping.Unified	
+ConfTyping.MemOp.allocS.elim	ConfTyping.Unified	
+ConfTyping.MemOp.casesOn	ConfTyping.Unified	
+ConfTyping.MemOp.ctorElim	ConfTyping.Unified	
+ConfTyping.MemOp.ctorElimType	ConfTyping.Unified	
+ConfTyping.MemOp.ctorIdx	ConfTyping.Unified	
+ConfTyping.MemOp.deref.elim	ConfTyping.Unified	
+ConfTyping.MemOp.free.elim	ConfTyping.Unified	
+ConfTyping.MemOp.noConfusion	ConfTyping.Unified	
+ConfTyping.MemOp.noConfusionType	ConfTyping.Unified	
+ConfTyping.MemOp.ofNat	ConfTyping.Unified	
+ConfTyping.MemOp.ofNat_ctorIdx	ConfTyping.Unified	
+ConfTyping.MemOp.recOn	ConfTyping.Unified	
+ConfTyping.Minimal	ConfTyping.LoadBearing	
+ConfTyping.ModifiesOnly	ConfTyping.CNReceive	
+ConfTyping.Multiplex	ConfTyping.Pipeline	
+ConfTyping.NestedProg	ConfTyping.AliasFix	
+ConfTyping.NonNeg	ConfTyping.Race	
+ConfTyping.OO	ConfTyping.Obs	
+ConfTyping.OStore	ConfTyping.WhileBridge	
+ConfTyping.Obs	ConfTyping.Obs	
+ConfTyping.OutNI	ConfTyping.SecTyT	
+ConfTyping.OutReleases	ConfTyping.SecTyTD	
+ConfTyping.Outcome	ConfTyping.Obs	
+ConfTyping.Owned	ConfTyping.LeakCert	
+ConfTyping.Owned.congr	ConfTyping.LeakCert	Quot.sound,propext
+ConfTyping.Owned.transport	ConfTyping.LeakCert	
+ConfTyping.Owned.weaken	ConfTyping.LeakCert	propext
+ConfTyping.PStep.casesOn	ConfTyping.PathTraversal	
+ConfTyping.PStep.ctorElim	ConfTyping.PathTraversal	
+ConfTyping.PStep.ctorElimType	ConfTyping.PathTraversal	
+ConfTyping.PStep.ctorIdx	ConfTyping.PathTraversal	
+ConfTyping.PStep.down.elim	ConfTyping.PathTraversal	
+ConfTyping.PStep.down.noConfusion	ConfTyping.PathTraversal	
+ConfTyping.PStep.noConfusion	ConfTyping.PathTraversal	
+ConfTyping.PStep.noConfusionType	ConfTyping.PathTraversal	
+ConfTyping.PStep.recOn	ConfTyping.PathTraversal	
+ConfTyping.PStep.up.elim	ConfTyping.PathTraversal	
+ConfTyping.PairClosed	ConfTyping.TwoSafety	
+ConfTyping.Pall	ConfTyping.HeapFlow	
+ConfTyping.ParamImmune	ConfTyping.QueryEscape	
+ConfTyping.Part	ConfTyping.AliasLoop	
+ConfTyping.Partition	ConfTyping.Imp	
+ConfTyping.PathCert.access	ConfTyping.PathCert	propext
+ConfTyping.PathCert.assign	ConfTyping.PathCert	propext
+ConfTyping.PathCert.casesOn	ConfTyping.PathCert	
+ConfTyping.PathCert.check	ConfTyping.PathCert	propext
+ConfTyping.PathCert.emit	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.PathCert.emitElsewhere	ConfTyping.PathCert	propext
+ConfTyping.PathCert.env	ConfTyping.PathCert	
+ConfTyping.PathCert.hop	ConfTyping.PathCert	propext
+ConfTyping.PathCert.inert	ConfTyping.PathCert	
+ConfTyping.PathCert.ite	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.PathCert.loop	ConfTyping.StringLoop	propext
+ConfTyping.PathCert.memop	ConfTyping.PathCert	propext
+ConfTyping.PathCert.path	ConfTyping.PathCert	
+ConfTyping.PathCert.recOn	ConfTyping.PathCert	
+ConfTyping.PathCert.seq	ConfTyping.PathCert	propext
+ConfTyping.PathCert.set	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.PathCert.setUnknown	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.PathCert.skip	ConfTyping.PathCert	propext
+ConfTyping.PathCert.strengthenPre	ConfTyping.StringLoop	
+ConfTyping.PathCert.weakenPost	ConfTyping.StringLoop	
+ConfTyping.Permit.casesOn	ConfTyping.SecTyD	
+ConfTyping.Permit.ctorElim	ConfTyping.SecTyD	
+ConfTyping.Permit.ctorElimType	ConfTyping.SecTyD	
+ConfTyping.Permit.ctorIdx	ConfTyping.SecTyD	
+ConfTyping.Permit.expr.elim	ConfTyping.SecTyD	
+ConfTyping.Permit.expr.noConfusion	ConfTyping.SecTyD	
+ConfTyping.Permit.guard.elim	ConfTyping.SecTyD	
+ConfTyping.Permit.guard.noConfusion	ConfTyping.SecTyD	
+ConfTyping.Permit.noConfusion	ConfTyping.SecTyD	
+ConfTyping.Permit.noConfusionType	ConfTyping.SecTyD	
+ConfTyping.Permit.recOn	ConfTyping.SecTyD	
+ConfTyping.Pfull	ConfTyping.Pleak	
+ConfTyping.Pheap	ConfTyping.HeapWiden	
+ConfTyping.Phigh	ConfTyping.Pleak	
+ConfTyping.Phigh_false	ConfTyping.Pleak	propext
+ConfTyping.Phx	ConfTyping.Ledger	
+ConfTyping.PiLeak	ConfTyping.Typing	
+ConfTyping.Pleak	ConfTyping.Pleak	
+ConfTyping.Pok	ConfTyping.SecTy	
+ConfTyping.Policy	ConfTyping.Typing	
+ConfTyping.PolicyIntended	ConfTyping.BundleLedger	
+ConfTyping.PoolPreserves	ConfTyping.Race	
+ConfTyping.PostClosed	ConfTyping.TwoSafety	
+ConfTyping.PostClosed3	ConfTyping.TwoSafety	
+ConfTyping.Preserves	ConfTyping.Race	
+ConfTyping.Prog	ConfTyping.AliasFix	
+ConfTyping.Psafe	ConfTyping.SupplyChain	
+ConfTyping.Psec	ConfTyping.UnifiedNI	
+ConfTyping.Psec_rejects_leaks	ConfTyping.UnifiedNI	propext
+ConfTyping.PtenantA	ConfTyping.Pipeline	
+ConfTyping.PtenantB	ConfTyping.Pipeline	
+ConfTyping.Ptime	ConfTyping.SecTy	
+ConfTyping.PtrLow	ConfTyping.SpecTrace	
+ConfTyping.PtrLow.mono	ConfTyping.SpecFused	
+ConfTyping.Ptwo	ConfTyping.HeapAttack	
+ConfTyping.QCmd.below	ConfTyping.QueryProgram	
+ConfTyping.QCmd.brecOn	ConfTyping.QueryProgram	
+ConfTyping.QCmd.brecOn.eq	ConfTyping.QueryProgram	
+ConfTyping.QCmd.brecOn.go	ConfTyping.QueryProgram	
+ConfTyping.QCmd.casesOn	ConfTyping.QueryProgram	
+ConfTyping.QCmd.concat.elim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.concat.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QCmd.ctorElim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.ctorElimType	ConfTyping.QueryProgram	
+ConfTyping.QCmd.ctorIdx	ConfTyping.QueryProgram	
+ConfTyping.QCmd.emitC.elim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.emitC.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QCmd.emitP.elim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.emitP.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QCmd.input.elim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.input.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QCmd.lit.elim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.lit.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QCmd.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QCmd.noConfusionType	ConfTyping.QueryProgram	
+ConfTyping.QCmd.recOn	ConfTyping.QueryProgram	
+ConfTyping.QCmd.seq.elim	ConfTyping.QueryProgram	
+ConfTyping.QCmd.seq.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QD	ConfTyping.FlowBridge	
+ConfTyping.QRel	ConfTyping.QueryProgram	
+ConfTyping.QState.casesOn	ConfTyping.QueryProgram	
+ConfTyping.QState.ctorIdx	ConfTyping.QueryProgram	
+ConfTyping.QState.mk.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QState.noConfusion	ConfTyping.QueryProgram	
+ConfTyping.QState.noConfusionType	ConfTyping.QueryProgram	
+ConfTyping.QState.out	ConfTyping.QueryProgram	
+ConfTyping.QState.recOn	ConfTyping.QueryProgram	
+ConfTyping.QState.store	ConfTyping.QueryProgram	
+ConfTyping.QStore	ConfTyping.QueryProgram	
+ConfTyping.Qsecret	ConfTyping.HeapFlow	
+ConfTyping.Query	ConfTyping.FlowBridge	
+ConfTyping.RBase.casesOn	ConfTyping.Race	
+ConfTyping.RBase.ctorElim	ConfTyping.Race	
+ConfTyping.RBase.ctorElimType	ConfTyping.Race	
+ConfTyping.RBase.ctorIdx	ConfTyping.Race	
+ConfTyping.RBase.decsh.elim	ConfTyping.Race	
+ConfTyping.RBase.decsh.noConfusion	ConfTyping.Race	
+ConfTyping.RBase.guard.elim	ConfTyping.Race	
+ConfTyping.RBase.guard.noConfusion	ConfTyping.Race	
+ConfTyping.RBase.load.elim	ConfTyping.Race	
+ConfTyping.RBase.load.noConfusion	ConfTyping.Race	
+ConfTyping.RBase.noConfusion	ConfTyping.Race	
+ConfTyping.RBase.noConfusionType	ConfTyping.Race	
+ConfTyping.RBase.recOn	ConfTyping.Race	
+ConfTyping.RBase.store.elim	ConfTyping.Race	
+ConfTyping.RBase.store.noConfusion	ConfTyping.Race	
+ConfTyping.RCfg.casesOn	ConfTyping.Race	
+ConfTyping.RCfg.ctorIdx	ConfTyping.Race	
+ConfTyping.RCfg.mk.noConfusion	ConfTyping.Race	
+ConfTyping.RCfg.noConfusion	ConfTyping.Race	
+ConfTyping.RCfg.noConfusionType	ConfTyping.Race	
+ConfTyping.RCfg.pool	ConfTyping.Race	
+ConfTyping.RCfg.recOn	ConfTyping.Race	
+ConfTyping.RCfg.sh	ConfTyping.Race	
+ConfTyping.RCh.casesOn	ConfTyping.LexReal	
+ConfTyping.RCh.ctorElim	ConfTyping.LexReal	
+ConfTyping.RCh.ctorElimType	ConfTyping.LexReal	
+ConfTyping.RCh.ctorIdx	ConfTyping.LexReal	
+ConfTyping.RCh.dg.elim	ConfTyping.LexReal	
+ConfTyping.RCh.la.elim	ConfTyping.LexReal	
+ConfTyping.RCh.lc.elim	ConfTyping.LexReal	
+ConfTyping.RCh.le.elim	ConfTyping.LexReal	
+ConfTyping.RCh.li.elim	ConfTyping.LexReal	
+ConfTyping.RCh.lm.elim	ConfTyping.LexReal	
+ConfTyping.RCh.ln.elim	ConfTyping.LexReal	
+ConfTyping.RCh.lo.elim	ConfTyping.LexReal	
+ConfTyping.RCh.noConfusion	ConfTyping.LexReal	
+ConfTyping.RCh.noConfusionType	ConfTyping.LexReal	
+ConfTyping.RCh.ofNat	ConfTyping.LexReal	
+ConfTyping.RCh.ofNat_ctorIdx	ConfTyping.LexReal	
+ConfTyping.RCh.recOn	ConfTyping.LexReal	
+ConfTyping.RCh.rsemi.elim	ConfTyping.LexReal	
+ConfTyping.RCh.rsp.elim	ConfTyping.LexReal	
+ConfTyping.RInstr.atom.elim	ConfTyping.Race	
+ConfTyping.RInstr.atom.noConfusion	ConfTyping.Race	
+ConfTyping.RInstr.base.elim	ConfTyping.Race	
+ConfTyping.RInstr.base.noConfusion	ConfTyping.Race	
+ConfTyping.RInstr.casesOn	ConfTyping.Race	
+ConfTyping.RInstr.ctorElim	ConfTyping.Race	
+ConfTyping.RInstr.ctorElimType	ConfTyping.Race	
+ConfTyping.RInstr.ctorIdx	ConfTyping.Race	
+ConfTyping.RInstr.noConfusion	ConfTyping.Race	
+ConfTyping.RInstr.noConfusionType	ConfTyping.Race	
+ConfTyping.RInstr.recOn	ConfTyping.Race	
+ConfTyping.RThread	ConfTyping.Race	
+ConfTyping.Rbad	ConfTyping.TwoSafety	propext
+ConfTyping.Rbad_nonseparable	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.Rbad_not_pairClosed	ConfTyping.TwoSafety	propext
+ConfTyping.Reconciles	ConfTyping.HeteroCompose	
+ConfTyping.Regs	ConfTyping.Race	
+ConfTyping.Release	ConfTyping.Obs	
+ConfTyping.ReleasesAtMost	ConfTyping.Obs	
+ConfTyping.RespectsCoarsening	ConfTyping.TwoSafety	
+ConfTyping.SBase.casesOn	ConfTyping.Speculate	
+ConfTyping.SBase.ctorElim	ConfTyping.Speculate	
+ConfTyping.SBase.ctorElimType	ConfTyping.Speculate	
+ConfTyping.SBase.ctorIdx	ConfTyping.Speculate	
+ConfTyping.SBase.fence.elim	ConfTyping.Speculate	
+ConfTyping.SBase.loadIdx.elim	ConfTyping.Speculate	
+ConfTyping.SBase.loadIdx.noConfusion	ConfTyping.Speculate	
+ConfTyping.SBase.loadK.elim	ConfTyping.Speculate	
+ConfTyping.SBase.loadK.noConfusion	ConfTyping.Speculate	
+ConfTyping.SBase.noConfusion	ConfTyping.Speculate	
+ConfTyping.SBase.noConfusionType	ConfTyping.Speculate	
+ConfTyping.SBase.recOn	ConfTyping.Speculate	
+ConfTyping.SCmd.below	ConfTyping.ParseSource	
+ConfTyping.SCmd.brecOn	ConfTyping.ParseSource	
+ConfTyping.SCmd.brecOn.eq	ConfTyping.ParseSource	
+ConfTyping.SCmd.brecOn.go	ConfTyping.ParseSource	
+ConfTyping.SCmd.casesOn	ConfTyping.ParseSource	
+ConfTyping.SCmd.ctorElim	ConfTyping.ParseSource	
+ConfTyping.SCmd.ctorElimType	ConfTyping.ParseSource	
+ConfTyping.SCmd.ctorIdx	ConfTyping.ParseSource	
+ConfTyping.SCmd.noConfusion	ConfTyping.ParseSource	
+ConfTyping.SCmd.noConfusionType	ConfTyping.ParseSource	
+ConfTyping.SCmd.one.elim	ConfTyping.ParseSource	
+ConfTyping.SCmd.one.noConfusion	ConfTyping.ParseSource	
+ConfTyping.SCmd.recOn	ConfTyping.ParseSource	
+ConfTyping.SCmd.seq.elim	ConfTyping.ParseSource	
+ConfTyping.SCmd.seq.noConfusion	ConfTyping.ParseSource	
+ConfTyping.SExpr.below	ConfTyping.Unified	
+ConfTyping.SExpr.brecOn	ConfTyping.Unified	
+ConfTyping.SExpr.brecOn.eq	ConfTyping.Unified	
+ConfTyping.SExpr.brecOn.go	ConfTyping.Unified	
+ConfTyping.SExpr.casesOn	ConfTyping.Unified	
+ConfTyping.SExpr.cat.elim	ConfTyping.Unified	
+ConfTyping.SExpr.cat.noConfusion	ConfTyping.Unified	
+ConfTyping.SExpr.ctorElim	ConfTyping.Unified	
+ConfTyping.SExpr.ctorElimType	ConfTyping.Unified	
+ConfTyping.SExpr.ctorIdx	ConfTyping.Unified	
+ConfTyping.SExpr.lit.elim	ConfTyping.Unified	
+ConfTyping.SExpr.lit.noConfusion	ConfTyping.Unified	
+ConfTyping.SExpr.noConfusion	ConfTyping.Unified	
+ConfTyping.SExpr.noConfusionType	ConfTyping.Unified	
+ConfTyping.SExpr.recOn	ConfTyping.Unified	
+ConfTyping.SExpr.san.elim	ConfTyping.Unified	
+ConfTyping.SExpr.san.noConfusion	ConfTyping.Unified	
+ConfTyping.SExpr.var.elim	ConfTyping.Unified	
+ConfTyping.SExpr.var.noConfusion	ConfTyping.Unified	
+ConfTyping.SInstr.base.elim	ConfTyping.Speculate	
+ConfTyping.SInstr.base.noConfusion	ConfTyping.Speculate	
+ConfTyping.SInstr.brLt.elim	ConfTyping.Speculate	
+ConfTyping.SInstr.brLt.noConfusion	ConfTyping.Speculate	
+ConfTyping.SInstr.casesOn	ConfTyping.Speculate	
+ConfTyping.SInstr.ctorElim	ConfTyping.Speculate	
+ConfTyping.SInstr.ctorElimType	ConfTyping.Speculate	
+ConfTyping.SInstr.ctorIdx	ConfTyping.Speculate	
+ConfTyping.SInstr.noConfusion	ConfTyping.Speculate	
+ConfTyping.SInstr.noConfusionType	ConfTyping.Speculate	
+ConfTyping.SInstr.recOn	ConfTyping.Speculate	
+ConfTyping.SLvl.casesOn	ConfTyping.JasminSCT	
+ConfTyping.SLvl.ctorIdx	ConfTyping.JasminSCT	
+ConfTyping.SLvl.join	ConfTyping.JasminSCT	
+ConfTyping.SLvl.le	ConfTyping.JasminSCT	
+ConfTyping.SLvl.mk.noConfusion	ConfTyping.JasminSCT	
+ConfTyping.SLvl.noConfusion	ConfTyping.JasminSCT	
+ConfTyping.SLvl.noConfusionType	ConfTyping.JasminSCT	
+ConfTyping.SLvl.normal	ConfTyping.JasminSCT	
+ConfTyping.SLvl.public	ConfTyping.JasminSCT	
+ConfTyping.SLvl.recOn	ConfTyping.JasminSCT	
+ConfTyping.SLvl.secret	ConfTyping.JasminSCT	
+ConfTyping.SLvl.spec	ConfTyping.JasminSCT	
+ConfTyping.SLvl.transient	ConfTyping.JasminSCT	
+ConfTyping.SOp.casesOn	ConfTyping.Unified	
+ConfTyping.SOp.ctorElim	ConfTyping.Unified	
+ConfTyping.SOp.ctorElimType	ConfTyping.Unified	
+ConfTyping.SOp.ctorIdx	ConfTyping.Unified	
+ConfTyping.SOp.emit.elim	ConfTyping.Unified	
+ConfTyping.SOp.noConfusion	ConfTyping.Unified	
+ConfTyping.SOp.noConfusionType	ConfTyping.Unified	
+ConfTyping.SOp.ofNat	ConfTyping.Unified	
+ConfTyping.SOp.ofNat_ctorIdx	ConfTyping.Unified	
+ConfTyping.SOp.recOn	ConfTyping.Unified	
+ConfTyping.SOp.set.elim	ConfTyping.Unified	
+ConfTyping.SRegs	ConfTyping.Speculate	
+ConfTyping.SRel	ConfTyping.ParseSource	
+ConfTyping.SState	ConfTyping.ParseSource	
+ConfTyping.SStore	ConfTyping.ParseSource	
+ConfTyping.Safe	ConfTyping.QueryProgram	
+ConfTyping.Sat	ConfTyping.Ledger	
+ConfTyping.Sched	ConfTyping.HeteroCompose	
+ConfTyping.SecLat.casesOn	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.ctorIdx	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.join	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.join_le_left	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.join_le_right	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.join_lub	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.le	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.le_refl	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.le_trans	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.mk.noConfusion	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.noConfusion	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.noConfusionType	ConfTyping.LatticeFlow	
+ConfTyping.SecLat.recOn	ConfTyping.LatticeFlow	
+ConfTyping.SecTy.below.casesOn	ConfTyping.SecTy	
+ConfTyping.SecTy.brecOn	ConfTyping.SecTy	
+ConfTyping.SecTy.casesOn	ConfTyping.SecTy	
+ConfTyping.SecTy.recOn	ConfTyping.SecTy	
+ConfTyping.SecTyD.below.casesOn	ConfTyping.SecTyD	
+ConfTyping.SecTyD.brecOn	ConfTyping.SecTyD	
+ConfTyping.SecTyD.casesOn	ConfTyping.SecTyD	
+ConfTyping.SecTyD.ofSecTy	ConfTyping.SecTyD	
+ConfTyping.SecTyD.recOn	ConfTyping.SecTyD	
+ConfTyping.SecTyT.below.casesOn	ConfTyping.SecTyT	
+ConfTyping.SecTyT.brecOn	ConfTyping.SecTyT	
+ConfTyping.SecTyT.casesOn	ConfTyping.SecTyT	
+ConfTyping.SecTyT.recOn	ConfTyping.SecTyT	
+ConfTyping.SecTyT.toSecTy	ConfTyping.SecTyT	
+ConfTyping.SecTyTD.below.casesOn	ConfTyping.SecTyTD	
+ConfTyping.SecTyTD.brecOn	ConfTyping.SecTyTD	
+ConfTyping.SecTyTD.casesOn	ConfTyping.SecTyTD	
+ConfTyping.SecTyTD.recOn	ConfTyping.SecTyTD	
+ConfTyping.SepCert.access	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.alloc	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.SepCert.allocS	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.SepCert.assign	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.SepCert.casesOn	ConfTyping.MemLinear	
+ConfTyping.SepCert.check	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.deref	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.free	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.SepCert.ite	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.load	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.SepCert.loop	ConfTyping.HeapJoint	propext
+ConfTyping.SepCert.recOn	ConfTyping.MemLinear	
+ConfTyping.SepCert.safe	ConfTyping.MemLinear	
+ConfTyping.SepCert.seq	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.skip	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.sop	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.store	ConfTyping.MemLinear	propext
+ConfTyping.SepCert.strengthenPre	ConfTyping.HeapJoint	
+ConfTyping.SepCert.weakenPost	ConfTyping.HeapJoint	
+ConfTyping.SepInv	ConfTyping.MemLinear	
+ConfTyping.SepInv.initU	ConfTyping.MemLinear	propext
+ConfTyping.SepInv.mono	ConfTyping.MemLinear	
+ConfTyping.SepInv.toMemInv	ConfTyping.MemLinear	
+ConfTyping.SimA3	ConfTyping.TwoSafety	
+ConfTyping.SpecArtifact	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.casesOn	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.ctorIdx	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.mk.noConfusion	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.noConfusion	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.noConfusionType	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.recOn	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.store	ConfTyping.HeteroCompose	
+ConfTyping.SpecRun.trace	ConfTyping.HeteroCompose	
+ConfTyping.Src.Tok.casesOn	ConfTyping.Surface	
+ConfTyping.Src.Tok.ctorElim	ConfTyping.Surface	
+ConfTyping.Src.Tok.ctorElimType	ConfTyping.Surface	
+ConfTyping.Src.Tok.ctorIdx	ConfTyping.Surface	
+ConfTyping.Src.Tok.noConfusion	ConfTyping.Surface	
+ConfTyping.Src.Tok.noConfusionType	ConfTyping.Surface	
+ConfTyping.Src.Tok.num.elim	ConfTyping.Surface	
+ConfTyping.Src.Tok.num.noConfusion	ConfTyping.Surface	
+ConfTyping.Src.Tok.recOn	ConfTyping.Surface	
+ConfTyping.Src.Tok.str.elim	ConfTyping.Surface	
+ConfTyping.Src.Tok.str.noConfusion	ConfTyping.Surface	
+ConfTyping.Src.Tok.word.elim	ConfTyping.Surface	
+ConfTyping.Src.Tok.word.noConfusion	ConfTyping.Surface	
+ConfTyping.Src.allDigits	ConfTyping.Surface	
+ConfTyping.Src.chunks	ConfTyping.Surface	
+ConfTyping.Src.classify	ConfTyping.Surface	propext
+ConfTyping.Src.decodeStr	ConfTyping.Surface	
+ConfTyping.Src.digitVal	ConfTyping.Surface	
+ConfTyping.Src.edepth	ConfTyping.Surface	
+ConfTyping.Src.encodeStr	ConfTyping.Surface	
+ConfTyping.Src.instDecidableEqTok	ConfTyping.Surface	
+ConfTyping.Src.instDecidableEqTok.decEq	ConfTyping.Surface	
+ConfTyping.Src.instReprTok	ConfTyping.Surface	propext
+ConfTyping.Src.instReprTok.repr	ConfTyping.Surface	propext
+ConfTyping.Src.isDigitC	ConfTyping.Surface	
+ConfTyping.Src.isSpace	ConfTyping.Surface	
+ConfTyping.Src.keywords	ConfTyping.Surface	
+ConfTyping.Src.lex	ConfTyping.Surface	propext
+ConfTyping.Src.natOfDigits	ConfTyping.Surface	
+ConfTyping.Src.okExpr	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.okName	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.okName_ne_lpar	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parse	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parseE	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parseE_toksE	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parseProg	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parseSE	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parseSource	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.parseStmt	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.print	ConfTyping.Surface	propext
+ConfTyping.Src.render	ConfTyping.Surface	propext
+ConfTyping.Src.renderTok	ConfTyping.Surface	propext
+ConfTyping.Src.source_certified	ConfTyping.Surface	Classical.choice,Quot.sound,propext
+ConfTyping.Src.toks	ConfTyping.Surface	
+ConfTyping.Src.toksE	ConfTyping.Surface	
+ConfTyping.Src.toksS	ConfTyping.Surface	
+ConfTyping.Step.below.casesOn	ConfTyping.Imp	
+ConfTyping.Step.brecOn	ConfTyping.Imp	
+ConfTyping.Step.casesOn	ConfTyping.Imp	
+ConfTyping.Step.recOn	ConfTyping.Imp	
+ConfTyping.Store	ConfTyping.Imp	
+ConfTyping.Stored	ConfTyping.DbInjection	
+ConfTyping.Str	ConfTyping.InjectionReal	
+ConfTyping.Stratum.casesOn	ConfTyping.Typing	
+ConfTyping.Stratum.closure.elim	ConfTyping.Typing	
+ConfTyping.Stratum.conformance.elim	ConfTyping.Typing	
+ConfTyping.Stratum.ctorElim	ConfTyping.Typing	
+ConfTyping.Stratum.ctorElimType	ConfTyping.Typing	
+ConfTyping.Stratum.ctorIdx	ConfTyping.Typing	
+ConfTyping.Stratum.noConfusion	ConfTyping.Typing	
+ConfTyping.Stratum.noConfusionType	ConfTyping.Typing	
+ConfTyping.Stratum.ofNat	ConfTyping.Typing	
+ConfTyping.Stratum.ofNat_ctorIdx	ConfTyping.Typing	
+ConfTyping.Stratum.policy.elim	ConfTyping.Typing	
+ConfTyping.Stratum.recOn	ConfTyping.Typing	
+ConfTyping.StringInert	ConfTyping.TaintCert	
+ConfTyping.StringInert.access	ConfTyping.TaintCert	propext
+ConfTyping.StringInert.assign	ConfTyping.TaintCert	propext
+ConfTyping.StringInert.check	ConfTyping.TaintCert	propext
+ConfTyping.StringInert.hop	ConfTyping.TaintCert	propext
+ConfTyping.StringInert.memop	ConfTyping.TaintCert	propext
+ConfTyping.StringInert.skip	ConfTyping.TaintCert	propext
+ConfTyping.TState.casesOn	ConfTyping.QueryEscape	
+ConfTyping.TState.ctorElim	ConfTyping.QueryEscape	
+ConfTyping.TState.ctorElimType	ConfTyping.QueryEscape	
+ConfTyping.TState.ctorIdx	ConfTyping.QueryEscape	
+ConfTyping.TState.esc.elim	ConfTyping.QueryEscape	
+ConfTyping.TState.inn.elim	ConfTyping.QueryEscape	
+ConfTyping.TState.noConfusion	ConfTyping.QueryEscape	
+ConfTyping.TState.noConfusionType	ConfTyping.QueryEscape	
+ConfTyping.TState.ofNat	ConfTyping.QueryEscape	
+ConfTyping.TState.ofNat_ctorIdx	ConfTyping.QueryEscape	
+ConfTyping.TState.out.elim	ConfTyping.QueryEscape	
+ConfTyping.TState.recOn	ConfTyping.QueryEscape	
+ConfTyping.TaintCert.access	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.assign	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.casesOn	ConfTyping.TaintCert	
+ConfTyping.TaintCert.check	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.emit	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.TaintCert.env	ConfTyping.TaintCert	
+ConfTyping.TaintCert.hop	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.inert	ConfTyping.TaintCert	
+ConfTyping.TaintCert.ite	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.TaintCert.loop	ConfTyping.StringLoop	propext
+ConfTyping.TaintCert.memop	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.recOn	ConfTyping.TaintCert	
+ConfTyping.TaintCert.seq	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.set	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.TaintCert.setUnknown	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.TaintCert.sink	ConfTyping.TaintCert	
+ConfTyping.TaintCert.skip	ConfTyping.TaintCert	propext
+ConfTyping.TaintCert.strengthenPre	ConfTyping.StringLoop	
+ConfTyping.TaintCert.weakenPost	ConfTyping.StringLoop	
+ConfTyping.TaintEnv	ConfTyping.TaintCert	
+ConfTyping.TaintInv	ConfTyping.TaintCert	
+ConfTyping.TaintInv.mono	ConfTyping.StringLoop	
+ConfTyping.ThreeSafety	ConfTyping.TwoSafety	
+ConfTyping.Tok.casesOn	ConfTyping.ParseSource	
+ConfTyping.Tok.ctorElim	ConfTyping.ParseSource	
+ConfTyping.Tok.ctorElimType	ConfTyping.ParseSource	
+ConfTyping.Tok.ctorIdx	ConfTyping.ParseSource	
+ConfTyping.Tok.id.elim	ConfTyping.ParseSource	
+ConfTyping.Tok.id.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Tok.kwCat.elim	ConfTyping.ParseSource	
+ConfTyping.Tok.kwConst.elim	ConfTyping.ParseSource	
+ConfTyping.Tok.kwEmit.elim	ConfTyping.ParseSource	
+ConfTyping.Tok.kwInput.elim	ConfTyping.ParseSource	
+ConfTyping.Tok.noConfusion	ConfTyping.ParseSource	
+ConfTyping.Tok.noConfusionType	ConfTyping.ParseSource	
+ConfTyping.Tok.recOn	ConfTyping.ParseSource	
+ConfTyping.Tok.semi.elim	ConfTyping.ParseSource	
+ConfTyping.Tokenizer	ConfTyping.QueryEscape	
+ConfTyping.TouchesOnly	ConfTyping.HeteroCompose	
+ConfTyping.Trace	ConfTyping.Speculate	
+ConfTyping.TraceEq.casesOn	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.cells	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.dead	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.freed	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.fresh	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.labels	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.ptrs	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.recOn	ConfTyping.SpecFactor	
+ConfTyping.TraceEq.store	ConfTyping.SpecFactor	
+ConfTyping.TraceInert	ConfTyping.HeteroCompose	
+ConfTyping.TwoSafety	ConfTyping.TwoSafety	
+ConfTyping.UCert.access	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.UCert.assign	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.UCert.auth	ConfTyping.Bundle	
+ConfTyping.UCert.budget	ConfTyping.Bundle	
+ConfTyping.UCert.casesOn	ConfTyping.Bundle	
+ConfTyping.UCert.check	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.UCert.forU	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.UCert.hop	ConfTyping.FullCert	Quot.sound,propext
+ConfTyping.UCert.ite	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.UCert.memop	ConfTyping.FullCert	Quot.sound,propext
+ConfTyping.UCert.ofEmbedded	ConfTyping.BundleLoop	Quot.sound,propext
+ConfTyping.UCert.recOn	ConfTyping.Bundle	
+ConfTyping.UCert.seq	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.UCert.skip	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.UCert.sop	ConfTyping.FullCert	Quot.sound,propext
+ConfTyping.UCert.weaken	ConfTyping.Bundle	
+ConfTyping.UCertL	ConfTyping.BundleLedger	
+ConfTyping.UCertL.discharge	ConfTyping.BundleLedger	
+ConfTyping.UCertL.nil	ConfTyping.BundleLedger	
+ConfTyping.UCertL.seq	ConfTyping.BundleLedger	Quot.sound,propext
+ConfTyping.UCh.casesOn	ConfTyping.Unified	
+ConfTyping.UCh.ctorElim	ConfTyping.Unified	
+ConfTyping.UCh.ctorElimType	ConfTyping.Unified	
+ConfTyping.UCh.ctorIdx	ConfTyping.Unified	
+ConfTyping.UCh.noConfusion	ConfTyping.Unified	
+ConfTyping.UCh.noConfusionType	ConfTyping.Unified	
+ConfTyping.UCh.ofNat	ConfTyping.Unified	
+ConfTyping.UCh.ofNat_ctorIdx	ConfTyping.Unified	
+ConfTyping.UCh.ord.elim	ConfTyping.Unified	
+ConfTyping.UCh.quote.elim	ConfTyping.Unified	
+ConfTyping.UCh.recOn	ConfTyping.Unified	
+ConfTyping.UCmd.access.elim	ConfTyping.Unified	
+ConfTyping.UCmd.access.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.assign.elim	ConfTyping.Unified	
+ConfTyping.UCmd.assign.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.below	ConfTyping.Unified	
+ConfTyping.UCmd.brecOn	ConfTyping.Unified	
+ConfTyping.UCmd.brecOn.eq	ConfTyping.Unified	
+ConfTyping.UCmd.brecOn.go	ConfTyping.Unified	
+ConfTyping.UCmd.casesOn	ConfTyping.Unified	
+ConfTyping.UCmd.check.elim	ConfTyping.Unified	
+ConfTyping.UCmd.check.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.ctorElim	ConfTyping.Unified	
+ConfTyping.UCmd.ctorElimType	ConfTyping.Unified	
+ConfTyping.UCmd.ctorIdx	ConfTyping.Unified	
+ConfTyping.UCmd.hop.elim	ConfTyping.Unified	
+ConfTyping.UCmd.hop.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.ite.elim	ConfTyping.Unified	
+ConfTyping.UCmd.ite.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.loop.elim	ConfTyping.Unified	
+ConfTyping.UCmd.loop.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.memop.elim	ConfTyping.Unified	
+ConfTyping.UCmd.memop.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.noConfusionType	ConfTyping.Unified	
+ConfTyping.UCmd.recOn	ConfTyping.Unified	
+ConfTyping.UCmd.seq.elim	ConfTyping.Unified	
+ConfTyping.UCmd.seq.noConfusion	ConfTyping.Unified	
+ConfTyping.UCmd.skip.elim	ConfTyping.Unified	
+ConfTyping.UCmd.sop.elim	ConfTyping.Unified	
+ConfTyping.UCmd.sop.noConfusion	ConfTyping.Unified	
+ConfTyping.UCostAtMost	ConfTyping.Unified	
+ConfTyping.UMedInv	ConfTyping.Bundle	
+ConfTyping.UMedInv.mono	ConfTyping.CountedLoop	
+ConfTyping.UMediated	ConfTyping.Unified	
+ConfTyping.USecTy.below.casesOn	ConfTyping.UnifiedNI	
+ConfTyping.USecTy.brecOn	ConfTyping.UnifiedNI	
+ConfTyping.USecTy.casesOn	ConfTyping.UnifiedNI	
+ConfTyping.USecTy.recOn	ConfTyping.UnifiedNI	
+ConfTyping.UState.auth	ConfTyping.Unified	
+ConfTyping.UState.casesOn	ConfTyping.Unified	
+ConfTyping.UState.ctorIdx	ConfTyping.Unified	
+ConfTyping.UState.dead	ConfTyping.Unified	
+ConfTyping.UState.err	ConfTyping.Unified	
+ConfTyping.UState.freed	ConfTyping.Unified	
+ConfTyping.UState.fresh	ConfTyping.Unified	
+ConfTyping.UState.heap	ConfTyping.Unified	
+ConfTyping.UState.hlab	ConfTyping.Unified	
+ConfTyping.UState.live	ConfTyping.Unified	
+ConfTyping.UState.mk.noConfusion	ConfTyping.Unified	
+ConfTyping.UState.noConfusion	ConfTyping.Unified	
+ConfTyping.UState.noConfusionType	ConfTyping.Unified	
+ConfTyping.UState.reads	ConfTyping.Unified	
+ConfTyping.UState.recOn	ConfTyping.Unified	
+ConfTyping.UState.sink	ConfTyping.Unified	
+ConfTyping.UState.sstore	ConfTyping.Unified	
+ConfTyping.UState.store	ConfTyping.Unified	
+ConfTyping.UStr	ConfTyping.Unified	
+ConfTyping.Unsafe	ConfTyping.QueryProgram	
+ConfTyping.Untrusted	ConfTyping.Integrity	
+ConfTyping.UseFreeLoop	ConfTyping.FreeLoop	
+ConfTyping.Val.below	ConfTyping.Obs	
+ConfTyping.Val.bits.elim	ConfTyping.Obs	
+ConfTyping.Val.bits.noConfusion	ConfTyping.Obs	
+ConfTyping.Val.brecOn	ConfTyping.Obs	
+ConfTyping.Val.brecOn.eq	ConfTyping.Obs	
+ConfTyping.Val.brecOn.go	ConfTyping.Obs	
+ConfTyping.Val.casesOn	ConfTyping.Obs	
+ConfTyping.Val.ctorElim	ConfTyping.Obs	
+ConfTyping.Val.ctorElimType	ConfTyping.Obs	
+ConfTyping.Val.ctorIdx	ConfTyping.Obs	
+ConfTyping.Val.int.elim	ConfTyping.Obs	
+ConfTyping.Val.int.noConfusion	ConfTyping.Obs	
+ConfTyping.Val.isPair	ConfTyping.TwoSafety	propext
+ConfTyping.Val.noConfusion	ConfTyping.Obs	
+ConfTyping.Val.noConfusionType	ConfTyping.Obs	
+ConfTyping.Val.pair.elim	ConfTyping.Obs	
+ConfTyping.Val.pair.noConfusion	ConfTyping.Obs	
+ConfTyping.Val.recOn	ConfTyping.Obs	
+ConfTyping.Val.st.elim	ConfTyping.Obs	
+ConfTyping.Val.st.noConfusion	ConfTyping.Obs	
+ConfTyping.Var	ConfTyping.QueryProgram	
+ConfTyping.WCmd.assign.elim	ConfTyping.WhileImp	
+ConfTyping.WCmd.assign.noConfusion	ConfTyping.WhileImp	
+ConfTyping.WCmd.below	ConfTyping.WhileImp	
+ConfTyping.WCmd.brecOn	ConfTyping.WhileImp	
+ConfTyping.WCmd.brecOn.eq	ConfTyping.WhileImp	
+ConfTyping.WCmd.brecOn.go	ConfTyping.WhileImp	
+ConfTyping.WCmd.casesOn	ConfTyping.WhileImp	
+ConfTyping.WCmd.ctorElim	ConfTyping.WhileImp	
+ConfTyping.WCmd.ctorElimType	ConfTyping.WhileImp	
+ConfTyping.WCmd.ctorIdx	ConfTyping.WhileImp	
+ConfTyping.WCmd.ite.elim	ConfTyping.WhileImp	
+ConfTyping.WCmd.ite.noConfusion	ConfTyping.WhileImp	
+ConfTyping.WCmd.loop.elim	ConfTyping.WhileImp	
+ConfTyping.WCmd.loop.noConfusion	ConfTyping.WhileImp	
+ConfTyping.WCmd.noConfusion	ConfTyping.WhileImp	
+ConfTyping.WCmd.noConfusionType	ConfTyping.WhileImp	
+ConfTyping.WCmd.recOn	ConfTyping.WhileImp	
+ConfTyping.WCmd.seq.elim	ConfTyping.WhileImp	
+ConfTyping.WCmd.seq.noConfusion	ConfTyping.WhileImp	
+ConfTyping.WCmd.skip.elim	ConfTyping.WhileImp	
+ConfTyping.WCondBoundary	ConfTyping.WhileLedger	propext
+ConfTyping.WCondBoundary_discharge	ConfTyping.WhileLedger	propext
+ConfTyping.WCondBoundary_nil	ConfTyping.WhileLedger	propext
+ConfTyping.WCondBoundary_of_check_assuming	ConfTyping.WhileLedger	Quot.sound,propext
+ConfTyping.WCondBoundary_seq	ConfTyping.WhileLedger	propext
+ConfTyping.WCondBoundary_weaken	ConfTyping.WhileLedger	propext
+ConfTyping.WHaltNI	ConfTyping.WhileBridge	propext
+ConfTyping.WLowQuery	ConfTyping.WhileBridge	propext
+ConfTyping.WOutNI	ConfTyping.WhileCompose	propext
+ConfTyping.WOutNI_imp_haltNI	ConfTyping.WhileBridge	propext
+ConfTyping.WOutNI_of_wcheck	ConfTyping.WhileCompose	propext
+ConfTyping.WOutNI_seq	ConfTyping.WhileCompose	propext
+ConfTyping.WOutNI_seq_of_check	ConfTyping.WhileCompose	propext
+ConfTyping.WQD	ConfTyping.WhileBridge	
+ConfTyping.WQuery	ConfTyping.WhileBridge	
+ConfTyping.WSecTy.below.casesOn	ConfTyping.WhileImp	
+ConfTyping.WSecTy.brecOn	ConfTyping.WhileImp	
+ConfTyping.WSecTy.casesOn	ConfTyping.WhileImp	
+ConfTyping.WSecTy.recOn	ConfTyping.WhileImp	
+ConfTyping.Wcx	ConfTyping.WhileLedger	
+ConfTyping.WeakBody	ConfTyping.AliasFix	
+ConfTyping.WeakLoop	ConfTyping.AliasFix	
+ConfTyping.WeakProg	ConfTyping.AliasFix	
+ConfTyping.Wleak	ConfTyping.WhileImp	
+ConfTyping.Wok	ConfTyping.WhileImp	
+ConfTyping.XObligation.casesOn	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.cnCerberus.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.cnSmt.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.cnTrustedSpec.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.cnTrustedSpec.noConfusion	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.cnVcgen.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.ctorElim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.ctorElimType	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.ctorIdx	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.jasminPreservation.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.jasminSpecSem.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.jasminTypeSystem.elim	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.noConfusion	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.noConfusionType	ConfTyping.CrossToolIndex	
+ConfTyping.XObligation.recOn	ConfTyping.CrossToolIndex	
+ConfTyping.a_dead_counted_loop_does_not_halt	ConfTyping.CountedLoop	propext
+ConfTyping.aba	ConfTyping.Reuse	
+ConfTyping.acceptGoal_of_no_sinks	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.access_is_static_by_design	ConfTyping.UnifiedNI	propext
+ConfTyping.access_really_reads	ConfTyping.Assumptions	propext
+ConfTyping.acheck	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.acheck_safe	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.acostU	ConfTyping.SpecUnified	propext
+ConfTyping.addresses_depend_on_the_schedule	ConfTyping.Interleave	
+ConfTyping.admissible_taint_is_Jtaint	ConfTyping.Integrity	Classical.choice,Quot.sound,propext
+ConfTyping.aevens	ConfTyping.CmdInjection	
+ConfTyping.aexec	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.agreeBelow	ConfTyping.LatticeFlow	
+ConfTyping.alcheck	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.alcheck2	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.alcheck2_loop_correct	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.alexec	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.aliasState	ConfTyping.MemLinear	
+ConfTyping.aliasState_violates_SepInv	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.alias_free_loop_safe	ConfTyping.AliasLoop	Classical.choice,Quot.sound,propext
+ConfTyping.alias_maintain_loop_safe	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.alias_maintain_loop_safe_complete	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.alias_ok_accepted	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.alias_ok_runs	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.alias_uaf_errors	ConfTyping.AliasSafe	Classical.choice,Quot.sound,propext
+ConfTyping.alias_uaf_loop_rejected	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.alias_uaf_rejected	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.aliased	ConfTyping.Ownership	
+ConfTyping.aliased_sepInv_singletons	ConfTyping.Ownership	Quot.sound,propext
+ConfTyping.aliasfree_checks	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.allcheck	ConfTyping.FullCert	propext
+ConfTyping.allcheck_NI_general	ConfTyping.Attack	Classical.choice,Quot.sound,propext
+ConfTyping.allcheck_gives_four	ConfTyping.FullCert	Classical.choice,Quot.sound,propext
+ConfTyping.allcheck_jcheck	ConfTyping.SpecFused	propext
+ConfTyping.allcheck_maintains_labels	ConfTyping.HeapLabel	Classical.choice,Quot.sound,propext
+ConfTyping.allcheck_refuses_loopHandler	ConfTyping.CountedLoop	propext
+ConfTyping.allcheck_sound	ConfTyping.FullCert	Quot.sound,propext
+ConfTyping.allocL_would_be_unsound	ConfTyping.HeapNI	
+ConfTyping.allocS_frames_over_a_disjoint_set	ConfTyping.Ownership	Classical.choice,Quot.sound,propext
+ConfTyping.allocS_wants_a_secret_name	ConfTyping.SpecTrace	propext
+ConfTyping.allocThenCheck	ConfTyping.LeakCert	
+ConfTyping.allocThenCheck_accepted	ConfTyping.LeakCert	
+ConfTyping.alloc_frames_over_a_disjoint_set	ConfTyping.Ownership	Classical.choice,Quot.sound,propext
+ConfTyping.alloc_free_ok	ConfTyping.MemLinear	propext
+ConfTyping.alloc_high_NI	ConfTyping.HeapNI	propext
+ConfTyping.alloc_rule_rests_on_low_guards	ConfTyping.HeapAlloc	
+ConfTyping.alloc_then_deref_ok	ConfTyping.MemCert	propext
+ConfTyping.allocating_loop_now_accepted	ConfTyping.HeapWiden	propext
+ConfTyping.allocating_loop_rejected	ConfTyping.HeapJoint	propext
+ConfTyping.allocation_site_must_match_the_level	ConfTyping.HeapLabel	propext
+ConfTyping.allocation_sync_is_load_bearing	ConfTyping.HeapAlloc	
+ConfTyping.allocation_zeroes	ConfTyping.HeapLabel	
+ConfTyping.allocfree_checks	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.allocfree_loop_safe	ConfTyping.FreeLoop	Classical.choice,Quot.sound,propext
+ConfTyping.alsafe	ConfTyping.AliasLoop	Classical.choice,Quot.sound,propext
+ConfTyping.alsafe2	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.alsafe2_of_check	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.alsafe_of_check	ConfTyping.AliasLoop	Classical.choice,Quot.sound,propext
+ConfTyping.an_fs_writer_is_charged	ConfTyping.Assumptions	propext
+ConfTyping.archBase	ConfTyping.Speculate	
+ConfTyping.archRun	ConfTyping.Speculate	
+ConfTyping.archTrace	ConfTyping.Speculate	
+ConfTyping.arch_indistinguishable	ConfTyping.Speculate	
+ConfTyping.arch_ni_transfers	ConfTyping.Speculate	propext
+ConfTyping.arch_reconciliation_insufficient	ConfTyping.HeteroCompose	Quot.sound,propext
+ConfTyping.archcost_window_free	ConfTyping.SpecBudget	propext
+ConfTyping.architecturally_indistinguishable_U	ConfTyping.SpecUnified	propext
+ConfTyping.argvOf	ConfTyping.CmdInjection	
+ConfTyping.argvOf_ne_nil	ConfTyping.CmdInjection	propext
+ConfTyping.argvParam	ConfTyping.CmdInjection	
+ConfTyping.argv_append_sep	ConfTyping.CmdInjection	propext
+ConfTyping.argv_correct	ConfTyping.CmdInjection	propext
+ConfTyping.argv_immune	ConfTyping.CmdInjection	
+ConfTyping.argv_noninterference	ConfTyping.CmdInjection	
+ConfTyping.argv_sepfree	ConfTyping.CmdInjection	propext
+ConfTyping.argv_sink_trusted	ConfTyping.CmdInjection	
+ConfTyping.arith_proof_is_not_mintable_here	ConfTyping.CNLedger	
+ConfTyping.asFor	ConfTyping.CountedLoop	propext
+ConfTyping.asFor_eq	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.asafe_of_check	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.asmGoal	ConfTyping.JasminLedger	
+ConfTyping.atomCfg	ConfTyping.Race	
+ConfTyping.atomQ	ConfTyping.FlowBridge	
+ConfTyping.atomQ_low	ConfTyping.FlowBridge	
+ConfTyping.atomT	ConfTyping.Race	
+ConfTyping.atomic_accepted	ConfTyping.Race	propext
+ConfTyping.atomic_all_schedules_safe	ConfTyping.Race	Quot.sound,propext
+ConfTyping.attackState	ConfTyping.TaintCert	
+ConfTyping.attack_access_without_check	ConfTyping.Attack	propext
+ConfTyping.attack_branch_on_a_secret	ConfTyping.Attack	propext
+ConfTyping.attack_check_the_wrong_resource	ConfTyping.Attack	propext
+ConfTyping.attack_emit_the_secret	ConfTyping.Attack	propext
+ConfTyping.attack_escaping_literal	ConfTyping.Attack	propext
+ConfTyping.attack_free_through_a_second_name	ConfTyping.Attack	propext
+ConfTyping.attack_launder_by_concatenation	ConfTyping.Attack	propext
+ConfTyping.attack_launder_by_sanitising	ConfTyping.Attack	propext
+ConfTyping.attack_leak_string_into_public	ConfTyping.Attack	propext
+ConfTyping.attack_loop_on_a_secret	ConfTyping.Attack	propext
+ConfTyping.attack_path_from_a_nonzero_variable	ConfTyping.Attack	propext
+ConfTyping.attack_use_after_free_via_alias	ConfTyping.Attack	propext
+ConfTyping.attest_is_not_J_evidence	ConfTyping.Typing	Classical.choice,Quot.sound,propext
+ConfTyping.b06	ConfTyping.LeakCert	
+ConfTyping.b06_rejected	ConfTyping.LeakCert	
+ConfTyping.b06fixed	ConfTyping.LeakCert	
+ConfTyping.b06fixed_accepted	ConfTyping.LeakCert	
+ConfTyping.bF	ConfTyping.BoundedCert	
+ConfTyping.bF3	ConfTyping.BoundedCert	
+ConfTyping.bF3_grows	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bF3_safe	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bF_grows	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bF_safe	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bG	ConfTyping.BoundedCert	
+ConfTyping.bG_safe	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bP	ConfTyping.BoundedCert	
+ConfTyping.badBase	ConfTyping.MinimalCompose	
+ConfTyping.badBase_minimal	ConfTyping.MinimalCompose	Quot.sound,propext
+ConfTyping.badBase_unsatisfiable	ConfTyping.MinimalCompose	
+ConfTyping.badBody	ConfTyping.Race	
+ConfTyping.bad_atom_accepted	ConfTyping.Race	propext
+ConfTyping.bad_atom_not_preserving	ConfTyping.Race	
+ConfTyping.baseLabels	ConfTyping.JasminCert	
+ConfTyping.baseLabels_length	ConfTyping.JasminCert	
+ConfTyping.bcbFootprint	ConfTyping.HeteroCompose	
+ConfTyping.bcbGadget	ConfTyping.HeteroCompose	
+ConfTyping.bcbProtected	ConfTyping.JasminSCT	
+ConfTyping.bcbProtected_arch_touches	ConfTyping.JasminSCT	propext
+ConfTyping.bcbProtected_trace_inert	ConfTyping.JasminSCT	
+ConfTyping.bcb_arch_touches	ConfTyping.HeteroCompose	propext
+ConfTyping.bcb_footprint_is_transient	ConfTyping.JasminSCT	Quot.sound,propext
+ConfTyping.bcb_not_touches	ConfTyping.HeteroCompose	Quot.sound,propext
+ConfTyping.bcb_not_trace_inert	ConfTyping.HeteroCompose	Quot.sound,propext
+ConfTyping.bcb_reconciles	ConfTyping.HeteroCompose	
+ConfTyping.bcheck	ConfTyping.CountedLoop	propext
+ConfTyping.bcheck_sound	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.benign	ConfTyping.InjectionReal	
+ConfTyping.benignBody	ConfTyping.Speculate	
+ConfTyping.benign_rejected	ConfTyping.Speculate	propext
+ConfTyping.benign_transient_is_constant	ConfTyping.Speculate	
+ConfTyping.bigHandler	ConfTyping.BigHandler	
+ConfTyping.bigHandler_allcheck	ConfTyping.SpecFused	propext
+ConfTyping.bigHandler_checks	ConfTyping.BigHandler	propext
+ConfTyping.bigHandler_cost_under_every_window	ConfTyping.BigHandler	Classical.choice,Quot.sound,propext
+ConfTyping.bigHandler_emits_one_clean_query	ConfTyping.BigHandler	
+ConfTyping.bigHandler_five	ConfTyping.BigHandler	Classical.choice,Quot.sound,propext
+ConfTyping.bigHandler_is_not_inert	ConfTyping.BigHandler	propext
+ConfTyping.bigHandler_owes_the_filesystem_nothing	ConfTyping.BigHandler	Classical.choice,Quot.sound,propext
+ConfTyping.bigHandler_releases_everything	ConfTyping.BigHandler	
+ConfTyping.bigHandler_runs_clean	ConfTyping.BigHandler	
+ConfTyping.bigHandler_speculative_cost	ConfTyping.BigHandler	propext
+ConfTyping.bigHandler_trace_happens_not_to_grow	ConfTyping.BigHandler	propext
+ConfTyping.bigHandler_trace_is_low	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.bigHandler_trace_is_not_empty	ConfTyping.SpecFused	propext
+ConfTyping.bigHandler_trusted_base	ConfTyping.BigHandler	propext
+ConfTyping.biz_check	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
+ConfTyping.biz_cond	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
+ConfTyping.biz_needs_assumption	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
+ConfTyping.biz_ζ0	ConfTyping.SupplyChain	propext
+ConfTyping.biz_ζ1	ConfTyping.SupplyChain	propext
+ConfTyping.blacklist	ConfTyping.Integrity	
+ConfTyping.blacklist_not_admissible	ConfTyping.Integrity	
+ConfTyping.bmul	ConfTyping.BoundedCert	
+ConfTyping.bmul_assoc	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.body_guided_right	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.both_rules_are_load_bearing	ConfTyping.HeapAttack	propext
+ConfTyping.both_threads_are_certified	ConfTyping.Interleave	propext
+ConfTyping.boundaryNI_iff_resultNI	ConfTyping.Compose	Quot.sound,propext
+ConfTyping.boundaryNI_of_check	ConfTyping.SecTy	propext
+ConfTyping.boundaryNI_seq	ConfTyping.Compose	
+ConfTyping.boundaryNI_skip	ConfTyping.Compose	
+ConfTyping.boundaryReleases_iff	ConfTyping.Compose	Quot.sound,propext
+ConfTyping.boundaryReleases_of_check	ConfTyping.SecTyD	Quot.sound,propext
+ConfTyping.boundaryReleases_seq	ConfTyping.FlowBridge	Quot.sound,propext
+ConfTyping.boundedGA	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bounded_act_phantom	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bounded_comp_gives_eight	ConfTyping.BoundedCert	propext
+ConfTyping.bounded_comp_sound	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bounded_comp_tight	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bounded_coupling_witness	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bounded_grade_does_not_factor	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.bounded_phantom_not_inert	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.brLow	ConfTyping.SpecUnified	
+ConfTyping.brWitness	ConfTyping.SpecFused	
+ConfTyping.brWitness_agrees_measured	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.brWitness_checks	ConfTyping.SpecFused	propext
+ConfTyping.brWitness_trace_is_low	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.brWitness_window_grows	ConfTyping.SpecFused	propext
+ConfTyping.branchO	ConfTyping.Obs	
+ConfTyping.branchO_J_rel3	ConfTyping.TwoSafety	propext
+ConfTyping.branch_Pleak_val	ConfTyping.TwoSafety	propext
+ConfTyping.branch_free_is_inert	ConfTyping.SpecUnified	propext
+ConfTyping.branch_not_closable	ConfTyping.Pleak	Classical.choice,Quot.sound,propext
+ConfTyping.branch_residual	ConfTyping.Typing	Classical.choice,Quot.sound,propext
+ConfTyping.branch_σ0	ConfTyping.Pleak	propext
+ConfTyping.branch_σ1	ConfTyping.Pleak	propext
+ConfTyping.brick24_rejects	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.bridge_iff_releases	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
+ConfTyping.broken_seam	ConfTyping.Compose	Classical.choice,Quot.sound,propext
+ConfTyping.bs	ConfTyping.QueryEscape	
+ConfTyping.bsafe_mono	ConfTyping.BoundedCert	
+ConfTyping.bsafe_zero	ConfTyping.BoundedCert	
+ConfTyping.budget	ConfTyping.CostBound	
+ConfTyping.budget_composes_across_threads	ConfTyping.Interleave	
+ConfTyping.budget_cost	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.buildCmdConcat	ConfTyping.CmdInjection	
+ConfTyping.buildConcat	ConfTyping.InjectionReal	
+ConfTyping.buildEsc	ConfTyping.QueryEscape	
+ConfTyping.buildEsc_id	ConfTyping.QueryEscape	
+ConfTyping.buildLogConcat	ConfTyping.LogInjection	
+ConfTyping.buildN	ConfTyping.QueryGrammar	
+ConfTyping.bumpFresh	ConfTyping.Unified	
+ConfTyping.bundle_covers_seam	ConfTyping.BundleCoverage	Quot.sound,propext
+ConfTyping.bundle_covers_store	ConfTyping.BundleCoverage	propext
+ConfTyping.bundle_covers_termination	ConfTyping.BundleCoverage	propext
+ConfTyping.bundle_covers_timing	ConfTyping.BundleCoverage	propext
+ConfTyping.cBenign	ConfTyping.CmdInjection	
+ConfTyping.cPayload	ConfTyping.CmdInjection	
+ConfTyping.cProg	ConfTyping.CmdInjection	
+ConfTyping.cdist	ConfTyping.CNReceive	
+ConfTyping.certified_cost_under_speculation	ConfTyping.SpecBudget	Classical.choice,Quot.sound,propext
+ConfTyping.certified_pipeline	ConfTyping.Pipeline	Quot.sound,propext
+ConfTyping.certified_pipeline_bridge	ConfTyping.Pipeline	Classical.choice,Quot.sound,propext
+ConfTyping.certified_pipeline_map	ConfTyping.Pipeline	Classical.choice,Quot.sound,propext
+ConfTyping.certified_pipeline_reconstruction	ConfTyping.Pipeline	Classical.choice,Quot.sound,propext
+ConfTyping.certified_trace_is_low	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.channel_certs_do_not_compose	ConfTyping.Compose	Classical.choice,Quot.sound,propext
+ConfTyping.checker_rederives_pleak_bound	ConfTyping.SecTyD	Quot.sound,propext
+ConfTyping.clear5	ConfTyping.HeteroCompose	
+ConfTyping.clear5CN	ConfTyping.HeteroCompose	Classical.choice,Quot.sound,propext
+ConfTyping.clear5SCT	ConfTyping.HeteroCompose	Quot.sound,propext
+ConfTyping.clear5_modifies	ConfTyping.HeteroCompose	propext
+ConfTyping.clobbered_pointer_rejected	ConfTyping.MemCert	propext
+ConfTyping.closure_is_const_policy	ConfTyping.Obs	
+ConfTyping.clsInB	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.cmdSkeleton	ConfTyping.CmdInjection	
+ConfTyping.cmd_benign_correct	ConfTyping.CmdInjection	
+ConfTyping.cmd_concat_injectable	ConfTyping.CmdInjection	
+ConfTyping.cmd_concat_leaks	ConfTyping.CmdInjection	
+ConfTyping.cnEmbed_injective	ConfTyping.CrossToolIndex	propext
+ConfTyping.cnGA	ConfTyping.CNReceive	Quot.sound,propext
+ConfTyping.cnNeedsI_eq	ConfTyping.IndexedBases	Quot.sound,propext
+ConfTyping.cnNeedsIdx	ConfTyping.IndexedBases	
+ConfTyping.cn_act_phantom	ConfTyping.CNReceive	Quot.sound,propext
+ConfTyping.cn_arith_charges_smt	ConfTyping.CNReceive	Quot.sound,propext
+ConfTyping.cn_base_strictly_smaller	ConfTyping.CNReceive	propext
+ConfTyping.cn_comp_base_strictly_smaller	ConfTyping.CNReceive	propext
+ConfTyping.cn_comp_footprint	ConfTyping.CNReceive	Classical.choice,Quot.sound,propext
+ConfTyping.cn_comp_ledger	ConfTyping.CNReceive	Classical.choice,Quot.sound,propext
+ConfTyping.cn_comp_map	ConfTyping.CNReceive	Classical.choice,Quot.sound,propext
+ConfTyping.cn_computed_reception_exists_where_fixed_does_not	ConfTyping.CNLedger	Classical.choice,Quot.sound,propext
+ConfTyping.cn_dedup_without_minimality	ConfTyping.IndexedBases	
+ConfTyping.cn_false_footprint_unreceivable	ConfTyping.CNReceive	propext
+ConfTyping.cn_footprint_not_total	ConfTyping.CNReceive	
+ConfTyping.cn_frameOnly_compIdx	ConfTyping.IndexedBases	
+ConfTyping.cn_frame_rule	ConfTyping.CNReceive	
+ConfTyping.cn_jasmin_obligations_disjoint	ConfTyping.CrossToolIndex	propext
+ConfTyping.cn_reception_transfers	ConfTyping.HeteroCompose	Quot.sound
+ConfTyping.cn_unions_jasmin_joins	ConfTyping.JasminSCT	Quot.sound,propext
+ConfTyping.cn_unions_sct_intersects	ConfTyping.HeteroCompose	Quot.sound,propext
+ConfTyping.cn_untouched_outside	ConfTyping.CNReceive	propext
+ConfTyping.coarsen_loop_complete	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.coarsen_loop_of_fix	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.coarsen_loop_safe	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.coarsen_loop_safe_gen	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.collapse	ConfTyping.AliasFix	
+ConfTyping.comp_map_is_seq	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
+ConfTyping.comp_reconstructs_seq_release	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
+ConfTyping.completeness_rel_O	ConfTyping.Joint	
+ConfTyping.completeness_thm2	ConfTyping.Joint	
+ConfTyping.compose	ConfTyping.JasminCert	propext
+ConfTyping.composeComputed	ConfTyping.JasminLedger	propext
+ConfTyping.composeComputed_ledger	ConfTyping.JasminLedger	propext
+ConfTyping.composeComputed_lvl	ConfTyping.JasminLedger	propext
+ConfTyping.composeComputed_source_avoids_preservation	ConfTyping.JasminLedger	propext
+ConfTyping.compose_ledger	ConfTyping.JasminCert	propext
+ConfTyping.compose_lvl_is_sctLvlGA	ConfTyping.JasminCert	propext
+ConfTyping.compose_modmsf	ConfTyping.JasminCert	propext
+ConfTyping.composition_destroys_minimality	ConfTyping.JasminLedger	Quot.sound,propext
+ConfTyping.concat_benign_correct	ConfTyping.QueryGrammar	
+ConfTyping.concat_injectable	ConfTyping.InjectionReal	
+ConfTyping.concat_injectable_N	ConfTyping.QueryGrammar	
+ConfTyping.concat_injectable_esc	ConfTyping.QueryEscape	
+ConfTyping.concat_leaks	ConfTyping.InjectionReal	
+ConfTyping.concat_leaks_N	ConfTyping.QueryGrammar	
+ConfTyping.condBoundary_discharge	ConfTyping.Ledger	
+ConfTyping.condBoundary_discharge_head	ConfTyping.Ledger	
+ConfTyping.condBoundary_nil	ConfTyping.Ledger	
+ConfTyping.condBoundary_of_check_assuming	ConfTyping.SupplyChain	Quot.sound,propext
+ConfTyping.condBoundary_of_unconditional	ConfTyping.Ledger	
+ConfTyping.condBoundary_seq	ConfTyping.Ledger	propext
+ConfTyping.condBoundary_weaken	ConfTyping.Ledger	
+ConfTyping.condReleases_seq	ConfTyping.Ledger	Quot.sound,propext
+ConfTyping.confidential_transport	ConfTyping.Typing	
+ConfTyping.confinement	ConfTyping.SecTy	
+ConfTyping.confinement_aux	ConfTyping.SecTy	
+ConfTyping.conform_refl	ConfTyping.Typing	
+ConfTyping.consHead	ConfTyping.QueryEscape	
+ConfTyping.copyImg	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.costCheck	ConfTyping.CostBound	propext
+ConfTyping.costCheck_sound	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.costGA	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.cost_assign	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.cost_ite	ConfTyping.CostBound	propext
+ConfTyping.cost_seq	ConfTyping.CostBound	propext
+ConfTyping.cost_seq_is_mul	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.cost_skip	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.countU	ConfTyping.CountedLoop	
+ConfTyping.countU_auth	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.countU_cost	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.countU_turn	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.countdown	ConfTyping.CostBound	
+ConfTyping.countdown_cost	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.countdown_turn	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.counting_cannot_decide_traversal	ConfTyping.PathCert	
+ConfTyping.crossBase_no_collisions	ConfTyping.CrossToolIndex	
+ConfTyping.crossBase_no_collisions_with_smt	ConfTyping.CrossToolIndex	
+ConfTyping.crossIdx	ConfTyping.CrossToolIndex	
+ConfTyping.crossIdx_dedup_is_identity	ConfTyping.CrossToolIndex	
+ConfTyping.cross_tool_composition_is_the_independent_case	ConfTyping.CrossToolIndex	propext
+ConfTyping.crosscompartment_leaks	ConfTyping.LatticeFlow	propext
+ConfTyping.crosscompartment_untypable	ConfTyping.LatticeFlow	propext
+ConfTyping.ctrStore	ConfTyping.CostBound	
+ConfTyping.cx_cond	ConfTyping.Ledger	propext
+ConfTyping.cx_not_unconditional	ConfTyping.Ledger	Classical.choice,Quot.sound,propext
+ConfTyping.cx_ξ0	ConfTyping.Ledger	propext
+ConfTyping.cx_ξ1	ConfTyping.Ledger	propext
+ConfTyping.dataSegs	ConfTyping.QueryEscape	
+ConfTyping.db_injection_free_of_check	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.dbcheck	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.dbcheckNaive	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.dbcheck_ni	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.deadCost	ConfTyping.BundleLoop	
+ConfTyping.deadPrefix	ConfTyping.SpecTrace	
+ConfTyping.deadS	ConfTyping.SpecTrace	
+ConfTyping.deadS_is_certified	ConfTyping.SpecTrace	propext
+ConfTyping.dec1	ConfTyping.CostBound	
+ConfTyping.decOne	ConfTyping.CountedLoop	
+ConfTyping.decimal_source_injection_free	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.dedup_repairs_the_composite	ConfTyping.IndexedBases	Quot.sound,propext
+ConfTyping.demo_pipeline	ConfTyping.Pipeline	Quot.sound,propext
+ConfTyping.demo_pipeline_bridge	ConfTyping.Pipeline	Classical.choice,Quot.sound,propext
+ConfTyping.denyAll	ConfTyping.Mediation	
+ConfTyping.deployment_reading	ConfTyping.Deploy	
+ConfTyping.deref_NI_given_safety	ConfTyping.HeapNI	propext
+ConfTyping.deref_leaks_through_dead	ConfTyping.HeapNI	propext
+ConfTyping.determinism	ConfTyping.Imp	propext
+ConfTyping.dexec	ConfTyping.DbInjection	
+ConfTyping.discharged_covers_needs	ConfTyping.Assumptions	propext
+ConfTyping.disjP	ConfTyping.AliasLoop	
+ConfTyping.disjP_10	ConfTyping.AliasFix	propext
+ConfTyping.disjP_filter	ConfTyping.AliasLoop	propext
+ConfTyping.disjP_mergeOne	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.disjP_purge	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.disjoint_threads_are_safe	ConfTyping.Interleave	
+ConfTyping.dmdJoin	ConfTyping.LatticeFlow	propext
+ConfTyping.dmdLat	ConfTyping.LatticeFlow	propext
+ConfTyping.dmdLeB	ConfTyping.LatticeFlow	propext
+ConfTyping.dos_unbounded	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.dos_unbounded_budget_bounded	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.dotdot_escapes	ConfTyping.PathTraversal	propext
+ConfTyping.double_free_errors	ConfTyping.MemFree	propext
+ConfTyping.double_free_rejected	ConfTyping.MemFree	propext
+ConfTyping.double_free_rejected_by_slcheck	ConfTyping.MemLinear	propext
+ConfTyping.doublefree_aliasloop_rejected	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.doublefree_loop_rejected	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.dropInt	ConfTyping.Unified	
+ConfTyping.dropInt_memInt	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.dropPair	ConfTyping.TaintCert	
+ConfTyping.dropPair_mem	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.dropPair_ne	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.dropStr	ConfTyping.MemCert	
+ConfTyping.dropStr_idem	ConfTyping.CountedLoop	
+ConfTyping.dropStr_mem	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.dropStr_ne	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.embed	ConfTyping.WhileImp	
+ConfTyping.emitBase	ConfTyping.LoadBearing	propext
+ConfTyping.emitBasePlusPolicy	ConfTyping.LoadBearing	propext
+ConfTyping.emitBasePlusPolicy_not_minimal	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.emitBase_size	ConfTyping.LoadBearing	propext
+ConfTyping.emitGoal	ConfTyping.LoadBearing	
+ConfTyping.emitProg	ConfTyping.LoadBearing	
+ConfTyping.emitProg_base_is_minimal	ConfTyping.LoadBearing	Quot.sound,propext
+ConfTyping.emitProg_checks	ConfTyping.LoadBearing	propext
+ConfTyping.emitProg_deployed_with_one	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.emitProg_ledger	ConfTyping.LoadBearing	propext
+ConfTyping.emitProg_needs	ConfTyping.LoadBearing	propext
+ConfTyping.emit_of_secret_rejected	ConfTyping.AllFive	propext
+ConfTyping.emit_sink_entry_load_bearing	ConfTyping.LoadBearing	propext
+ConfTyping.entry3	ConfTyping.AliasFix	
+ConfTyping.entryProp	ConfTyping.Assumptions	
+ConfTyping.eqStr	ConfTyping.LeakCert	
+ConfTyping.eqStr_symm	ConfTyping.LeakCert	propext
+ConfTyping.esc	ConfTyping.QueryEscape	
+ConfTyping.escBad	ConfTyping.QueryEscape	
+ConfTyping.escBad_eq_esc	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.escBad_injectable	ConfTyping.QueryEscape	
+ConfTyping.escBad_noBS_ok	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.escDouble	ConfTyping.QueryEscape	
+ConfTyping.escDouble_mismatch_injectable	ConfTyping.QueryEscape	
+ConfTyping.escDouble_skeleton	ConfTyping.QueryEscape	propext
+ConfTyping.esc_cond_immune	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.esc_faithful	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.esc_immune	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.esc_mismatch_injectable	ConfTyping.QueryEscape	
+ConfTyping.esc_not_unconditional	ConfTyping.QueryEscape	
+ConfTyping.esc_skeleton	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.escapeState	ConfTyping.PathCert	
+ConfTyping.escaping_is_convention_relative	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.escaping_no_silent_discharge	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.escaping_reducible_parameterization_in	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.eval	ConfTyping.Imp	
+ConfTyping.evalE	ConfTyping.Imp	
+ConfTyping.evalE_agree	ConfTyping.LatticeFlow	propext
+ConfTyping.evalE_lowEq	ConfTyping.SecTy	propext
+ConfTyping.evalS	ConfTyping.Unified	
+ConfTyping.evalS_lowEq	ConfTyping.Unified	propext
+ConfTyping.evalStore	ConfTyping.Compose	
+ConfTyping.eval_Pfull_store	ConfTyping.Pleak	propext
+ConfTyping.eval_Pleak_store	ConfTyping.Pleak	propext
+ConfTyping.eval_seq	ConfTyping.Compose	
+ConfTyping.eval_step	ConfTyping.Imp	propext
+ConfTyping.eval_σ0_l	ConfTyping.Pleak	propext
+ConfTyping.eval_σ1_l	ConfTyping.Pleak	propext
+ConfTyping.evens	ConfTyping.InjectionReal	
+ConfTyping.evens_segsN	ConfTyping.QueryGrammar	Quot.sound,propext
+ConfTyping.evidenceFor	ConfTyping.Typing	
+ConfTyping.execA	ConfTyping.ParseSource	
+ConfTyping.exists_wlow_separator	ConfTyping.WhileBridge	Classical.choice,Quot.sound,propext
+ConfTyping.exprLevel	ConfTyping.LatticeFlow	
+ConfTyping.exprLevel_ge_acc	ConfTyping.LatticeFlow	
+ConfTyping.exprLow	ConfTyping.SecTy	
+ConfTyping.fLive	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.fLive_true	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.factoring_holds_here	ConfTyping.AllFive	propext
+ConfTyping.falseGoal	ConfTyping.MinimalCompose	
+ConfTyping.fcheck	ConfTyping.MemFree	propext
+ConfTyping.fcheck_safe	ConfTyping.MemFree	Classical.choice,Quot.sound,propext
+ConfTyping.fexec	ConfTyping.MemFree	
+ConfTyping.fieldParam	ConfTyping.LogInjection	
+ConfTyping.field_correct	ConfTyping.LogInjection	propext
+ConfTyping.field_immune	ConfTyping.LogInjection	
+ConfTyping.field_noninterference	ConfTyping.LogInjection	
+ConfTyping.field_sink_trusted	ConfTyping.LogInjection	
+ConfTyping.findMerge	ConfTyping.AliasFix	propext
+ConfTyping.findMerge2	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.findMerge2_mem	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.findMerge_eq	ConfTyping.AliasFix	propext
+ConfTyping.findMerge_mem	ConfTyping.AliasFix	propext
+ConfTyping.findMerge_mergeOne_length	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.findOut	ConfTyping.JasminCert	Classical.choice,Quot.sound,propext
+ConfTyping.fiveBase	ConfTyping.LoadBearing	propext
+ConfTyping.fiveBase_size	ConfTyping.LoadBearing	propext
+ConfTyping.fiveGoal	ConfTyping.LoadBearing	
+ConfTyping.fiveGoal_refutable	ConfTyping.LoadBearing	propext
+ConfTyping.fiveGoal_satisfiable	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.fiveGoal_split	ConfTyping.LoadBearing	
+ConfTyping.fiveProg	ConfTyping.AllFive	
+ConfTyping.fiveProg_base_is_load_bearing	ConfTyping.LoadBearing	Quot.sound,propext
+ConfTyping.fiveProg_base_is_minimal	ConfTyping.LoadBearing	Quot.sound,propext
+ConfTyping.fiveProg_checks	ConfTyping.AllFive	propext
+ConfTyping.fiveProg_costs_six_even_speculating	ConfTyping.SpecBudget	Classical.choice,Quot.sound,propext
+ConfTyping.fiveProg_deployed	ConfTyping.Deploy	Classical.choice,Quot.sound,propext
+ConfTyping.fiveProg_deployed_with_two	ConfTyping.Assumptions	Classical.choice,Quot.sound,propext
+ConfTyping.fiveProg_five	ConfTyping.AllFive	Classical.choice,Quot.sound,propext
+ConfTyping.fiveProg_is_speculatively_inert	ConfTyping.SpecUnified	propext
+ConfTyping.fiveProg_ledger	ConfTyping.Assumptions	propext
+ConfTyping.fiveProg_needs	ConfTyping.Assumptions	propext
+ConfTyping.fiveProg_owes_the_filesystem_nothing	ConfTyping.Assumptions	Classical.choice,Quot.sound,propext
+ConfTyping.fiveProg_paths_vacuous	ConfTyping.Deploy	Classical.choice,Quot.sound,propext
+ConfTyping.fiveProg_runs	ConfTyping.AllFive	
+ConfTyping.five_of_six_compose_over_loops	ConfTyping.StringLoop	propext
+ConfTyping.fixedMed	ConfTyping.Mediation	
+ConfTyping.fixedP	ConfTyping.Speculate	
+ConfTyping.fixedU	ConfTyping.CostBound	
+ConfTyping.fixed_accepted	ConfTyping.Speculate	propext
+ConfTyping.fixed_bounded	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.fixed_mediated	ConfTyping.Mediation	Quot.sound,propext
+ConfTyping.fixed_no_transient_leak	ConfTyping.Speculate	propext
+ConfTyping.fixed_secret_independent	ConfTyping.Speculate	propext
+ConfTyping.flUpd	ConfTyping.FreeLoop	
+ConfTyping.flat	ConfTyping.PathTraversal	
+ConfTyping.flat_contained	ConfTyping.PathTraversal	Quot.sound,propext
+ConfTyping.flat_resolveRel_aux	ConfTyping.PathTraversal	Quot.sound,propext
+ConfTyping.flatten	ConfTyping.SpecUnified	propext
+ConfTyping.flbind_ne_err	ConfTyping.FreeLoop	propext
+ConfTyping.flbind_ok	ConfTyping.FreeLoop	propext
+ConfTyping.flcheck	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.flexec	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.flowGA	ConfTyping.FlowBridge	
+ConfTyping.flsafe	ConfTyping.FreeLoop	Classical.choice,Quot.sound,propext
+ConfTyping.flsafe_of_check	ConfTyping.FreeLoop	Classical.choice,Quot.sound,propext
+ConfTyping.footprintLevel	ConfTyping.JasminSCT	
+ConfTyping.forU	ConfTyping.CountedLoop	
+ConfTyping.four_laws_one_composition	ConfTyping.BundleLedger	Quot.sound,propext
+ConfTyping.four_of_five_are_immune	ConfTyping.SpecBudget	propext
+ConfTyping.fpsafe_checks	ConfTyping.MemFree	propext
+ConfTyping.fpsafe_memsafe	ConfTyping.MemFree	Classical.choice,Quot.sound,propext
+ConfTyping.frameOnlyProof	ConfTyping.CNReceive	
+ConfTyping.freeThenAlloc	ConfTyping.Reuse	
+ConfTyping.free_NI_given_safety	ConfTyping.HeapNI	propext
+ConfTyping.free_frames_when_owned	ConfTyping.Ownership	Classical.choice,Quot.sound,propext
+ConfTyping.free_has_no_level_condition	ConfTyping.HeapRetire	propext
+ConfTyping.free_has_no_rule	ConfTyping.MemCert	propext
+ConfTyping.free_is_the_obstruction	ConfTyping.Ownership	propext
+ConfTyping.free_needs_no_level_condition	ConfTyping.Reuse	propext
+ConfTyping.free_one_keep_other	ConfTyping.MemLinear	propext
+ConfTyping.freed_and_live_are_disjoint	ConfTyping.Reuse	
+ConfTyping.freeing_a_secret_pointer_leaks	ConfTyping.Reuse	propext
+ConfTyping.fresh_counter_is_monotone	ConfTyping.Attack	Classical.choice,Quot.sound,propext
+ConfTyping.fsafe_of_check	ConfTyping.MemFree	Classical.choice,Quot.sound,propext
+ConfTyping.fstV	ConfTyping.Joint	propext
+ConfTyping.fsub	ConfTyping.CNReceive	
+ConfTyping.fullProg	ConfTyping.FullCert	
+ConfTyping.fullProg_checks	ConfTyping.FullCert	propext
+ConfTyping.fullProg_four	ConfTyping.FullCert	Classical.choice,Quot.sound,propext
+ConfTyping.fullProg_needs_its_check	ConfTyping.FullCert	propext
+ConfTyping.fullProg_runs	ConfTyping.FullCert	
+ConfTyping.full_flow_defeats_sanitizer	ConfTyping.Integrity	Classical.choice,Quot.sound,propext
+ConfTyping.gBenign	ConfTyping.QueryGrammar	
+ConfTyping.gPayload	ConfTyping.QueryGrammar	
+ConfTyping.gS	ConfTyping.QueryGrammar	
+ConfTyping.gadget	ConfTyping.Speculate	
+ConfTyping.gadgetU	ConfTyping.SpecUnified	
+ConfTyping.gadget_rejected_by_memory_safety	ConfTyping.SpecUnified	propext
+ConfTyping.gen_mono	ConfTyping.Obs	
+ConfTyping.glue	ConfTyping.Compose	
+ConfTyping.haltQ	ConfTyping.WhileBridge	
+ConfTyping.haltQ_wlow	ConfTyping.WhileBridge	propext
+ConfTyping.halted_machine_leaks_in_the_raw_model	ConfTyping.SpecTrace	propext
+ConfTyping.handler	ConfTyping.Bundle	
+ConfTyping.handlerBounded	ConfTyping.BundleLoop	
+ConfTyping.handlerBounded_cert	ConfTyping.BundleLoop	Quot.sound,propext
+ConfTyping.handlerBounded_contains_a_loop	ConfTyping.BundleLoop	
+ConfTyping.handlerBounded_covers_mediation_and_budget	ConfTyping.BundleCoverage	Quot.sound,propext
+ConfTyping.handlerBounded_mediated	ConfTyping.BundleLoop	Quot.sound,propext
+ConfTyping.handlerBounded_numbers	ConfTyping.BundleLoop	
+ConfTyping.handler_NI	ConfTyping.UnifiedNI	propext
+ConfTyping.handler_budget	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.handler_budget_tight	ConfTyping.Bundle	
+ConfTyping.handler_bundle	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.handler_bundle_end_to_end	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.handler_checks	ConfTyping.Bundle	propext
+ConfTyping.handler_checks_NI	ConfTyping.UnifiedNI	propext
+ConfTyping.handler_covers_six_rows	ConfTyping.BundleCoverage	Quot.sound,propext
+ConfTyping.handler_intended_reads	ConfTyping.BundleLedger	Quot.sound,propext
+ConfTyping.handler_mediated	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.handler_needs_the_policy_assumption	ConfTyping.BundleLedger	
+ConfTyping.handler_partial_policy	ConfTyping.Bundle	
+ConfTyping.handler_three_certificates	ConfTyping.UnifiedNI	Quot.sound,propext
+ConfTyping.handler_without_check_rejected	ConfTyping.Bundle	propext
+ConfTyping.hasAccess	ConfTyping.Assumptions	propext
+ConfTyping.hasIte	ConfTyping.SpecUnified	propext
+ConfTyping.hasNL	ConfTyping.LogInjection	
+ConfTyping.hasQ	ConfTyping.InjectionReal	
+ConfTyping.hasSep	ConfTyping.CmdInjection	
+ConfTyping.hcheck	ConfTyping.HeapFlow	
+ConfTyping.hcheck_sound	ConfTyping.HeapFlow	propext
+ConfTyping.hconfine	ConfTyping.HeapFlow	propext
+ConfTyping.headerFlag	ConfTyping.JasminCert	Classical.choice,Quot.sound,propext
+ConfTyping.headerName	ConfTyping.JasminCert	propext
+ConfTyping.heapLowEq	ConfTyping.HeapFlow	
+ConfTyping.heapProg	ConfTyping.HeapNI	
+ConfTyping.heapProg_NI_and_safe	ConfTyping.HeapNI	Classical.choice,Quot.sound,propext
+ConfTyping.heapProg_two_certificates	ConfTyping.HeapNI	propext
+ConfTyping.heap_leak	ConfTyping.HeapFlow	Classical.choice,Quot.sound,propext
+ConfTyping.hetero_bundle_componentwise	ConfTyping.HeteroCompose	Classical.choice,Quot.sound,propext
+ConfTyping.hetero_bundle_laws	ConfTyping.HeteroCompose	Classical.choice,Quot.sound,propext
+ConfTyping.hexec	ConfTyping.HeapFlow	
+ConfTyping.highBranch	ConfTyping.HeapAlloc	
+ConfTyping.highBranch_is_untypable	ConfTyping.HeapAlloc	propext
+ConfTyping.high_alloc_is_NI_typed	ConfTyping.UnifiedNI	propext
+ConfTyping.high_branch_desynchronises_the_allocator	ConfTyping.HeapAlloc	propext
+ConfTyping.high_string_assignment_is_fine	ConfTyping.AllFive	propext
+ConfTyping.hlUpd	ConfTyping.HeapLoop	
+ConfTyping.hlValidB	ConfTyping.HeapLoop	
+ConfTyping.hlbind_ne_err	ConfTyping.HeapLoop	propext
+ConfTyping.hlbind_ok	ConfTyping.HeapLoop	propext
+ConfTyping.hlcheck	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.hlcheck_safe	ConfTyping.HeapLoop	Classical.choice,Quot.sound,propext
+ConfTyping.hlexec	ConfTyping.HeapLoop	
+ConfTyping.hllinter	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.hllinter_left	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.hllinter_right	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.hllsubB	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.hllsub_mem	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.hlrem	ConfTyping.HeapLoop	
+ConfTyping.hlval	ConfTyping.HeapLoop	
+ConfTyping.honestDeployment	ConfTyping.LoadBearing	
+ConfTyping.hostileSink	ConfTyping.Deploy	
+ConfTyping.hpsafe_ni	ConfTyping.HeapFlow	propext
+ConfTyping.hsecTy_ni	ConfTyping.HeapFlow	propext
+ConfTyping.iLowEq	ConfTyping.HeapFlow	
+ConfTyping.iLowEq_symm	ConfTyping.HeapFlow	
+ConfTyping.iLowEq_trans	ConfTyping.HeapFlow	
+ConfTyping.incrAt	ConfTyping.CNReceive	
+ConfTyping.incrAt_modifies	ConfTyping.CNReceive	propext
+ConfTyping.indexed_beats_the_conjunction	ConfTyping.HeapJoint	propext
+ConfTyping.initMed	ConfTyping.Mediation	
+ConfTyping.initU	ConfTyping.Unified	
+ConfTyping.initU_hides_string_inputs	ConfTyping.Attack	
+ConfTyping.injection_free_of_check	ConfTyping.QueryProgram	Quot.sound,propext
+ConfTyping.injection_is_real	ConfTyping.TaintCert	
+ConfTyping.injection_rejected	ConfTyping.TaintCert	propext
+ConfTyping.injection_row	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.instDecidableEqACh	ConfTyping.CmdInjection	
+ConfTyping.instDecidableEqACh.decEq	ConfTyping.CmdInjection	
+ConfTyping.instDecidableEqAssume	ConfTyping.Assumptions	
+ConfTyping.instDecidableEqAssume.decEq	ConfTyping.Assumptions	
+ConfTyping.instDecidableEqAtom	ConfTyping.ParseSource	
+ConfTyping.instDecidableEqAtom.decEq	ConfTyping.ParseSource	
+ConfTyping.instDecidableEqBGrade	ConfTyping.BoundedCert	
+ConfTyping.instDecidableEqBGrade.decEq	ConfTyping.BoundedCert	
+ConfTyping.instDecidableEqCNAssume	ConfTyping.IndexedBases	
+ConfTyping.instDecidableEqCNAssume.decEq	ConfTyping.IndexedBases	
+ConfTyping.instDecidableEqCh	ConfTyping.InjectionReal	
+ConfTyping.instDecidableEqCh.decEq	ConfTyping.InjectionReal	
+ConfTyping.instDecidableEqDCh	ConfTyping.DecimalId	
+ConfTyping.instDecidableEqDCh.decEq	ConfTyping.DecimalId	
+ConfTyping.instDecidableEqDState	ConfTyping.QueryEscape	
+ConfTyping.instDecidableEqDmd	ConfTyping.LatticeFlow	
+ConfTyping.instDecidableEqEvKind	ConfTyping.Typing	
+ConfTyping.instDecidableEqExpr	ConfTyping.SecTyD	
+ConfTyping.instDecidableEqExpr.decEq	ConfTyping.SecTyD	
+ConfTyping.instDecidableEqGCh	ConfTyping.LogInjection	
+ConfTyping.instDecidableEqGCh.decEq	ConfTyping.LogInjection	
+ConfTyping.instDecidableEqHOp	ConfTyping.Unified	
+ConfTyping.instDecidableEqJAssume	ConfTyping.IndexedBases	
+ConfTyping.instDecidableEqJasminCert	ConfTyping.JasminCert	
+ConfTyping.instDecidableEqJasminCert.decEq	ConfTyping.JasminCert	
+ConfTyping.instDecidableEqLCh	ConfTyping.LexSource	
+ConfTyping.instDecidableEqLCh.decEq	ConfTyping.LexSource	
+ConfTyping.instDecidableEqLvl	ConfTyping.JasminSCT	
+ConfTyping.instDecidableEqMedBase	ConfTyping.Mediation	
+ConfTyping.instDecidableEqMedBase.decEq	ConfTyping.Mediation	
+ConfTyping.instDecidableEqMemOp	ConfTyping.Unified	
+ConfTyping.instDecidableEqPStep	ConfTyping.PathTraversal	
+ConfTyping.instDecidableEqPStep.decEq	ConfTyping.PathTraversal	
+ConfTyping.instDecidableEqPermit	ConfTyping.SecTyD	
+ConfTyping.instDecidableEqPermit.decEq	ConfTyping.SecTyD	
+ConfTyping.instDecidableEqRCh	ConfTyping.LexReal	
+ConfTyping.instDecidableEqSCmd	ConfTyping.ParseSource	
+ConfTyping.instDecidableEqSCmd.decEq	ConfTyping.ParseSource	
+ConfTyping.instDecidableEqSLvl	ConfTyping.JasminSCT	
+ConfTyping.instDecidableEqSLvl.decEq	ConfTyping.JasminSCT	
+ConfTyping.instDecidableEqSOp	ConfTyping.Unified	
+ConfTyping.instDecidableEqStratum	ConfTyping.Typing	
+ConfTyping.instDecidableEqTState	ConfTyping.QueryEscape	
+ConfTyping.instDecidableEqTok	ConfTyping.ParseSource	
+ConfTyping.instDecidableEqTok.decEq	ConfTyping.ParseSource	
+ConfTyping.instDecidableEqUCh	ConfTyping.Unified	
+ConfTyping.instDecidableEqXObligation	ConfTyping.CrossToolIndex	
+ConfTyping.instDecidableEqXObligation.decEq	ConfTyping.CrossToolIndex	
+ConfTyping.instReprAssume	ConfTyping.Assumptions	propext
+ConfTyping.instReprAssume.repr	ConfTyping.Assumptions	propext
+ConfTyping.instReprBGrade	ConfTyping.BoundedCert	
+ConfTyping.instReprBGrade.repr	ConfTyping.BoundedCert	
+ConfTyping.instReprCNAssume	ConfTyping.IndexedBases	propext
+ConfTyping.instReprCNAssume.repr	ConfTyping.IndexedBases	propext
+ConfTyping.instReprCmd	ConfTyping.Imp	propext
+ConfTyping.instReprCmd.repr	ConfTyping.Imp	propext
+ConfTyping.instReprEvKind	ConfTyping.Typing	
+ConfTyping.instReprEvKind.repr	ConfTyping.Typing	
+ConfTyping.instReprExpr	ConfTyping.Imp	propext
+ConfTyping.instReprExpr.repr	ConfTyping.Imp	propext
+ConfTyping.instReprHOp	ConfTyping.Unified	
+ConfTyping.instReprHOp.repr	ConfTyping.Unified	
+ConfTyping.instReprJAssume	ConfTyping.IndexedBases	
+ConfTyping.instReprJAssume.repr	ConfTyping.IndexedBases	
+ConfTyping.instReprJasminCert	ConfTyping.JasminCert	propext
+ConfTyping.instReprJasminCert.repr	ConfTyping.JasminCert	propext
+ConfTyping.instReprLvl	ConfTyping.JasminSCT	
+ConfTyping.instReprLvl.repr	ConfTyping.JasminSCT	
+ConfTyping.instReprMedBase	ConfTyping.Mediation	propext
+ConfTyping.instReprMedBase.repr	ConfTyping.Mediation	propext
+ConfTyping.instReprMedInstr	ConfTyping.Mediation	propext
+ConfTyping.instReprMedInstr.repr	ConfTyping.Mediation	propext
+ConfTyping.instReprMedState	ConfTyping.Mediation	propext
+ConfTyping.instReprMedState.repr	ConfTyping.Mediation	propext
+ConfTyping.instReprMemOp	ConfTyping.Unified	
+ConfTyping.instReprMemOp.repr	ConfTyping.Unified	
+ConfTyping.instReprRBase	ConfTyping.Race	propext
+ConfTyping.instReprRBase.repr	ConfTyping.Race	propext
+ConfTyping.instReprRInstr	ConfTyping.Race	propext
+ConfTyping.instReprRInstr.repr	ConfTyping.Race	propext
+ConfTyping.instReprSBase	ConfTyping.Speculate	propext
+ConfTyping.instReprSBase.repr	ConfTyping.Speculate	propext
+ConfTyping.instReprSExpr	ConfTyping.Unified	propext
+ConfTyping.instReprSExpr.repr	ConfTyping.Unified	propext
+ConfTyping.instReprSInstr	ConfTyping.Speculate	propext
+ConfTyping.instReprSInstr.repr	ConfTyping.Speculate	propext
+ConfTyping.instReprSLvl	ConfTyping.JasminSCT	
+ConfTyping.instReprSLvl.repr	ConfTyping.JasminSCT	
+ConfTyping.instReprSOp	ConfTyping.Unified	
+ConfTyping.instReprSOp.repr	ConfTyping.Unified	
+ConfTyping.instReprStratum	ConfTyping.Typing	
+ConfTyping.instReprStratum.repr	ConfTyping.Typing	
+ConfTyping.instReprUCh	ConfTyping.Unified	
+ConfTyping.instReprUCh.repr	ConfTyping.Unified	
+ConfTyping.instReprXObligation	ConfTyping.CrossToolIndex	propext
+ConfTyping.instReprXObligation.repr	ConfTyping.CrossToolIndex	propext
+ConfTyping.intBEqOfDecEq	ConfTyping.Imp	
+ConfTyping.inter	ConfTyping.MemSafe	propext
+ConfTyping.interNat	ConfTyping.TaintCert	
+ConfTyping.interNat_left	ConfTyping.TaintCert	propext
+ConfTyping.interNat_right	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.interStr	ConfTyping.Mediation	
+ConfTyping.interStr_left	ConfTyping.Mediation	propext
+ConfTyping.interStr_right	ConfTyping.Mediation	propext
+ConfTyping.inter_subset_left	ConfTyping.MemSafe	propext
+ConfTyping.inter_subset_right	ConfTyping.MemSafe	propext
+ConfTyping.interleaving_breaks_memory_safety	ConfTyping.Interleave	
+ConfTyping.inv_of_interL	ConfTyping.Mediation	propext
+ConfTyping.inv_of_interR	ConfTyping.Mediation	propext
+ConfTyping.isAtomic	ConfTyping.SpecFused	propext
+ConfTyping.iteTD_aux	ConfTyping.SecTyTD	propext
+ConfTyping.ite_aux	ConfTyping.SecTyD	propext
+ConfTyping.jAllTrue	ConfTyping.JasminLedger	
+ConfTyping.jCompIdx	ConfTyping.IndexedBases	
+ConfTyping.jEmbed_injective	ConfTyping.CrossToolIndex	propext
+ConfTyping.jNeedsI_eq	ConfTyping.IndexedBases	
+ConfTyping.jNeedsIdx	ConfTyping.IndexedBases	
+ConfTyping.jNeedsIdx_distinguishable	ConfTyping.IndexedBases	
+ConfTyping.jNoPreservation	ConfTyping.JasminLedger	
+ConfTyping.jNoSpecSem	ConfTyping.JasminLedger	
+ConfTyping.jNoTypeSystem	ConfTyping.JasminLedger	
+ConfTyping.jasmin_asm_base_is_minimal	ConfTyping.JasminLedger	Quot.sound,propext
+ConfTyping.jasmin_asm_entry0	ConfTyping.JasminLedger	
+ConfTyping.jasmin_asm_entry1	ConfTyping.JasminLedger	
+ConfTyping.jasmin_asm_entry2	ConfTyping.JasminLedger	
+ConfTyping.jasmin_assembly_charges_preservation	ConfTyping.JasminCert	propext
+ConfTyping.jasmin_base_strictly_smaller	ConfTyping.JasminCert	propext
+ConfTyping.jasmin_fixed_base_not_minimal_for_source	ConfTyping.JasminLedger	Quot.sound,propext
+ConfTyping.jasmin_goals_refutable	ConfTyping.JasminLedger	
+ConfTyping.jasmin_goals_satisfiable	ConfTyping.JasminLedger	
+ConfTyping.jasmin_src_base_is_minimal	ConfTyping.JasminLedger	Quot.sound,propext
+ConfTyping.jasmin_src_entry0	ConfTyping.JasminLedger	
+ConfTyping.jasmin_src_entry1	ConfTyping.JasminLedger	
+ConfTyping.jbase	ConfTyping.JasminLedger	
+ConfTyping.jbase_false_size	ConfTyping.JasminLedger	
+ConfTyping.jbase_true_size	ConfTyping.JasminLedger	
+ConfTyping.jcheck	ConfTyping.HeapJoint	propext
+ConfTyping.jcheckList	ConfTyping.SpecFused	propext
+ConfTyping.jcheckList_append	ConfTyping.SpecFused	propext
+ConfTyping.jcheckW	ConfTyping.HeapWiden	propext
+ConfTyping.jcheckW_gives_both	ConfTyping.HeapWiden	Classical.choice,Quot.sound,propext
+ConfTyping.jcheckW_out_of_fuel	ConfTyping.HeapWiden	propext
+ConfTyping.jcheckW_sound	ConfTyping.HeapWiden	Quot.sound,propext
+ConfTyping.jcheck_flatten	ConfTyping.SpecFused	propext
+ConfTyping.jcheck_gives_both	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.jcheck_ptrLow	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.jcheck_sound	ConfTyping.HeapJoint	propext
+ConfTyping.jcheck_strace	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.jcompBase	ConfTyping.JasminLedger	propext
+ConfTyping.jcompBaseD	ConfTyping.IndexedBases	
+ConfTyping.jcompBaseD_eq_jbase	ConfTyping.IndexedBases	
+ConfTyping.jcompBaseD_size	ConfTyping.IndexedBases	
+ConfTyping.jcompBase_is_four	ConfTyping.JasminLedger	propext
+ConfTyping.jcompBase_size	ConfTyping.JasminLedger	propext
+ConfTyping.jcompD_minimal	ConfTyping.IndexedBases	Quot.sound,propext
+ConfTyping.jcomp_every_entry_inert	ConfTyping.JasminLedger	Quot.sound,propext
+ConfTyping.joint	ConfTyping.Joint	
+ConfTyping.joint_cons_fst	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.joint_cons_snd	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.joint_to_perchannel	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.jsecTy_sound	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.kerLE	ConfTyping.TwoSafety	
+ConfTyping.ksafety_above_twosafety	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.lBenign	ConfTyping.LogInjection	
+ConfTyping.lPayload	ConfTyping.LogInjection	
+ConfTyping.lPre	ConfTyping.LogInjection	
+ConfTyping.labInv_alloc	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.labInv_assign	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.labInv_carry	ConfTyping.HeapJoint	
+ConfTyping.labInv_is_the_missing_hypothesis	ConfTyping.SpecFactor	
+ConfTyping.labInv_load	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.labInv_of_stable	ConfTyping.HeapJoint	
+ConfTyping.labStable_access	ConfTyping.HeapJoint	Quot.sound,propext
+ConfTyping.labStable_check	ConfTyping.HeapJoint	Quot.sound,propext
+ConfTyping.labStable_deref	ConfTyping.HeapJoint	Quot.sound,propext
+ConfTyping.labStable_free	ConfTyping.HeapJoint	Quot.sound,propext
+ConfTyping.labStable_hstore	ConfTyping.HeapJoint	Quot.sound,propext
+ConfTyping.labStable_skip	ConfTyping.HeapJoint	propext
+ConfTyping.labStable_sop	ConfTyping.HeapJoint	Quot.sound,propext
+ConfTyping.labels_dedup_but_the_ledger_cannot	ConfTyping.JasminLedger	propext
+ConfTyping.latConfine	ConfTyping.LatticeFlow	propext
+ConfTyping.latSecTy_ni	ConfTyping.LatticeFlow	Classical.choice,Quot.sound,propext
+ConfTyping.lcheck	ConfTyping.LeakCert	
+ConfTyping.lcheck_owned	ConfTyping.LeakCert	Classical.choice,Quot.sound,propext
+ConfTyping.leakBound	ConfTyping.FlowBridge	
+ConfTyping.leakSafe	ConfTyping.LeakCert	
+ConfTyping.leakSafe_sound	ConfTyping.LeakCert	Classical.choice,Quot.sound,propext
+ConfTyping.leak_needs_window_two	ConfTyping.Speculate	
+ConfTyping.leak_needs_window_two_U	ConfTyping.SpecUnified	propext
+ConfTyping.leak_rejected	ConfTyping.HeapFlow	
+ConfTyping.leaky_not_isolated	ConfTyping.Pipeline	Classical.choice,Quot.sound,propext
+ConfTyping.leaky_rejected	ConfTyping.Pipeline	
+ConfTyping.leaky_τ0	ConfTyping.Pipeline	propext
+ConfTyping.leaky_τ1	ConfTyping.Pipeline	propext
+ConfTyping.ledgerBridge_comp_flow	ConfTyping.LedgerBridge	
+ConfTyping.ledgerBridge_comp_ledger	ConfTyping.LedgerBridge	
+ConfTyping.ledgerGA	ConfTyping.LedgerBridge	
+ConfTyping.ledger_act_phantom	ConfTyping.LedgerBridge	
+ConfTyping.ledger_no_silent_discharge	ConfTyping.Ledger	Classical.choice,Quot.sound,propext
+ConfTyping.ledger_supply_chain_bound	ConfTyping.LedgerBridge	Classical.choice,Quot.sound,propext
+ConfTyping.ledger_supply_chain_ledger	ConfTyping.LedgerBridge	Classical.choice,Quot.sound,propext
+ConfTyping.ledger_supply_chain_map	ConfTyping.LedgerBridge	Classical.choice,Quot.sound,propext
+ConfTyping.levens	ConfTyping.LogInjection	
+ConfTyping.lex	ConfTyping.LexSource	
+ConfTyping.lexD	ConfTyping.DecimalId	propext
+ConfTyping.lexD_printD	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.lexFuel	ConfTyping.LexReal	propext
+ConfTyping.lexFuelD	ConfTyping.DecimalId	propext
+ConfTyping.lexFuelD_printD	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.lexFuel_printReal	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.lexR	ConfTyping.LexReal	propext
+ConfTyping.lexR_printReal	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.lex_print	ConfTyping.LexSource	propext
+ConfTyping.lex_skip_space	ConfTyping.LexSource	propext
+ConfTyping.liveB	ConfTyping.AliasSafe	Quot.sound,propext
+ConfTyping.liveP	ConfTyping.AliasLoop	
+ConfTyping.liveP_any	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.liveP_collapse	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.liveP_cons	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.liveP_mergeOne	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.liveP_purge	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.loadBearingAt_pair_left	ConfTyping.MinimalCompose	propext
+ConfTyping.loadBearingAt_pair_right	ConfTyping.MinimalCompose	Quot.sound,propext
+ConfTyping.logSkeleton	ConfTyping.LogInjection	
+ConfTyping.log_benign_correct	ConfTyping.LogInjection	
+ConfTyping.log_check	ConfTyping.SupplyChain	propext
+ConfTyping.log_concat_injectable	ConfTyping.LogInjection	
+ConfTyping.log_concat_leaks	ConfTyping.LogInjection	
+ConfTyping.log_cond	ConfTyping.SupplyChain	propext
+ConfTyping.lookNat	ConfTyping.TaintCert	
+ConfTyping.lookNat_mem	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.loopBody	ConfTyping.CountedLoop	
+ConfTyping.loopFix	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopFix2	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopFix2_correct	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopFix_converges	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopFix_correct	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopFix_terminates	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopHandler	ConfTyping.CountedLoop	
+ConfTyping.loopHandler_checks	ConfTyping.CountedLoop	propext
+ConfTyping.loopHandler_five	ConfTyping.CountedLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loopHandler_strings	ConfTyping.CountedLoop	propext
+ConfTyping.loopHandler_trace_is_low	ConfTyping.CountedLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loopQuery	ConfTyping.StringLoop	
+ConfTyping.loopQuery_checks	ConfTyping.StringLoop	propext
+ConfTyping.loopQuery_needed_the_widening	ConfTyping.StringLoop	propext
+ConfTyping.loopQuery_safe	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loopSearch	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopSearch_complete	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopSearch_correct	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.loopServe	ConfTyping.StringLoop	
+ConfTyping.loopServe_checks	ConfTyping.StringLoop	propext
+ConfTyping.loopServe_safe	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loop_alloc_rejected	ConfTyping.LeakCert	
+ConfTyping.loop_balanced_accepted	ConfTyping.LeakCert	
+ConfTyping.loop_wild_errors	ConfTyping.HeapLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loop_wild_rejected	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.loopalloc_checks	ConfTyping.HeapLoop	Quot.sound,propext
+ConfTyping.loopalloc_safe	ConfTyping.HeapLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loops_carry_three_of_four	ConfTyping.FullCert	propext
+ConfTyping.lowAllocProg	ConfTyping.HeapAlloc	
+ConfTyping.lowAllocProg_both	ConfTyping.HeapAlloc	Classical.choice,Quot.sound,propext
+ConfTyping.lowAllocProg_runs	ConfTyping.HeapAlloc	
+ConfTyping.lowEq	ConfTyping.Obs	
+ConfTyping.lowEq_of_no_atom	ConfTyping.FlowBridge	
+ConfTyping.lowEq_of_no_watom	ConfTyping.WhileBridge	
+ConfTyping.lowEq_σ	ConfTyping.Pleak	Classical.choice,Quot.sound,propext
+ConfTyping.low_alloc_now_typable	ConfTyping.HeapAlloc	propext
+ConfTyping.lrem	ConfTyping.DbInjection	
+ConfTyping.machine_guarantees_need_no_deployment	ConfTyping.Deploy	Classical.choice,Quot.sound,propext
+ConfTyping.maintain_collapse_preserved	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.maintain_loopFix	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.maintain_loopSearch	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.mcheck	ConfTyping.MemSafe	propext
+ConfTyping.mcheck_safe	ConfTyping.MemSafe	Classical.choice,Quot.sound,propext
+ConfTyping.medBase	ConfTyping.Mediation	
+ConfTyping.medCheck	ConfTyping.Mediation	propext
+ConfTyping.medCheck_sound	ConfTyping.Mediation	Quot.sound,propext
+ConfTyping.medGoal_of_no_access	ConfTyping.LoadBearing	propext
+ConfTyping.medRun	ConfTyping.Mediation	
+ConfTyping.medRunBody	ConfTyping.Mediation	
+ConfTyping.medRunBody_inv	ConfTyping.Mediation	propext
+ConfTyping.medRun_inv	ConfTyping.Mediation	propext
+ConfTyping.medStep	ConfTyping.Mediation	
+ConfTyping.medStep_inv	ConfTyping.Mediation	propext
+ConfTyping.med_fixed_accepted	ConfTyping.Mediation	propext
+ConfTyping.med_victim_bypasses	ConfTyping.Mediation	propext
+ConfTyping.med_victim_rejected	ConfTyping.Mediation	propext
+ConfTyping.mediation_generated_policy_carried	ConfTyping.Mediation	Quot.sound,propext
+ConfTyping.memA	ConfTyping.Speculate	
+ConfTyping.memB	ConfTyping.Speculate	
+ConfTyping.memCons_ne	ConfTyping.MemLinear	propext
+ConfTyping.memInt	ConfTyping.Unified	
+ConfTyping.memInt_cons_ne	ConfTyping.MemLinear	Quot.sound,propext
+ConfTyping.memInt_dropInt_of_ne	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.memInt_dropInt_self	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.memInt_mem	ConfTyping.Unified	Quot.sound,propext
+ConfTyping.memInv_not_preserved_by_free	ConfTyping.MemLinear	propext
+ConfTyping.memStr	ConfTyping.Mediation	
+ConfTyping.memStr_append	ConfTyping.Assumptions	propext
+ConfTyping.memStr_append_false	ConfTyping.Assumptions	propext
+ConfTyping.memStr_cons	ConfTyping.LeakCert	propext
+ConfTyping.memStr_dropStr_of_ne	ConfTyping.LeakCert	Classical.choice,Quot.sound,propext
+ConfTyping.memStr_mem	ConfTyping.Mediation	propext
+ConfTyping.memStr_of_subStr	ConfTyping.LeakCert	Quot.sound,propext
+ConfTyping.mem_filter_ne	ConfTyping.AliasLoop	Quot.sound,propext
+ConfTyping.mem_is_postproc	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.mem_lrem	ConfTyping.DbInjection	propext
+ConfTyping.mem_memStr	ConfTyping.LeakCert	propext
+ConfTyping.mem_mergeFilter	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.mem_of_mem_hlrem	ConfTyping.HeapLoop	propext
+ConfTyping.mem_of_mem_lrem	ConfTyping.DbInjection	propext
+ConfTyping.mem_of_mem_remove	ConfTyping.MemSafe	propext
+ConfTyping.mem_of_mem_trem	ConfTyping.ParseSource	propext
+ConfTyping.mem_of_mem_vremove	ConfTyping.QueryProgram	propext
+ConfTyping.mem_vremove	ConfTyping.QueryProgram	propext
+ConfTyping.memops_not_yet_NI_typed	ConfTyping.UnifiedNI	propext
+ConfTyping.memory_safety_always_allowed_it	ConfTyping.HeapAttack	propext
+ConfTyping.memory_safety_extended_for_free	ConfTyping.HeapValue	Classical.choice,Quot.sound,propext
+ConfTyping.mergeOne	ConfTyping.AliasFix	
+ConfTyping.mexec	ConfTyping.MemSafe	
+ConfTyping.min_sound_when_nongrowing	ConfTyping.BoundedCert	propext
+ConfTyping.min_unsound	ConfTyping.BoundedCert	Quot.sound,propext
+ConfTyping.minimal_pair	ConfTyping.MinimalCompose	Quot.sound,propext
+ConfTyping.misp	ConfTyping.Speculate	
+ConfTyping.modifiesOnly_comp	ConfTyping.CNReceive	
+ConfTyping.mpsafe_checks	ConfTyping.MemSafe	propext
+ConfTyping.mpsafe_memsafe	ConfTyping.MemSafe	Classical.choice,Quot.sound,propext
+ConfTyping.msafe_of_check	ConfTyping.MemSafe	Classical.choice,Quot.sound,propext
+ConfTyping.multiplex_checks_A	ConfTyping.Pipeline	
+ConfTyping.multiplex_checks_B	ConfTyping.Pipeline	
+ConfTyping.multiplex_isolates_A	ConfTyping.Pipeline	Quot.sound,propext
+ConfTyping.multiplex_isolates_B	ConfTyping.Pipeline	Quot.sound,propext
+ConfTyping.multiplex_pipeline_isolates_B	ConfTyping.Pipeline	propext
+ConfTyping.mwild_rejected	ConfTyping.MemSafe	propext
+ConfTyping.mwild_store_errors	ConfTyping.MemSafe	Classical.choice,Quot.sound,propext
+ConfTyping.naive_accepts_stored	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.narrowEnv	ConfTyping.StringLoop	
+ConfTyping.narrowEnv_spec	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.narrowFix	ConfTyping.HeapWiden	
+ConfTyping.narrowFix_spec	ConfTyping.HeapWiden	Quot.sound,propext
+ConfTyping.narrowing_budget_is_computed	ConfTyping.HeapWiden	propext
+ConfTyping.ne_of_mem_hlrem	ConfTyping.HeapLoop	propext
+ConfTyping.ne_of_mem_remove	ConfTyping.MemSafe	propext
+ConfTyping.ne_of_mem_trem	ConfTyping.ParseSource	propext
+ConfTyping.ne_of_mem_vremove	ConfTyping.QueryProgram	propext
+ConfTyping.needs	ConfTyping.Assumptions	propext
+ConfTyping.needsD	ConfTyping.LedgerDedup	propext
+ConfTyping.needsD_seq	ConfTyping.LedgerDedup	propext
+ConfTyping.needsLedger	ConfTyping.Assumptions	propext
+ConfTyping.needsLedgerD	ConfTyping.LedgerDedup	propext
+ConfTyping.needs_is_syntactic	ConfTyping.Assumptions	propext
+ConfTyping.needs_seq_duplicates	ConfTyping.LedgerDedup	propext
+ConfTyping.nested_checks	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.nested_prog_safe	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.ni_and_memory_do_not_factor	ConfTyping.HeapNI	propext
+ConfTyping.ni_of_check	ConfTyping.HeapFlow	propext
+ConfTyping.ni_transfers_to_speculation	ConfTyping.SpecBudget	propext
+ConfTyping.noAlloc	ConfTyping.HeapNI	
+ConfTyping.noAlloc'	ConfTyping.HeapNI	
+ConfTyping.noAlloc_lowEq	ConfTyping.HeapNI	
+ConfTyping.noAssign	ConfTyping.CostBound	
+ConfTyping.noAssign_preserves	ConfTyping.CostBound	propext
+ConfTyping.noBS	ConfTyping.QueryEscape	
+ConfTyping.noPolicy	ConfTyping.Typing	
+ConfTyping.noQ	ConfTyping.QueryGrammar	
+ConfTyping.noQ_head	ConfTyping.QueryGrammar	propext
+ConfTyping.noQ_tail	ConfTyping.QueryGrammar	propext
+ConfTyping.noWrite	ConfTyping.CountedLoop	
+ConfTyping.noWrite_preserves	ConfTyping.CountedLoop	propext
+ConfTyping.no_access_no_reads	ConfTyping.Assumptions	propext
+ConfTyping.no_entry_bears_of_unconditional	ConfTyping.LoadBearing	
+ConfTyping.no_irreducible_admissible	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.no_pointer_arithmetic_here	ConfTyping.SpecUnified	
+ConfTyping.no_relabelling_operation_exists	ConfTyping.HeapSecret	propext
+ConfTyping.notAllDistinct	ConfTyping.TwoSafety	
+ConfTyping.notAllDistinct_postclosed	ConfTyping.TwoSafety	
+ConfTyping.not_loadBearingAt_of_suffices	ConfTyping.LoadBearing	
+ConfTyping.oLowEq	ConfTyping.WhileBridge	propext
+ConfTyping.obs	ConfTyping.Obs	
+ConfTyping.obs_seq	ConfTyping.Compose	
+ConfTyping.odds	ConfTyping.QueryEscape	
+ConfTyping.ofCNComputed_carries_needs	ConfTyping.CNLedger	Classical.choice,Quot.sound,propext
+ConfTyping.ofCNComputed_comp_ledger	ConfTyping.CNLedger	Classical.choice,Quot.sound,propext
+ConfTyping.ofCNComputed_same_footprint	ConfTyping.CNLedger	Classical.choice,Quot.sound,propext
+ConfTyping.ofCN_admits_no_minimal_nonempty_base	ConfTyping.CNLedger	
+ConfTyping.ofCN_ignores_its_ledger	ConfTyping.CNLedger	Classical.choice,Quot.sound,propext
+ConfTyping.ofCN_ledger_inert_for_its_own_guarantee	ConfTyping.CNLedger	
+ConfTyping.ofComponent_cert	ConfTyping.FlowBridge	
+ConfTyping.ofDigits	ConfTyping.DecimalId	
+ConfTyping.ofDigits_snoc	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.ofDigits_toDigits	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.ofRelease_cert	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
+ConfTyping.ofWComponent_comp_cert	ConfTyping.WhileBridge	
+ConfTyping.ofWComponent_comp_map	ConfTyping.WhileBridge	
+ConfTyping.okBase	ConfTyping.MinimalCompose	
+ConfTyping.okBase_minimal	ConfTyping.MinimalCompose	Quot.sound,propext
+ConfTyping.only_the_budget_lacks_a_loop_rule	ConfTyping.FullCert	propext
+ConfTyping.openLeaf	ConfTyping.PathTraversal	
+ConfTyping.openLeaf_contained	ConfTyping.PathTraversal	
+ConfTyping.optLowEq	ConfTyping.WhileImp	propext
+ConfTyping.optLowEq_bind	ConfTyping.WhileImp	propext
+ConfTyping.optLowEq_map	ConfTyping.WhileImp	propext
+ConfTyping.optLowEq_of_wcheck	ConfTyping.WhileImp	propext
+ConfTyping.outNI_boundary	ConfTyping.Compose	propext
+ConfTyping.outNI_of_checkT	ConfTyping.SecTyT	Quot.sound,propext
+ConfTyping.outNI_seq	ConfTyping.Compose	Quot.sound,propext
+ConfTyping.outNI_to_JNI	ConfTyping.SecTyT	Quot.sound,propext
+ConfTyping.outO	ConfTyping.Compose	
+ConfTyping.outReleases_to_releasesAtMost	ConfTyping.SecTyTD	Quot.sound,propext
+ConfTyping.overwrite_rejected	ConfTyping.LeakCert	
+ConfTyping.ownership_is_the_missing_hypothesis	ConfTyping.Ownership	propext
+ConfTyping.paddedBase	ConfTyping.LoadBearing	propext
+ConfTyping.padded_base_not_load_bearing	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.pairBase	ConfTyping.MinimalCompose	
+ConfTyping.pairBase_size	ConfTyping.MinimalCompose	propext
+ConfTyping.pairGoal	ConfTyping.MinimalCompose	
+ConfTyping.pair_needs_satisfiability	ConfTyping.MinimalCompose	Quot.sound,propext
+ConfTyping.paramStructure	ConfTyping.InjectionReal	
+ConfTyping.paramStructureN	ConfTyping.QueryGrammar	
+ConfTyping.param_correct	ConfTyping.InjectionReal	propext
+ConfTyping.param_correct_N	ConfTyping.QueryGrammar	Quot.sound,propext
+ConfTyping.param_correct_esc	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.param_immune	ConfTyping.InjectionReal	
+ConfTyping.param_immune_N	ConfTyping.QueryGrammar	
+ConfTyping.param_immune_no_ledger	ConfTyping.QueryEscape	
+ConfTyping.param_noninterference	ConfTyping.InjectionReal	
+ConfTyping.param_noninterference_N	ConfTyping.QueryGrammar	
+ConfTyping.param_sink_trusted	ConfTyping.InjectionReal	
+ConfTyping.parse	ConfTyping.ParseSource	propext
+ConfTyping.parseAtom	ConfTyping.ParseSource	propext
+ConfTyping.parseAtom_print	ConfTyping.ParseSource	propext
+ConfTyping.parseEmission	ConfTyping.JasminCert	Classical.choice,Quot.sound,propext
+ConfTyping.parseEntry	ConfTyping.JasminCert	Classical.choice,Quot.sound,propext
+ConfTyping.parseLvl	ConfTyping.JasminCert	Classical.choice,Quot.sound,propext
+ConfTyping.parseS	ConfTyping.ParseSource	propext
+ConfTyping.parseS_print	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.parse_print	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.pathCheck	ConfTyping.PathTraversal	
+ConfTyping.pathCheck_rejects	ConfTyping.PathTraversal	
+ConfTyping.pathCheck_sound	ConfTyping.PathTraversal	Quot.sound,propext
+ConfTyping.path_escape_is_real	ConfTyping.PathCert	
+ConfTyping.path_escape_rejected	ConfTyping.PathCert	propext
+ConfTyping.path_needs_the_taint_environment	ConfTyping.PathCert	propext
+ConfTyping.path_row	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.payload	ConfTyping.InjectionReal	
+ConfTyping.payloadBS	ConfTyping.QueryEscape	
+ConfTyping.pcheck	ConfTyping.PathCert	propext
+ConfTyping.pcheckW	ConfTyping.StringLoop	propext
+ConfTyping.pcheckW_no_escape	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.pcheckW_sound	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.pcheck_no_escape	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.pcheck_sound	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.perchannel_covered	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.perchannel_to_joint	ConfTyping.Joint	propext
+ConfTyping.permissivePolicy	ConfTyping.LoadBearing	
+ConfTyping.pfull_accepted_declared	ConfTyping.SecTyD	propext
+ConfTyping.pfull_ledger	ConfTyping.SecTyD	
+ConfTyping.pfull_rejected_undeclared	ConfTyping.SecTyD	propext
+ConfTyping.pickAddr	ConfTyping.Unified	
+ConfTyping.pleak_boundary_releases	ConfTyping.Compose	Classical.choice,Quot.sound,propext
+ConfTyping.pleak_chain_releases	ConfTyping.Compose	Classical.choice,Quot.sound,propext
+ConfTyping.pleak_checksD	ConfTyping.SecTyD	propext
+ConfTyping.pleak_confidential_deploy	ConfTyping.Typing	Classical.choice,Quot.sound,propext
+ConfTyping.pleak_confidential_local	ConfTyping.Typing	Classical.choice,Quot.sound,propext
+ConfTyping.pleak_influenced_at_most_bit	ConfTyping.Integrity	Classical.choice,Quot.sound,propext
+ConfTyping.pleak_not_boundaryNI	ConfTyping.Compose	Classical.choice,Quot.sound,propext
+ConfTyping.pleak_rejected	ConfTyping.SecTy	
+ConfTyping.pleak_typed_local	ConfTyping.Typing	Classical.choice,Quot.sound,propext
+ConfTyping.pok_certified	ConfTyping.SecTy	propext
+ConfTyping.pok_checks	ConfTyping.SecTy	
+ConfTyping.pok_outNI	ConfTyping.SecTyT	Quot.sound,propext
+ConfTyping.pok_seq_certified	ConfTyping.SecTy	propext
+ConfTyping.policy_assumption_is_load_bearing	ConfTyping.Deploy	
+ConfTyping.policy_correctness_not_witnessed	ConfTyping.Mediation	Quot.sound,propext
+ConfTyping.policy_entry_inert_for_emitProg	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.policy_entry_load_bearing	ConfTyping.LoadBearing	propext
+ConfTyping.policy_entry_not_duplicated	ConfTyping.LedgerDedup	propext
+ConfTyping.poolPreserves_step	ConfTyping.Race	propext
+ConfTyping.post	ConfTyping.Obs	
+ConfTyping.postclosed_collapse	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.prependHead	ConfTyping.QueryEscape	
+ConfTyping.prependHead_cons	ConfTyping.QueryEscape	propext
+ConfTyping.preservation_inert_for_source	ConfTyping.JasminLedger	
+ConfTyping.preservedB	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.preservedB_spec	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.printAtom	ConfTyping.ParseSource	
+ConfTyping.printCh	ConfTyping.LexSource	
+ConfTyping.printD	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.printReal	ConfTyping.LexReal	
+ConfTyping.printS	ConfTyping.ParseSource	
+ConfTyping.printTokD	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.printTokD_ne_sp	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.printTokR	ConfTyping.LexReal	
+ConfTyping.printTokR_ne_sp	ConfTyping.LexReal	propext
+ConfTyping.prog_checks	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.prog_safe	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.protect_changes_only_the_speculative_component	ConfTyping.JasminSCT	
+ConfTyping.protected_footprint_is_public	ConfTyping.JasminSCT	propext
+ConfTyping.ptime_checksTD	ConfTyping.SecTyTD	propext
+ConfTyping.ptime_rejected_T	ConfTyping.SecTyT	
+ConfTyping.ptime_rejected_TD	ConfTyping.SecTyTD	propext
+ConfTyping.ptime_timing_released	ConfTyping.SecTyTD	Quot.sound,propext
+ConfTyping.ptime_wall_of_bit	ConfTyping.SecTyTD	propext
+ConfTyping.ptrFive	ConfTyping.Reuse	
+ConfTyping.ptrInSecret	ConfTyping.HeapNI	
+ConfTyping.ptrInSecret'	ConfTyping.HeapNI	
+ConfTyping.ptrInSecret_lowEq	ConfTyping.HeapNI	propext
+ConfTyping.ptrLow_initial	ConfTyping.SpecTrace	
+ConfTyping.ptrLow_is_not_implied_by_uLowEqA	ConfTyping.SpecTrace	propext
+ConfTyping.ptrLow_step	ConfTyping.SpecTrace	Classical.choice,Quot.sound,propext
+ConfTyping.ptrSeven	ConfTyping.Reuse	
+ConfTyping.ptr_states_lowEqA	ConfTyping.Reuse	propext
+ConfTyping.ptr_states_sepInv	ConfTyping.Reuse	Classical.choice,Quot.sound,propext
+ConfTyping.publicCell	ConfTyping.SpecFactor	
+ConfTyping.publicCell_labInv	ConfTyping.SpecFactor	propext
+ConfTyping.public_cells_can_be_freed	ConfTyping.HeapAttack	propext
+ConfTyping.public_is_recycled_secret_is_retired	ConfTyping.HeapRetire	
+ConfTyping.public_pointer_cannot_carry_a_secret	ConfTyping.HeapLabel	propext
+ConfTyping.public_pointer_still_cannot_carry_a_secret	ConfTyping.HeapSecret	propext
+ConfTyping.public_value_into_a_secret_cell	ConfTyping.HeapSecret	propext
+ConfTyping.pull	ConfTyping.FlowBridge	
+ConfTyping.pureBase	ConfTyping.LoadBearing	propext
+ConfTyping.pureBase_size	ConfTyping.LoadBearing	propext
+ConfTyping.pureGoal	ConfTyping.LoadBearing	
+ConfTyping.pureGoal_unconditional	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.pureGoal_unconditional_from_syntax	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.pureProg	ConfTyping.Assumptions	
+ConfTyping.pureProg_admits_no_other_minimal	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.pureProg_base_is_minimal	ConfTyping.LoadBearing	Quot.sound,propext
+ConfTyping.pureProg_deployed_with_nothing	ConfTyping.Assumptions	Classical.choice,Quot.sound,propext
+ConfTyping.pureProg_ledger	ConfTyping.Assumptions	propext
+ConfTyping.pureProg_needs_nothing	ConfTyping.Assumptions	propext
+ConfTyping.pureProg_reads_nothing	ConfTyping.Assumptions	propext
+ConfTyping.pureProg_sink_stays_empty	ConfTyping.Assumptions	Classical.choice,Quot.sound,propext
+ConfTyping.purge	ConfTyping.AliasLoop	
+ConfTyping.qcheck	ConfTyping.QueryProgram	Quot.sound,propext
+ConfTyping.qcheck_ni	ConfTyping.QueryProgram	Quot.sound,propext
+ConfTyping.qcount	ConfTyping.Unified	
+ConfTyping.qcount_append	ConfTyping.Unified	propext
+ConfTyping.qcount_sanStr	ConfTyping.Unified	
+ConfTyping.qd	ConfTyping.FlowBridge	
+ConfTyping.qexec	ConfTyping.QueryProgram	
+ConfTyping.qle	ConfTyping.FlowBridge	
+ConfTyping.qleT	ConfTyping.FlowBridge	
+ConfTyping.qualitative_admissible_is_JNI	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.query_sink_untouched_by_path_checker	ConfTyping.PathCert	propext
+ConfTyping.quoteVal	ConfTyping.QueryEscape	
+ConfTyping.rReg	ConfTyping.Race	
+ConfTyping.raceSched	ConfTyping.Race	
+ConfTyping.race_rejected_atomic_safe	ConfTyping.Race	Quot.sound,propext
+ConfTyping.racefree	ConfTyping.Race	propext
+ConfTyping.racefree_all_schedules	ConfTyping.Race	Quot.sound,propext
+ConfTyping.racefree_poolPreserves	ConfTyping.Race	Quot.sound,propext
+ConfTyping.racyCfg	ConfTyping.Race	
+ConfTyping.racyT	ConfTyping.Race	
+ConfTyping.racy_rejected	ConfTyping.Race	propext
+ConfTyping.racy_seq_safe	ConfTyping.Race	
+ConfTyping.rcostU	ConfTyping.SpecUnified	propext
+ConfTyping.readTok	ConfTyping.LexReal	propext
+ConfTyping.readTokD	ConfTyping.DecimalId	propext
+ConfTyping.readTokD_printTokD	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.readTok_printTokR	ConfTyping.LexReal	propext
+ConfTyping.recordsOf	ConfTyping.LogInjection	
+ConfTyping.recordsOf_ne_nil	ConfTyping.LogInjection	propext
+ConfTyping.records_append_nl	ConfTyping.LogInjection	propext
+ConfTyping.records_nlfree	ConfTyping.LogInjection	propext
+ConfTyping.reject_Jinvariant	ConfTyping.Typing	
+ConfTyping.relOf	ConfTyping.SecTyD	
+ConfTyping.relOf_seq	ConfTyping.SecTyD	
+ConfTyping.rel_joint_to_perchannel	ConfTyping.TwoSafety	Quot.sound,propext
+ConfTyping.rel_perchannel_to_joint	ConfTyping.TwoSafety	propext
+ConfTyping.rel_postproc	ConfTyping.TwoSafety	
+ConfTyping.rel_separability_equiv	ConfTyping.TwoSafety	Quot.sound,propext
+ConfTyping.releasesAtMost_of_checkTD	ConfTyping.SecTyTD	Quot.sound,propext
+ConfTyping.releases_seq	ConfTyping.Compose	
+ConfTyping.releases_seq_const_consistency	ConfTyping.Compose	
+ConfTyping.remove	ConfTyping.MemSafe	
+ConfTyping.resDB	ConfTyping.Mediation	
+ConfTyping.resolve	ConfTyping.PathTraversal	
+ConfTyping.resolveRel	ConfTyping.PathTraversal	
+ConfTyping.resultNI_of_check	ConfTyping.SecTy	Quot.sound,propext
+ConfTyping.resultNI_seq	ConfTyping.Compose	
+ConfTyping.resultO	ConfTyping.Obs	
+ConfTyping.result_full_not_bounded_by_bit	ConfTyping.Pleak	Classical.choice,Quot.sound,propext
+ConfTyping.result_not_closable	ConfTyping.Pleak	Classical.choice,Quot.sound,propext
+ConfTyping.result_releases_at_most_bit	ConfTyping.Pleak	Classical.choice,Quot.sound,propext
+ConfTyping.rexec	ConfTyping.Race	
+ConfTyping.rexecBase	ConfTyping.Race	
+ConfTyping.rexecBase_pure	ConfTyping.Race	propext
+ConfTyping.rexecSeq	ConfTyping.Race	
+ConfTyping.rfI	ConfTyping.Race	propext
+ConfTyping.rho0	ConfTyping.Speculate	
+ConfTyping.rich_source_injection_free	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.rollback_is_complete	ConfTyping.SpecBudget	propext
+ConfTyping.roundTrip	ConfTyping.HeapValue	
+ConfTyping.roundTrip_certified	ConfTyping.HeapValue	propext
+ConfTyping.row7_carried_is_a_ledger_entry	ConfTyping.BundleLedger	Quot.sound,propext
+ConfTyping.rrun	ConfTyping.Race	
+ConfTyping.rrun_preserves	ConfTyping.Race	propext
+ConfTyping.rstep	ConfTyping.Race	
+ConfTyping.rstepPool	ConfTyping.Race	
+ConfTyping.runDg	ConfTyping.LexReal	propext
+ConfTyping.runDg_replicate	ConfTyping.LexReal	propext
+ConfTyping.runS	ConfTyping.LatticeFlow	
+ConfTyping.runS_assign	ConfTyping.LatticeFlow	
+ConfTyping.runS_ite	ConfTyping.LatticeFlow	
+ConfTyping.runS_seq	ConfTyping.LatticeFlow	
+ConfTyping.runS_skip	ConfTyping.LatticeFlow	
+ConfTyping.rρ0	ConfTyping.Race	
+ConfTyping.rσ0	ConfTyping.Race	
+ConfTyping.s0	ConfTyping.AliasFix	
+ConfTyping.safeChars	ConfTyping.LexSource	
+ConfTyping.safeDecimal	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.safeHeapProg	ConfTyping.HeapJoint	
+ConfTyping.safeHeapProg_both	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
+ConfTyping.safeHeapProg_runs	ConfTyping.HeapJoint	
+ConfTyping.safePath	ConfTyping.PathCert	
+ConfTyping.safePathProg	ConfTyping.PathCert	
+ConfTyping.safeQuery	ConfTyping.TaintCert	
+ConfTyping.safeRich	ConfTyping.LexReal	
+ConfTyping.safeSrc	ConfTyping.ParseSource	
+ConfTyping.safeToks	ConfTyping.LexReal	
+ConfTyping.safeToksD	ConfTyping.DecimalId	
+ConfTyping.safe_accepted	ConfTyping.QueryProgram	Quot.sound,propext
+ConfTyping.safe_chars_accepted	ConfTyping.LexSource	Quot.sound,propext
+ConfTyping.safe_chars_injection_free	ConfTyping.LexSource	Quot.sound,propext
+ConfTyping.safe_chars_parse	ConfTyping.LexSource	propext
+ConfTyping.safe_decimal_accepted	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.safe_decimal_injection_free	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.safe_decimal_parses	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.safe_injection_free	ConfTyping.QueryProgram	Quot.sound,propext
+ConfTyping.safe_of_check	ConfTyping.HeapLoop	Classical.choice,Quot.sound,propext
+ConfTyping.safe_parses	ConfTyping.ParseSource	propext
+ConfTyping.safe_path_checks	ConfTyping.PathCert	propext
+ConfTyping.safe_path_contained	ConfTyping.PathTraversal	Quot.sound,propext
+ConfTyping.safe_path_holds_under_every_input	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.safe_rich_accepted	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.safe_rich_injection_free	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.safe_rich_parses	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.safe_src_accepted	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.safe_src_injection_free	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.sameClassP	ConfTyping.AliasLoop	
+ConfTyping.sameClassP_mergeOne	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.sameElemsB	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.sameKernel	ConfTyping.TwoSafety	
+ConfTyping.sample_f	ConfTyping.JasminCert	
+ConfTyping.sample_id	ConfTyping.JasminCert	
+ConfTyping.sample_id3	ConfTyping.JasminCert	
+ConfTyping.sample_multiline	ConfTyping.JasminCert	
+ConfTyping.sanStr	ConfTyping.Unified	
+ConfTyping.sanitisation_is_the_discharge	ConfTyping.TaintCert	
+ConfTyping.sanitised_query_checks	ConfTyping.TaintCert	propext
+ConfTyping.sanitised_query_holds_under_every_input	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.sanitising_does_not_declassify	ConfTyping.AllFive	propext
+ConfTyping.sanitize_const_is_taint	ConfTyping.Integrity	
+ConfTyping.sat_append	ConfTyping.Ledger	propext
+ConfTyping.sat_iff_forall_mem	ConfTyping.LedgerDedup	Quot.sound,propext
+ConfTyping.sat_jcompBaseD_iff	ConfTyping.IndexedBases	Quot.sound,propext
+ConfTyping.sat_map_eraseDups	ConfTyping.LedgerDedup	Quot.sound,propext
+ConfTyping.sat_needsLedgerD_iff	ConfTyping.LedgerDedup	Quot.sound,propext
+ConfTyping.sat_of_subset	ConfTyping.LedgerDedup	Quot.sound,propext
+ConfTyping.sat_toLedger	ConfTyping.Deploy	
+ConfTyping.scanCerts	ConfTyping.JasminCert	Classical.choice,Quot.sound,propext
+ConfTyping.scheck	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.scheckA	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.scheckA_ni	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.scheck_ni	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.scount	ConfTyping.TaintCert	propext
+ConfTyping.scount_sound	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.sctGA	ConfTyping.HeteroCompose	Quot.sound,propext
+ConfTyping.sctLvlGA	ConfTyping.JasminSCT	propext
+ConfTyping.secCheck	ConfTyping.SecTy	
+ConfTyping.secCheckD	ConfTyping.SecTyD	propext
+ConfTyping.secCheckD_sound	ConfTyping.SecTyD	propext
+ConfTyping.secCheckT	ConfTyping.SecTyT	
+ConfTyping.secCheckTD	ConfTyping.SecTyTD	propext
+ConfTyping.secCheckTD_sound	ConfTyping.SecTyTD	propext
+ConfTyping.secCheckT_imp_secCheck	ConfTyping.SecTyT	propext
+ConfTyping.secCheckT_sound	ConfTyping.SecTyT	propext
+ConfTyping.secCheck_sound	ConfTyping.SecTy	propext
+ConfTyping.secTyD_sound	ConfTyping.SecTyD	Quot.sound,propext
+ConfTyping.secTyTD_outReleases	ConfTyping.SecTyTD	propext
+ConfTyping.secTyTD_sound	ConfTyping.SecTyTD	Quot.sound,propext
+ConfTyping.secTyT_outNI	ConfTyping.SecTyT	propext
+ConfTyping.secTyT_sound	ConfTyping.SecTyT	Quot.sound,propext
+ConfTyping.secTy_boundaryNI	ConfTyping.SecTy	propext
+ConfTyping.secretAddr	ConfTyping.Speculate	
+ConfTyping.secretCell	ConfTyping.SpecFactor	
+ConfTyping.secretCell_traceEq	ConfTyping.SpecFactor	propext
+ConfTyping.secretLifecycle	ConfTyping.HeapRetire	
+ConfTyping.secretLifecycle_checks	ConfTyping.HeapRetire	propext
+ConfTyping.secretLifecycle_runs	ConfTyping.HeapRetire	
+ConfTyping.secretOne	ConfTyping.HeapAlloc	
+ConfTyping.secretStr	ConfTyping.Attack	
+ConfTyping.secretStr'	ConfTyping.Attack	
+ConfTyping.secretStr_lowEqA	ConfTyping.Attack	propext
+ConfTyping.secretStr_sepInv	ConfTyping.Attack	Quot.sound,propext
+ConfTyping.secretTouching	ConfTyping.Attack	
+ConfTyping.secretTouching_NI_is_real	ConfTyping.Attack	Classical.choice,Quot.sound,propext
+ConfTyping.secretTouching_checks	ConfTyping.Attack	propext
+ConfTyping.secretWrite	ConfTyping.HeapAttack	
+ConfTyping.secretWrite_checks	ConfTyping.HeapAttack	propext
+ConfTyping.secretZero	ConfTyping.HeapAlloc	
+ConfTyping.secret_cell_cannot_be_read_into_a_public_variable	ConfTyping.HeapSecret	propext
+ConfTyping.secret_cells_can_now_be_freed	ConfTyping.HeapAttack	propext
+ConfTyping.secret_guard_rejected	ConfTyping.SpecUnified	propext
+ConfTyping.secret_loop_still_rejected	ConfTyping.UnifiedNI	propext
+ConfTyping.secret_pointer_needs_a_secret_destination	ConfTyping.HeapValue	propext
+ConfTyping.secret_round_trip_checks	ConfTyping.HeapSecret	propext
+ConfTyping.secret_states_lowEqA	ConfTyping.HeapAlloc	propext
+ConfTyping.secret_through_a_secret_pointer	ConfTyping.HeapSecret	propext
+ConfTyping.secret_write_is_not_vacuous	ConfTyping.HeapAttack	Classical.choice,Quot.sound,propext
+ConfTyping.seedObs	ConfTyping.Joint	
+ConfTyping.seed_JNI	ConfTyping.Joint	
+ConfTyping.segs	ConfTyping.InjectionReal	
+ConfTyping.segsD	ConfTyping.QueryEscape	
+ConfTyping.segsD_escDouble	ConfTyping.QueryEscape	propext
+ConfTyping.segsD_out_append_q	ConfTyping.QueryEscape	propext
+ConfTyping.segsD_out_qfree	ConfTyping.QueryEscape	propext
+ConfTyping.segsD_qq_qfree	ConfTyping.QueryEscape	propext
+ConfTyping.segsDoubled	ConfTyping.QueryEscape	
+ConfTyping.segsE	ConfTyping.QueryEscape	
+ConfTyping.segsE_buildEsc	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.segsN	ConfTyping.QueryGrammar	
+ConfTyping.segsT	ConfTyping.QueryEscape	
+ConfTyping.segsT_esc	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.segsT_noBS	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.segsT_out_append_q	ConfTyping.QueryEscape	propext
+ConfTyping.segsT_out_qfree	ConfTyping.QueryEscape	propext
+ConfTyping.segs_append_q	ConfTyping.InjectionReal	propext
+ConfTyping.segs_buildN	ConfTyping.QueryGrammar	Quot.sound,propext
+ConfTyping.segs_cons_c	ConfTyping.QueryEscape	
+ConfTyping.segs_ne_nil	ConfTyping.InjectionReal	propext
+ConfTyping.segs_qfree	ConfTyping.InjectionReal	propext
+ConfTyping.separability_equiv	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.separation_is_not_conjunctive	ConfTyping.Ownership	Classical.choice,Quot.sound,propext
+ConfTyping.seqAll	ConfTyping.BigHandler	
+ConfTyping.seqBase	ConfTyping.LedgerDedup	propext
+ConfTyping.seqBaseD	ConfTyping.LedgerDedup	propext
+ConfTyping.seqBaseD_eq_fiveBase	ConfTyping.LedgerDedup	propext
+ConfTyping.seqBaseD_minimal	ConfTyping.LedgerDedup	Quot.sound,propext
+ConfTyping.seqBaseD_size	ConfTyping.LedgerDedup	propext
+ConfTyping.seqBase_not_minimal	ConfTyping.LedgerDedup	Classical.choice,Quot.sound,propext
+ConfTyping.seqBase_size	ConfTyping.LedgerDedup	propext
+ConfTyping.seqRelease	ConfTyping.Compose	
+ConfTyping.seqSched01	ConfTyping.Race	
+ConfTyping.seqSched10	ConfTyping.Race	
+ConfTyping.seq_all_channels	ConfTyping.Compose	Quot.sound,propext
+ConfTyping.seq_third_entry_inert	ConfTyping.LedgerDedup	propext
+ConfTyping.sequential_model_misses_races	ConfTyping.Race	
+ConfTyping.sexec	ConfTyping.ParseSource	
+ConfTyping.sexprLow	ConfTyping.Unified	
+ConfTyping.shareSuper	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.simA3_iff_respectsCoarsening	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.sink_assumption_is_load_bearing	ConfTyping.Deploy	Quot.sound,propext
+ConfTyping.sink_entry_load_bearing	ConfTyping.LoadBearing	propext
+ConfTyping.sinksOf	ConfTyping.Assumptions	propext
+ConfTyping.size	ConfTyping.ParseSource	
+ConfTyping.size_le_len	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.skeleton	ConfTyping.InjectionReal	
+ConfTyping.skeletonD	ConfTyping.QueryEscape	
+ConfTyping.skeletonE	ConfTyping.QueryEscape	
+ConfTyping.skeletonE_eq_skeleton	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.skip_WOutNI	ConfTyping.WhileCompose	propext
+ConfTyping.slcheck	ConfTyping.MemLinear	propext
+ConfTyping.slcheck_extends_umcheck	ConfTyping.MemLinear	propext
+ConfTyping.slcheck_no_fault	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.slcheck_sound	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.slvl_transient_ne_public	ConfTyping.JasminSCT	
+ConfTyping.slvl_transient_ne_secret	ConfTyping.JasminSCT	
+ConfTyping.sndV	ConfTyping.Joint	propext
+ConfTyping.sound_rejects_stored	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.soundness	ConfTyping.Typing	
+ConfTyping.soundness_deploy	ConfTyping.Typing	propext
+ConfTyping.sourceGoal	ConfTyping.JasminLedger	
+ConfTyping.source_and_asm_differ	ConfTyping.JasminLedger	
+ConfTyping.source_injection_free	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.source_string_injection_free	ConfTyping.LexSource	Quot.sound,propext
+ConfTyping.spaced_lexes_same	ConfTyping.LexSource	
+ConfTyping.spanDigits	ConfTyping.DecimalId	propext
+ConfTyping.spanDigits_map	ConfTyping.DecimalId	propext
+ConfTyping.spath	ConfTyping.PathCert	
+ConfTyping.spath_sound	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.specCheck	ConfTyping.Speculate	propext
+ConfTyping.specCheck_sound	ConfTyping.Speculate	propext
+ConfTyping.specExec	ConfTyping.Speculate	
+ConfTyping.specRun	ConfTyping.Speculate	
+ConfTyping.specRun_startsFenced	ConfTyping.Speculate	propext
+ConfTyping.specState	ConfTyping.SpecUnified	
+ConfTyping.specStore	ConfTyping.HeteroCompose	
+ConfTyping.specStore_eq_of_reconciles	ConfTyping.HeteroCompose	Quot.sound
+ConfTyping.specTrace	ConfTyping.Speculate	
+ConfTyping.spec_cost_bound	ConfTyping.SpecBudget	Quot.sound,propext
+ConfTyping.spec_inert	ConfTyping.Speculate	propext
+ConfTyping.spec_is_uexec_extended	ConfTyping.SpecUnified	propext
+ConfTyping.spectre_leaks	ConfTyping.Speculate	
+ConfTyping.spectre_rejected_fixed_safe	ConfTyping.Speculate	propext
+ConfTyping.spectre_trace_is_the_secret	ConfTyping.Speculate	
+ConfTyping.speculative_model_misses_it	ConfTyping.Speculate	
+ConfTyping.spinU	ConfTyping.CostBound	
+ConfTyping.spinU_cost_lb	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.spinU_step	ConfTyping.CostBound	Quot.sound,propext
+ConfTyping.splitOnChar	ConfTyping.JasminCert	
+ConfTyping.stale_pointer_refused_after_reuse	ConfTyping.Reuse	propext
+ConfTyping.startsFenced	ConfTyping.Speculate	propext
+ConfTyping.startsWithL	ConfTyping.JasminCert	
+ConfTyping.stepRel	ConfTyping.PathTraversal	
+ConfTyping.step_eval	ConfTyping.Imp	propext
+ConfTyping.stored_injection_leaks	ConfTyping.DbInjection	
+ConfTyping.storing_a_public_value_is_fine	ConfTyping.HeapValue	propext
+ConfTyping.storing_a_secret_is_refused	ConfTyping.HeapValue	propext
+ConfTyping.straceU	ConfTyping.SpecUnified	propext
+ConfTyping.subOf	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.subOf_iff	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.subStr	ConfTyping.CountedLoop	
+ConfTyping.subStr_mem	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.supd	ConfTyping.ParseSource	
+ConfTyping.supply_chain_discharged	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
+ConfTyping.supply_chain_ledger	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
+ConfTyping.tPre	ConfTyping.InjectionReal	
+ConfTyping.tPre_qfree	ConfTyping.QueryEscape	
+ConfTyping.tSuf	ConfTyping.InjectionReal	
+ConfTyping.tSuf_qfree	ConfTyping.QueryEscape	
+ConfTyping.taint_is_JNI	ConfTyping.Integrity	
+ConfTyping.taint_result_seq	ConfTyping.Compose	
+ConfTyping.tcheck	ConfTyping.TaintCert	propext
+ConfTyping.tcheckW	ConfTyping.StringLoop	propext
+ConfTyping.tcheckW_no_injection	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.tcheckW_out_of_fuel	ConfTyping.StringLoop	propext
+ConfTyping.tcheckW_sound	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.tcheck_no_injection	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.tcheck_no_injection_from	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.tcheck_sound	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.the_allocator_reuses	ConfTyping.Reuse	
+ConfTyping.the_bound_is_not_vacuous	ConfTyping.SpecBudget	propext
+ConfTyping.the_extra_command_touches_memory	ConfTyping.SpecUnified	propext
+ConfTyping.the_fix_closes_it	ConfTyping.SpecTrace	propext
+ConfTyping.the_fix_is_targeted	ConfTyping.Reuse	propext
+ConfTyping.the_gap_closed	ConfTyping.HeapAttack	propext
+ConfTyping.the_heap_is_a_public_resource	ConfTyping.HeapValue	propext
+ConfTyping.the_heap_is_live	ConfTyping.HeapValue	
+ConfTyping.the_heap_is_two_level	ConfTyping.HeapSecret	propext
+ConfTyping.the_hypothesis_is_load_bearing	ConfTyping.SpecFused	propext
+ConfTyping.the_leaking_state_is_the_unsafe_one	ConfTyping.HeapNI	propext
+ConfTyping.the_leaking_state_violates_the_label_invariant	ConfTyping.Reuse	propext
+ConfTyping.the_live_run_was_always_fine	ConfTyping.SpecTrace	propext
+ConfTyping.the_load_is_certified	ConfTyping.SpecFactor	propext
+ConfTyping.the_rule_is_no_longer_needed	ConfTyping.HeapRetire	propext
+ConfTyping.the_secret_address_is_retired	ConfTyping.BigHandler	
+ConfTyping.threadA	ConfTyping.Interleave	
+ConfTyping.threadB	ConfTyping.Interleave	
+ConfTyping.threadFree	ConfTyping.Interleave	
+ConfTyping.threadUse	ConfTyping.Interleave	
+ConfTyping.thread_local_certificates_do_not_compose	ConfTyping.Interleave	propext
+ConfTyping.toAddr	ConfTyping.Speculate	
+ConfTyping.toDigits	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.toDigits.induct	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.toDigits_ne_nil	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.toLedger	ConfTyping.Deploy	
+ConfTyping.toLedger_all_junk_for_pureProg	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.toLedger_not_load_bearing	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.toLedger_not_minimal	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
+ConfTyping.toLedger_size	ConfTyping.LoadBearing	
+ConfTyping.toctou_interleaving_unsafe	ConfTyping.Race	
+ConfTyping.tokOf	ConfTyping.LexSource	
+ConfTyping.tokOf_printCh	ConfTyping.LexSource	
+ConfTyping.tokens	ConfTyping.JasminCert	
+ConfTyping.touched	ConfTyping.SpecUnified	propext
+ConfTyping.touchedRaw	ConfTyping.SpecUnified	propext
+ConfTyping.touched_agrees	ConfTyping.SpecTrace	propext
+ConfTyping.touched_dead	ConfTyping.SpecTrace	propext
+ConfTyping.touched_live	ConfTyping.SpecTrace	propext
+ConfTyping.touchesOnly_imp_arch	ConfTyping.JasminSCT	
+ConfTyping.touchesOnly_of_inert	ConfTyping.HeteroCompose	
+ConfTyping.traceEq_is_not_inductive	ConfTyping.SpecFactor	propext
+ConfTyping.trace_split	ConfTyping.SpecFused	propext
+ConfTyping.traced_step_agrees	ConfTyping.SpecFactor	Classical.choice,Quot.sound,propext
+ConfTyping.transRun	ConfTyping.SpecUnified	propext
+ConfTyping.transRun_agrees	ConfTyping.SpecFused	Classical.choice,Quot.sound,propext
+ConfTyping.transSteps	ConfTyping.SpecUnified	
+ConfTyping.transSteps_le	ConfTyping.SpecUnified	Quot.sound,propext
+ConfTyping.transient_work_is_off_the_budget	ConfTyping.SpecUnified	propext
+ConfTyping.transport_JNI	ConfTyping.Typing	
+ConfTyping.transport_releases	ConfTyping.Typing	
+ConfTyping.traversal_escapes	ConfTyping.PathTraversal	propext
+ConfTyping.trem	ConfTyping.ParseSource	
+ConfTyping.trimL	ConfTyping.JasminCert	
+ConfTyping.trustEq	ConfTyping.Integrity	
+ConfTyping.tup	ConfTyping.Obs	
+ConfTyping.twelve_attacks_refused	ConfTyping.Attack	propext
+ConfTyping.twoCells	ConfTyping.HeapLabel	
+ConfTyping.twoCells_checks	ConfTyping.HeapLabel	propext
+ConfTyping.twoCells_labels	ConfTyping.HeapLabel	
+ConfTyping.twoLive	ConfTyping.SpecUnified	
+ConfTyping.typed_but_wall_leaks	ConfTyping.SecTy	Classical.choice,Quot.sound,propext
+ConfTyping.uCtr	ConfTyping.CostBound	
+ConfTyping.uFixed	ConfTyping.Unified	
+ConfTyping.uFixed_permitted_reads	ConfTyping.Unified	
+ConfTyping.uFixed_refused_reads_nothing	ConfTyping.Unified	
+ConfTyping.uLowEq	ConfTyping.UnifiedNI	
+ConfTyping.uLowEqA	ConfTyping.HeapJoint	
+ConfTyping.uNI_of_check	ConfTyping.UnifiedNI	propext
+ConfTyping.uOptLowEq	ConfTyping.UnifiedNI	propext
+ConfTyping.uOptLowEqA	ConfTyping.HeapJoint	propext
+ConfTyping.uOptLowEqA.toLowEq	ConfTyping.HeapJoint	propext
+ConfTyping.uOptLowEqA_bindE	ConfTyping.HeapJoint	propext
+ConfTyping.uOptLowEqA_mapE	ConfTyping.HeapJoint	propext
+ConfTyping.uOptLowEqA_split	ConfTyping.SpecFused	propext
+ConfTyping.uOptLowEq_bind	ConfTyping.UnifiedNI	propext
+ConfTyping.uOptLowEq_bindE	ConfTyping.HeapJoint	propext
+ConfTyping.uOptLowEq_map	ConfTyping.UnifiedNI	propext
+ConfTyping.uOptLowEq_mapE	ConfTyping.HeapJoint	propext
+ConfTyping.uVictim	ConfTyping.Unified	
+ConfTyping.uVictim_not_mediated	ConfTyping.Unified	propext
+ConfTyping.uaf_errors	ConfTyping.MemFree	propext
+ConfTyping.uaf_rejected	ConfTyping.MemFree	propext
+ConfTyping.ucheck	ConfTyping.Bundle	propext
+ConfTyping.ucheckNI	ConfTyping.UnifiedNI	propext
+ConfTyping.ucheckNI_sound	ConfTyping.UnifiedNI	propext
+ConfTyping.ucheck_sound	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.ucost_of_cost	ConfTyping.Unified	Quot.sound,propext
+ConfTyping.uembed	ConfTyping.Unified	
+ConfTyping.uembed_mediated	ConfTyping.Unified	Quot.sound,propext
+ConfTyping.uexec	ConfTyping.Unified	
+ConfTyping.uexecPar	ConfTyping.Interleave	
+ConfTyping.uexecS	ConfTyping.SpecUnified	propext
+ConfTyping.uexecS_ite_eq	ConfTyping.SpecUnified	propext
+ConfTyping.uexecS_loop_eq	ConfTyping.SpecUnified	propext
+ConfTyping.uexecS_uexec	ConfTyping.SpecFused	propext
+ConfTyping.uexec_atomic	ConfTyping.SpecFused	propext
+ConfTyping.uexec_dead	ConfTyping.LeakCert	propext
+ConfTyping.uexec_dead_cost	ConfTyping.BundleLoop	Quot.sound,propext
+ConfTyping.uexec_dead_loop_diverges	ConfTyping.BundleLoop	propext
+ConfTyping.uexec_dead_unchanged	ConfTyping.BundleLoop	propext
+ConfTyping.uexec_embed_eq	ConfTyping.Unified	Quot.sound,propext
+ConfTyping.uexec_fresh_mono	ConfTyping.Attack	Classical.choice,Quot.sound,propext
+ConfTyping.uexec_ite_eq	ConfTyping.Unified	
+ConfTyping.uexec_keeps_dead	ConfTyping.SpecTrace	propext
+ConfTyping.uexec_loop_eq	ConfTyping.Unified	
+ConfTyping.uexec_seq_eq	ConfTyping.Unified	
+ConfTyping.umcheck	ConfTyping.MemCert	propext
+ConfTyping.umcheck_no_fault	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.umcheck_sound	ConfTyping.MemCert	Classical.choice,Quot.sound,propext
+ConfTyping.unbounded_countdown_still_refused	ConfTyping.CountedLoop	propext
+ConfTyping.union_gives_both	ConfTyping.Ownership	propext
+ConfTyping.unsafeChars	ConfTyping.LexSource	
+ConfTyping.unsafeCharsSpaced	ConfTyping.LexSource	
+ConfTyping.unsafeDecimal	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.unsafeRich	ConfTyping.LexReal	
+ConfTyping.unsafeSrc	ConfTyping.ParseSource	
+ConfTyping.unsafeToks	ConfTyping.LexReal	
+ConfTyping.unsafeToksD	ConfTyping.DecimalId	
+ConfTyping.unsafe_chars_parse	ConfTyping.LexSource	propext
+ConfTyping.unsafe_chars_rejected	ConfTyping.LexSource	Quot.sound,propext
+ConfTyping.unsafe_decimal_lexes	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.unsafe_decimal_parses	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.unsafe_decimal_rejected	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.unsafe_leaks	ConfTyping.QueryProgram	
+ConfTyping.unsafe_parses	ConfTyping.ParseSource	propext
+ConfTyping.unsafe_rejected	ConfTyping.QueryProgram	Quot.sound,propext
+ConfTyping.unsafe_rich_lexes	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.unsafe_rich_parses	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.unsafe_rich_rejected	ConfTyping.LexReal	Quot.sound,propext
+ConfTyping.unsafe_src_rejected	ConfTyping.ParseSource	Quot.sound,propext
+ConfTyping.unsoundSolver	ConfTyping.CNLedger	
+ConfTyping.unsoundSolver_fails_fixed	ConfTyping.CNLedger	
+ConfTyping.unsoundSolver_satisfies_computed	ConfTyping.CNLedger	propext
+ConfTyping.unwritten_sink_untouched	ConfTyping.Assumptions	Classical.choice,Quot.sound,propext
+ConfTyping.upd	ConfTyping.Imp	
+ConfTyping.updB	ConfTyping.MemFree	
+ConfTyping.updBU	ConfTyping.Unified	
+ConfTyping.updH	ConfTyping.MemSafe	
+ConfTyping.updHU	ConfTyping.Unified	
+ConfTyping.updN	ConfTyping.DbInjection	
+ConfTyping.updO	ConfTyping.AliasSafe	
+ConfTyping.updS	ConfTyping.QueryProgram	
+ConfTyping.updSU	ConfTyping.Unified	
+ConfTyping.use_after_free_faults	ConfTyping.MemLinear	
+ConfTyping.use_after_free_rejected	ConfTyping.MemLinear	propext
+ConfTyping.usecTy_sound	ConfTyping.UnifiedNI	propext
+ConfTyping.usefree_loop_errors	ConfTyping.FreeLoop	Classical.choice,Quot.sound,propext
+ConfTyping.usefree_loop_rejected	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.vBal	ConfTyping.Race	
+ConfTyping.validB	ConfTyping.MemSafe	
+ConfTyping.value_predicate_not_admissible	ConfTyping.Integrity	
+ConfTyping.victim	ConfTyping.Speculate	
+ConfTyping.victimMed	ConfTyping.Mediation	
+ConfTyping.victimU	ConfTyping.SpecUnified	
+ConfTyping.victimU_leaks	ConfTyping.SpecUnified	propext
+ConfTyping.victim_guarded_path_is_fine	ConfTyping.Mediation	
+ConfTyping.victim_not_mediated	ConfTyping.Mediation	propext
+ConfTyping.victim_rejected	ConfTyping.Speculate	propext
+ConfTyping.vremove	ConfTyping.QueryProgram	
+ConfTyping.vulnPath	ConfTyping.PathCert	
+ConfTyping.vulnQuery	ConfTyping.TaintCert	
+ConfTyping.wNIBound	ConfTyping.WhileBridge	propext
+ConfTyping.wOutNI_contracts	ConfTyping.WhileBridge	Classical.choice,Quot.sound,propext
+ConfTyping.walk	ConfTyping.PathCert	
+ConfTyping.walk_append	ConfTyping.PathCert	
+ConfTyping.walk_mono	ConfTyping.PathCert	Quot.sound,propext
+ConfTyping.walk_noQuote	ConfTyping.PathCert	Quot.sound,propext
+ConfTyping.wall	ConfTyping.Obs	
+ConfTyping.wall_Ptime_σ0	ConfTyping.SecTy	propext
+ConfTyping.wall_Ptime_σ1	ConfTyping.SecTy	propext
+ConfTyping.wall_closure	ConfTyping.Pleak	
+ConfTyping.wall_const	ConfTyping.Pleak	
+ConfTyping.wall_never_bits	ConfTyping.Integrity	
+ConfTyping.wall_rejection	ConfTyping.Typing	
+ConfTyping.watomQ	ConfTyping.WhileBridge	
+ConfTyping.watomQ_wlow	ConfTyping.WhileBridge	propext
+ConfTyping.wbridge_iff_sound	ConfTyping.WhileBridge	Classical.choice,Quot.sound,propext
+ConfTyping.wcheck	ConfTyping.WhileImp	
+ConfTyping.wcheck_sound	ConfTyping.WhileImp	propext
+ConfTyping.wcx_cond	ConfTyping.WhileLedger	Quot.sound,propext
+ConfTyping.wcx_not_unconditional	ConfTyping.WhileLedger	Classical.choice,Quot.sound,propext
+ConfTyping.wcx_χ0_spin	ConfTyping.WhileLedger	propext
+ConfTyping.wcx_χ1_halt	ConfTyping.WhileLedger	propext
+ConfTyping.wdBody	ConfTyping.Race	
+ConfTyping.wd_atom_preserves	ConfTyping.Race	Quot.sound,propext
+ConfTyping.weakInv	ConfTyping.AliasFix	
+ConfTyping.weak_accepted	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.weak_prog_checks	ConfTyping.AliasFix	Quot.sound,propext
+ConfTyping.weak_prog_safe	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
+ConfTyping.wexec	ConfTyping.WhileImp	
+ConfTyping.wexec_Wleak_halt	ConfTyping.WhileImp	propext
+ConfTyping.wexec_Wleak_spin	ConfTyping.WhileImp	propext
+ConfTyping.wexec_embed_eq	ConfTyping.WhileImp	propext
+ConfTyping.wexec_ite_eq	ConfTyping.WhileImp	
+ConfTyping.wexec_loop_eq	ConfTyping.WhileImp	
+ConfTyping.wexec_mono	ConfTyping.WhileImp	propext
+ConfTyping.wexec_mono_le	ConfTyping.WhileImp	propext
+ConfTyping.wexec_seq_eq	ConfTyping.WhileImp	
+ConfTyping.wflowGA	ConfTyping.WhileBridge	
+ConfTyping.widenProg	ConfTyping.HeapWiden	
+ConfTyping.widenProg_both	ConfTyping.HeapWiden	Classical.choice,Quot.sound,propext
+ConfTyping.widenProg_runs	ConfTyping.HeapWiden	
+ConfTyping.widened_agrees_on_safeHeapProg	ConfTyping.HeapWiden	propext
+ConfTyping.widening_beats_the_exact_rule	ConfTyping.HeapWiden	propext
+ConfTyping.wild_deref_faults	ConfTyping.MemCert	
+ConfTyping.wild_deref_rejected	ConfTyping.MemCert	propext
+ConfTyping.wild_store_faults	ConfTyping.HeapValue	
+ConfTyping.wild_store_rejected	ConfTyping.HeapValue	propext
+ConfTyping.wleak_leaks	ConfTyping.WhileImp	Classical.choice,Quot.sound,propext
+ConfTyping.wleak_poisons_seam	ConfTyping.WhileCompose	Classical.choice,Quot.sound,propext
+ConfTyping.wleak_rejected	ConfTyping.WhileImp	
+ConfTyping.wleak_seq_halt	ConfTyping.WhileCompose	Quot.sound,propext
+ConfTyping.wleak_seq_spin	ConfTyping.WhileCompose	Quot.sound,propext
+ConfTyping.wledger_no_silent_discharge	ConfTyping.WhileLedger	Classical.choice,Quot.sound,propext
+ConfTyping.wmap	ConfTyping.WhileBridge	
+ConfTyping.wok_certified	ConfTyping.WhileImp	propext
+ConfTyping.wok_pipeline_certified	ConfTyping.WhileCompose	propext
+ConfTyping.work_cert	ConfTyping.BundleLoop	Quot.sound,propext
+ConfTyping.wpull	ConfTyping.WhileBridge	
+ConfTyping.wqd	ConfTyping.WhileBridge	
+ConfTyping.wqle	ConfTyping.WhileBridge	
+ConfTyping.wqleT	ConfTyping.WhileBridge	
+ConfTyping.writesShB	ConfTyping.Race	propext
+ConfTyping.wsecTy_WOutNI	ConfTyping.WhileCompose	propext
+ConfTyping.wsecTy_seq_WOutNI	ConfTyping.WhileCompose	propext
+ConfTyping.wsecTy_sound	ConfTyping.WhileImp	propext
+ConfTyping.xcheck	ConfTyping.AllFive	propext
+ConfTyping.xcheck_gives_five	ConfTyping.AllFive	Classical.choice,Quot.sound,propext
+ConfTyping.Γcomp	ConfTyping.LatticeFlow	
+ConfTyping.Γcomp_o	ConfTyping.LatticeFlow	
+ConfTyping.Γcomp_s	ConfTyping.LatticeFlow	
+ConfTyping.ζ0	ConfTyping.SupplyChain	
+ConfTyping.ζ1	ConfTyping.SupplyChain	
+ConfTyping.ξ0	ConfTyping.Ledger	
+ConfTyping.ξ1	ConfTyping.Ledger	
+ConfTyping.σ0	ConfTyping.Pleak	
+ConfTyping.σ1	ConfTyping.Pleak	
+ConfTyping.σ_b1	ConfTyping.Pleak	
+ConfTyping.σ_b2	ConfTyping.Pleak	
+ConfTyping.σhi	ConfTyping.SpecTrace	
+ConfTyping.σlo	ConfTyping.SpecTrace	
+ConfTyping.σlo_lowEq_σhi	ConfTyping.SpecTrace	propext
+ConfTyping.τ0	ConfTyping.Pipeline	
+ConfTyping.τ1	ConfTyping.Pipeline	
+ConfTyping.φ_bit	ConfTyping.Pleak	
+ConfTyping.χ0	ConfTyping.WhileLedger	
+ConfTyping.χ1	ConfTyping.WhileLedger	
+TransportCalculus.Bridge.casesOn	TransportCalculus	
+TransportCalculus.Bridge.cert	TransportCalculus	
+TransportCalculus.Bridge.comp	TransportCalculus	
+TransportCalculus.Bridge.comp_cert	TransportCalculus	
+TransportCalculus.Bridge.contracts	TransportCalculus	
+TransportCalculus.Bridge.ctorIdx	TransportCalculus	
+TransportCalculus.Bridge.map	TransportCalculus	
+TransportCalculus.Bridge.mk.noConfusion	TransportCalculus	
+TransportCalculus.Bridge.noConfusion	TransportCalculus	
+TransportCalculus.Bridge.noConfusionType	TransportCalculus	
+TransportCalculus.Bridge.ofModulus	TransportCalculus	
+TransportCalculus.Bridge.pair	TransportCalculus	propext
+TransportCalculus.Bridge.pair_cert	TransportCalculus	propext
+TransportCalculus.Bridge.pair_comp_cert	TransportCalculus	propext
+TransportCalculus.Bridge.pair_comp_map	TransportCalculus	propext
+TransportCalculus.Bridge.recOn	TransportCalculus	
+TransportCalculus.CoherentSeq.Trivial	TransportCalculus	
+TransportCalculus.CoherentSeq.casesOn	TransportCalculus	
+TransportCalculus.CoherentSeq.coh	TransportCalculus	
+TransportCalculus.CoherentSeq.ctorIdx	TransportCalculus	
+TransportCalculus.CoherentSeq.e	TransportCalculus	
+TransportCalculus.CoherentSeq.mk.noConfusion	TransportCalculus	
+TransportCalculus.CoherentSeq.noConfusion	TransportCalculus	
+TransportCalculus.CoherentSeq.noConfusionType	TransportCalculus	
+TransportCalculus.CoherentSeq.recOn	TransportCalculus	
+TransportCalculus.CountableSegments	TransportCalculus	
+TransportCalculus.D3.casesOn	TransportCalculus	
+TransportCalculus.D3.ctorElim	TransportCalculus	
+TransportCalculus.D3.ctorElimType	TransportCalculus	
+TransportCalculus.D3.ctorIdx	TransportCalculus	
+TransportCalculus.D3.dB.elim	TransportCalculus	
+TransportCalculus.D3.dP.elim	TransportCalculus	
+TransportCalculus.D3.dQ.elim	TransportCalculus	
+TransportCalculus.D3.noConfusion	TransportCalculus	
+TransportCalculus.D3.noConfusionType	TransportCalculus	
+TransportCalculus.D3.ofNat	TransportCalculus	
+TransportCalculus.D3.ofNat_ctorIdx	TransportCalculus	
+TransportCalculus.D3.recOn	TransportCalculus	
+TransportCalculus.DirOrder.casesOn	TransportCalculus	
+TransportCalculus.DirOrder.ctorIdx	TransportCalculus	
+TransportCalculus.DirOrder.le	TransportCalculus	
+TransportCalculus.DirOrder.le_refl	TransportCalculus	
+TransportCalculus.DirOrder.le_trans	TransportCalculus	
+TransportCalculus.DirOrder.mk.noConfusion	TransportCalculus	
+TransportCalculus.DirOrder.noConfusion	TransportCalculus	
+TransportCalculus.DirOrder.noConfusionType	TransportCalculus	
+TransportCalculus.DirOrder.recOn	TransportCalculus	
+TransportCalculus.Directed.casesOn	TransportCalculus	
+TransportCalculus.Directed.ctorIdx	TransportCalculus	
+TransportCalculus.Directed.cub	TransportCalculus	
+TransportCalculus.Directed.le_cub_left	TransportCalculus	
+TransportCalculus.Directed.le_cub_right	TransportCalculus	
+TransportCalculus.Directed.mk.noConfusion	TransportCalculus	
+TransportCalculus.Directed.noConfusion	TransportCalculus	
+TransportCalculus.Directed.noConfusionType	TransportCalculus	
+TransportCalculus.Directed.recOn	TransportCalculus	
+TransportCalculus.Dm.L.elim	TransportCalculus	
+TransportCalculus.Dm.R.elim	TransportCalculus	
+TransportCalculus.Dm.casesOn	TransportCalculus	
+TransportCalculus.Dm.ctorElim	TransportCalculus	
+TransportCalculus.Dm.ctorElimType	TransportCalculus	
+TransportCalculus.Dm.ctorIdx	TransportCalculus	
+TransportCalculus.Dm.fin.elim	TransportCalculus	
+TransportCalculus.Dm.fin.noConfusion	TransportCalculus	
+TransportCalculus.Dm.noConfusion	TransportCalculus	
+TransportCalculus.Dm.noConfusionType	TransportCalculus	
+TransportCalculus.Dm.recOn	TransportCalculus	
+TransportCalculus.Dm.top.elim	TransportCalculus	
+TransportCalculus.Dm_chain_no_sup	TransportCalculus	Quot.sound,propext
+TransportCalculus.Dm_factors	TransportCalculus	Quot.sound,propext
+TransportCalculus.DomRetraction.casesOn	TransportCalculus	
+TransportCalculus.DomRetraction.ctorIdx	TransportCalculus	
+TransportCalculus.DomRetraction.mk.noConfusion	TransportCalculus	
+TransportCalculus.DomRetraction.mono	TransportCalculus	
+TransportCalculus.DomRetraction.noConfusion	TransportCalculus	
+TransportCalculus.DomRetraction.noConfusionType	TransportCalculus	
+TransportCalculus.DomRetraction.r	TransportCalculus	
+TransportCalculus.DomRetraction.recOn	TransportCalculus	
+TransportCalculus.DomRetraction.ub	TransportCalculus	
+TransportCalculus.Dominator.casesOn	TransportCalculus	
+TransportCalculus.Dominator.ctorIdx	TransportCalculus	
+TransportCalculus.Dominator.dom	TransportCalculus	
+TransportCalculus.Dominator.mk.noConfusion	TransportCalculus	
+TransportCalculus.Dominator.mono	TransportCalculus	
+TransportCalculus.Dominator.noConfusion	TransportCalculus	
+TransportCalculus.Dominator.noConfusionType	TransportCalculus	
+TransportCalculus.Dominator.recOn	TransportCalculus	
+TransportCalculus.Dominator.φ	TransportCalculus	
+TransportCalculus.Fb	TransportCalculus	
+TransportCalculus.FiniteP	TransportCalculus	
+TransportCalculus.FiniteP.mono	TransportCalculus	
+TransportCalculus.FiniteP.union	TransportCalculus	propext
+TransportCalculus.GenericDom.casesOn	TransportCalculus	
+TransportCalculus.GenericDom.cover	TransportCalculus	
+TransportCalculus.GenericDom.cross	TransportCalculus	
+TransportCalculus.GenericDom.ctorIdx	TransportCalculus	
+TransportCalculus.GenericDom.mk.noConfusion	TransportCalculus	
+TransportCalculus.GenericDom.noConfusion	TransportCalculus	
+TransportCalculus.GenericDom.noConfusionType	TransportCalculus	
+TransportCalculus.GenericDom.p	TransportCalculus	
+TransportCalculus.GenericDom.recOn	TransportCalculus	
+TransportCalculus.GenericDom.ι	TransportCalculus	
+TransportCalculus.GradedAction.act	TransportCalculus	
+TransportCalculus.GradedAction.act_assoc	TransportCalculus	propext
+TransportCalculus.GradedAction.act_mono	TransportCalculus	
+TransportCalculus.GradedAction.act_mul	TransportCalculus	
+TransportCalculus.GradedAction.casesOn	TransportCalculus	
+TransportCalculus.GradedAction.ctorIdx	TransportCalculus	
+TransportCalculus.GradedAction.le	TransportCalculus	
+TransportCalculus.GradedAction.le_trans	TransportCalculus	
+TransportCalculus.GradedAction.mk.congr_simp	ConfTyping.BoundedCert	
+TransportCalculus.GradedAction.mk.noConfusion	TransportCalculus	
+TransportCalculus.GradedAction.mul	TransportCalculus	
+TransportCalculus.GradedAction.mul_assoc_of_faithful	TransportCalculus	propext
+TransportCalculus.GradedAction.noConfusion	TransportCalculus	
+TransportCalculus.GradedAction.noConfusionType	TransportCalculus	
+TransportCalculus.GradedAction.prod	TransportCalculus	propext
+TransportCalculus.GradedAction.recOn	TransportCalculus	
+TransportCalculus.GradedAction.repr	TransportCalculus	
+TransportCalculus.GradedAction.repr_mul	TransportCalculus	Quot.sound
+TransportCalculus.LegalSystem.M	TransportCalculus	
+TransportCalculus.LegalSystem.bdd	TransportCalculus	
+TransportCalculus.LegalSystem.casesOn	TransportCalculus	
+TransportCalculus.LegalSystem.ctorIdx	TransportCalculus	
+TransportCalculus.LegalSystem.mk.noConfusion	TransportCalculus	
+TransportCalculus.LegalSystem.mono	TransportCalculus	
+TransportCalculus.LegalSystem.noConfusion	TransportCalculus	
+TransportCalculus.LegalSystem.noConfusionType	TransportCalculus	
+TransportCalculus.LegalSystem.recOn	TransportCalculus	
+TransportCalculus.Mono.casesOn	TransportCalculus	
+TransportCalculus.Mono.comp	TransportCalculus	
+TransportCalculus.Mono.ctorIdx	TransportCalculus	
+TransportCalculus.Mono.ext	TransportCalculus	
+TransportCalculus.Mono.mk.noConfusion	TransportCalculus	
+TransportCalculus.Mono.mono	TransportCalculus	
+TransportCalculus.Mono.noConfusion	TransportCalculus	
+TransportCalculus.Mono.noConfusionType	TransportCalculus	
+TransportCalculus.Mono.recOn	TransportCalculus	
+TransportCalculus.Mono.toFun	TransportCalculus	
+TransportCalculus.P4.a.elim	TransportCalculus	
+TransportCalculus.P4.b.elim	TransportCalculus	
+TransportCalculus.P4.c.elim	TransportCalculus	
+TransportCalculus.P4.casesOn	TransportCalculus	
+TransportCalculus.P4.ctorElim	TransportCalculus	
+TransportCalculus.P4.ctorElimType	TransportCalculus	
+TransportCalculus.P4.ctorIdx	TransportCalculus	
+TransportCalculus.P4.e.elim	TransportCalculus	
+TransportCalculus.P4.noConfusion	TransportCalculus	
+TransportCalculus.P4.noConfusionType	TransportCalculus	
+TransportCalculus.P4.ofNat	TransportCalculus	
+TransportCalculus.P4.ofNat_ctorIdx	TransportCalculus	
+TransportCalculus.P4.recOn	TransportCalculus	
+TransportCalculus.PartialDom.casesOn	TransportCalculus	
+TransportCalculus.PartialDom.compat	TransportCalculus	
+TransportCalculus.PartialDom.compat_of_crossMono	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.PartialDom.ctorIdx	TransportCalculus	
+TransportCalculus.PartialDom.dominates	TransportCalculus	
+TransportCalculus.PartialDom.inDom	TransportCalculus	
+TransportCalculus.PartialDom.mk.noConfusion	TransportCalculus	
+TransportCalculus.PartialDom.mono	TransportCalculus	
+TransportCalculus.PartialDom.noConfusion	TransportCalculus	
+TransportCalculus.PartialDom.noConfusionType	TransportCalculus	
+TransportCalculus.PartialDom.recOn	TransportCalculus	
+TransportCalculus.PartialDom.val	TransportCalculus	
+TransportCalculus.Phi	TransportCalculus	
+TransportCalculus.PrefixBounded	TransportCalculus	
+TransportCalculus.Reps.casesOn	TransportCalculus	
+TransportCalculus.Reps.ctorIdx	TransportCalculus	
+TransportCalculus.Reps.fiber	TransportCalculus	
+TransportCalculus.Reps.mk.noConfusion	TransportCalculus	
+TransportCalculus.Reps.mono	TransportCalculus	
+TransportCalculus.Reps.noConfusion	TransportCalculus	
+TransportCalculus.Reps.noConfusionType	TransportCalculus	
+TransportCalculus.Reps.recOn	TransportCalculus	
+TransportCalculus.Reps.ρ	TransportCalculus	
+TransportCalculus.Ruler.casesOn	TransportCalculus	
+TransportCalculus.Ruler.cofinal	TransportCalculus	
+TransportCalculus.Ruler.ctorIdx	TransportCalculus	
+TransportCalculus.Ruler.k	TransportCalculus	
+TransportCalculus.Ruler.mk.noConfusion	TransportCalculus	
+TransportCalculus.Ruler.mono	TransportCalculus	
+TransportCalculus.Ruler.noConfusion	TransportCalculus	
+TransportCalculus.Ruler.noConfusionType	TransportCalculus	
+TransportCalculus.Ruler.ofCofinalSeq	TransportCalculus	
+TransportCalculus.Ruler.recOn	TransportCalculus	
+TransportCalculus.SigmaDirected	TransportCalculus	
+TransportCalculus.WRuler.casesOn	TransportCalculus	
+TransportCalculus.WRuler.cofinal	TransportCalculus	
+TransportCalculus.WRuler.ctorIdx	TransportCalculus	
+TransportCalculus.WRuler.k	TransportCalculus	
+TransportCalculus.WRuler.mk.noConfusion	TransportCalculus	
+TransportCalculus.WRuler.mono	TransportCalculus	
+TransportCalculus.WRuler.noConfusion	TransportCalculus	
+TransportCalculus.WRuler.noConfusionType	TransportCalculus	
+TransportCalculus.WRuler.ofCofinalFamily	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.WRuler.recOn	TransportCalculus	
+TransportCalculus.WellIndex.casesOn	TransportCalculus	
+TransportCalculus.WellIndex.ctorIdx	TransportCalculus	
+TransportCalculus.WellIndex.le	TransportCalculus	
+TransportCalculus.WellIndex.le_antisymm	TransportCalculus	
+TransportCalculus.WellIndex.le_refl	TransportCalculus	
+TransportCalculus.WellIndex.le_trans	TransportCalculus	
+TransportCalculus.WellIndex.least	TransportCalculus	
+TransportCalculus.WellIndex.lt	TransportCalculus	
+TransportCalculus.WellIndex.lt_of_le_of_lt	TransportCalculus	
+TransportCalculus.WellIndex.lt_of_lt_of_le	TransportCalculus	
+TransportCalculus.WellIndex.mk.noConfusion	TransportCalculus	
+TransportCalculus.WellIndex.noConfusion	TransportCalculus	
+TransportCalculus.WellIndex.noConfusionType	TransportCalculus	
+TransportCalculus.WellIndex.recOn	TransportCalculus	
+TransportCalculus.WellIndex.total	TransportCalculus	
+TransportCalculus.WellIndex.wf	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.addBridge	TransportCalculus	Quot.sound,propext
+TransportCalculus.addGA	TransportCalculus	Quot.sound,propext
+TransportCalculus.bundle_accumulates_componentwise	TransportCalculus	Quot.sound,propext
+TransportCalculus.bundle_cert	TransportCalculus	Quot.sound,propext
+TransportCalculus.chiLt	TransportCalculus	
+TransportCalculus.chiLt_coherent	TransportCalculus	Quot.sound,propext
+TransportCalculus.chiLt_mono	TransportCalculus	Quot.sound,propext
+TransportCalculus.cofChain	TransportCalculus	
+TransportCalculus.cofChain_le_succ	TransportCalculus	
+TransportCalculus.cofChain_mono	TransportCalculus	
+TransportCalculus.countable_cofinal_factors	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.countable_cofinal_factors'	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.cubLvl	TransportCalculus	propext
+TransportCalculus.dirF	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.dirL	TransportCalculus	propext
+TransportCalculus.dirM	TransportCalculus	propext
+TransportCalculus.directed_finite_factors	TransportCalculus	propext
+TransportCalculus.dist	TransportCalculus	
+TransportCalculus.distMax	TransportCalculus	
+TransportCalculus.distP	TransportCalculus	propext
+TransportCalculus.domRetraction_of_join	TransportCalculus	
+TransportCalculus.domRetraction_of_top	TransportCalculus	
+TransportCalculus.double	TransportCalculus	Quot.sound,propext
+TransportCalculus.escapee_no_monotone_dominator	TransportCalculus	propext
+TransportCalculus.escapee_not_in_universalGA	TransportCalculus	propext
+TransportCalculus.escapee_unbounded	TransportCalculus	propext
+TransportCalculus.evalP	TransportCalculus	
+TransportCalculus.evalP_ladder_ge	TransportCalculus	Quot.sound,propext
+TransportCalculus.evalP_ladder_lt	TransportCalculus	Quot.sound,propext
+TransportCalculus.evalP_le_maxValP	TransportCalculus	propext
+TransportCalculus.evalP_mergeP_of_mem	TransportCalculus	
+TransportCalculus.evalP_not_key	TransportCalculus	
+TransportCalculus.evalP_zeroEvens_even	TransportCalculus	Quot.sound,propext
+TransportCalculus.evalP_zeroEvens_le_one	TransportCalculus	
+TransportCalculus.exists_fresh	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.exists_gt	TransportCalculus	
+TransportCalculus.exists_least	TransportCalculus	Quot.sound,propext
+TransportCalculus.fP	TransportCalculus	
+TransportCalculus.factors_of_completeness	TransportCalculus	
+TransportCalculus.factors_of_global_bound	TransportCalculus	
+TransportCalculus.factors_of_image_sups	TransportCalculus	
+TransportCalculus.fb_factors	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.fb_ladder_cofinal	TransportCalculus	Quot.sound,propext
+TransportCalculus.fb_no_minimal_ub	TransportCalculus	Quot.sound,propext
+TransportCalculus.fb_not_sigma_directed	TransportCalculus	Quot.sound,propext
+TransportCalculus.foldCub	TransportCalculus	
+TransportCalculus.image_sups_not_necessary	TransportCalculus	Quot.sound,propext
+TransportCalculus.inLvl	TransportCalculus	
+TransportCalculus.inLvl_mono	TransportCalculus	
+TransportCalculus.instDecidableEqD3	TransportCalculus	
+TransportCalculus.instDecidableEqP4	TransportCalculus	
+TransportCalculus.invar	TransportCalculus	
+TransportCalculus.key_le_maxKeyP	TransportCalculus	propext
+TransportCalculus.ladder	TransportCalculus	
+TransportCalculus.le3	TransportCalculus	propext
+TransportCalculus.le3_refl	TransportCalculus	propext
+TransportCalculus.le3_trans	TransportCalculus	propext
+TransportCalculus.leF	TransportCalculus	
+TransportCalculus.leF_refl	TransportCalculus	
+TransportCalculus.leF_trans	TransportCalculus	
+TransportCalculus.leL	TransportCalculus	
+TransportCalculus.leL_refl	TransportCalculus	
+TransportCalculus.leL_trans	TransportCalculus	
+TransportCalculus.leLvl	TransportCalculus	
+TransportCalculus.leLvl_cubLvl_left	TransportCalculus	propext
+TransportCalculus.leLvl_cubLvl_right	TransportCalculus	propext
+TransportCalculus.leLvl_refl	TransportCalculus	
+TransportCalculus.leLvl_trans	TransportCalculus	
+TransportCalculus.leM	TransportCalculus	propext
+TransportCalculus.leM_refl	TransportCalculus	propext
+TransportCalculus.leM_top	TransportCalculus	propext
+TransportCalculus.leM_trans	TransportCalculus	Quot.sound,propext
+TransportCalculus.le_acc_foldCub	TransportCalculus	
+TransportCalculus.le_cofChain	TransportCalculus	
+TransportCalculus.le_evalP_mergeP_left	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.le_evalP_mergeP_right	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.le_mem_foldCub	TransportCalculus	propext
+TransportCalculus.le_monotonize	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.lemmaF_below_finite	TransportCalculus	Quot.sound,propext
+TransportCalculus.lemmaF_below_subset	TransportCalculus	Quot.sound,propext
+TransportCalculus.lists_bounded_factors	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.lists_not_sigma_directed	TransportCalculus	Quot.sound,propext
+TransportCalculus.maxBridge	TransportCalculus	propext
+TransportCalculus.maxGA	TransportCalculus	propext
+TransportCalculus.maxKeyP	TransportCalculus	
+TransportCalculus.maxValP	TransportCalculus	
+TransportCalculus.mem_le_foldMax	TransportCalculus	propext
+TransportCalculus.mergeP	TransportCalculus	
+TransportCalculus.monotonize	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.monotonize_eq	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.monotonize_lt_mono	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.monotonize_mono	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.natGA	TransportCalculus	propext
+TransportCalculus.natRuler	TransportCalculus	
+TransportCalculus.natWellIndex	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.nat_not_sigma_directed	TransportCalculus	Quot.sound,propext
+TransportCalculus.no_common_ub	TransportCalculus	propext
+TransportCalculus.no_directed_on_D3	TransportCalculus	propext
+TransportCalculus.no_injection_into_list	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.omega_concentration_fails	TransportCalculus	Quot.sound,propext
+TransportCalculus.pair_bound	TransportCalculus	Quot.sound,propext
+TransportCalculus.phi_of_domRetraction	TransportCalculus	
+TransportCalculus.phi_of_generic	TransportCalculus	Classical.choice
+TransportCalculus.phi_of_join	TransportCalculus	
+TransportCalculus.phi_of_top	TransportCalculus	
+TransportCalculus.prefixBounded_of_directed	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.prefixBounded_of_sigmaDirected	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.prefix_bounded_cofinal_factors	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.reps_implies_trivial	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.ruler_defeats_bounded_escapee	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.sEv	TransportCalculus	
+TransportCalculus.scheduleLeftover	TransportCalculus	
+TransportCalculus.sfind	TransportCalculus	
+TransportCalculus.sfind_le	TransportCalculus	Quot.sound,propext
+TransportCalculus.sfind_p	TransportCalculus	Quot.sound,propext
+TransportCalculus.sigma_directed_cofinal_factors	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.singletonDom	TransportCalculus	Classical.choice
+TransportCalculus.singletonDom_compat_of_incomp	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.singletonDom_incompat_comparable	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.singleton_antichain_is_chain	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.summary	TransportCalculus	
+TransportCalculus.summary_not_composable	TransportCalculus	Quot.sound,propext
+TransportCalculus.thmA_leftover_subset	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.thmA_schedulable	TransportCalculus	Classical.choice,Quot.sound,propext
+TransportCalculus.trivDip	TransportCalculus	
+TransportCalculus.universalGA	TransportCalculus	
+TransportCalculus.upDefect	TransportCalculus	
+TransportCalculus.wruler_defeats_bounded_escapee	TransportCalculus	Classical.choice
+TransportCalculus.zeroEvens	TransportCalculus	
