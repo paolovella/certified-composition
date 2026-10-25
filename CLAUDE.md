@@ -23,7 +23,8 @@ claim here is absolute, and each one carries its versions.
 | 3 | untrusted tooling: inference, renderers, generators, schedulers | anyone; nothing it outputs is believed until a Ring 0/1 check passes |
 
 Until `l-core/` exists, Ring 0 means: `tools/`, `.github/`, `CLAUDE.md`, `.claude/`,
-`*/lean-toolchain`, `*/lakefile*`, and any frozen statement file.
+`*/lean-toolchain`, `*/lakefile*`, `*/lake-manifest.json`, the root workspace (`lean-toolchain`,
+`lakefile.toml`, `lake-manifest.json`, `workspace/`), and any frozen statement file.
 
 ## Session protocol
 
