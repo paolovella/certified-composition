@@ -72,7 +72,7 @@ theorem σlo_lowEq_σhi : lowEq Psec σlo σhi := by
   intro x hx
   have : ¬ (x = "secret") := by
     intro h; rw [h] at hx; exact absurd hx (by decide)
-  simp only [σlo, σhi, if_neg this]
+  simp only [σlo, σhi, ite_eq_right this]
 
 /-- **The defect, on record.** After a failed `check` the machine is halted and the
     secret pointer still holds its *initial* value, so stage 2d's `touchedRaw` reports an
@@ -186,8 +186,8 @@ theorem uexec_keeps_dead {c : UCmd} {π : MedPolicy} {s : UState}
   case loop e c₀ =>
     rw [uexec_loop_eq] at h
     by_cases hg : evalE e s.store ≠ 0
-    · rw [if_pos hg] at h; simp [uexec] at h
-    · rw [if_neg hg] at h; simp only [Option.some.injEq] at h; rw [← h]
+    · rw [ite_eq_left hg] at h; simp [uexec] at h
+    · rw [ite_eq_right hg] at h; simp only [Option.some.injEq] at h; rw [← h]
   all_goals first
     | (simp [uexec] at h; done)
     | (simp only [uexec, Option.some.injEq] at h; subst h; simp [hd])
@@ -218,13 +218,13 @@ theorem ptrLow_step {P : Partition} {V V' : List String} {c : UCmd} {π : MedPol
       have hrr : r.1 = s := by
         rw [uexec_loop_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr; simp [uexec] at hr
-        · rw [if_neg hg] at hr; simp only [Option.some.injEq] at hr; rw [← hr]
+        · rw [ite_eq_left hg] at hr; simp [uexec] at hr
+        · rw [ite_eq_right hg] at hr; simp only [Option.some.injEq] at hr; rw [← hr]
       have hrr' : r'.1 = s' := by
         rw [uexec_loop_eq] at hr'
         by_cases hg : evalE e s'.store ≠ 0
-        · rw [if_pos hg] at hr'; simp [uexec] at hr'
-        · rw [if_neg hg] at hr'; simp only [Option.some.injEq] at hr'; rw [← hr']
+        · rw [ite_eq_left hg] at hr'; simp [uexec] at hr'
+        · rw [ite_eq_right hg] at hr'; simp only [Option.some.injEq] at hr'; rw [← hr']
       simp only [jcheck] at hc
       split at hc
       · simp only [Option.some.injEq] at hc; subst hc
@@ -240,8 +240,8 @@ theorem ptrLow_step {P : Partition} {V V' : List String} {c : UCmd} {π : MedPol
       rw [← hr, ← hr']; subst hc
       rw [hd0, hd0']
       by_cases hq : π q = true
-      · rw [if_pos hq, if_pos hq]; exact hstore x hx
-      · rw [if_neg hq, if_neg hq]; exact hstore x hx
+      · rw [ite_eq_left hq, ite_eq_left hq]; exact hstore x hx
+      · rw [ite_eq_right hq, ite_eq_right hq]; exact hstore x hx
   | access q =>
       simp only [uexec, Option.some.injEq] at hr hr'
       simp only [jcheck, Option.some.injEq] at hc
@@ -253,7 +253,7 @@ theorem ptrLow_step {P : Partition} {V V' : List String} {c : UCmd} {π : MedPol
       · simp only [Option.some.injEq] at hc; subst hc
         rw [← hr, ← hr', hd0, hd0']
         show upd s.store y (evalE e s.store) x = upd s'.store y (evalE e s'.store) x
-        rw [upd, upd, if_neg (dropStr_ne hx), if_neg (dropStr_ne hx)]
+        rw [upd, upd, ite_eq_right (dropStr_ne hx), ite_eq_right (dropStr_ne hx)]
         exact hstore x (dropStr_mem hx)
       · cases hc
   | sop op y e =>
@@ -278,8 +278,8 @@ theorem ptrLow_step {P : Partition} {V V' : List String} {c : UCmd} {π : MedPol
               rw [← hr', hd0']; rfl
             rw [e1, e1', upd, upd, hfresh, hfreed]
             by_cases hxy : x = y
-            · rw [if_pos hxy, if_pos hxy]
-            · rw [if_neg hxy, if_neg hxy]
+            · rw [ite_eq_left hxy, ite_eq_left hxy]
+            · rw [ite_eq_right hxy, ite_eq_right hxy]
               exact hstore x ((List.mem_cons.mp hx).resolve_left hxy)
       | allocS =>
           simp only [uexec, Option.some.injEq] at hr hr'
@@ -292,8 +292,8 @@ theorem ptrLow_step {P : Partition} {V V' : List String} {c : UCmd} {π : MedPol
               rw [← hr', hd0']; rfl
             rw [e1, e1', upd, upd, hfresh, hfreed]
             by_cases hxy : x = y
-            · rw [if_pos hxy, if_pos hxy]
-            · rw [if_neg hxy, if_neg hxy]
+            · rw [ite_eq_left hxy, ite_eq_left hxy]
+            · rw [ite_eq_right hxy, ite_eq_right hxy]
               exact hstore x ((List.mem_cons.mp hx).resolve_left hxy)
           · cases hc
       | deref =>

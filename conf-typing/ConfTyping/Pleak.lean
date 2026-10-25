@@ -111,7 +111,7 @@ theorem result_releases_at_most_bit :
     · subst hxl
       simp only [upd]
       exact hbit
-    · simp only [upd, if_neg hxl]
+    · simp only [upd, ite_eq_right hxl]
       exact hle x (Phigh_false hxb)
 
 /-! ### Non-vacuity: the bound has teeth.

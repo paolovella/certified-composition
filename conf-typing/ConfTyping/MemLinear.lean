@@ -44,11 +44,11 @@ theorem memInt_dropInt_of_ne {a b : Int} : ∀ {L : List Int},
   | x :: xs, h, hn => by
       simp only [memInt, Bool.or_eq_true, beq_iff_eq] at h
       by_cases hx : x = b
-      · rw [dropInt, if_pos (by simp [hx])]
+      · rw [dropInt, ite_eq_left (by simp [hx])]
         rcases h with h | h
         · exact absurd (hx ▸ h.symm) hn
         · exact memInt_dropInt_of_ne h hn
-      · rw [dropInt, if_neg (by simpa using hx)]
+      · rw [dropInt, ite_eq_right (by simpa using hx)]
         simp only [memInt, Bool.or_eq_true, beq_iff_eq]
         rcases h with h | h
         · exact Or.inl h
@@ -60,9 +60,9 @@ theorem dropInt_memInt {a b : Int} : ∀ {L : List Int},
   | x :: xs, h => by
       simp only [memInt, Bool.or_eq_true, beq_iff_eq]
       by_cases hx : x = b
-      · rw [dropInt, if_pos (by simp [hx])] at h
+      · rw [dropInt, ite_eq_left (by simp [hx])] at h
         exact Or.inr (dropInt_memInt h)
-      · rw [dropInt, if_neg (by simpa using hx)] at h
+      · rw [dropInt, ite_eq_right (by simpa using hx)] at h
         simp only [memInt, Bool.or_eq_true, beq_iff_eq] at h
         rcases h with h | h
         · exact Or.inl h
@@ -72,8 +72,8 @@ theorem memInt_dropInt_self (a : Int) : ∀ (L : List Int), memInt a (dropInt a 
   | []      => rfl
   | x :: xs => by
       by_cases hx : x = a
-      · rw [dropInt, if_pos (by simp [hx])]; exact memInt_dropInt_self a xs
-      · rw [dropInt, if_neg (by simpa using hx)]
+      · rw [dropInt, ite_eq_left (by simp [hx])]; exact memInt_dropInt_self a xs
+      · rw [dropInt, ite_eq_right (by simpa using hx)]
         simp only [memInt, Bool.or_eq_false_iff, beq_eq_false_iff_ne]
         exact ⟨by simpa using hx, memInt_dropInt_self a xs⟩
 
@@ -163,13 +163,13 @@ theorem SepCert.ite {V V₁ V₂ : List String} {e : Expr} {c₁ c₂ : UCmd}
   | succ n =>
       rw [uexec_ite_eq] at hr
       by_cases hg : evalE e s.store ≠ 0
-      · rw [if_pos hg] at hr
+      · rw [ite_eq_left hg] at hr
         rcases e₁ : uexec n c₁ π s with _ | r₁
         · rw [e₁] at hr; simp at hr
         · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
           subst hr
           exact SepInv.mono (fun _ hq => interStr_left hq) (h₁.safe n π s r₁ hinv e₁)
-      · rw [if_neg hg] at hr
+      · rw [ite_eq_right hg] at hr
         rcases e₂ : uexec n c₂ π s with _ | r₂
         · rw [e₂] at hr; simp at hr
         · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -196,19 +196,19 @@ theorem SepCert.assign {V : List String} (x : String) (e : Expr) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]
+      · simp only [ite_eq_left hd]
         exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        simp only [if_neg hd]
+        simp only [ite_eq_right hd]
         obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
         refine ⟨he, fun _ => ⟨?_, ?_, hfr, hdisj, hfb⟩⟩
         · intro q hq
           show memInt (upd s.store x (evalE e s.store) q) s.live = true
-          simp only [upd, if_neg (dropStr_ne hq)]
+          simp only [upd, ite_eq_right (dropStr_ne hq)]
           exact hlive q (dropStr_mem hq)
         · intro q hq y hy hne
           show ¬ (upd s.store x (evalE e s.store) q = upd s.store x (evalE e s.store) y)
-          simp only [upd, if_neg (dropStr_ne hq), if_neg (dropStr_ne hy)]
+          simp only [upd, ite_eq_right (dropStr_ne hq), ite_eq_right (dropStr_ne hy)]
           exact hinj q (dropStr_mem hq) y (dropStr_mem hy) hne
 
 theorem SepCert.check {V : List String} (r₀ : String) : SepCert V (.check r₀) V := by
@@ -221,12 +221,12 @@ theorem SepCert.check {V : List String} (r₀ : String) : SepCert V (.check r₀
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        simp only [if_neg hd]
+        simp only [ite_eq_right hd]
         by_cases hp : π r₀ = true
-        · simp only [if_pos hp]; exact ⟨he, fun _ => hv hd0⟩
-        · simp only [if_neg hp]; exact ⟨he, fun hc => absurd hc (by simp)⟩
+        · simp only [ite_eq_left hp]; exact ⟨he, fun _ => hv hd0⟩
+        · simp only [ite_eq_right hp]; exact ⟨he, fun hc => absurd hc (by simp)⟩
 
 theorem SepCert.access {V : List String} (r₀ : String) : SepCert V (.access r₀) V := by
   constructor
@@ -238,9 +238,9 @@ theorem SepCert.access {V : List String} (r₀ : String) : SepCert V (.access r�
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        simp only [if_neg hd]; exact ⟨he, fun _ => hv hd0⟩
+        simp only [ite_eq_right hd]; exact ⟨he, fun _ => hv hd0⟩
 
 /-- **Allocation, now with separation.** The new address is `s.fresh`, and every
     address already live is `< s.fresh`, so the new pointer is distinct from every
@@ -256,9 +256,9 @@ theorem SepCert.alloc {V : List String} (x : String) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        simp only [if_neg hd]
+        simp only [ite_eq_right hd]
         obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
         -- the address handed out is not live, whether it came from the free list or
         -- the counter: from the free list by disjointness, from the counter by
@@ -289,21 +289,21 @@ theorem SepCert.alloc {V : List String} (x : String) :
                  (pickAddr s.freed s.fresh :: s.live) = true
           by_cases hqx : q = x
           · subst hqx; simp [upd, memInt]
-          · simp only [upd, if_neg hqx, memInt, Bool.or_eq_true]
+          · simp only [upd, ite_eq_right hqx, memInt, Bool.or_eq_true]
             exact Or.inr (hlive q (memCons_ne hq hqx))
         · intro q hq y hy hne
           show ¬ (upd s.store x (pickAddr s.freed s.fresh) q
                 = upd s.store x (pickAddr s.freed s.fresh) y)
           by_cases hqx : q = x
           · have hyx : ¬ (y = x) := fun h => hne (hqx.trans h.symm)
-            simp only [upd, if_pos hqx, if_neg hyx]
+            simp only [upd, ite_eq_left hqx, ite_eq_right hyx]
             intro hc
             exact absurd (hc ▸ hlive y (memCons_ne hy hyx)) (by simp [hnl])
           · by_cases hyx : y = x
-            · simp only [upd, if_neg hqx, if_pos hyx]
+            · simp only [upd, ite_eq_right hqx, ite_eq_left hyx]
               intro hc
               exact absurd (hc ▸ hlive q (memCons_ne hq hqx)) (by simp [hnl])
-            · simp only [upd, if_neg hqx, if_neg hyx]
+            · simp only [upd, ite_eq_right hqx, ite_eq_right hyx]
               exact hinj q (memCons_ne hq hqx) y (memCons_ne hy hyx) hne
         · intro a ha
           show a < bumpFresh s.freed s.fresh
@@ -336,9 +336,9 @@ theorem SepCert.allocS {V : List String} (x : String) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        simp only [if_neg hd]
+        simp only [ite_eq_right hd]
         obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
         -- the address handed out is not live, whether it came from the free list or
         -- the counter: from the free list by disjointness, from the counter by
@@ -369,21 +369,21 @@ theorem SepCert.allocS {V : List String} (x : String) :
                  (pickAddr s.freed s.fresh :: s.live) = true
           by_cases hqx : q = x
           · subst hqx; simp [upd, memInt]
-          · simp only [upd, if_neg hqx, memInt, Bool.or_eq_true]
+          · simp only [upd, ite_eq_right hqx, memInt, Bool.or_eq_true]
             exact Or.inr (hlive q (memCons_ne hq hqx))
         · intro q hq y hy hne
           show ¬ (upd s.store x (pickAddr s.freed s.fresh) q
                 = upd s.store x (pickAddr s.freed s.fresh) y)
           by_cases hqx : q = x
           · have hyx : ¬ (y = x) := fun h => hne (hqx.trans h.symm)
-            simp only [upd, if_pos hqx, if_neg hyx]
+            simp only [upd, ite_eq_left hqx, ite_eq_right hyx]
             intro hc
             exact absurd (hc ▸ hlive y (memCons_ne hy hyx)) (by simp [hnl])
           · by_cases hyx : y = x
-            · simp only [upd, if_neg hqx, if_pos hyx]
+            · simp only [upd, ite_eq_right hqx, ite_eq_left hyx]
               intro hc
               exact absurd (hc ▸ hlive q (memCons_ne hq hqx)) (by simp [hnl])
-            · simp only [upd, if_neg hqx, if_neg hyx]
+            · simp only [upd, ite_eq_right hqx, ite_eq_right hyx]
               exact hinj q (memCons_ne hq hqx) y (memCons_ne hy hyx) hne
         · intro a ha
           show a < bumpFresh s.freed s.fresh
@@ -416,10 +416,10 @@ theorem SepCert.deref {V : List String} (x : String) (hx : memStr x V = true) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
         have hlive : memInt (s.store x) s.live = true := (hv hd0).1 x (memStr_mem hx)
-        simp only [if_neg hd, if_pos hlive]
+        simp only [ite_eq_right hd, ite_eq_left hlive]
         exact ⟨he, fun _ => hv hd0⟩
 
 /-- **Deallocation — the rule stage 1h could not state.** Freeing `x` removes one
@@ -437,13 +437,13 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]
+      · simp only [ite_eq_left hd]
         exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
         obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
         have hxV : x ∈ V := memStr_mem hx
         have hxl : memInt (s.store x) s.live = true := hlive x hxV
-        simp only [if_neg hd, if_pos hxl]
+        simp only [ite_eq_right hd, ite_eq_left hxl]
         refine ⟨he, fun _ => ⟨?_, ?_, ?_, ?_, ?_⟩⟩
         · intro q hq
           show memInt (s.store q) (dropInt (s.store x) s.live) = true
@@ -462,8 +462,8 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
               b = s.store x ∨ memInt b s.freed = true := by
             intro b hb
             by_cases hlab : s.hlab (s.store x) = true
-            · rw [if_pos hlab] at hb; exact Or.inr hb
-            · rw [if_neg hlab] at hb
+            · rw [ite_eq_left hlab] at hb; exact Or.inr hb
+            · rw [ite_eq_right hlab] at hb
               simp only [memInt, Bool.or_eq_true, beq_iff_eq] at hb
               rcases hb with hb | hb
               · exact Or.inl hb.symm
@@ -481,8 +481,8 @@ theorem SepCert.free {V : List String} (x : String) (hx : memStr x V = true) :
               b = s.store x ∨ memInt b s.freed = true := by
             intro b hb
             by_cases hlab : s.hlab (s.store x) = true
-            · rw [if_pos hlab] at hb; exact Or.inr hb
-            · rw [if_neg hlab] at hb
+            · rw [ite_eq_left hlab] at hb; exact Or.inr hb
+            · rw [ite_eq_right hlab] at hb
               simp only [memInt, Bool.or_eq_true, beq_iff_eq] at hb
               rcases hb with hb | hb
               · exact Or.inl hb.symm
@@ -504,20 +504,20 @@ theorem SepCert.load {V : List String} (d p : String) (hp : memStr p V = true) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
         obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hv hd0
         have hl : memInt (s.store p) s.live = true := hlive p (memStr_mem hp)
-        simp only [if_neg hd, if_pos hl]
+        simp only [ite_eq_right hd, ite_eq_left hl]
         refine ⟨he, fun _ => ⟨?_, ?_, hfr, hdisj, hfb⟩⟩
         · intro q hq
           show memInt (upd s.store d (s.heap (s.store p)) q) s.live = true
-          simp only [upd, if_neg (dropStr_ne hq)]
+          simp only [upd, ite_eq_right (dropStr_ne hq)]
           exact hlive q (dropStr_mem hq)
         · intro q hq y hy hne
           show ¬ (upd s.store d (s.heap (s.store p)) q
                 = upd s.store d (s.heap (s.store p)) y)
-          simp only [upd, if_neg (dropStr_ne hq), if_neg (dropStr_ne hy)]
+          simp only [upd, ite_eq_right (dropStr_ne hq), ite_eq_right (dropStr_ne hy)]
           exact hinj q (dropStr_mem hq) y (dropStr_mem hy) hne
 
 /-- **Storing through a live pointer is safe**, and changes nothing the separation
@@ -533,10 +533,10 @@ theorem SepCert.store {V : List String} (p v : String) (hp : memStr p V = true) 
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
         have hl : memInt (s.store p) s.live = true := (hv hd0).1 p (memStr_mem hp)
-        simp only [if_neg hd, if_pos hl]
+        simp only [ite_eq_right hd, ite_eq_left hl]
         exact ⟨he, fun _ => hv hd0⟩
 
 /-- String operations do not touch the heap, so the separation invariant rides
@@ -552,9 +552,9 @@ theorem SepCert.sop {V : List String} (op : SOp) (x : String) (e : SExpr) :
       subst hr
       obtain ⟨he, hv⟩ := hinv
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
+      · simp only [ite_eq_left hd]; exact ⟨he, fun hc => absurd (hd ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hd
-        simp only [if_neg hd]
+        simp only [ite_eq_right hd]
         cases op with
         | set  => exact ⟨he, fun _ => hv hd0⟩
         | emit => exact ⟨he, fun _ => hv hd0⟩
@@ -596,17 +596,17 @@ theorem slcheck_sound : ∀ (c : UCmd) (V V' : List String),
   | .memop .deref x, V, V', h => by
       simp only [slcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         exact SepCert.deref x hx
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .free x, V, V', h => by
       simp only [slcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         exact SepCert.free x hx
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .seq c₁ c₂, V, V', h => by
       simp only [slcheck] at h
       rcases e₁ : slcheck V c₁ with _ | V₁
@@ -625,17 +625,17 @@ theorem slcheck_sound : ∀ (c : UCmd) (V V' : List String),
   | .hop .load d p, V, V', h => by
       simp only [slcheck] at h
       by_cases hp : memStr p V = true
-      · rw [if_pos hp] at h
+      · rw [ite_eq_left hp] at h
         simp only [Option.some.injEq] at h; subst h
         exact SepCert.load d p hp
-      · rw [if_neg hp] at h; simp at h
+      · rw [ite_eq_right hp] at h; simp at h
   | .hop .store p v, V, V', h => by
       simp only [slcheck] at h
       by_cases hp : memStr p V = true
-      · rw [if_pos hp] at h
+      · rw [ite_eq_left hp] at h
         simp only [Option.some.injEq] at h; subst h
         exact SepCert.store p v hp
-      · rw [if_neg hp] at h; simp at h
+      · rw [ite_eq_right hp] at h; simp at h
   | .loop _ _, _, _, h => by simp [slcheck] at h
 
 /-- **Memory safety, with deallocation.** A checked program never faults — no wild
@@ -736,10 +736,10 @@ theorem slcheck_extends_umcheck : ∀ (c : UCmd) (V V' : List String),
   | .memop .deref x, V, V', h => by
       simp only [umcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
-        simp only [slcheck, if_pos hx]
+      · rw [ite_eq_left hx] at h
+        simp only [slcheck, ite_eq_left hx]
         exact h
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .free _, _, _, h => by simp [umcheck] at h
   | .seq c₁ c₂, V, V', h => by
       simp only [umcheck] at h

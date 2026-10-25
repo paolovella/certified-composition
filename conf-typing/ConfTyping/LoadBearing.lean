@@ -375,7 +375,7 @@ theorem emitProg_ledger (D : Deployment) :
     needsLedger D [2] "fs" emitProg = [(∀ t, qcount t ∈ [2] → D.accepts t)] := by
   show (needs emitProg).map (entryProp D [2] "fs") = _
   rw [emitProg_needs]
-  simp only [List.map_cons, List.map_nil, entryProp, if_neg (by decide : ¬ ("db" = "fs"))]
+  simp only [List.map_cons, List.map_nil, entryProp, ite_eq_right (by decide : ¬ ("db" = "fs"))]
 
 def emitBase (D : Deployment) : Ledger := needsLedger D [2] "fs" emitProg
 

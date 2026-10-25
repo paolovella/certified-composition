@@ -63,21 +63,21 @@ theorem UCert.memop {A : List String} (op : MemOp) (x : String) :
         subst hr
         obtain ⟨ha, hrd, hd⟩ := hinv
         by_cases hdead : s.dead = true
-        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
+        · simp only [ite_eq_left hdead]; exact ⟨ha, hrd, hd⟩
         · have hd0 : s.dead = false := by simpa using hdead
-          simp only [if_neg hdead]
+          simp only [ite_eq_right hdead]
           cases op with
           | alloc => exact ⟨ha, hrd, fun _ => hd hd0⟩
           | allocS => exact ⟨ha, hrd, fun _ => hd hd0⟩
           | deref =>
               by_cases hl : memInt (s.store x) s.live = true
-              · simp only [if_pos hl]; exact ⟨ha, hrd, hd⟩
-              · simp only [if_neg hl]
+              · simp only [ite_eq_left hl]; exact ⟨ha, hrd, hd⟩
+              · simp only [ite_eq_right hl]
                 exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
           | free =>
               by_cases hl : memInt (s.store x) s.live = true
-              · simp only [if_pos hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
-              · simp only [if_neg hl]
+              · simp only [ite_eq_left hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
+              · simp only [ite_eq_right hl]
                 exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
 
 /-- String operations cost one step and leave mediation alone, for the same reason
@@ -97,9 +97,9 @@ theorem UCert.sop {A : List String} (op : SOp) (x : String) (e : SExpr) :
         subst hr
         obtain ⟨ha, hrd, hd⟩ := hinv
         by_cases hdead : s.dead = true
-        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
+        · simp only [ite_eq_left hdead]; exact ⟨ha, hrd, hd⟩
         · have hd0 : s.dead = false := by simpa using hdead
-          simp only [if_neg hdead]
+          simp only [ite_eq_right hdead]
           cases op with
           | set  => exact ⟨ha, hrd, fun _ => hd hd0⟩
           | emit => exact ⟨ha, hrd, fun _ => hd hd0⟩
@@ -120,18 +120,18 @@ theorem UCert.hop {A : List String} (op : HOp) (x y : String) :
         subst hr
         obtain ⟨ha, hrd, hd⟩ := hinv
         by_cases hdead : s.dead = true
-        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
+        · simp only [ite_eq_left hdead]; exact ⟨ha, hrd, hd⟩
         · have hd0 : s.dead = false := by simpa using hdead
-          simp only [if_neg hdead]
+          simp only [ite_eq_right hdead]
           cases op with
           | load =>
               by_cases hl : memInt (s.store y) s.live = true
-              · simp only [if_pos hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
-              · simp only [if_neg hl]; exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
+              · simp only [ite_eq_left hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
+              · simp only [ite_eq_right hl]; exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
           | store =>
               by_cases hl : memInt (s.store x) s.live = true
-              · simp only [if_pos hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
-              · simp only [if_neg hl]; exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
+              · simp only [ite_eq_left hl]; exact ⟨ha, hrd, fun _ => hd hd0⟩
+              · simp only [ite_eq_right hl]; exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
 
 /-! ## The full certificate -/
 
@@ -184,73 +184,73 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
   | .assign x e, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : (P x || exprLow P e) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         refine ⟨UCert.assign x e, ?_⟩
         rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
         · exact .assignH V x e h'
         · exact .assignL V x e h'
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .access r, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hr : memStr r A = true
-      · rw [if_pos hr] at h
+      · rw [ite_eq_left hr] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.access r hr, .access V r⟩
-      · rw [if_neg hr] at h; simp at h
+      · rw [ite_eq_right hr] at h; simp at h
   | .memop .alloc x, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : P x = true
-      · rw [if_pos hx] at h; simp at h
-      · rw [if_neg hx] at h
+      · rw [ite_eq_left hx] at h; simp at h
+      · rw [ite_eq_right hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.memop .alloc x, .alloc V x (by simpa using hx)⟩
   | .memop .allocS x, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : P x = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.memop .allocS x, .allocS V x hx⟩
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .deref x, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.memop .deref x, .deref V x hx⟩
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .free x, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.memop .free x, .free V x hx⟩
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .sop .set x e, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : (P x || sexprLow P e) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         refine ⟨UCert.sop .set x e, ?_⟩
         rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
         · exact .setH V x e h'
         · exact .setL V x e h'
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .sop .emit q e, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : sexprLow P e = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         exact ⟨UCert.sop .emit q e, .emit V q e hx⟩
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .seq c₁ c₂, A, V, A', V', k, h => by
       simp only [allcheck] at h
       rcases e₁ : allcheck P A V c₁ with _ | p₁
@@ -267,7 +267,7 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
   | .ite e c₁ c₂, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hg : exprLow P e = true
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         rcases e₁ : allcheck P A V c₁ with _ | p₁
         · rw [e₁] at h; simp at h
         · rcases e₂ : allcheck P A V c₂ with _ | p₂
@@ -278,11 +278,11 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
             have f₁ := allcheck_sound c₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁])
             have f₂ := allcheck_sound c₂ A V p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂])
             exact ⟨UCert.ite f₁.bundle f₂.bundle, .iteL e hg f₁.joint f₂.joint⟩
-      · rw [if_neg hg] at h; simp at h
+      · rw [ite_eq_right hg] at h; simp at h
   | .hop .load d p, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : (memStr p V && (!P p || P d)) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
@@ -290,11 +290,11 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
         rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
         · exact .loadL V d p h1 (by simpa using h')
         · exact .loadH V d p h1 h'
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .hop .store p v, A, V, A', V', k, h => by
       simp only [allcheck] at h
       by_cases hx : (memStr p V && (P p || !P v)) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl, rfl⟩ := h
         obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
@@ -304,7 +304,7 @@ theorem allcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String
         · by_cases hpp : P p = true
           · exact .storeH V p v h1 hpp
           · exact .storeL V p v h1 (by simpa using hpp) (by simpa using h')
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .loop _ _, _, _, _, _, _, h => by simp [allcheck] at h
 
 /-! ## Four certificates from one run of one checker -/

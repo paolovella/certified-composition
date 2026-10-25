@@ -337,7 +337,7 @@ theorem uexec_embed_eq : ∀ (n : Nat) (c : WCmd) (π : MedPolicy) (s : UState),
           simp only [uembed, uexec, wexec, Option.map_some]
       | assign x e =>
           simp only [uembed, uexec, wexec, Option.map_some, hd, Bool.false_eq_true,
-                     if_false]
+                     ite_false]
       | seq c₁ c₂ =>
           rw [uembed, uexec_seq_eq, wexec_seq_eq,
               uexec_embed_eq n c₁ π s hd]
@@ -352,14 +352,14 @@ theorem uexec_embed_eq : ∀ (n : Nat) (c : WCmd) (π : MedPolicy) (s : UState),
       | ite e c₁ c₂ =>
           rw [uembed, uexec_ite_eq, wexec_ite_eq]
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg, if_pos hg, uexec_embed_eq n c₁ π s hd]
+          · rw [ite_eq_left hg, ite_eq_left hg, uexec_embed_eq n c₁ π s hd]
             rcases h₁ : wexec n c₁ s.store with _ | o₁ <;> simp
-          · rw [if_neg hg, if_neg hg, uexec_embed_eq n c₂ π s hd]
+          · rw [ite_eq_right hg, ite_eq_right hg, uexec_embed_eq n c₂ π s hd]
             rcases h₁ : wexec n c₂ s.store with _ | o₁ <;> simp
       | loop e c₀ =>
           rw [uembed, uexec_loop_eq, wexec_loop_eq]
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg, if_pos hg, uexec_embed_eq n c₀ π s hd]
+          · rw [ite_eq_left hg, ite_eq_left hg, uexec_embed_eq n c₀ π s hd]
             rcases h₁ : wexec n c₀ s.store with _ | o₁
             · simp
             · simp only [Option.map_some, Option.bind_some]
@@ -370,7 +370,7 @@ theorem uexec_embed_eq : ∀ (n : Nat) (c : WCmd) (π : MedPolicy) (s : UState),
               rcases h₂ : wexec n (.loop e c₀) o₁.1 with _ | o₂
               · simp
               · simp
-          · rw [if_neg hg, if_neg hg]
+          · rw [ite_eq_right hg, ite_eq_right hg]
             simp only [Option.map_some]
 
 /-! ## What transfers -/

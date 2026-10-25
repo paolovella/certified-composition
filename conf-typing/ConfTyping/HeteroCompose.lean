@@ -253,7 +253,7 @@ def clear5 : CStore → CStore := fun σ l => if l = 5 then 0 else σ l
 
 theorem clear5_modifies : ModifiesOnly clear5 (fun l => l = 5) := by
   intro σ l hl
-  simp only [clear5, if_neg hl]
+  simp only [clear5, ite_eq_right hl]
 
 /-- Its CN half. -/
 def clear5CN (Γ : Ledger) : Bridge CStore (Footprint × Ledger) Footprint cnGA cdist :=
@@ -267,7 +267,7 @@ def clear5SCT : Bridge CStore Footprint Footprint sctGA cdist where
   contracts := fun σ τ l hne => by
     by_cases h5 : l = 5
     · exact absurd (by simp [clear5, h5]) hne
-    · exact ⟨h5, by simpa only [cdist, clear5, if_neg h5] using hne⟩
+    · exact ⟨h5, by simpa only [cdist, clear5, ite_eq_right h5] using hne⟩
 
 /-- **The stage-C milestone, positive direction.** One artifact, two certificates
     from two different accumulation laws, composed once: the footprints union and

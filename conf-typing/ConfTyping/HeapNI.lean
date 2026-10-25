@@ -156,13 +156,13 @@ theorem deref_NI_given_safety {P : Partition} {V : List String} {x : String}
   refine ⟨?_, rfl, rfl⟩
   by_cases hd : s.dead = true
   · have hd' : s'.dead = true := by rwa [hdd] at hd
-    rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+    rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd⟩
   · have hd0 : s.dead = false := by simpa using hd
     have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
     have hd0' : s'.dead = false := by simpa using hd'
     have hl : memInt (s.store x) s.live = true := hs.2 hd0 x (memStr_mem hx)
     have hl' : memInt (s'.store x) s'.live = true := hs'.2 hd0' x (memStr_mem hx)
-    rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+    rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
     exact ⟨hst, hrd, hdd⟩
 
 /-- The same for `free`: it edits `live`, which is not observed, and leaves the store,
@@ -178,13 +178,13 @@ theorem free_NI_given_safety {P : Partition} {V : List String} {x : String}
   refine ⟨?_, rfl, rfl⟩
   by_cases hd : s.dead = true
   · have hd' : s'.dead = true := by rwa [hdd] at hd
-    rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+    rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd⟩
   · have hd0 : s.dead = false := by simpa using hd
     have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
     have hd0' : s'.dead = false := by simpa using hd'
     have hl : memInt (s.store x) s.live = true := hs.2 hd0 x (memStr_mem hx)
     have hl' : memInt (s'.store x) s'.live = true := hs'.2 hd0' x (memStr_mem hx)
-    rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+    rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
     exact ⟨hst, hrd, hdd⟩
 
 /-! ## The finding -/

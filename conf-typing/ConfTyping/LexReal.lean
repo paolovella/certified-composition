@@ -145,7 +145,7 @@ theorem lexFuel_printReal :
             simp only [printReal, hpt, List.cons_append]
           rw [hhead]
           have hcsp : ¬ (c = RCh.rsp) := hc
-          simp only [lexFuel, if_neg hcsp]
+          simp only [lexFuel, ite_eq_right hcsp]
           -- longest match reads token t, leaving the separator + rest
           have hread : readTok (c :: (cs ++ .rsp :: printReal ts))
               = some (t, .rsp :: printReal ts) := by

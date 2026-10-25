@@ -51,7 +51,7 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
           · simp [hd]
-          · simp only [if_neg hd]; split <;> rfl
+          · simp only [ite_eq_right hd]; split <;> rfl
       | access q =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true <;> simp [hd]
@@ -62,7 +62,7 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
             exact fun hh => hnw hh.symm
           by_cases hd : s.dead = true
           · simp [hd]
-          · simp only [if_neg hd]; show upd s.store y _ x = s.store x
+          · simp only [ite_eq_right hd]; show upd s.store y _ x = s.store x
             simp [upd, hxy]
       | sop op y e =>
           cases op
@@ -70,12 +70,12 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]
+            · simp only [ite_eq_right hd]
           case emit =>
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]
+            · simp only [ite_eq_right hd]
       | memop op y =>
           have hxy : ¬ (x = y) := by
             simp only [noWrite, bne_iff_ne, ne_eq] at hnw
@@ -85,26 +85,26 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]
+            · simp only [ite_eq_right hd]
               show upd s.store y (pickAddr s.freed s.fresh) x = s.store x
               simp [upd, hxy]
           case allocS =>
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]
+            · simp only [ite_eq_right hd]
               show upd s.store y (pickAddr s.freed s.fresh) x = s.store x
               simp [upd, hxy]
           case deref =>
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]; split <;> rfl
+            · simp only [ite_eq_right hd]; split <;> rfl
           case free =>
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]; split <;> rfl
+            · simp only [ite_eq_right hd]; split <;> rfl
       | hop op d y =>
           cases op
           case load =>
@@ -114,7 +114,7 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]
+            · simp only [ite_eq_right hd]
               split
               · show upd s.store d (s.heap (s.store y)) x = s.store x
                 simp [upd, hxd]
@@ -123,7 +123,7 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
             simp only [uexec, Option.some.injEq] at h; subst h
             by_cases hd : s.dead = true
             · simp [hd]
-            · simp only [if_neg hd]; split <;> rfl
+            · simp only [ite_eq_right hd]; split <;> rfl
       | seq c₁ c₂ =>
           simp only [noWrite, Bool.and_eq_true] at hnw
           rw [uexec_seq_eq] at h
@@ -141,12 +141,12 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
           simp only [noWrite, Bool.and_eq_true] at hnw
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
             rw [← h]; exact noWrite_preserves n x c₁ π s r₁ hnw.1 e₁
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -155,7 +155,7 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
           simp only [noWrite] at hnw
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₀ π s with _ | r₁
             · rw [e₁] at h; simp at h
             rw [e₁, Option.bind_some] at h
@@ -166,7 +166,7 @@ theorem noWrite_preserves : ∀ (n : Nat) (x : String) (c : UCmd) (π : MedPolic
             show r₂.1.store x = s.store x
             rw [noWrite_preserves n x (.loop e c₀) π r₁.1 r₂ (by simp [noWrite, hnw]) e₂,
                 noWrite_preserves n x c₀ π s r₁ hnw e₁]
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; rw [← h]
 
 /-! ## The counted loop -/
@@ -216,14 +216,14 @@ theorem countU_turn {i : String} {body : UCmd} {b : Nat}
           · rw [← e₂]
             refine ⟨by show r₁.2.1 + 1 ≤ b + 1; omega, Or.inr ⟨by simp [hd], ?_⟩⟩
             show (if r₁.1.dead then r₁.1 else _).store i = s.store i
-            rw [if_pos hd]; exact hkeep
+            rw [ite_eq_left hd]; exact hkeep
           · rw [← e₂]
             refine ⟨by show r₁.2.1 + 1 ≤ b + 1; omega, Or.inl ?_⟩
             show (if r₁.1.dead then r₁.1 else _).store i = s.store i - 1
-            rw [if_neg hd]
+            rw [ite_eq_right hd]
             show upd r₁.1.store i (evalE (.add (.var i) (.num (-1))) r₁.1.store) i
                    = s.store i - 1
-            simp only [upd, evalE, hkeep, if_true, reduceIte]
+            simp only [upd, evalE, hkeep, ite_true, reduceIte]
             omega
 
 /-- **The cost of a counted loop, natively.** The counter's value bounds the iterations,
@@ -245,7 +245,7 @@ theorem countU_cost {i : String} {body : UCmd} {b : Nat}
   | n + 1, π, s, r, hpos, h => by
       rw [countU, uexec_loop_eq] at h
       by_cases hg : evalE (.var i) s.store ≠ 0
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         have hgi : s.store i ≠ 0 := by simpa [evalE] using hg
         rcases e₁ : uexec n (.seq body (decOne i)) π s with _ | r₁
         · rw [e₁] at h; simp at h
@@ -275,7 +275,7 @@ theorem countU_cost {i : String} {body : UCmd} {b : Nat}
           rw [uexec_dead_loop_diverges n (.var i) (.seq body (decOne i)) π r₁.1
                 hdead hg1] at e₂
           cases e₂
-      · rw [if_neg hg] at h
+      · rw [ite_eq_right hg] at h
         simp only [Option.some.injEq] at h
         rw [← h]; exact Nat.le_add_right 1 _
 
@@ -302,7 +302,7 @@ theorem countU_auth {i : String} {A A' : List String} {body : UCmd} {b : Nat}
   | n + 1, π, s, r, hinv, h => by
       rw [countU, uexec_loop_eq] at h
       by_cases hg : evalE (.var i) s.store ≠ 0
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         rcases e₁ : uexec n (.seq body (decOne i)) π s with _ | r₁
         · rw [e₁] at h; simp at h
         rw [e₁, Option.bind_some] at h
@@ -327,7 +327,7 @@ theorem countU_auth {i : String} {A A' : List String} {body : UCmd} {b : Nat}
                   (hcert.auth m π s q₁ hinv f₁) f₂)
         rw [← h]
         exact countU_auth hsub hcert n π r₁.1 r₂ hturn e₂
-      · rw [if_neg hg] at h
+      · rw [ite_eq_right hg] at h
         simp only [Option.some.injEq] at h
         rw [← h]; exact hinv
 
@@ -375,7 +375,7 @@ theorem UCert.forU {A A' : List String} {i : String} {k : Nat} {body : UCmd} {b 
                 · rw [uexec_dead_loop_diverges (m' + 1) (.var i) (.seq body (decOne i))
                         π r₁.1 hd1 hg] at e₂
                   cases e₂
-                · rw [uexec_loop_eq, if_neg hg] at e₂
+                · rw [uexec_loop_eq, ite_eq_right hg] at e₂
                   simp only [Option.some.injEq] at e₂; rw [← e₂]
           rw [hc1, hc2]; omega
         · have hd0 : s.dead = false := by simpa using hd
@@ -386,10 +386,10 @@ theorem UCert.forU {A A' : List String} {i : String} {k : Nat} {body : UCmd} {b 
                 simp only [uexec, Option.some.injEq] at e₁
                 rw [← e₁]
                 show (if s.dead then s else _).store i = (k : Int)
-                rw [if_neg hd]
+                rw [ite_eq_right hd]
                 show upd s.store i (evalE (.num (k : Int)) s.store) i = (k : Int)
                 simp [upd, evalE]
-          have hpos : 0 ≤ r₁.1.store i := by rw [hi]; exact Int.ofNat_nonneg k
+          have hpos : 0 ≤ r₁.1.store i := by rw [hi]; exact Int.natCast_nonneg k
           have hloop := countU_cost hnw hcert.budget m π r₁.1 r₂ hpos e₂
           rw [hi] at hloop
           simp only [Int.toNat_natCast] at hloop
@@ -415,8 +415,8 @@ theorem dropStr_idem (x : String) : ∀ (V : List String), dropStr x (dropStr x 
   | []      => rfl
   | y :: ys => by
       by_cases h : (y == x) = true
-      · rw [dropStr, if_pos h, dropStr_idem x ys]
-      · rw [dropStr, if_neg h, dropStr, if_neg h, dropStr_idem x ys]
+      · rw [dropStr, ite_eq_left h, dropStr_idem x ys]
+      · rw [dropStr, ite_eq_right h, dropStr, ite_eq_right h, dropStr_idem x ys]
 
 /-- **The counted loop is typable by the joint judgment**, so it carries noninterference
     and memory safety too. The counter must be Low — a loop whose *length* is secret is

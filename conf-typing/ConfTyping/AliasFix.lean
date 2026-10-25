@@ -238,9 +238,9 @@ theorem loopFix_correct {P : Part} {c : ALCmd} :
       | some Q₁ =>
           simp only [loopFix, hchk] at h
           by_cases hpres : preservedB Q Q₁ = true
-          · rw [if_pos hpres, Option.some.injEq] at h; subst h
+          · rw [ite_eq_left hpres, Option.some.injEq] at h; subst h
             exact ⟨hCo, Q₁, hchk, hpres⟩
-          · rw [if_neg hpres] at h
+          · rw [ite_eq_right hpres] at h
             cases hfm : findMerge Q with
             | none => simp [hfm] at h
             | some ab =>
@@ -305,7 +305,7 @@ theorem loopFix_converges (c : ALCmd) :
       | some Q₁ =>
           by_cases hp : preservedB Q Q₁ = true
           · simp [hp]
-          · simp only [if_neg hp]
+          · simp only [ite_eq_right hp]
             cases hfm : findMerge Q with
             | none => rfl
             | some ab =>
@@ -431,9 +431,9 @@ theorem loopSearch_correct {P : Part} {c : ALCmd} {n : Nat} {Q R : Part}
       | some Q₁ =>
           simp only [hchk] at h
           by_cases hp : preservedB (collapse Q) Q₁ = true
-          · rw [if_pos hp, Option.some.injEq] at h; subst h
+          · rw [ite_eq_left hp, Option.some.injEq] at h; subst h
             exact ⟨Coarsens_trans hCo (Coarsens_collapse Q), Q₁, hchk, hp⟩
-          · rw [if_neg hp] at h; simp at h
+          · rw [ite_eq_right hp] at h; simp at h
 
 /-- **The widened search is complete for the top.** If the fully-merged invariant
     is a preserved fixed point, the search never fails — it finds an invariant
@@ -641,9 +641,9 @@ theorem loopFix2_correct {P : Part} {c : ALCmd} :
       | some Q₁ =>
           simp only [loopFix2, hchk] at h
           by_cases hpres : preservedB Q Q₁ = true
-          · rw [if_pos hpres, Option.some.injEq] at h; subst h
+          · rw [ite_eq_left hpres, Option.some.injEq] at h; subst h
             exact ⟨hCo, Q₁, hchk, hpres⟩
-          · rw [if_neg hpres] at h
+          · rw [ite_eq_right hpres] at h
             cases hfm : findMerge2 Q Q₁ with
             | none => simp [hfm] at h
             | some ab =>
@@ -669,9 +669,9 @@ theorem alcheck2_loop_correct {P P' : Part} {e : HLExpr} {c : ALCmd}
       | some Q₁ =>
           simp only [hchk] at h
           by_cases hp : preservedB (collapse P) Q₁ = true
-          · rw [if_pos hp, Option.some.injEq] at h; subst h
+          · rw [ite_eq_left hp, Option.some.injEq] at h; subst h
             exact ⟨Coarsens_collapse P, Q₁, hchk, hp⟩
-          · rw [if_neg hp] at h; simp at h
+          · rw [ite_eq_right hp] at h; simp at h
 
 /-- **Whole-program soundness, nested loops and all.** A program accepted by the
     integrated checker never hits a use-after-free / double-free / wild access, at

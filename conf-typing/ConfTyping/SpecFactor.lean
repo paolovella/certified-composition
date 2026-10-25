@@ -75,7 +75,7 @@ theorem secretCell_traceEq : TraceEq Psec ["p"] (secretCell 42) (secretCell 99) 
   intro a ha
   have : ¬ (a = 3) := by
     intro h; rw [h] at ha; exact absurd ha (by decide)
-  simp only [secretCell, if_neg this]
+  simp only [secretCell, ite_eq_right this]
 
 /-- The command is certified: `jcheck`'s load rule wants the source tracked and
     `!P p || P d`, and a Low pointer satisfies that whatever the destination is. -/

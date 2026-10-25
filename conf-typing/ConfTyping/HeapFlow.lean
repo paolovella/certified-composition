@@ -147,15 +147,15 @@ theorem hsecTy_ni {P Q} {pc : Bool} {c : HCmd} (h : HSecTy P Q pc c) :
       refine ⟨fun y hy => ?_, hs.2⟩
       have hyx : y ≠ x := fun e => by rw [e, hx] at hy; cases hy
       show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
-      simp only [upd, if_neg hyx]; exact hs.1 y hy
+      simp only [upd, ite_eq_right hyx]; exact hs.1 y hy
   | assignL x e he =>
       intro s s' hs; obtain ⟨σ, hp⟩ := s; obtain ⟨σ', hp'⟩ := s'
       refine ⟨fun y hy => ?_, hs.2⟩
       show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
       simp only [upd]
       by_cases hyx : y = x
-      · rw [if_pos hyx, if_pos hyx, evalE_lowEq e he hs.1]
-      · rw [if_neg hyx, if_neg hyx]; exact hs.1 y hy
+      · rw [ite_eq_left hyx, ite_eq_left hyx, evalE_lowEq e he hs.1]
+      · rw [ite_eq_right hyx, ite_eq_right hyx]; exact hs.1 y hy
   | seq _ _ ih₁ ih₂ => intro s s' hs; exact ih₂ _ _ (ih₁ s s' hs)
   | iteL e he _ _ ih₁ ih₂ =>
       intro s s' hs; obtain ⟨σ, hp⟩ := s; obtain ⟨σ', hp'⟩ := s'
@@ -173,7 +173,7 @@ theorem hsecTy_ni {P Q} {pc : Bool} {c : HCmd} (h : HSecTy P Q pc c) :
       refine ⟨fun z hz => ?_, hs.2⟩
       have hzy : z ≠ y := fun e => by rw [e, hy] at hz; cases hz
       show upd σ y (hp k) z = upd σ' y (hp' k) z
-      simp only [upd, if_neg hzy]; exact hs.1 z hz
+      simp only [upd, ite_eq_right hzy]; exact hs.1 z hz
   | loadL y k hk =>
       intro s s' hs; obtain ⟨σ, hp⟩ := s; obtain ⟨σ', hp'⟩ := s'
       refine ⟨fun z hz => ?_, hs.2⟩
@@ -181,14 +181,14 @@ theorem hsecTy_ni {P Q} {pc : Bool} {c : HCmd} (h : HSecTy P Q pc c) :
       have hcell : hp k = hp' k := hs.2 k hk
       simp only [upd]
       by_cases hzy : z = y
-      · rw [if_pos hzy, if_pos hzy, hcell]
-      · rw [if_neg hzy, if_neg hzy]; exact hs.1 z hz
+      · rw [ite_eq_left hzy, ite_eq_left hzy, hcell]
+      · rw [ite_eq_right hzy, ite_eq_right hzy]; exact hs.1 z hz
   | storeH k e hk =>
       intro s s' hs; obtain ⟨σ, hp⟩ := s; obtain ⟨σ', hp'⟩ := s'
       refine ⟨hs.1, fun a ha => ?_⟩
       have hak : a ≠ k := fun e => by rw [e, hk] at ha; cases ha
       show updH hp k (evalE e σ) a = updH hp' k (evalE e σ') a
-      simp only [updH, if_neg hak]; exact hs.2 a ha
+      simp only [updH, ite_eq_right hak]; exact hs.2 a ha
   | storeL k e he =>
       intro s s' hs; obtain ⟨σ, hp⟩ := s; obtain ⟨σ', hp'⟩ := s'
       have hev : evalE e σ = evalE e σ' := evalE_lowEq e he hs.1
@@ -196,8 +196,8 @@ theorem hsecTy_ni {P Q} {pc : Bool} {c : HCmd} (h : HSecTy P Q pc c) :
       show updH hp k (evalE e σ) a = updH hp' k (evalE e σ') a
       simp only [updH, hev]
       by_cases hak : a = k
-      · rw [if_pos hak, if_pos hak]
-      · rw [if_neg hak, if_neg hak]; exact hs.2 a ha
+      · rw [ite_eq_left hak, ite_eq_left hak]
+      · rw [ite_eq_right hak, ite_eq_right hak]; exact hs.2 a ha
 
 /-! ## The executable checker -/
 

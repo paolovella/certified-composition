@@ -205,7 +205,7 @@ theorem spec_cost_bound : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UStat
       | ite e c₁ c₂ =>
           rw [uexecS_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexecS n w c₁ π s with _ | r₁ <;> rw [e₁] at h
             · simp at h
             · simp only [Option.map_some, Option.some.injEq] at h; subst h
@@ -213,7 +213,7 @@ theorem spec_cost_bound : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UStat
               have ht := transSteps_le w (flatten c₂) π s
               show 1 + transSteps w (flatten c₂) π s + r₁.2.2.1 ≤ (1 + r₁.2.1) * (1 + w)
               rw [Nat.add_mul, Nat.one_mul]; omega
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexecS n w c₂ π s with _ | r₂ <;> rw [e₂] at h
             · simp at h
             · simp only [Option.map_some, Option.some.injEq] at h; subst h
@@ -224,7 +224,7 @@ theorem spec_cost_bound : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UStat
       | loop e c₀ =>
           rw [uexecS_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexecS n w c₀ π s with _ | r₁ <;> rw [e₁] at h
             · simp at h
             · rw [Option.bind_some] at h
@@ -235,7 +235,7 @@ theorem spec_cost_bound : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : UStat
                 have h₂ := spec_cost_bound n w (.loop e c₀) π r₁.1 r₂ e₂
                 show 1 + r₁.2.2.1 + r₂.2.2.1 ≤ (1 + r₁.2.1 + r₂.2.1) * (1 + w)
                 rw [Nat.add_mul, Nat.add_mul, Nat.one_mul]; omega
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h
             show 1 ≤ 1 * (1 + w); omega
 

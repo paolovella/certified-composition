@@ -194,27 +194,27 @@ theorem flsafe :
           rcases key z hz with hzx | ⟨hzV, hzx, hzlt⟩
           · rcases key w hw with hwx | ⟨hwV, hwx, hwlt⟩
             · exact absurd (hzx.trans hwx.symm) hzw
-            · rw [hσx z, hσx w, if_pos hzx, if_neg hwx]; omega
+            · rw [hσx z, hσx w, ite_eq_left hzx, ite_eq_right hwx]; omega
           · rcases key w hw with hwx | ⟨hwV, hwx, hwlt⟩
-            · rw [hσx z, hσx w, if_neg hzx, if_pos hwx]; omega
-            · rw [hσx z, hσx w, if_neg hzx, if_neg hwx]; exact hds z hzV w hwV hzw
+            · rw [hσx z, hσx w, ite_eq_right hzx, ite_eq_left hwx]; omega
+            · rw [hσx z, hσx w, ite_eq_right hzx, ite_eq_right hwx]; exact hds z hzV w hwV hzw
         · intro a ha; have := hfr a ha; omega
     | access x =>
         simp only [flcheck] at hchk
         by_cases hxV : x ∈ V
-        · rw [if_pos hxV, Option.some.injEq] at hchk; subst hchk
+        · rw [ite_eq_left hxV, Option.some.injEq] at hchk; subst hchk
           have hlive := hli x hxV
           refine ⟨by simp [flexec, hlive], ?_⟩
-          intro s' hs; simp only [flexec, hlive, if_true, FLRes.ok.injEq] at hs; subst hs
+          intro s' hs; simp only [flexec, hlive, ite_true, FLRes.ok.injEq] at hs; subst hs
           exact ⟨hli, hbd, hds, hfr⟩
-        · rw [if_neg hxV] at hchk; simp at hchk
+        · rw [ite_eq_right hxV] at hchk; simp at hchk
     | free x =>
         simp only [flcheck] at hchk
         by_cases hxV : x ∈ V
-        · rw [if_pos hxV, Option.some.injEq] at hchk; subst hchk
+        · rw [ite_eq_left hxV, Option.some.injEq] at hchk; subst hchk
           have hlive := hli x hxV
           refine ⟨by simp [flexec, hlive], ?_⟩
-          intro s' hs; simp only [flexec, hlive, if_true, FLRes.ok.injEq] at hs; subst hs
+          intro s' hs; simp only [flexec, hlive, ite_true, FLRes.ok.injEq] at hs; subst hs
           refine ⟨?_, fun z hz => hbd z (mem_of_mem_hlrem hz),
                   fun z hz w hw hzw => hds z (mem_of_mem_hlrem hz) w (mem_of_mem_hlrem hw) hzw, ?_⟩
           · intro z hz
@@ -232,7 +232,7 @@ theorem flsafe :
             rcases List.mem_cons.mp ha with h | h
             · subst h; exact (hbd x hxV).2
             · exact hfr a h
-        · rw [if_neg hxV] at hchk; simp at hchk
+        · rw [ite_eq_right hxV] at hchk; simp at hchk
     | seq c₁ c₂ =>
         simp only [flcheck, Option.bind_eq_bind] at hchk
         cases hV₁ : flcheck V c₁ with
@@ -266,9 +266,9 @@ theorem flsafe :
         | some V₁ =>
             simp only [flcheck, hV₁] at hchk
             by_cases hsub : hllsubB V V₁ = true
-            · rw [if_pos hsub, Option.some.injEq] at hchk; subst hchk
+            · rw [ite_eq_left hsub, Option.some.injEq] at hchk; subst hchk
               have hloopchk : flcheck V (.loop e c) = some V := by
-                simp only [flcheck, hV₁, hsub, if_true]
+                simp only [flcheck, hV₁, hsub, ite_true]
               have bodyStep : ∀ s₁, flexec k c (σ, n, F) = .ok s₁ → FLInv V s₁ := by
                 intro s₁ hs₁
                 exact FLInv_mono (fun z hz => hllsub_mem hsub hz)
@@ -283,7 +283,7 @@ theorem flsafe :
                 · obtain ⟨s₁, ho₁, ho₂⟩ := flbind_ok hs
                   exact (ih (.loop e c) V V s₁ hloopchk (bodyStep s₁ ho₁)).2 s' ho₂
                 · rw [FLRes.ok.injEq] at hs; subst hs; exact ⟨hli, hbd, hds, hfr⟩
-            · rw [if_neg hsub] at hchk; simp at hchk
+            · rw [ite_eq_right hsub] at hchk; simp at hchk
 
 /-- **Certified free-under-loops-safe by `decide`.** -/
 theorem flsafe_of_check {c : FLCmd} {V' : List HLoc} (fuel : Nat) (σ₀ : HLoc → Int)

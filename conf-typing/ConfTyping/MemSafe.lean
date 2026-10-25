@@ -179,12 +179,12 @@ theorem mcheck_safe :
               · obtain ⟨s', hs', hinv'⟩ := ih₁ V V₁ (σ, h, n) hV₁ hinv
                 refine ⟨s', ?_, ?_⟩
                 · show (if evalE e σ ≠ 0 then _ else _) = some s'
-                  rw [if_pos hb]; exact hs'
+                  rw [ite_eq_left hb]; exact hs'
                 · intro z hz; exact hinv' z (inter_subset_left hz)
               · obtain ⟨s', hs', hinv'⟩ := ih₂ V V₂ (σ, h, n) hV₂ hinv
                 refine ⟨s', ?_, ?_⟩
                 · show (if evalE e σ ≠ 0 then _ else _) = some s'
-                  rw [if_neg hb]; exact hs'
+                  rw [ite_eq_right hb]; exact hs'
                 · intro z hz; exact hinv' z (inter_subset_right hz)
   | alloc x =>
       intro V V' s hchk hinv
@@ -207,35 +207,35 @@ theorem mcheck_safe :
       obtain ⟨σ, h, n⟩ := s
       simp only [mcheck] at hchk
       by_cases hxV : x ∈ V
-      · rw [if_pos hxV] at hchk
+      · rw [ite_eq_left hxV] at hchk
         simp only [Option.some.injEq] at hchk; subst hchk
         have hval := hinv x hxV
         have hvb : validB (σ x) n = true := by
           simp only [validB, Bool.and_eq_true, decide_eq_true_eq]; exact hval
         refine ⟨(upd σ y (h (σ x)), h, n), ?_, ?_⟩
         · show (if validB (σ x) n then _ else _) = _
-          rw [if_pos hvb]
+          rw [ite_eq_left hvb]
         · intro z hz
           have hzV : z ∈ V := mem_of_mem_remove hz
           have hzy : z ≠ y := ne_of_mem_remove hz
           have := hinv z hzV
           simpa [upd, hzy] using this
-      · rw [if_neg hxV] at hchk; simp at hchk
+      · rw [ite_eq_right hxV] at hchk; simp at hchk
   | store x e =>
       intro V V' s hchk hinv
       obtain ⟨σ, h, n⟩ := s
       simp only [mcheck] at hchk
       by_cases hxV : x ∈ V
-      · rw [if_pos hxV] at hchk
+      · rw [ite_eq_left hxV] at hchk
         simp only [Option.some.injEq] at hchk; subst hchk
         have hval := hinv x hxV
         have hvb : validB (σ x) n = true := by
           simp only [validB, Bool.and_eq_true, decide_eq_true_eq]; exact hval
         refine ⟨(σ, updH h (σ x) (evalE e σ), n), ?_, ?_⟩
         · show (if validB (σ x) n then _ else _) = _
-          rw [if_pos hvb]
+          rw [ite_eq_left hvb]
         · exact hinv
-      · rw [if_neg hxV] at hchk; simp at hchk
+      · rw [ite_eq_right hxV] at hchk; simp at hchk
 
 /-- **Certified memory-safe by `decide`.** From the empty tracked set (no
     assumed-valid pointers) a checked program runs to a real state — never a

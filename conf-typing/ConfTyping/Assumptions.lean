@@ -103,51 +103,51 @@ theorem no_access_no_reads : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : USta
       | assign x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]
-          · simp only [if_neg hd]
+          · simp only [ite_eq_left hd]
+          · simp only [ite_eq_right hd]
       | check q =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]
-          · simp only [if_neg hd]
+          · simp only [ite_eq_left hd]
+          · simp only [ite_eq_right hd]
             by_cases hp : π q = true
-            · simp only [if_pos hp]
-            · simp only [if_neg hp]
+            · simp only [ite_eq_left hp]
+            · simp only [ite_eq_right hp]
       | sop op x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]
+          · simp only [ite_eq_right hd]; cases op with
             | set => rfl
             | emit => rfl
       | hop op x y =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]
+          · simp only [ite_eq_right hd]; cases op with
             | load =>
                 by_cases hl : memInt (s.store y) s.live = true
-                · simp only [if_pos hl]
-                · simp only [if_neg hl]
+                · simp only [ite_eq_left hl]
+                · simp only [ite_eq_right hl]
             | store =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]
-                · simp only [if_neg hl]
+                · simp only [ite_eq_left hl]
+                · simp only [ite_eq_right hl]
       | memop op x =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]
+          · simp only [ite_eq_right hd]; cases op with
             | alloc => rfl
             | allocS => rfl
             | deref =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]
-                · simp only [if_neg hl]
+                · simp only [ite_eq_left hl]
+                · simp only [ite_eq_right hl]
             | free =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]
-                · simp only [if_neg hl]
+                · simp only [ite_eq_left hl]
+                · simp only [ite_eq_right hl]
       | seq c₁ c₂ =>
           simp only [hasAccess, Bool.or_eq_false_iff] at ha
           rw [uexec_seq_eq] at h
@@ -164,12 +164,12 @@ theorem no_access_no_reads : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : USta
           simp only [hasAccess, Bool.or_eq_false_iff] at ha
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
               subst h; exact no_access_no_reads n c₁ π s r₁ ha.1 e₁
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             · rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -178,7 +178,7 @@ theorem no_access_no_reads : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : USta
           simp only [hasAccess] at ha
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₀ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁, Option.bind_some] at h
@@ -188,7 +188,7 @@ theorem no_access_no_reads : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : USta
                 simp only [Option.map_some, Option.some.injEq] at h; subst h
                 rw [no_access_no_reads n (.loop e c₀) π r₁.1 r₂ (by simp [hasAccess, ha]) e₂,
                     no_access_no_reads n c₀ π s r₁ ha e₁]
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h; rfl
 
 /-- **A sink the program never writes stays as it was.** So that sink's parser entry is
@@ -203,54 +203,54 @@ theorem unwritten_sink_untouched : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s 
       | access _ =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact fun p hp _ => hp
-          · simp only [if_neg hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_left hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_right hd]; exact fun p hp _ => hp
       | assign x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact fun p hp _ => hp
-          · simp only [if_neg hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_left hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_right hd]; exact fun p hp _ => hp
       | check qq =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact fun p hp _ => hp
-          · simp only [if_neg hd]
+          · simp only [ite_eq_left hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_right hd]
             by_cases hp : π qq = true
-            · simp only [if_pos hp]; exact fun p hp _ => hp
-            · simp only [if_neg hp]; exact fun p hp _ => hp
+            · simp only [ite_eq_left hp]; exact fun p hp _ => hp
+            · simp only [ite_eq_right hp]; exact fun p hp _ => hp
       | hop op x y =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact fun p hp _ => hp
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_right hd]; cases op with
             | load =>
                 by_cases hl : memInt (s.store y) s.live = true
-                · simp only [if_pos hl]; exact fun p hp _ => hp
-                · simp only [if_neg hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_left hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_right hl]; exact fun p hp _ => hp
             | store =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; exact fun p hp _ => hp
-                · simp only [if_neg hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_left hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_right hl]; exact fun p hp _ => hp
       | memop op x =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact fun p hp _ => hp
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_right hd]; cases op with
             | alloc => exact fun p hp _ => hp
             | allocS => exact fun p hp _ => hp
             | deref =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; exact fun p hp _ => hp
-                · simp only [if_neg hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_left hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_right hl]; exact fun p hp _ => hp
             | free =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; exact fun p hp _ => hp
-                · simp only [if_neg hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_left hl]; exact fun p hp _ => hp
+                · simp only [ite_eq_right hl]; exact fun p hp _ => hp
       | sop op x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; exact fun p hp _ => hp
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]; exact fun p hp _ => hp
+          · simp only [ite_eq_right hd]; cases op with
             | set => exact fun p hp _ => hp
             | emit =>
                 intro p hp hpq
@@ -280,12 +280,12 @@ theorem unwritten_sink_untouched : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s 
             memStr_append_false hq
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
               subst h; exact unwritten_sink_untouched n c₁ π s r₁ q h1.1 e₁
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             · rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -294,7 +294,7 @@ theorem unwritten_sink_untouched : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s 
           have h0 : memStr q (sinksOf c₀) = false := hq
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₀ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁, Option.bind_some] at h
@@ -305,7 +305,7 @@ theorem unwritten_sink_untouched : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s 
                 intro p hp hpq
                 exact unwritten_sink_untouched n c₀ π s r₁ q h0 e₁ p
                   (unwritten_sink_untouched n (.loop e c₀) π r₁.1 r₂ q hq e₂ p hp hpq) hpq
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h; exact fun p hp _ => hp
 
 /-! ## The computed base, on the worked programs -/
@@ -408,8 +408,8 @@ theorem discharged_covers_needs {D : Deployment} {Ks : List Nat} {fs : String}
         | sinkHonest q =>
             show entryProp D Ks fs (.sinkHonest q)
             by_cases hq : q = fs
-            · simp only [entryProp, if_pos hq]; exact hD.fsInside
-            · simp only [entryProp, if_neg hq]; exact hD.sinkAccepts
+            · simp only [entryProp, ite_eq_left hq]; exact hD.fsInside
+            · simp only [entryProp, ite_eq_right hq]; exact hD.sinkAccepts
   exact key (needs c)
 
 /-- **`fiveProg`'s ledger has two entries, not three.** Stage 1s charged it the
@@ -420,7 +420,7 @@ theorem fiveProg_ledger (D : Deployment) :
       = [(∀ r, D.policy r = D.intended r), (∀ t, qcount t ∈ [2] → D.accepts t)] := by
   show (needs fiveProg).map (entryProp D [2] "fs") = _
   rw [fiveProg_needs]
-  simp only [List.map_cons, List.map_nil, entryProp, if_neg (by decide : ¬ ("db" = "fs"))]
+  simp only [List.map_cons, List.map_nil, entryProp, ite_eq_right (by decide : ¬ ("db" = "fs"))]
 
 /-- A pure computation's ledger is **empty**, so `Sat` is `True`. -/
 theorem pureProg_ledger (D : Deployment) (Ks : List Nat) (fs : String) :

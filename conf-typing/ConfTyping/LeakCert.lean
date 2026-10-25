@@ -136,11 +136,11 @@ theorem memStr_dropStr_of_ne {x y : String} : ∀ {O : List String},
   | z :: zs, hn, h => by
       simp only [memStr, Bool.or_eq_true, beq_iff_eq] at h
       by_cases hz : z = x
-      · rw [dropStr, if_pos (by simp [hz])]
+      · rw [dropStr, ite_eq_left (by simp [hz])]
         rcases h with h | h
         · exact absurd (hz ▸ h.symm) hn
         · exact memStr_dropStr_of_ne hn h
-      · rw [dropStr, if_neg (by simpa using hz)]
+      · rw [dropStr, ite_eq_right (by simpa using hz)]
         simp only [memStr, Bool.or_eq_true, beq_iff_eq]
         rcases h with h | h
         · exact Or.inl h
@@ -239,7 +239,7 @@ theorem uexec_dead : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s s' : UState)
             obtain ⟨hs, -⟩ := h
             exact hs ▸ hd
       | _ =>
-          simp only [uexec, if_pos hd, Option.some.injEq, Prod.mk.injEq] at h
+          simp only [uexec, ite_eq_left hd, Option.some.injEq, Prod.mk.injEq] at h
           obtain ⟨hs, -⟩ := h
           exact hs ▸ hd
 
@@ -271,7 +271,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
           by_cases hd : s.dead = true
           · exact Or.inl (by simp [hd])
           · simp only [Bool.not_eq_true] at hd
-            rw [if_neg (by simp [hd])]
+            rw [ite_eq_right (by simp [hd])]
             refine h3.transport ?_ ?_ ?_
             · intro hdd; simp_all
             · intro a ha; split at ha <;> exact ha
@@ -284,7 +284,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
           by_cases hd : s.dead = true
           · exact Or.inl (by simp [hd])
           · simp only [Bool.not_eq_true] at hd
-            rw [if_neg (by simp [hd])]
+            rw [ite_eq_right (by simp [hd])]
             exact h3.transport (fun hdd => by simp_all) (fun _ ha => ha) (fun _ _ => rfl)
       | sop op x e =>
           simp only [lcheck, Option.some.injEq] at h1
@@ -294,7 +294,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
           by_cases hd : s.dead = true
           · exact Or.inl (by simp [hd])
           · simp only [Bool.not_eq_true] at hd
-            rw [if_neg (by simp [hd])]
+            rw [ite_eq_right (by simp [hd])]
             cases op <;>
               exact h3.transport (fun hdd => by simp_all) (fun _ ha => ha) (fun _ _ => rfl)
       | assign x e =>
@@ -309,11 +309,11 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
             by_cases hd : s.dead = true
             · exact Or.inl (by simp [hd])
             · simp only [Bool.not_eq_true] at hd
-              rw [if_neg (by simp [hd])]
+              rw [ite_eq_right (by simp [hd])]
               refine h3.transport (fun hdd => by simp_all) (fun _ ha => ha) ?_
               intro y hy
               have hne : ¬ (y = x) := by rintro rfl; simp_all
-              simp only [upd, if_neg hne]
+              simp only [upd, ite_eq_right hne]
       | hop op x y =>
           cases op with
           | load =>
@@ -328,13 +328,13 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
                 by_cases hd : s.dead = true
                 · exact Or.inl (by simp [hd])
                 · simp only [Bool.not_eq_true] at hd
-                  rw [if_neg (by simp [hd])]
+                  rw [ite_eq_right (by simp [hd])]
                   refine h3.transport (fun hdd => by simp_all) ?_ ?_
                   · intro a ha; split at ha <;> exact ha
                   · intro z hz
                     have hne : ¬ (z = x) := by rintro rfl; simp_all
                     split
-                    · simp only [upd, if_neg hne]
+                    · simp only [upd, ite_eq_right hne]
                     · rfl
           | store =>
               simp only [lcheck, Option.some.injEq] at h1
@@ -344,7 +344,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
               by_cases hd : s.dead = true
               · exact Or.inl (by simp [hd])
               · simp only [Bool.not_eq_true] at hd
-                rw [if_neg (by simp [hd])]
+                rw [ite_eq_right (by simp [hd])]
                 refine h3.transport (fun hdd => by simp_all) ?_ ?_
                 · intro a ha; split at ha <;> exact ha
                 · intro z _; split <;> rfl
@@ -358,7 +358,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
               by_cases hd : s.dead = true
               · exact Or.inl (by simp [hd])
               · simp only [Bool.not_eq_true] at hd
-                rw [if_neg (by simp [hd])]
+                rw [ite_eq_right (by simp [hd])]
                 refine h3.transport (fun hdd => by simp_all) ?_ ?_
                 · intro a ha; split at ha <;> exact ha
                 · intro z _; split <;> rfl
@@ -377,15 +377,15 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
                   rcases h3 with hdd | h3
                   · exact absurd hdd (by simp [hd])
                   refine Or.inr fun a ha => ?_
-                  rw [if_neg (by simp [hd])] at ha
+                  rw [ite_eq_right (by simp [hd])] at ha
                   simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
-                  rw [if_neg (by simp [hd])]
+                  rw [ite_eq_right (by simp [hd])]
                   rcases ha with ha | ha
                   · exact Or.inr ⟨x, by simp [memStr], by simp [upd, ha]⟩
                   · rcases h3 a ha with h₀ | ⟨y, hy, hsy⟩
                     · exact Or.inl h₀
                     · have hne : ¬ (y = x) := by rintro rfl; simp_all
-                      exact Or.inr ⟨y, memStr_cons hy, by simp only [upd, if_neg hne]; exact hsy⟩
+                      exact Or.inr ⟨y, memStr_cons hy, by simp only [upd, ite_eq_right hne]; exact hsy⟩
           | allocS =>
               simp only [lcheck] at h1
               split at h1
@@ -401,15 +401,15 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
                   rcases h3 with hdd | h3
                   · exact absurd hdd (by simp [hd])
                   refine Or.inr fun a ha => ?_
-                  rw [if_neg (by simp [hd])] at ha
+                  rw [ite_eq_right (by simp [hd])] at ha
                   simp only [memInt, Bool.or_eq_true, beq_iff_eq] at ha
-                  rw [if_neg (by simp [hd])]
+                  rw [ite_eq_right (by simp [hd])]
                   rcases ha with ha | ha
                   · exact Or.inr ⟨x, by simp [memStr], by simp [upd, ha]⟩
                   · rcases h3 a ha with h₀ | ⟨y, hy, hsy⟩
                     · exact Or.inl h₀
                     · have hne : ¬ (y = x) := by rintro rfl; simp_all
-                      exact Or.inr ⟨y, memStr_cons hy, by simp only [upd, if_neg hne]; exact hsy⟩
+                      exact Or.inr ⟨y, memStr_cons hy, by simp only [upd, ite_eq_right hne]; exact hsy⟩
           | free =>
               simp only [lcheck] at h1
               split at h1
@@ -423,7 +423,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
                 · simp only [Bool.not_eq_true] at hd
                   rcases h3 with hdd | h3
                   · exact absurd hdd (by simp [hd])
-                  rw [if_neg (by simp [hd])]
+                  rw [ite_eq_right (by simp [hd])]
                   split
                   · refine Or.inr fun a ha => ?_
                     have hmem : memInt a s.live = true := dropInt_memInt ha
@@ -506,7 +506,7 @@ theorem lcheck_owned : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (O O' : List St
                 have hbody : Owned O s₀ r₁.1 :=
                   (ih body π O O₁ s₀ s r₁.1 r₁.2.1 r₁.2.2 lb e₁ h3).congr heq
                 have hloop : lcheck O (.loop e body) = some O := by
-                  simp only [lcheck, lb, Option.bind_some]; rw [if_pos heq]
+                  simp only [lcheck, lb, Option.bind_some]; rw [ite_eq_left heq]
                 exact ih (.loop e body) π O O s₀ r₁.1 r₂.1 r₂.2.1 r₂.2.2 hloop e₂ hbody
               · simp only [Option.some.injEq, Prod.mk.injEq] at h2
                 obtain ⟨hs, -⟩ := h2

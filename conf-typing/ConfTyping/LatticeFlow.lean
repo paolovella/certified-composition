@@ -152,9 +152,9 @@ theorem latSecTy_ni (Γ : String → L) (ℓ : L) :
       by_cases hzx : z = x
       · subst hzx
         have hlev : 𝓛.le (exprLevel 𝓛 Γ e pc) ℓ := 𝓛.le_trans hxe hz
-        simp only [upd, if_pos rfl]
+        simp only [upd, ite_eq_left rfl]
         exact evalE_agree 𝓛 Γ ℓ hag e pc hlev
-      · simp only [upd, if_neg hzx]; exact hag z hz
+      · simp only [upd, ite_eq_right hzx]; exact hag z hz
   | seq _ _ ih₁ ih₂ =>
       intro σ σ' hag z hz
       rw [runS_seq, runS_seq]

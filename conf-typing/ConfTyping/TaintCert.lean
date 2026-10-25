@@ -58,10 +58,10 @@ theorem lookNat_mem {x : String} {k : Nat} :
   | [],          h => by simp [lookNat] at h
   | (y, j) :: r, h => by
       by_cases hy : y = x
-      · rw [lookNat, if_pos (by simp [hy])] at h
+      · rw [lookNat, ite_eq_left (by simp [hy])] at h
         simp only [Option.some.injEq] at h
         subst h; subst hy; exact List.mem_cons_self ..
-      · rw [lookNat, if_neg (by simpa using hy)] at h
+      · rw [lookNat, ite_eq_right (by simpa using hy)] at h
         exact List.mem_cons_of_mem _ (lookNat_mem h)
 
 theorem dropPair_mem {x : String} {p : String × Nat} :
@@ -69,9 +69,9 @@ theorem dropPair_mem {x : String} {p : String × Nat} :
   | [],          h => by simp [dropPair] at h
   | (y, j) :: r, h => by
       by_cases hy : y = x
-      · rw [dropPair, if_pos (by simp [hy])] at h
+      · rw [dropPair, ite_eq_left (by simp [hy])] at h
         exact List.mem_cons_of_mem _ (dropPair_mem h)
-      · rw [dropPair, if_neg (by simpa using hy)] at h
+      · rw [dropPair, ite_eq_right (by simpa using hy)] at h
         rcases List.mem_cons.mp h with h' | h'
         · exact h' ▸ List.mem_cons_self ..
         · exact List.mem_cons_of_mem _ (dropPair_mem h')
@@ -81,8 +81,8 @@ theorem dropPair_ne {x : String} {p : String × Nat} :
   | [],          h => by simp [dropPair] at h
   | (y, j) :: r, h => by
       by_cases hy : y = x
-      · rw [dropPair, if_pos (by simp [hy])] at h; exact dropPair_ne h
-      · rw [dropPair, if_neg (by simpa using hy)] at h
+      · rw [dropPair, ite_eq_left (by simp [hy])] at h; exact dropPair_ne h
+      · rw [dropPair, ite_eq_right (by simpa using hy)] at h
         rcases List.mem_cons.mp h with h' | h'
         · rw [h']; simpa using hy
         · exact dropPair_ne h'
@@ -98,11 +98,11 @@ theorem interNat_left {p : String × Nat} :
   | [],          _, h => by simp [interNat] at h
   | (y, k) :: r, D, h => by
       by_cases hy : (lookNat y D == some k) = true
-      · rw [interNat, if_pos hy] at h
+      · rw [interNat, ite_eq_left hy] at h
         rcases List.mem_cons.mp h with h' | h'
         · exact h' ▸ List.mem_cons_self ..
         · exact List.mem_cons_of_mem _ (interNat_left h')
-      · rw [interNat, if_neg hy] at h
+      · rw [interNat, ite_eq_right hy] at h
         exact List.mem_cons_of_mem _ (interNat_left h)
 
 theorem interNat_right {p : String × Nat} :
@@ -110,12 +110,12 @@ theorem interNat_right {p : String × Nat} :
   | [],          _, h => by simp [interNat] at h
   | (y, k) :: r, D, h => by
       by_cases hy : (lookNat y D == some k) = true
-      · rw [interNat, if_pos hy] at h
+      · rw [interNat, ite_eq_left hy] at h
         rcases List.mem_cons.mp h with h' | h'
         · have : lookNat y D = some k := by simpa using hy
           exact h' ▸ lookNat_mem this
         · exact interNat_right h'
-      · rw [interNat, if_neg hy] at h
+      · rw [interNat, ite_eq_right hy] at h
         exact interNat_right h
 
 /-! ## Counting delimiters symbolically -/
@@ -210,8 +210,8 @@ theorem StringInert.assign (x : String) (e : Expr) : StringInert (.assign x e) :
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-        · simp only [if_neg hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+        · simp only [ite_eq_left hd]; exact ⟨by simp, by simp, id⟩
+        · simp only [ite_eq_right hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
 
 theorem TaintCert.assign {C : TaintEnv} (x : String) (e : Expr) :
     TaintCert C (.assign x e) C [] :=
@@ -224,11 +224,11 @@ theorem StringInert.check (q : String) : StringInert ((.check q)) := by
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-        · simp only [if_neg hd]
+        · simp only [ite_eq_left hd]; exact ⟨by simp, by simp, id⟩
+        · simp only [ite_eq_right hd]
           by_cases hp : π q = true
-          · simp only [if_pos hp]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-          · simp only [if_neg hp]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+          · simp only [ite_eq_left hp]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+          · simp only [ite_eq_right hp]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem TaintCert.check {C : TaintEnv} (q : String) : TaintCert C ((.check q)) C [] :=
   TaintCert.inert (StringInert.check q)
@@ -240,8 +240,8 @@ theorem StringInert.access (q : String) : StringInert ((.access q)) := by
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-        · simp only [if_neg hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+        · simp only [ite_eq_left hd]; exact ⟨by simp, by simp, id⟩
+        · simp only [ite_eq_right hd]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
 
 theorem TaintCert.access {C : TaintEnv} (q : String) : TaintCert C ((.access q)) C [] :=
   TaintCert.inert (StringInert.access q)
@@ -253,19 +253,19 @@ theorem StringInert.memop (op : MemOp) (x : String) : StringInert (.memop op x) 
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-        · simp only [if_neg hd]
+        · simp only [ite_eq_left hd]; exact ⟨by simp, by simp, id⟩
+        · simp only [ite_eq_right hd]
           cases op with
           | alloc => exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
           | allocS => exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
           | deref =>
               by_cases hl : memInt (s.store x) s.live = true
-              · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-              · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+              · simp only [ite_eq_left hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+              · simp only [ite_eq_right hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
           | free =>
               by_cases hl : memInt (s.store x) s.live = true
-              · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-              · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+              · simp only [ite_eq_left hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+              · simp only [ite_eq_right hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem TaintCert.memop {C : TaintEnv} (op : MemOp) (x : String) :
     TaintCert C (.memop op x) C [] :=
@@ -278,17 +278,17 @@ theorem StringInert.hop (op : HOp) (x y : String) : StringInert (.hop op x y) :=
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨by simp, by simp, id⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨by simp, by simp, id⟩
+      · simp only [ite_eq_right hd]
         cases op with
         | load =>
             by_cases hl : memInt (s.store y) s.live = true
-            · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-            · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+            · simp only [ite_eq_left hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+            · simp only [ite_eq_right hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
         | store =>
             by_cases hl : memInt (s.store x) s.live = true
-            · simp only [if_pos hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
-            · simp only [if_neg hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
+            · simp only [ite_eq_left hl]; exact ⟨by simp, by simp, fun _ => by simpa using hd⟩
+            · simp only [ite_eq_right hl]; exact ⟨by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem TaintCert.hop {C : TaintEnv} (op : HOp) (x y : String) :
     TaintCert C (.hop op x y) C [] :=
@@ -309,20 +309,20 @@ theorem TaintCert.set {C : TaintEnv} (x : String) (e : SExpr) (k : Nat)
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]
+        · simp only [ite_eq_left hd]
           intro hc
           exact absurd (hd ▸ hc) (by simp)
         · have hd0 : s.dead = false := by simpa using hd
-          simp only [if_neg hd]
+          simp only [ite_eq_right hd]
           intro _ p hp
           rcases List.mem_cons.mp hp with h' | h'
           · subst h'
             show qcount (updSU s.sstore x (evalS s.sstore e) x) = k
-            simp only [updSU, if_pos rfl]
+            simp only [updSU, ite_eq_left rfl]
             exact scount_sound (hinv hd0) e k hk
           · have hne : ¬ (p.1 = x) := dropPair_ne h'
             show qcount (updSU s.sstore x (evalS s.sstore e) p.1) = p.2
-            simp only [updSU, if_neg hne]
+            simp only [updSU, ite_eq_right hne]
             exact hinv hd0 p (dropPair_mem h')
   · intro n π s r _ hr t ht
     cases n with
@@ -330,8 +330,8 @@ theorem TaintCert.set {C : TaintEnv} (x : String) (e : SExpr) (k : Nat)
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd] at ht; exact Or.inl ht
-        · simp only [if_neg hd] at ht; exact Or.inl ht
+        · simp only [ite_eq_left hd] at ht; exact Or.inl ht
+        · simp only [ite_eq_right hd] at ht; exact Or.inl ht
 
 /-- Assigning a value whose count cannot be pinned down simply *forgets* the variable.
     So `set` never fails — the obligation is entirely on `emit`, which is where an
@@ -345,13 +345,13 @@ theorem TaintCert.setUnknown {C : TaintEnv} (x : String) (e : SExpr) :
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]; intro hc; exact absurd (hd ▸ hc) (by simp)
+        · simp only [ite_eq_left hd]; intro hc; exact absurd (hd ▸ hc) (by simp)
         · have hd0 : s.dead = false := by simpa using hd
-          simp only [if_neg hd]
+          simp only [ite_eq_right hd]
           intro _ p hp
           have hne : ¬ (p.1 = x) := dropPair_ne hp
           show qcount (updSU s.sstore x (evalS s.sstore e) p.1) = p.2
-          simp only [updSU, if_neg hne]
+          simp only [updSU, ite_eq_right hne]
           exact hinv hd0 p (dropPair_mem hp)
   · intro n π s r _ hr t ht
     cases n with
@@ -359,8 +359,8 @@ theorem TaintCert.setUnknown {C : TaintEnv} (x : String) (e : SExpr) :
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd] at ht; exact Or.inl ht
-        · simp only [if_neg hd] at ht; exact Or.inl ht
+        · simp only [ite_eq_left hd] at ht; exact Or.inl ht
+        · simp only [ite_eq_right hd] at ht; exact Or.inl ht
 
 /-- **The rule with the obligation.** Emitting is allowed only when the delimiter count
     of the expression is *known*, and then the emitted string carries exactly that
@@ -375,17 +375,17 @@ theorem TaintCert.emit {C : TaintEnv} (q : String) (e : SExpr) (k : Nat)
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd]; exact hinv
-        · simp only [if_neg hd]; exact hinv
+        · simp only [ite_eq_left hd]; exact hinv
+        · simp only [ite_eq_right hd]; exact hinv
   · intro n π s r hinv hr t ht
     cases n with
     | zero => simp [uexec] at hr
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hd : s.dead = true
-        · simp only [if_pos hd] at ht; exact Or.inl ht
+        · simp only [ite_eq_left hd] at ht; exact Or.inl ht
         · have hd0 : s.dead = false := by simpa using hd
-          simp only [if_neg hd] at ht
+          simp only [ite_eq_right hd] at ht
           rcases List.mem_cons.mp ht with h' | h'
           · exact Or.inr (by rw [h', scount_sound (hinv hd0) e k hk]; simp)
           · exact Or.inl h'
@@ -440,14 +440,14 @@ theorem TaintCert.ite {C C₁ C₂ : TaintEnv} {e : Expr} {c₁ c₂ : UCmd} {K�
     | succ n =>
         rw [uexec_ite_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec n c₁ π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
             subst hr
             intro hd p hp
             exact h₁.env n π s r₁ hinv e₁ hd p (interNat_left hp)
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           rcases e₂ : uexec n c₂ π s with _ | r₂
           · rw [e₂] at hr; simp at hr
           · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -460,7 +460,7 @@ theorem TaintCert.ite {C C₁ C₂ : TaintEnv} {e : Expr} {c₁ c₂ : UCmd} {K�
     | succ n =>
         rw [uexec_ite_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec n c₁ π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -468,7 +468,7 @@ theorem TaintCert.ite {C C₁ C₂ : TaintEnv} {e : Expr} {c₁ c₂ : UCmd} {K�
             rcases h₁.sink n π s r₁ hinv e₁ t ht with h' | h'
             · exact Or.inl h'
             · exact Or.inr (by simp [h'])
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           rcases e₂ : uexec n c₂ π s with _ | r₂
           · rw [e₂] at hr; simp at hr
           · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr

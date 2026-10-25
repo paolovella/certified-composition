@@ -179,14 +179,14 @@ theorem hlcheck_safe :
     | access x =>
         simp only [hlcheck] at hchk
         by_cases hxV : x ∈ V
-        · rw [if_pos hxV, Option.some.injEq] at hchk; subst hchk
+        · rw [ite_eq_left hxV, Option.some.injEq] at hchk; subst hchk
           have hv := hinv x hxV
           have hvb : hlValidB (σ x) n = true := by
             simp only [hlValidB, Bool.and_eq_true, decide_eq_true_eq]; exact hv
           refine ⟨by simp [hlexec, hvb], ?_⟩
-          intro s' hs; simp only [hlexec, hvb, if_true, HRes.ok.injEq] at hs; subst hs
+          intro s' hs; simp only [hlexec, hvb, ite_true, HRes.ok.injEq] at hs; subst hs
           exact hinv
-        · rw [if_neg hxV] at hchk; simp at hchk
+        · rw [ite_eq_right hxV] at hchk; simp at hchk
     | seq c₁ c₂ =>
         simp only [hlcheck, Option.bind_eq_bind] at hchk
         cases hV₁ : hlcheck V c₁ with
@@ -222,9 +222,9 @@ theorem hlcheck_safe :
         | some V₁ =>
             simp only [hlcheck, hV₁] at hchk
             by_cases hsub : hllsubB V V₁ = true
-            · rw [if_pos hsub, Option.some.injEq] at hchk; subst hchk
+            · rw [ite_eq_left hsub, Option.some.injEq] at hchk; subst hchk
               have hloopchk : hlcheck V (.loop e c) = some V := by
-                simp only [hlcheck, hV₁, hsub, if_true]
+                simp only [hlcheck, hV₁, hsub, ite_true]
               have bodyStep : ∀ s₁, hlexec k c (σ, n) = .ok s₁ → HLInv V s₁ := by
                 intro s₁ hs₁
                 have hb := (ih c V V₁ (σ, n) hV₁ hinv).2 s₁ hs₁
@@ -241,7 +241,7 @@ theorem hlcheck_safe :
                 · obtain ⟨s₁, ho₁, ho₂⟩ := hlbind_ok hs
                   exact (ih (.loop e c) V V s₁ hloopchk (bodyStep s₁ ho₁)).2 s' ho₂
                 · rw [HRes.ok.injEq] at hs; subst hs; exact hinv
-            · rw [if_neg hsub] at hchk; simp at hchk
+            · rw [ite_eq_right hsub] at hchk; simp at hchk
 
 /-- **Certified heap-loop-safe by `decide`.** A checked program never errors. -/
 theorem safe_of_check {c : HLCmd} {V' : List HLoc} (fuel : Nat) (σ₀ : HLoc → Int)

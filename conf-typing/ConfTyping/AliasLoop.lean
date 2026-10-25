@@ -261,17 +261,17 @@ theorem alsafe :
           constructor
           · rintro ⟨cls, ⟨cls0, hcls0, rfl⟩, hz⟩
             by_cases hy : y ∈ cls0
-            · simp only [if_pos hy, List.mem_cons] at hz
+            · simp only [ite_eq_left hy, List.mem_cons] at hz
               rcases hz with rfl | hz
               · exact Or.inl ⟨rfl, cls0, hcls0, hy⟩
               · exact Or.inr ⟨cls0, hcls0, hz⟩
-            · simp only [if_neg hy] at hz
+            · simp only [ite_eq_right hy] at hz
               exact Or.inr ⟨cls0, hcls0, hz⟩
           · rintro (⟨rfl, cls0, hcls0, hy⟩ | ⟨cls0, hcls0, hz⟩)
             · exact ⟨_, ⟨cls0, hcls0, rfl⟩, by simp [hy]⟩
             · by_cases hy : y ∈ cls0
-              · exact ⟨_, ⟨cls0, hcls0, rfl⟩, by simp [if_pos hy, hz]⟩
-              · exact ⟨_, ⟨cls0, hcls0, rfl⟩, by simp [if_neg hy, hz]⟩
+              · exact ⟨_, ⟨cls0, hcls0, rfl⟩, by simp [ite_eq_left hy, hz]⟩
+              · exact ⟨_, ⟨cls0, hcls0, rfl⟩, by simp [ite_eq_right hy, hz]⟩
         -- helper: address bounds for live-in-purge vars
         have hpb : ∀ z, liveP (purge x P) z → 0 ≤ σ z ∧ σ z < (n : Int) ∧ σ z ∉ F := by
           intro z hz; exact hli z ((liveP_purge.mp hz).2)
@@ -287,20 +287,20 @@ theorem alsafe :
           rw [memQ] at hz
           rcases hz with ⟨rfl, hylive⟩ | hz
           · refine ⟨y, hylive, by simp [flUpd], ?_⟩
-            intro cls hy; rw [if_pos hy]; simp
+            intro cls hy; rw [ite_eq_left hy]; simp
           · have hzx : z ≠ x := (liveP_purge.mp hz).1
             refine ⟨z, hz, by simp [flUpd, hzx], ?_⟩
             intro cls hzc
             by_cases hy : y ∈ cls
-            · rw [if_pos hy]; exact List.mem_cons_of_mem x hzc
-            · rw [if_neg hy]; exact hzc
+            · rw [ite_eq_left hy]; exact List.mem_cons_of_mem x hzc
+            · rw [ite_eq_right hy]; exact hzc
         refine ⟨?_, ?_, ?_, ?_⟩
         · intro z hz
           rw [memQ] at hz
           rcases hz with ⟨rfl, hylive⟩ | hz
-          · simp only [flUpd, if_pos rfl]; exact hpb y hylive
+          · simp only [flUpd, ite_eq_left rfl]; exact hpb y hylive
           · have hzx : z ≠ x := (liveP_purge.mp hz).1
-            simp only [flUpd, if_neg hzx]; exact hpb z hz
+            simp only [flUpd, ite_eq_right hzx]; exact hpb z hz
         · intro a b ha hb hab
           obtain ⟨wa, hwa, hva, hga⟩ := rep a ha
           obtain ⟨wb, hwb, hvb, hgb⟩ := rep b hb
@@ -328,43 +328,43 @@ theorem alsafe :
             have hy1 : y ∈ cls₁ := by
               by_cases hy : y ∈ cls₁
               · exact hy
-              · rw [if_neg hy] at hz1; exact absurd hz1 (hxnp cls₁ hcls₁)
+              · rw [ite_eq_right hy] at hz1; exact absurd hz1 (hxnp cls₁ hcls₁)
             have hy2 : y ∈ cls₂ := by
               by_cases hy : y ∈ cls₂
               · exact hy
-              · rw [if_neg hy] at hz2; exact absurd hz2 (hxnp cls₂ hcls₂)
+              · rw [ite_eq_right hy] at hz2; exact absurd hz2 (hxnp cls₂ hcls₂)
             rw [disjP_purge hdj y cls₁ cls₂ hcls₁ hcls₂ hy1 hy2]
           · have hz1' : z ∈ cls₁ := by
               by_cases hy : y ∈ cls₁
-              · rw [if_pos hy, List.mem_cons] at hz1; exact hz1.resolve_left hzx
-              · rw [if_neg hy] at hz1; exact hz1
+              · rw [ite_eq_left hy, List.mem_cons] at hz1; exact hz1.resolve_left hzx
+              · rw [ite_eq_right hy] at hz1; exact hz1
             have hz2' : z ∈ cls₂ := by
               by_cases hy : y ∈ cls₂
-              · rw [if_pos hy, List.mem_cons] at hz2; exact hz2.resolve_left hzx
-              · rw [if_neg hy] at hz2; exact hz2
+              · rw [ite_eq_left hy, List.mem_cons] at hz2; exact hz2.resolve_left hzx
+              · rw [ite_eq_right hy] at hz2; exact hz2
             rw [disjP_purge hdj z cls₁ cls₂ hcls₁ hcls₂ hz1' hz2']
     | access x =>
         simp only [alcheck] at hchk
         by_cases hxP : (P.any (fun cls => decide (x ∈ cls)) = true)
-        · rw [if_pos hxP, Option.some.injEq] at hchk; subst hchk
+        · rw [ite_eq_left hxP, Option.some.injEq] at hchk; subst hchk
           have hlive : liveP P x := liveP_any.mp hxP
           obtain ⟨cls, hcls, hxc⟩ := hlive
           have hlv := hli x ⟨cls, hcls, hxc⟩
           have hfl : fLive (σ x) n F = true := fLive_true hlv.1 hlv.2.1 hlv.2.2
           refine ⟨by simp [alexec, hfl], ?_⟩
-          intro s' hs; simp only [alexec, hfl, if_true, FLRes.ok.injEq] at hs; subst hs
+          intro s' hs; simp only [alexec, hfl, ite_true, FLRes.ok.injEq] at hs; subst hs
           exact ⟨hli, hsc, hfr, hdj⟩
-        · rw [if_neg hxP] at hchk; simp at hchk
+        · rw [ite_eq_right hxP] at hchk; simp at hchk
     | free x =>
         simp only [alcheck] at hchk
         by_cases hxP : (P.any (fun cls => decide (x ∈ cls)) = true)
-        · rw [if_pos hxP, Option.some.injEq] at hchk; subst hchk
+        · rw [ite_eq_left hxP, Option.some.injEq] at hchk; subst hchk
           have hlive : liveP P x := liveP_any.mp hxP
           obtain ⟨clsx, hclsx, hxcx⟩ := hlive
           have hlv := hli x ⟨clsx, hclsx, hxcx⟩
           have hfl : fLive (σ x) n F = true := fLive_true hlv.1 hlv.2.1 hlv.2.2
           refine ⟨by simp [alexec, hfl], ?_⟩
-          intro s' hs; simp only [alexec, hfl, if_true, FLRes.ok.injEq] at hs; subst hs
+          intro s' hs; simp only [alexec, hfl, ite_true, FLRes.ok.injEq] at hs; subst hs
           have hsubF : ∀ z, liveP (P.filter (fun cls => decide (x ∉ cls))) z → liveP P z := by
             rintro z ⟨cls, hcls, hz⟩; rw [List.mem_filter] at hcls; exact ⟨cls, hcls.1, hz⟩
           refine ⟨?_, ?_, ?_, disjP_filter hdj⟩
@@ -398,7 +398,7 @@ theorem alsafe :
             rcases List.mem_cons.mp ha with h | h
             · rw [h]; exact hlv.2.1
             · exact hfr a h
-        · rw [if_neg hxP] at hchk; simp at hchk
+        · rw [ite_eq_right hxP] at hchk; simp at hchk
     | seq c₁ c₂ =>
         simp only [alcheck, Option.bind_eq_bind] at hchk
         cases hP₁ : alcheck P c₁ with
@@ -416,13 +416,13 @@ theorem alsafe :
         | some P₁ =>
             simp only [alcheck, hP₁] at hchk
             by_cases hsub : (P.all (fun cls => decide (cls ∈ P₁)) = true)
-            · rw [if_pos hsub, Option.some.injEq] at hchk; subst hchk
+            · rw [ite_eq_left hsub, Option.some.injEq] at hchk; subst hchk
               have hsubcls : ∀ cls ∈ P, cls ∈ P₁ := by
                 intro cls hcls
                 have := (List.all_eq_true.mp hsub) cls hcls
                 simpa using of_decide_eq_true this
               have hloopchk : alcheck P (.loop e c) = some P := by
-                simp only [alcheck, hP₁, hsub, if_true]
+                simp only [alcheck, hP₁, hsub, ite_true]
               have bodyStep : ∀ s₁, alexec k c (σ, n, F) = .ok s₁ → ALInv P s₁ := by
                 intro s₁ hs₁
                 exact ALInv_of_sub hsubcls ((ih c P P₁ (σ, n, F) hP₁ ⟨hli, hsc, hfr, hdj⟩).2 s₁ hs₁)
@@ -436,7 +436,7 @@ theorem alsafe :
                 · obtain ⟨s₁, ho₁, ho₂⟩ := flbind_ok hs
                   exact (ih (.loop e c) P P s₁ hloopchk (bodyStep s₁ ho₁)).2 s' ho₂
                 · rw [FLRes.ok.injEq] at hs; subst hs; exact ⟨hli, hsc, hfr, hdj⟩
-            · rw [if_neg hsub] at hchk; simp at hchk
+            · rw [ite_eq_right hsub] at hchk; simp at hchk
 
 /-- **Certified may-alias-safe under loops by `decide`.** -/
 theorem alsafe_of_check {c : ALCmd} {P' : Part} (fuel : Nat) (σ₀ : HLoc → Int)

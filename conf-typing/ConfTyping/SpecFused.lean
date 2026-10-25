@@ -83,7 +83,7 @@ theorem jcheck_ptrLow {P : Partition} :
       case ite e c₁ c₂ =>
           simp only [jcheck] at hc
           by_cases he : exprLow P e = true
-          · rw [if_pos he] at hc
+          · rw [ite_eq_left he] at hc
             rcases e₁ : jcheck P V c₁ with _ | V₁
             · rw [e₁] at hc; simp at hc
             rcases e₂ : jcheck P V c₂ with _ | V₂
@@ -94,7 +94,7 @@ theorem jcheck_ptrLow {P : Partition} :
             have hguard : evalE e s.store = evalE e s'.store := evalE_lowEq e he hlow.1
             by_cases hg : evalE e s.store ≠ 0
             · have hg' : evalE e s'.store ≠ 0 := by rw [← hguard]; exact hg
-              rw [if_pos hg] at hr; rw [if_pos hg'] at hr'
+              rw [ite_eq_left hg] at hr; rw [ite_eq_left hg'] at hr'
               rcases f₁ : uexec m c₁ π s with _ | r₁
               · rw [f₁] at hr; simp at hr
               rcases f₁' : uexec m c₁ π s' with _ | r₁'
@@ -105,7 +105,7 @@ theorem jcheck_ptrLow {P : Partition} :
               rw [← hc, ← hr, ← hr']
               exact PtrLow.mono (fun _ hx => interStr_left hx) hp₁
             · have hg' : ¬ (evalE e s'.store ≠ 0) := by rw [← hguard]; exact hg
-              rw [if_neg hg] at hr; rw [if_neg hg'] at hr'
+              rw [ite_eq_right hg] at hr; rw [ite_eq_right hg'] at hr'
               rcases f₂ : uexec m c₂ π s with _ | r₂
               · rw [f₂] at hr; simp at hr
               rcases f₂' : uexec m c₂ π s' with _ | r₂'
@@ -115,11 +115,11 @@ theorem jcheck_ptrLow {P : Partition} :
               have hp₂ := ih c₂ V V₂ e₂ π s s' r₂ r₂' hI hI' hL hL' hlow hp f₂ f₂'
               rw [← hc, ← hr, ← hr']
               exact PtrLow.mono (fun _ hx => interStr_right hx) hp₂
-          · rw [if_neg he] at hc; cases hc
+          · rw [ite_eq_right he] at hc; cases hc
       case loop e c₀ =>
           by_cases hcond : (exprLow P e && (jcheck P V c₀ == some V)) = true
           · have hloopc : jcheck P V (.loop e c₀) = some V := by
-              simp only [jcheck, if_pos hcond]
+              simp only [jcheck, ite_eq_left hcond]
             rw [hloopc] at hc
             simp only [Option.some.injEq] at hc
             subst hc
@@ -129,7 +129,7 @@ theorem jcheck_ptrLow {P : Partition} :
             have hguard : evalE e s.store = evalE e s'.store := evalE_lowEq e he hlow.1
             by_cases hg : evalE e s.store ≠ 0
             · have hg' : evalE e s'.store ≠ 0 := by rw [← hguard]; exact hg
-              rw [if_pos hg] at hr; rw [if_pos hg'] at hr'
+              rw [ite_eq_left hg] at hr; rw [ite_eq_left hg'] at hr'
               rcases f₁ : uexec m c₀ π s with _ | r₁
               · rw [f₁] at hr; simp at hr
               rcases f₁' : uexec m c₀ π s' with _ | r₁'
@@ -155,10 +155,10 @@ theorem jcheck_ptrLow {P : Partition} :
                 hS₁ hS₁' hL₁ hL₁' hlow₁ hp₁ f₂ f₂'
               rw [← hr, ← hr']; exact this
             · have hg' : ¬ (evalE e s'.store ≠ 0) := by rw [← hguard]; exact hg
-              rw [if_neg hg] at hr; rw [if_neg hg'] at hr'
+              rw [ite_eq_right hg] at hr; rw [ite_eq_right hg'] at hr'
               simp only [Option.some.injEq] at hr hr'
               rw [← hr, ← hr']; exact hp
-          · simp only [jcheck, if_neg hcond] at hc; cases hc
+          · simp only [jcheck, ite_eq_right hcond] at hc; cases hc
       all_goals exact absurd rfl hatom
 
 /-! ## The frame, bundled
@@ -364,7 +364,7 @@ theorem jcheck_strace {P : Partition} :
       case ite e c₁ c₂ =>
           simp only [jcheck] at hc
           by_cases he : exprLow P e = true
-          · rw [if_pos he] at hc
+          · rw [ite_eq_left he] at hc
             rcases e₁ : jcheck P V c₁ with _ | V₁
             · rw [e₁] at hc; simp at hc
             rcases e₂ : jcheck P V c₂ with _ | V₂
@@ -374,7 +374,7 @@ theorem jcheck_strace {P : Partition} :
             have hguard : evalE e s.store = evalE e s'.store := evalE_lowEq e he h.low.1
             by_cases hg : evalE e s.store ≠ 0
             · have hg' : evalE e s'.store ≠ 0 := by rw [← hguard]; exact hg
-              rw [if_pos hg, if_pos hg']
+              rw [ite_eq_left hg, ite_eq_left hg']
               have htr : transRun w (flatten c₂) π s = transRun w (flatten c₂) π s' :=
                 transRun_agrees w (flatten c₂) V V₂ (jcheck_flatten c₂ V V₂ e₂) π s s' h
               rcases trace_split (ih w c₁ V V₁ e₁ π s s' h) with
@@ -384,7 +384,7 @@ theorem jcheck_strace {P : Partition} :
                 simp only [Option.map_some, Option.some.injEq]
                 rw [htr, ht₁]
             · have hg' : ¬ (evalE e s'.store ≠ 0) := by rw [← hguard]; exact hg
-              rw [if_neg hg, if_neg hg']
+              rw [ite_eq_right hg, ite_eq_right hg']
               have htr : transRun w (flatten c₁) π s = transRun w (flatten c₁) π s' :=
                 transRun_agrees w (flatten c₁) V V₁ (jcheck_flatten c₁ V V₁ e₁) π s s' h
               rcases trace_split (ih w c₂ V V₂ e₂ π s s' h) with
@@ -393,11 +393,11 @@ theorem jcheck_strace {P : Partition} :
               · rw [q₂, q₂']
                 simp only [Option.map_some, Option.some.injEq]
                 rw [htr, ht₂]
-          · rw [if_neg he] at hc; cases hc
+          · rw [ite_eq_right he] at hc; cases hc
       case loop e c₀ =>
           by_cases hcond : (exprLow P e && (jcheck P V c₀ == some V)) = true
           · have hloopc : jcheck P V (.loop e c₀) = some V := by
-              simp only [jcheck, if_pos hcond]
+              simp only [jcheck, ite_eq_left hcond]
             rw [hloopc] at hc
             simp only [Option.some.injEq] at hc
             subst hc
@@ -407,7 +407,7 @@ theorem jcheck_strace {P : Partition} :
             have hguard : evalE e s.store = evalE e s'.store := evalE_lowEq e he h.low.1
             by_cases hg : evalE e s.store ≠ 0
             · have hg' : evalE e s'.store ≠ 0 := by rw [← hguard]; exact hg
-              rw [if_pos hg, if_pos hg']
+              rw [ite_eq_left hg, ite_eq_left hg']
               rcases trace_split (ih w c₀ V V hbody π s s' h) with
                 ⟨hn, hn'⟩ | ⟨r₁, r₁', q₁, q₁', ht₁⟩
               · rw [hn, hn']
@@ -423,8 +423,8 @@ theorem jcheck_strace {P : Partition} :
                   simp only [Option.map_some, Option.some.injEq]
                   rw [ht₁, ht₂]
             · have hg' : ¬ (evalE e s'.store ≠ 0) := by rw [← hguard]; exact hg
-              rw [if_neg hg, if_neg hg']; rfl
-          · simp only [jcheck, if_neg hcond] at hc; cases hc
+              rw [ite_eq_right hg, ite_eq_right hg']; rfl
+          · simp only [jcheck, ite_eq_right hcond] at hc; cases hc
       all_goals exact absurd rfl hatom
 
 /-! ## The bridge to the five-certificate checker -/
@@ -461,7 +461,7 @@ theorem allcheck_jcheck {P : Partition} : ∀ (c : UCmd) (A V A' V' : List Strin
         · rw [e₁, e₂] at h; simp at h
         rw [e₁, e₂] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
-        simp only [jcheck, if_pos he, ih₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁]),
+        simp only [jcheck, ite_eq_left he, ih₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁]),
           ih₂ A V p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂]), Option.some.injEq]
         exact h.2.1
       · cases h

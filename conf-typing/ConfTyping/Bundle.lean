@@ -111,7 +111,7 @@ theorem UCert.ite {A A₁ A₂ : List String} {e : Expr} {c₁ c₂ : UCmd} {k�
     | succ n =>
         rw [uexec_ite_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec n c₁ π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -119,7 +119,7 @@ theorem UCert.ite {A A₁ A₂ : List String} {e : Expr} {c₁ c₂ : UCmd} {k�
             have := h₁.budget n π s r₁ e₁
             simp only []
             omega
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           rcases e₂ : uexec n c₂ π s with _ | r₂
           · rw [e₂] at hr; simp at hr
           · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -133,14 +133,14 @@ theorem UCert.ite {A A₁ A₂ : List String} {e : Expr} {c₁ c₂ : UCmd} {k�
     | succ n =>
         rw [uexec_ite_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec n c₁ π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
             subst hr
             obtain ⟨ha, hrd, hd⟩ := h₁.auth n π s r₁ hinv e₁
             exact ⟨ha, hrd, fun hdead q hq => hd hdead q (interStr_left hq)⟩
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           rcases e₂ : uexec n c₂ π s with _ | r₂
           · rw [e₂] at hr; simp at hr
           · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -176,8 +176,8 @@ theorem UCert.assign {A : List String} (x : String) (e : Expr) :
         subst hr
         obtain ⟨ha, hrd, hd⟩ := hinv
         by_cases hdead : s.dead = true
-        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
-        · simp only [if_neg hdead]; exact ⟨ha, hrd, hd⟩
+        · simp only [ite_eq_left hdead]; exact ⟨ha, hrd, hd⟩
+        · simp only [ite_eq_right hdead]; exact ⟨ha, hrd, hd⟩
 
 /-- A `check` extends the authorization set statically. When the policy *refuses*, the
     run goes dead and the third clause is vacuous — which is exactly why the static
@@ -197,12 +197,12 @@ theorem UCert.check {A : List String} (r₀ : String) :
         subst hr
         obtain ⟨ha, hrd, hd⟩ := hinv
         by_cases hdead : s.dead = true
-        · simp only [if_pos hdead]
+        · simp only [ite_eq_left hdead]
           exact ⟨ha, hrd, fun hc => absurd (hdead ▸ hc) (by simp)⟩
         · have hd0 : s.dead = false := by simpa using hdead
-          simp only [if_neg hdead]
+          simp only [ite_eq_right hdead]
           by_cases hp : π r₀ = true
-          · simp only [if_pos hp]
+          · simp only [ite_eq_left hp]
             refine ⟨?_, hrd, ?_⟩
             · intro q hq
               rcases List.mem_cons.mp hq with h | h
@@ -212,7 +212,7 @@ theorem UCert.check {A : List String} (r₀ : String) :
               rcases List.mem_cons.mp hq with h | h
               · exact h ▸ List.mem_cons_self ..
               · exact List.mem_cons_of_mem _ (hd hd0 q h)
-          · simp only [if_neg hp]
+          · simp only [ite_eq_right hp]
             exact ⟨ha, hrd, fun hc => absurd hc (by simp)⟩
 
 /-- An `access` is certified exactly when the resource is in the authorization set. -/
@@ -231,9 +231,9 @@ theorem UCert.access {A : List String} (r₀ : String) (hmem : memStr r₀ A = t
         subst hr
         obtain ⟨ha, hrd, hd⟩ := hinv
         by_cases hdead : s.dead = true
-        · simp only [if_pos hdead]; exact ⟨ha, hrd, hd⟩
+        · simp only [ite_eq_left hdead]; exact ⟨ha, hrd, hd⟩
         · have hd0 : s.dead = false := by simpa using hdead
-          simp only [if_neg hdead]
+          simp only [ite_eq_right hdead]
           refine ⟨ha, ?_, hd⟩
           intro q hq
           rcases List.mem_cons.mp hq with h | h
@@ -279,11 +279,11 @@ theorem ucheck_sound : ∀ (c : UCmd) (A A' : List String) (k : Nat),
   | .access r, A, A', k, h => by
       simp only [ucheck] at h
       by_cases hmem : memStr r A = true
-      · rw [if_pos hmem] at h
+      · rw [ite_eq_left hmem] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨h1, h2⟩ := h; subst h1; subst h2
         exact UCert.access r hmem
-      · rw [if_neg hmem] at h; simp at h
+      · rw [ite_eq_right hmem] at h; simp at h
   | .seq c₁ c₂, A, A', k, h => by
       simp only [ucheck] at h
       rcases e₁ : ucheck A c₁ with _ | p₁

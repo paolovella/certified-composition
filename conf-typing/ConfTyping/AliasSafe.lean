@@ -109,9 +109,9 @@ theorem acheck_safe :
       intro z a hz
       simp only [updO] at hz
       by_cases hzx : z = x
-      · subst hzx; simp only [if_pos rfl] at hz
+      · subst hzx; simp only [ite_eq_left rfl] at hz
         cases hz; refine ⟨by simp [upd], ?_, ?_⟩ <;> omega
-      · rw [if_neg hzx] at hz
+      · rw [ite_eq_right hzx] at hz
         obtain ⟨hσ, h0, hlt⟩ := hpt z a hz
         refine ⟨by simp [upd, hzx, hσ], h0, ?_⟩
         omega
@@ -124,10 +124,10 @@ theorem acheck_safe :
       intro z a hz
       simp only [updO] at hz
       by_cases hzx : z = x
-      · subst hzx; simp only [if_pos rfl] at hz
+      · subst hzx; simp only [ite_eq_left rfl] at hz
         obtain ⟨hσ, h0, hlt⟩ := hpt y a hz
         exact ⟨by simp [upd, hσ], h0, hlt⟩
-      · rw [if_neg hzx] at hz
+      · rw [ite_eq_right hzx] at hz
         obtain ⟨hσ, h0, hlt⟩ := hpt z a hz
         exact ⟨by simp [upd, hzx, hσ], h0, hlt⟩
   | data x e =>
@@ -140,7 +140,7 @@ theorem acheck_safe :
       simp only [updO] at hz
       by_cases hzx : z = x
       · subst hzx; simp at hz
-      · rw [if_neg hzx] at hz
+      · rw [ite_eq_right hzx] at hz
         obtain ⟨hσ, h0, hlt⟩ := hpt z a hz
         exact ⟨by simp [upd, hzx, hσ], h0, hlt⟩
   | free x =>
@@ -152,14 +152,14 @@ theorem acheck_safe :
       | some a =>
           simp only [acheck, hAx] at hchk
           by_cases haF : a ∈ F
-          · rw [if_pos haF] at hchk; simp at hchk
-          · rw [if_neg haF, Option.some.injEq] at hchk; subst hchk
+          · rw [ite_eq_left haF] at hchk; simp at hchk
+          · rw [ite_eq_right haF, Option.some.injEq] at hchk; subst hchk
             obtain ⟨hσ, h0, hlt⟩ := hpt x a hAx
             have hlive : liveB (σ x) nx F = true := by
               simp only [liveB, hσ, Bool.and_eq_true, decide_eq_true_eq]
               exact ⟨⟨h0, hlt⟩, haF⟩
             refine ⟨(σ, nx, σ x :: F), ?_, rfl, ?_, hpt⟩
-            · show (if liveB (σ x) nx F then _ else _) = _; rw [if_pos hlive]
+            · show (if liveB (σ x) nx F then _ else _) = _; rw [ite_eq_left hlive]
             · rw [hσ]
   | access x =>
       intro ⟨A, nx, F⟩ CS' ⟨σ, n, Fc⟩ hchk hinv
@@ -170,14 +170,14 @@ theorem acheck_safe :
       | some a =>
           simp only [acheck, hAx] at hchk
           by_cases haF : a ∈ F
-          · rw [if_pos haF] at hchk; simp at hchk
-          · rw [if_neg haF, Option.some.injEq] at hchk; subst hchk
+          · rw [ite_eq_left haF] at hchk; simp at hchk
+          · rw [ite_eq_right haF, Option.some.injEq] at hchk; subst hchk
             obtain ⟨hσ, h0, hlt⟩ := hpt x a hAx
             have hlive : liveB (σ x) nx F = true := by
               simp only [liveB, hσ, Bool.and_eq_true, decide_eq_true_eq]
               exact ⟨⟨h0, hlt⟩, haF⟩
             refine ⟨(σ, nx, F), ?_, rfl, rfl, hpt⟩
-            show (if liveB (σ x) nx F then _ else _) = _; rw [if_pos hlive]
+            show (if liveB (σ x) nx F then _ else _) = _; rw [ite_eq_left hlive]
   | seq c₁ c₂ ih₁ ih₂ =>
       intro CS CS' s hchk hinv
       simp only [acheck, Option.bind_eq_bind] at hchk

@@ -112,12 +112,12 @@ theorem spath_sound {C : TaintEnv} {τ : String → UStr}
   | .var x, d, d', h => by
       simp only [spath] at h
       by_cases hx : (lookNat x C == some 0) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         have hx0 : lookNat x C = some 0 := by simpa using hx
         have : qcount (τ x) = 0 := hC (x, 0) (lookNat_mem hx0)
         exact walk_noQuote (τ x) this d
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .cat a b, d, d', h => by
       simp only [spath] at h
       rcases ea : spath C d a with _ | d₁
@@ -206,17 +206,17 @@ theorem PathCert.emit {fs : String} {C : TaintEnv} (q : String) (e : SExpr) (d :
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hdd : s.dead = true
-        · simp only [if_pos hdd]; exact hinv
-        · simp only [if_neg hdd]; exact hinv
+        · simp only [ite_eq_left hdd]; exact hinv
+        · simp only [ite_eq_right hdd]; exact hinv
   · intro n π s r hinv hr t ht
     cases n with
     | zero => simp [uexec] at hr
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hdd : s.dead = true
-        · simp only [if_pos hdd] at ht; exact Or.inl ht
+        · simp only [ite_eq_left hdd] at ht; exact Or.inl ht
         · have hd0 : s.dead = false := by simpa using hdd
-          simp only [if_neg hdd] at ht
+          simp only [ite_eq_right hdd] at ht
           rcases List.mem_cons.mp ht with h' | h'
           · refine Or.inr (fun _ => ?_)
             obtain ⟨dd, hw, _⟩ := spath_sound (hinv hd0) e 0 d hd
@@ -235,16 +235,16 @@ theorem PathCert.emitElsewhere {fs : String} {C : TaintEnv} (q : String) (e : SE
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hdd : s.dead = true
-        · simp only [if_pos hdd]; exact hinv
-        · simp only [if_neg hdd]; exact hinv
+        · simp only [ite_eq_left hdd]; exact hinv
+        · simp only [ite_eq_right hdd]; exact hinv
   · intro n π s r _ hr t ht
     cases n with
     | zero => simp [uexec] at hr
     | succ n =>
         simp only [uexec, Option.some.injEq] at hr; subst hr
         by_cases hdd : s.dead = true
-        · simp only [if_pos hdd] at ht; exact Or.inl ht
-        · simp only [if_neg hdd] at ht
+        · simp only [ite_eq_left hdd] at ht; exact Or.inl ht
+        · simp only [ite_eq_right hdd] at ht
           rcases List.mem_cons.mp ht with h' | h'
           · exact Or.inr (fun hfs => absurd (by rw [← hfs, h']) hq)
           · exact Or.inl h'
@@ -295,14 +295,14 @@ theorem PathCert.ite {fs : String} {C C₁ C₂ : TaintEnv} {e : Expr} {c₁ c�
     | succ n =>
         rw [uexec_ite_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec n c₁ π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
             subst hr
             intro hd p hp
             exact h₁.env n π s r₁ hinv e₁ hd p (interNat_left hp)
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           rcases e₂ : uexec n c₂ π s with _ | r₂
           · rw [e₂] at hr; simp at hr
           · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -315,13 +315,13 @@ theorem PathCert.ite {fs : String} {C C₁ C₂ : TaintEnv} {e : Expr} {c₁ c�
     | succ n =>
         rw [uexec_ite_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec n c₁ π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
             subst hr
             exact h₁.path n π s r₁ hinv e₁ t ht
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           rcases e₂ : uexec n c₂ π s with _ | r₂
           · rw [e₂] at hr; simp at hr
           · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -377,13 +377,13 @@ theorem pcheck_sound (fs : String) : ∀ (c : UCmd) (C C' : TaintEnv),
   | .sop .emit q e, C, C', h => by
       simp only [pcheck] at h
       by_cases hq : (q == fs) = true
-      · rw [if_pos hq] at h
+      · rw [ite_eq_left hq] at h
         rcases hd : spath C 0 e with _ | d
         · rw [hd] at h; simp at h
         · rw [hd] at h
           simp only [Option.some.injEq] at h; subst h
           exact PathCert.emit q e d hd
-      · rw [if_neg hq] at h
+      · rw [ite_eq_right hq] at h
         simp only [Option.some.injEq] at h; subst h
         exact PathCert.emitElsewhere q e (by simpa using hq)
   | .seq c₁ c₂, C, C', h => by

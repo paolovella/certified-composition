@@ -193,9 +193,9 @@ theorem specCheck_sound : ∀ (p : List SInstr) (sched : List Nat) (m : Mem) (ρ
       obtain ⟨hb, hr⟩ : startsFenced body = true ∧ specCheck is = true := by
         simpa [specCheck] using h
       by_cases hg : ρ r < n
-      · simp only [specExec, archRun, if_pos hg,
+      · simp only [specExec, archRun, ite_eq_left hg,
           specCheck_sound is (sched.tailD []) m (archBase body m ρ).1 hr]
-      · simp only [specExec, archRun, if_neg hg,
+      · simp only [specExec, archRun, ite_eq_right hg,
           specRun_startsFenced (sched.headD 0) body m ρ hb,
           specCheck_sound is (sched.tailD []) m ρ hr, List.nil_append]
 

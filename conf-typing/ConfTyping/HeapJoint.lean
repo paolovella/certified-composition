@@ -53,7 +53,7 @@ theorem SepCert.loop {V : List String} {e : Expr} {c : UCmd} (h : SepCert V c V)
       intro π s r hinv hr
       rw [uexec_loop_eq] at hr
       by_cases hg : evalE e s.store ≠ 0
-      · rw [if_pos hg] at hr
+      · rw [ite_eq_left hg] at hr
         rcases e₁ : uexec m c π s with _ | r₁
         · rw [e₁] at hr; simp at hr
         · rw [e₁, Option.bind_some] at hr
@@ -63,7 +63,7 @@ theorem SepCert.loop {V : List String} {e : Expr} {c : UCmd} (h : SepCert V c V)
             simp only [Option.map_some, Option.some.injEq] at hr
             subst hr
             exact ihm π r₁.1 r₂ (h.safe m π s r₁ hinv e₁) e₂
-      · rw [if_neg hg] at hr
+      · rw [ite_eq_right hg] at hr
         simp only [Option.some.injEq] at hr
         subst hr
         exact hinv
@@ -217,12 +217,12 @@ theorem labStable_check (q : String) : LabStable (.check q) := by
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [ite_eq_right hd]
         by_cases hp : π q = true
-        · simp only [if_pos hp]
+        · simp only [ite_eq_left hp]
           exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
-        · simp only [if_neg hp]
+        · simp only [ite_eq_right hp]
           exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem labStable_access (q : String) : LabStable (.access q) := by
@@ -232,8 +232,8 @@ theorem labStable_access (q : String) : LabStable (.access q) := by
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [ite_eq_right hd]
         exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
 
 theorem labStable_sop (op : SOp) (x : String) (e : SExpr) : LabStable (.sop op x e) := by
@@ -243,8 +243,8 @@ theorem labStable_sop (op : SOp) (x : String) (e : SExpr) : LabStable (.sop op x
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [ite_eq_right hd]
         cases op with
         | set  => exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
         | emit => exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
@@ -256,12 +256,12 @@ theorem labStable_deref (x : String) : LabStable (.memop .deref x) := by
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [ite_eq_right hd]
         by_cases hl : memInt (s.store x) s.live = true
-        · simp only [if_pos hl]
+        · simp only [ite_eq_left hl]
           exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
-        · simp only [if_neg hl]
+        · simp only [ite_eq_right hl]
           exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem labStable_free (x : String) : LabStable (.memop .free x) := by
@@ -271,12 +271,12 @@ theorem labStable_free (x : String) : LabStable (.memop .free x) := by
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [ite_eq_right hd]
         by_cases hl : memInt (s.store x) s.live = true
-        · simp only [if_pos hl]
+        · simp only [ite_eq_left hl]
           exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
-        · simp only [if_neg hl]
+        · simp only [ite_eq_right hl]
           exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem labStable_hstore (p v : String) : LabStable (.hop .store p v) := by
@@ -286,12 +286,12 @@ theorem labStable_hstore (p v : String) : LabStable (.hop .store p v) := by
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
-      · simp only [if_neg hd]
+      · simp only [ite_eq_left hd]; exact ⟨fun _ => by simp, by simp, by simp⟩
+      · simp only [ite_eq_right hd]
         by_cases hl : memInt (s.store p) s.live = true
-        · simp only [if_pos hl]
+        · simp only [ite_eq_left hl]
           exact ⟨fun _ => by simp, by simp, fun _ => by simpa using hd⟩
-        · simp only [if_neg hl]
+        · simp only [ite_eq_right hl]
           exact ⟨fun _ => by simp, by simp, fun h => absurd h (by simp)⟩
 
 theorem labInv_of_stable {P : Partition} {V : List String} {c : UCmd}
@@ -312,12 +312,12 @@ theorem labInv_assign {P : Partition} {V : List String} {x : String} {e : Expr}
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]
+      · simp only [ite_eq_left hd]
         exact labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun _ _ => rfl) rfl id hL
-      · simp only [if_neg hd]
+      · simp only [ite_eq_right hd]
         refine labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun y hy => ?_) rfl id hL
         show upd s.store x (evalE e s.store) y = s.store y
-        simp only [upd, if_neg (dropStr_ne hy)]
+        simp only [upd, ite_eq_right (dropStr_ne hy)]
 
 theorem labInv_load {P : Partition} {V : List String} {d p : String}
     {n : Nat} {π : MedPolicy} {s : UState} {r : UState × Nat × List Bool}
@@ -328,15 +328,15 @@ theorem labInv_load {P : Partition} {V : List String} {d p : String}
   | succ n =>
       simp only [uexec, Option.some.injEq] at hr; subst hr
       by_cases hd : s.dead = true
-      · simp only [if_pos hd]
+      · simp only [ite_eq_left hd]
         exact labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun _ _ => rfl) rfl id hL
-      · simp only [if_neg hd]
+      · simp only [ite_eq_right hd]
         by_cases hl : memInt (s.store p) s.live = true
-        · simp only [if_pos hl]
+        · simp only [ite_eq_left hl]
           refine labInv_carry (s := s) (fun _ hz => dropStr_mem hz) (fun y hy => ?_) rfl id hL
           show upd s.store d (s.heap (s.store p)) y = s.store y
-          simp only [upd, if_neg (dropStr_ne hy)]
-        · simp only [if_neg hl]
+          simp only [upd, ite_eq_right (dropStr_ne hy)]
+        · simp only [ite_eq_right hl]
           intro hc; exact absurd hc (by simp)
 
 /-- **The allocation case**, and the only one that needs the separation invariant: the
@@ -352,7 +352,7 @@ theorem labInv_alloc {P : Partition} {V : List String} {x : String} {b : Bool}
   | succ n =>
       by_cases hd : s.dead = true
       · cases b <;>
-          simp only [uexec, if_pos hd, Option.some.injEq, if_true, if_false] at hr <;>
+          simp only [uexec, ite_eq_left hd, Option.some.injEq, ite_true, ite_false] at hr <;>
           subst hr <;> intro hc <;> exact absurd (hd ▸ hc) (by simp)
       · have hd0 : s.dead = false := by simpa using hd
         obtain ⟨hlive, hinj, hfr, hdisj, hfb⟩ := hS.2 hd0
@@ -377,22 +377,22 @@ theorem labInv_alloc {P : Partition} {V : List String} {x : String} {b : Bool}
                  (upd s.store x (pickAddr s.freed s.fresh) y) = P y
           by_cases hyx : y = x
           · subst hyx
-            simp only [upd, if_pos rfl]
+            simp only [upd, ite_eq_left rfl]
             show (if pickAddr s.freed s.fresh = pickAddr s.freed s.fresh then lab
                   else s.hlab (pickAddr s.freed s.fresh)) = P y
-            rw [if_pos rfl, hlabx]
+            rw [ite_eq_left rfl, hlabx]
           · have hyV : y ∈ V := memCons_ne hy hyx
             have hne : ¬ (s.store y = pickAddr s.freed s.fresh) := by
               intro hc
               exact absurd (hc ▸ hlive y hyV) (by simp [hnl])
-            simp only [upd, if_neg hyx, updBU, if_neg hne]
+            simp only [upd, ite_eq_right hyx, updBU, ite_eq_right hne]
             exact hL hd0 y hyV
         cases b with
         | false =>
-            simp only [uexec, if_neg hd, if_false, Option.some.injEq] at hr
+            simp only [uexec, ite_eq_right hd, ite_false, Option.some.injEq] at hr
             subst hr; exact key false hb
         | true =>
-            simp only [uexec, if_neg hd, if_true, Option.some.injEq] at hr
+            simp only [uexec, ite_eq_right hd, ite_true, Option.some.injEq] at hr
             subst hr; exact key true hb
 
 /-! ## Preservation -/
@@ -452,13 +452,13 @@ theorem JSecTy.toLabInv {P : Partition} {V : List String} {c : UCmd} {V' : List 
       | succ m =>
           rw [uexec_ite_eq] at hr
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at hr
+          · rw [ite_eq_left hg] at hr
             rcases e₁ : uexec m c₁ π s with _ | r₁
             · rw [e₁] at hr; simp at hr
             · rw [e₁] at hr; simp only [Option.map_some, Option.some.injEq] at hr
               subst hr
               exact LabInv.mono (fun _ hz => interStr_left hz) (ih₁ m π s r₁ hS hL e₁)
-          · rw [if_neg hg] at hr
+          · rw [ite_eq_right hg] at hr
             rcases e₂ : uexec m c₂ π s with _ | r₂
             · rw [e₂] at hr; simp at hr
             · rw [e₂] at hr; simp only [Option.map_some, Option.some.injEq] at hr
@@ -476,7 +476,7 @@ theorem JSecTy.toLabInv {P : Partition} {V : List String} {c : UCmd} {V' : List 
             intro π s r hSW hLW hr
             rw [uexec_loop_eq] at hr
             by_cases hg : evalE e s.store ≠ 0
-            · rw [if_pos hg] at hr
+            · rw [ite_eq_left hg] at hr
               rcases e₁ : uexec m c₀ π s with _ | r₁
               · rw [e₁] at hr; simp at hr
               · rw [e₁, Option.bind_some] at hr
@@ -487,7 +487,7 @@ theorem JSecTy.toLabInv {P : Partition} {V : List String} {c : UCmd} {V' : List 
                   subst hr
                   exact ihm π r₁.1 r₂ (hbody.safe m π s r₁ hSW e₁)
                     (LabInv.mono hWW₁ (ih m π s r₁ hSW hLW e₁)) e₂
-            · rw [if_neg hg] at hr
+            · rw [ite_eq_right hg] at hr
               simp only [Option.some.injEq] at hr; subst hr; exact hLW
       intro n π s r hS hL hr
       exact main n π s r (SepInv.mono hWV hS) (LabInv.mono hWV hL) hr
@@ -628,21 +628,21 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           by_cases hp : π r = true
-          · rw [if_pos hp, if_pos hp]; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
-          · rw [if_neg hp, if_neg hp]; exact ⟨hst, hrd, rfl, hfr, hss, hsk, hfd, hhl, hho⟩
+          · rw [ite_eq_left hp, ite_eq_left hp]; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          · rw [ite_eq_right hp, ite_eq_right hp]; exact ⟨hst, hrd, rfl, hfr, hss, hsk, hfd, hhl, hho⟩
     | access _ r =>
         show uOptLowEqA P (uexec (m+1) (.access r) π s) (uexec (m+1) (.access r) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           exact ⟨hst, by simp [hrd], hdd, hfr, hss, hsk, hfd, hhl, hho⟩
     | assignH _ x e hx =>
         show uOptLowEqA P (uexec (m+1) (.assign x e) π s) (uexec (m+1) (.assign x e) π s')
@@ -650,30 +650,30 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro y hy
           have hyx : y ≠ x := fun h => by rw [h, hx] at hy; cases hy
           show upd s.store x (evalE e s.store) y = upd s'.store x (evalE e s'.store) y
-          simp only [upd, if_neg hyx]; exact hst y hy
+          simp only [upd, ite_eq_right hyx]; exact hst y hy
     | assignL _ x e he =>
         show uOptLowEqA P (uexec (m+1) (.assign x e) π s) (uexec (m+1) (.assign x e) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro y hy
           show upd s.store x (evalE e s.store) y = upd s'.store x (evalE e s'.store) y
           simp only [upd]
           by_cases hxy : y = x
-          · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hst]
-          · rw [if_neg hxy, if_neg hxy]; exact hst y hy
+          · rw [ite_eq_left hxy, ite_eq_left hxy, evalE_lowEq e he hst]
+          · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hst y hy
     | alloc _ x _ =>
         show uOptLowEqA P (uexec (m+1) (.memop .alloc x) π s)
                         (uexec (m+1) (.memop .alloc x) π s')
@@ -681,9 +681,9 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨?_, hrd, hdd,
                   by show bumpFresh s.freed s.fresh = bumpFresh s'.freed s'.fresh
                      rw [hfr, hfd],
@@ -700,19 +700,19 @@ theorem jsecTy_sound {P : Partition} :
                      show (if b = pickAddr s.freed s.fresh then (0 : Int) else s.heap b)
                         = (if b = pickAddr s'.freed s'.fresh then (0 : Int) else s'.heap b)
                      by_cases hba : b = pickAddr s.freed s.fresh
-                     · rw [if_pos hba, if_pos (hba'.mp hba)]
-                     · rw [if_neg hba, if_neg (fun h => hba (hba'.mpr h))]
+                     · rw [ite_eq_left hba, ite_eq_left (hba'.mp hba)]
+                     · rw [ite_eq_right hba, ite_eq_right (fun h => hba (hba'.mpr h))]
                        refine hho b ?_
                        have hb2 : updBU s.hlab (pickAddr s.freed s.fresh) false b
-                           = s.hlab b := by simp only [updBU, if_neg hba]
+                           = s.hlab b := by simp only [updBU, ite_eq_right hba]
                        rw [← hb2]; exact hb⟩
           intro z hz
           show upd s.store x (pickAddr s.freed s.fresh) z
              = upd s'.store x (pickAddr s'.freed s'.fresh) z
           simp only [upd]
           by_cases hzx : z = x
-          · rw [if_pos hzx, if_pos hzx, hfr, hfd]
-          · rw [if_neg hzx, if_neg hzx]; exact hst z hz
+          · rw [ite_eq_left hzx, ite_eq_left hzx, hfr, hfd]
+          · rw [ite_eq_right hzx, ite_eq_right hzx]; exact hst z hz
     | allocS _ x _ =>
         show uOptLowEqA P (uexec (m+1) (.memop .allocS x) π s)
                         (uexec (m+1) (.memop .allocS x) π s')
@@ -720,9 +720,9 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨?_, hrd, hdd,
                   by show bumpFresh s.freed s.fresh = bumpFresh s'.freed s'.fresh
                      rw [hfr, hfd],
@@ -739,19 +739,19 @@ theorem jsecTy_sound {P : Partition} :
                      show (if b = pickAddr s.freed s.fresh then (0 : Int) else s.heap b)
                         = (if b = pickAddr s'.freed s'.fresh then (0 : Int) else s'.heap b)
                      by_cases hba : b = pickAddr s.freed s.fresh
-                     · rw [if_pos hba, if_pos (hba'.mp hba)]
-                     · rw [if_neg hba, if_neg (fun h => hba (hba'.mpr h))]
+                     · rw [ite_eq_left hba, ite_eq_left (hba'.mp hba)]
+                     · rw [ite_eq_right hba, ite_eq_right (fun h => hba (hba'.mpr h))]
                        refine hho b ?_
                        have hb2 : updBU s.hlab (pickAddr s.freed s.fresh) true b
-                           = s.hlab b := by simp only [updBU, if_neg hba]
+                           = s.hlab b := by simp only [updBU, ite_eq_right hba]
                        rw [← hb2]; exact hb⟩
           intro z hz
           show upd s.store x (pickAddr s.freed s.fresh) z
              = upd s'.store x (pickAddr s'.freed s'.fresh) z
           simp only [upd]
           by_cases hzx : z = x
-          · rw [if_pos hzx, if_pos hzx, hfr, hfd]
-          · rw [if_neg hzx, if_neg hzx]; exact hst z hz
+          · rw [ite_eq_left hzx, ite_eq_left hzx, hfr, hfd]
+          · rw [ite_eq_right hzx, ite_eq_right hzx]; exact hst z hz
     | deref _ x hx =>
         show uOptLowEqA P (uexec (m+1) (.memop .deref x) π s)
                         (uexec (m+1) (.memop .deref x) π s')
@@ -759,7 +759,7 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
@@ -767,7 +767,7 @@ theorem jsecTy_sound {P : Partition} :
             hI.toMemInv.2 hd0 x (memStr_mem hx)
           have hl' : memInt (s'.store x) s'.live = true :=
             hI'.toMemInv.2 hd0' x (memStr_mem hx)
-          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
           exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
     | free _ x hx =>
         show uOptLowEqA P (uexec (m+1) (.memop .free x) π s)
@@ -776,7 +776,7 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
@@ -784,7 +784,7 @@ theorem jsecTy_sound {P : Partition} :
             hI.toMemInv.2 hd0 x (memStr_mem hx)
           have hl' : memInt (s'.store x) s'.live = true :=
             hI'.toMemInv.2 hd0' x (memStr_mem hx)
-          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
           -- a secret address is retired (both runs list nothing); a public one is
           -- listed, and then the pointer is Low so the two lists stay identical
           have hlx : s.hlab (s.store x) = P x := hL hd0 x (memStr_mem hx)
@@ -793,9 +793,9 @@ theorem jsecTy_sound {P : Partition} :
           show (if s.hlab (s.store x) then s.freed else s.store x :: s.freed)
              = (if s'.hlab (s'.store x) then s'.freed else s'.store x :: s'.freed)
           by_cases hPx : P x = true
-          · rw [if_pos (by rw [hlx, hPx]), if_pos (by rw [hlx', hPx])]; exact hfd
+          · rw [ite_eq_left (by rw [hlx, hPx]), ite_eq_left (by rw [hlx', hPx])]; exact hfd
           · have hPx' : P x = false := by simpa using hPx
-            rw [if_neg (by rw [hlx, hPx']; simp), if_neg (by rw [hlx', hPx']; simp)]
+            rw [ite_eq_right (by rw [hlx, hPx']; simp), ite_eq_right (by rw [hlx', hPx']; simp)]
             rw [hst x hPx', hfd]
     | setH _ x e hx =>
         show uOptLowEqA P (uexec (m+1) (.sop .set x e) π s) (uexec (m+1) (.sop .set x e) π s')
@@ -803,32 +803,32 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨hst, hrd, hdd, hfr, ?_, hsk, hfd, hhl, hho⟩
           intro z hz
           have hzx : ¬ (z = x) := fun h => by rw [h, hx] at hz; cases hz
           show updSU s.sstore x (evalS s.sstore e) z
              = updSU s'.sstore x (evalS s'.sstore e) z
-          simp only [updSU, if_neg hzx]; exact hss z hz
+          simp only [updSU, ite_eq_right hzx]; exact hss z hz
     | setL _ x e he =>
         show uOptLowEqA P (uexec (m+1) (.sop .set x e) π s) (uexec (m+1) (.sop .set x e) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨hst, hrd, hdd, hfr, ?_, hsk, hfd, hhl, hho⟩
           intro z hz
           show updSU s.sstore x (evalS s.sstore e) z
              = updSU s'.sstore x (evalS s'.sstore e) z
           simp only [updSU]
           by_cases hzx : z = x
-          · rw [if_pos hzx, if_pos hzx, evalS_lowEq hss e he]
-          · rw [if_neg hzx, if_neg hzx]; exact hss z hz
+          · rw [ite_eq_left hzx, ite_eq_left hzx, evalS_lowEq hss e he]
+          · rw [ite_eq_right hzx, ite_eq_right hzx]; exact hss z hz
     | emit _ q e he =>
         show uOptLowEqA P (uexec (m+1) (.sop .emit q e) π s)
                         (uexec (m+1) (.sop .emit q e) π s')
@@ -836,9 +836,9 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨hst, hrd, hdd, hfr, hss, ?_, hfd, hhl, hho⟩
           show (q, evalS s.sstore e) :: s.sink = (q, evalS s'.sstore e) :: s'.sink
           rw [evalS_lowEq hss e he, hsk]
@@ -849,22 +849,22 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
-          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
           refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro z hz
           show upd s.store d (s.heap (s.store p)) z
              = upd s'.store d (s'.heap (s'.store p)) z
           simp only [upd]
           by_cases hzd : z = d
-          · rw [if_pos hzd, if_pos hzd, hst p hPp]
+          · rw [ite_eq_left hzd, ite_eq_left hzd, hst p hPp]
             exact hho (s'.store p) (by rw [← hst p hPp]; exact (hL hd0 p (memStr_mem hp)).trans hPp)
-          · rw [if_neg hzd, if_neg hzd]; exact hst z hz
+          · rw [ite_eq_right hzd, ite_eq_right hzd]; exact hst z hz
     | loadH _ d p hp hPd =>
         show uOptLowEqA P (uexec (m+1) (.hop .load d p) π s)
                         (uexec (m+1) (.hop .load d p) π s')
@@ -872,19 +872,19 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
-          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
           refine ⟨?_, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
           intro z hz
           have hzd : z ≠ d := fun h => by rw [h, hPd] at hz; cases hz
           show upd s.store d (s.heap (s.store p)) z
              = upd s'.store d (s'.heap (s'.store p)) z
-          simp only [upd, if_neg hzd]; exact hst z hz
+          simp only [upd, ite_eq_right hzd]; exact hst z hz
     | storeL _ p v hp hPp hPv =>
         show uOptLowEqA P (uexec (m+1) (.hop .store p v) π s)
                         (uexec (m+1) (.hop .store p v) π s')
@@ -892,21 +892,21 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
-          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
           refine ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, ?_⟩
           intro b hb
           show (if b = s.store p then s.store v else s.heap b)
              = (if b = s'.store p then s'.store v else s'.heap b)
           rw [hst p hPp, hst v hPv]
           by_cases hbp : b = s'.store p
-          · rw [if_pos hbp, if_pos hbp]
-          · rw [if_neg hbp, if_neg hbp]; exact hho b hb
+          · rw [ite_eq_left hbp, ite_eq_left hbp]
+          · rw [ite_eq_right hbp, ite_eq_right hbp]; exact hho b hb
     | storeH _ p v hp hPp =>
         show uOptLowEqA P (uexec (m+1) (.hop .store p v) π s)
                         (uexec (m+1) (.hop .store p v) π s')
@@ -914,13 +914,13 @@ theorem jsecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩
         · have hd0 : s.dead = false := by simpa using hd
           have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
           have hd0' : s'.dead = false := by simpa using hd'
           have hl := hI.toMemInv.2 hd0 p (memStr_mem hp)
           have hl' := hI'.toMemInv.2 hd0' p (memStr_mem hp)
-          rw [if_neg hd, if_neg hd', if_pos hl, if_pos hl']
+          rw [ite_eq_right hd, ite_eq_right hd', ite_eq_left hl, ite_eq_left hl']
           refine ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, ?_⟩
           -- both runs write a **secret** cell, so no public cell moves
           intro b hb
@@ -931,7 +931,7 @@ theorem jsecTy_sound {P : Partition} :
             intro h; rw [← hhl] at hsec'; rw [h, hsec'] at hb; cases hb
           show (if b = s.store p then s.store v else s.heap b)
              = (if b = s'.store p then s'.store v else s'.heap b)
-          rw [if_neg hbp, if_neg hbp']; exact hho b hb
+          rw [ite_eq_right hbp, ite_eq_right hbp']; exact hho b hb
     | @seq _ V₁ _ c₁ c₂ h₁ h₂ =>
         show uOptLowEqA P (uexec (m+1) (.seq c₁ c₂) π s) (uexec (m+1) (.seq c₁ c₂) π s')
         rw [uexec_seq_eq, uexec_seq_eq]
@@ -950,11 +950,11 @@ theorem jsecTy_sound {P : Partition} :
         rw [uexec_ite_eq, uexec_ite_eq]
         by_cases hb : evalE e s.store ≠ 0
         · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-          rw [if_pos hb, if_pos hb']
+          rw [ite_eq_left hb, ite_eq_left hb']
           refine uOptLowEqA_mapE (ih c₁ _ _ h₁ π s s' hI hI' hL hL' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
           intro r r' _ _ hs hcs htr; exact ⟨hs, by simp [hcs], by simp [htr]⟩
         · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-          rw [if_neg hb, if_neg hb']
+          rw [ite_eq_right hb, ite_eq_right hb']
           refine uOptLowEqA_mapE (ih c₂ _ _ h₂ π s s' hI hI' hL hL' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
           intro r r' _ _ hs hcs htr; exact ⟨hs, by simp [hcs], by simp [htr]⟩
     | @whileW _ _ W₁ c₀ e hg hWV h₀ hWW₁ =>
@@ -968,7 +968,7 @@ theorem jsecTy_sound {P : Partition} :
         rw [uexec_loop_eq, uexec_loop_eq]
         by_cases hb : evalE e s.store ≠ 0
         · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-          rw [if_pos hb, if_pos hb']
+          rw [ite_eq_left hb, ite_eq_left hb']
           refine uOptLowEqA_bindE (ih c₀ V' W₁ h₀ π s s' hIV' hIV'' hLV' hLV'' ⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩) ?_
           intro r₁ r₁' e₁ e₁' hs₁ hc1 ht1
           have hJ : SepInv V' r₁.1 := hbody.safe m π s r₁ hIV' e₁
@@ -983,7 +983,7 @@ theorem jsecTy_sound {P : Partition} :
           intro r₂ r₂' _ _ hs₂ hc2 ht2
           exact ⟨hs₂, by simp [hc1, hc2], by simp [ht1, ht2]⟩
         · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-          rw [if_neg hb, if_neg hb']
+          rw [ite_eq_right hb, ite_eq_right hb']
           exact ⟨⟨hst, hrd, hdd, hfr, hss, hsk, hfd, hhl, hho⟩, rfl, rfl⟩
 
 /-! ## The checker -/
@@ -1021,39 +1021,39 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
   | .assign x e, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : (P x || exprLow P e) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
         · exact .assignH V x e h'
         · exact .assignL V x e h'
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .alloc x, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : P x = true
-      · rw [if_pos hx] at h; simp at h
-      · rw [if_neg hx] at h
+      · rw [ite_eq_left hx] at h; simp at h
+      · rw [ite_eq_right hx] at h
         simp only [Option.some.injEq] at h; subst h
         exact .alloc V x (by simpa using hx)
   | .memop .allocS x, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : P x = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         exact .allocS V x hx
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .deref x, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h; exact .deref V x hx
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .memop .free x, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : memStr x V = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         exact .free V x hx
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .seq c₁ c₂, V, V', h => by
       simp only [jcheck] at h
       rcases e₁ : jcheck P V c₁ with _ | V₁
@@ -1063,7 +1063,7 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
   | .ite e c₁ c₂, V, V', h => by
       simp only [jcheck] at h
       by_cases hg : exprLow P e = true
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         rcases e₁ : jcheck P V c₁ with _ | V₁
         · rw [e₁] at h; simp at h
         · rcases e₂ : jcheck P V c₂ with _ | V₂
@@ -1071,37 +1071,37 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
           · rw [e₁, e₂] at h
             simp only [Option.some.injEq] at h; subst h
             exact .iteL e hg (jcheck_sound c₁ V V₁ e₁) (jcheck_sound c₂ V V₂ e₂)
-      · rw [if_neg hg] at h; simp at h
+      · rw [ite_eq_right hg] at h; simp at h
   | .sop .set x e, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : (P x || sexprLow P e) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
         · exact .setH V x e h'
         · exact .setL V x e h'
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .sop .emit q e, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : sexprLow P e = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         exact .emit V q e hx
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .hop .load d p, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : (memStr p V && (!P p || P d)) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
         rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
         · exact .loadL V d p h1 (by simpa using h')
         · exact .loadH V d p h1 h'
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .hop .store p v, V, V', h => by
       simp only [jcheck] at h
       by_cases hx : (memStr p V && (P p || !P v)) = true
-      · rw [if_pos hx] at h
+      · rw [ite_eq_left hx] at h
         simp only [Option.some.injEq] at h; subst h
         obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
         rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
@@ -1109,16 +1109,16 @@ theorem jcheck_sound {P : Partition} : ∀ (c : UCmd) (V V' : List String),
         · by_cases hpp : P p = true
           · exact .storeH V p v h1 hpp
           · exact .storeL V p v h1 (by simpa using hpp) (by simpa using h')
-      · rw [if_neg hx] at h; simp at h
+      · rw [ite_eq_right hx] at h; simp at h
   | .loop e c₀, V, V', h => by
       simp only [jcheck] at h
       by_cases hg : (exprLow P e && (jcheck P V c₀ == some V)) = true
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         simp only [Option.some.injEq] at h; subst h
         obtain ⟨hg1, hg2⟩ := Bool.and_eq_true _ _ |>.mp hg
         exact .whileW e hg1 (fun _ hx => hx)
           (jcheck_sound c₀ V V (by simpa using hg2)) (fun _ hx => hx)
-      · rw [if_neg hg] at h; simp at h
+      · rw [ite_eq_right hg] at h; simp at h
 
 /-- **Both guarantees, from one run of one checker.** Noninterference *including* the
     heap operations, and no memory fault — for a program the two separate checkers

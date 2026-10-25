@@ -50,7 +50,7 @@ theorem ofDigits_toDigits (n : Nat) : ofDigits (toDigits n) = n := by
   induction n using toDigits.induct with
   | case1 n h => rw [toDigits]; simp [h, ofDigits]
   | case2 n h ih =>
-      rw [toDigits, dif_neg h, ofDigits_snoc, ih]
+      rw [toDigits, dite_eq_right h, ofDigits_snoc, ih]
       simp only [Fin.val_mk]
       omega
 
@@ -171,7 +171,7 @@ theorem lexFuelD_printD :
           have hhead : printD (t :: ts) = c :: (cs ++ .dsp :: printD ts) := by
             simp only [printD, hpt, List.cons_append]
           rw [hhead]
-          simp only [lexFuelD, if_neg hc]
+          simp only [lexFuelD, ite_eq_right hc]
           have hread : readTokD (c :: (cs ++ .dsp :: printD ts))
               = some (t, .dsp :: printD ts) := by
             have h := readTokD_printTokD t (printD ts)

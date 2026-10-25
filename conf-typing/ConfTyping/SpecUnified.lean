@@ -256,7 +256,7 @@ theorem spec_is_uexec_extended : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s 
       | ite e c₁ c₂ =>
           by_cases hg : evalE e s.store ≠ 0
           · show (Option.map _ (if _ then (uexecS n w c₁ π s).map _ else _)) = _
-            rw [if_pos hg, uexec_ite_eq, if_pos hg]
+            rw [ite_eq_left hg, uexec_ite_eq, ite_eq_left hg]
             have h₁ := spec_is_uexec_extended n w c₁ π s
             rcases e₁ : uexecS n w c₁ π s with _ | r₁ <;> rw [e₁] at h₁
             · rcases e₁' : uexec n c₁ π s with _ | r₁' <;> rw [e₁'] at h₁
@@ -268,7 +268,7 @@ theorem spec_is_uexec_extended : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s 
                 simp only [Option.map_some, Option.some.injEq, Prod.mk.injEq, h₁.1, h₁.2,
                   true_and, and_self]
           · show (Option.map _ (if _ then _ else (uexecS n w c₂ π s).map _)) = _
-            rw [if_neg hg, uexec_ite_eq, if_neg hg]
+            rw [ite_eq_right hg, uexec_ite_eq, ite_eq_right hg]
             have h₂ := spec_is_uexec_extended n w c₂ π s
             rcases e₂ : uexecS n w c₂ π s with _ | r₂ <;> rw [e₂] at h₂
             · rcases e₂' : uexec n c₂ π s with _ | r₂' <;> rw [e₂'] at h₂
@@ -282,7 +282,7 @@ theorem spec_is_uexec_extended : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s 
       | loop e c₀ =>
           by_cases hg : evalE e s.store ≠ 0
           · show (Option.map _ (if _ then (uexecS n w c₀ π s).bind _ else _)) = _
-            rw [if_pos hg, uexec_loop_eq, if_pos hg]
+            rw [ite_eq_left hg, uexec_loop_eq, ite_eq_left hg]
             have h₁ := spec_is_uexec_extended n w c₀ π s
             rcases e₁ : uexecS n w c₀ π s with _ | ⟨s₁, k₁, t₁⟩ <;> rw [e₁] at h₁
             · rcases e₁' : uexec n c₀ π s with _ | r₁' <;> rw [e₁'] at h₁
@@ -306,7 +306,7 @@ theorem spec_is_uexec_extended : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s 
                     subst hst2; subst hk2
                     rfl
           · show (Option.map _ (if _ then _ else some (s, 1, 1, ([] : List Int)))) = _
-            rw [if_neg hg, uexec_loop_eq, if_neg hg]; rfl
+            rw [ite_eq_right hg, uexec_loop_eq, ite_eq_right hg]; rfl
 
 /-! ## The machine can express the leak -/
 
@@ -465,14 +465,14 @@ theorem branch_free_is_inert : ∀ (n w : Nat) (c : UCmd) (π : MedPolicy) (s : 
           by_cases hg : evalE e s.store ≠ 0
           · show (if _ then (uexecS n w c₀ π s).bind _ else _)
                   = (if _ then (uexecS n 0 c₀ π s).bind _ else _)
-            rw [if_pos hg, if_pos hg, branch_free_is_inert n w c₀ π s hc]
+            rw [ite_eq_left hg, ite_eq_left hg, branch_free_is_inert n w c₀ π s hc]
             rcases e₁ : uexecS n 0 c₀ π s with _ | r₁
             · rfl
             · simp only [Option.bind_some,
                 branch_free_is_inert n w (.loop e c₀) π r₁.1 (by simp [hasIte, hc])]
           · show (if _ then _ else some (s, 1, 1, ([] : List Int)))
                   = (if _ then _ else some (s, 1, 1, ([] : List Int)))
-            rw [if_neg hg, if_neg hg]
+            rw [ite_eq_right hg, ite_eq_right hg]
 
 /-- **The worked program is speculation-proof**, because it never branches. Narrow, but
     it is a real statement about a real program: `fiveProg`'s five certificates hold on

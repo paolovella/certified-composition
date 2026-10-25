@@ -143,7 +143,7 @@ theorem segsT_noBS : ∀ (s : Str), noBS s = true → ∀ t : TState, t ≠ .esc
           cases t with
           | out => simp only [segsT, segs_cons_c, ih hr .out (by simp)]
           | inn =>
-              simp only [segsT, segs_cons_c, if_neg hn', ih hr .inn (by simp)]
+              simp only [segsT, segs_cons_c, ite_eq_right hn', ih hr .inn (by simp)]
           | esc => exact absurd rfl ht
 
 /-- The skeletons agree on backslash-free queries: bricks 14 and 26 transfer
@@ -233,8 +233,8 @@ theorem segsT_esc : ∀ (v rest : Str),
         simp only [bs, segsT, prependHead, segsT_esc r rest]
         rfl
       · show segsT .inn ((if (n == 92) then bs :: bs :: esc r else .c n :: esc r) ++ rest) = _
-        rw [if_neg hn]
-        simp only [List.cons_append, segsT, if_neg hn, prependHead, segsT_esc r rest]
+        rw [ite_eq_right hn]
+        simp only [List.cons_append, segsT, ite_eq_right hn, prependHead, segsT_esc r rest]
 
 /-! ## Escaping, done completely, is sound and faithful -/
 
@@ -296,7 +296,7 @@ theorem escBad_eq_esc : ∀ {v : Str}, noBS v = true → escBad v = esc v
   | .c n :: r, h => by
       obtain ⟨hn0, hr⟩ : ¬ n = 92 ∧ noBS r = true := by simpa [noBS] using h
       have hn : ¬ (n == 92) = true := by simpa using hn0
-      simp only [escBad, esc, if_neg hn, escBad_eq_esc hr]
+      simp only [escBad, esc, ite_eq_right hn, escBad_eq_esc hr]
 
 /-- **The precise boundary.** The buggy escaper is sound on every
     backslash-free value and unsound in general: the vulnerability is located,

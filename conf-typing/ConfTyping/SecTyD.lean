@@ -112,7 +112,7 @@ theorem ite_aux {P : Partition} {e : Expr} {c₁ c₂ : Cmd}
     BoundaryReleases (.ite e c₁ c₂) P (relOf P (.ite e c₁ c₂)) := by
   intro σ σ' hle hφ
   by_cases hg : exprLow P e = true
-  · simp only [relOf, if_pos hg] at hφ
+  · simp only [relOf, ite_eq_left hg] at hφ
     injection hφ with hφ₁ hφ₂
     have hgv : evalE e σ = evalE e σ' := evalE_lowEq e hg hle
     show lowEq P ((eval (.ite e c₁ c₂) σ).1) ((eval (.ite e c₁ c₂) σ').1)
@@ -120,7 +120,7 @@ theorem ite_aux {P : Partition} {e : Expr} {c₁ c₂ : Cmd}
     split
     · exact ih₁ σ σ' hle hφ₁
     · exact ih₂ σ σ' hle hφ₂
-  · simp only [relOf, if_neg hg] at hφ
+  · simp only [relOf, ite_eq_right hg] at hφ
     injection hφ with hbit hφr
     injection hφr with hφ₁ hφ₂
     injection hbit with hbit
@@ -130,10 +130,10 @@ theorem ite_aux {P : Partition} {e : Expr} {c₁ c₂ : Cmd}
     show lowEq P ((eval (.ite e c₁ c₂) σ).1) ((eval (.ite e c₁ c₂) σ').1)
     by_cases hb : evalE e σ ≠ 0
     · have hb' : evalE e σ' ≠ 0 := hgv.mp hb
-      simp only [eval, if_pos hb, if_pos hb']
+      simp only [eval, ite_eq_left hb, ite_eq_left hb']
       exact ih₁ σ σ' hle hφ₁
     · have hb' : ¬ evalE e σ' ≠ 0 := fun h => hb (hgv.mpr h)
-      simp only [eval, if_neg hb, if_neg hb']
+      simp only [eval, ite_eq_right hb, ite_eq_right hb']
       exact ih₂ σ σ' hle hφ₂
 
 /-- **Soundness, Policy form.** A typed component reveals at most its
@@ -147,27 +147,27 @@ theorem secTyD_sound {P : Partition} {Δ : List Permit} {pc : Bool} {c : Cmd}
       intro σ σ' hle _ x hx
       show upd σ y (evalE e σ) x = upd σ' y (evalE e σ') x
       have hxy : x ≠ y := fun hxy => by rw [hxy, hyH] at hx; cases hx
-      simp only [upd, if_neg hxy]
+      simp only [upd, ite_eq_right hxy]
       exact hle x hx
   | assignL y e he =>
       intro σ σ' hle _ x hx
       show upd σ y (evalE e σ) x = upd σ' y (evalE e σ') x
       simp only [upd]
       by_cases hxy : x = y
-      · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hle]
-      · rw [if_neg hxy, if_neg hxy]; exact hle x hx
+      · rw [ite_eq_left hxy, ite_eq_left hxy, evalE_lowEq e he hle]
+      · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hle x hx
   | assignD y e _ =>
       intro σ σ' hle hφ x hx
       show upd σ y (evalE e σ) x = upd σ' y (evalE e σ') x
       have hev : evalE e σ = evalE e σ' := by
         by_cases hl : exprLow P e = true
         · exact evalE_lowEq e hl hle
-        · simp only [relOf, if_neg hl] at hφ
+        · simp only [relOf, ite_eq_right hl] at hφ
           injection hφ
       simp only [upd, hev]
       by_cases hxy : x = y
-      · rw [if_pos hxy, if_pos hxy]
-      · rw [if_neg hxy, if_neg hxy]; exact hle x hx
+      · rw [ite_eq_left hxy, ite_eq_left hxy]
+      · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hle x hx
   | seq _ _ ih₁ ih₂ => exact boundaryReleases_seq ih₁ ih₂
   | iteL e _ _ _ ih₁ ih₂ => exact ite_aux ih₁ ih₂
   | iteH _ _ ih₁ ih₂ => exact ite_aux ih₁ ih₂

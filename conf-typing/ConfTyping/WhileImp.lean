@@ -133,15 +133,15 @@ theorem wsecTy_sound {P : Partition} :
             intro y hy
             have hyx : y ≠ x := fun h => by rw [h, hx] at hy; cases hy
             show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
-            simp only [upd, if_neg hyx]; exact hle y hy
+            simp only [upd, ite_eq_right hyx]; exact hle y hy
         | assignL _ _ he =>
             refine ⟨?_, rfl, rfl⟩
             intro y hy
             show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
             simp only [upd]
             by_cases hxy : y = x
-            · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hle]
-            · rw [if_neg hxy, if_neg hxy]; exact hle y hy
+            · rw [ite_eq_left hxy, ite_eq_left hxy, evalE_lowEq e he hle]
+            · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hle y hy
     | seq c₁ c₂ =>
         cases hc with
         | seq hc₁ hc₂ =>
@@ -160,11 +160,11 @@ theorem wsecTy_sound {P : Partition} :
             simp only [wexec]
             by_cases hb : evalE e σ ≠ 0
             · have hb' : evalE e σ' ≠ 0 := by rwa [hgv] at hb
-              rw [if_pos hb, if_pos hb']
+              rw [ite_eq_left hb, ite_eq_left hb']
               refine optLowEq_map (ih c₁ h₁ σ σ' hle) ?_
               intro r r' hs hcs htr; exact ⟨hs, by rw [hcs], by rw [htr]⟩
             · have hb' : ¬ evalE e σ' ≠ 0 := by rwa [hgv] at hb
-              rw [if_neg hb, if_neg hb']
+              rw [ite_eq_right hb, ite_eq_right hb']
               refine optLowEq_map (ih c₂ h₂ σ σ' hle) ?_
               intro r r' hs hcs htr; exact ⟨hs, by rw [hcs], by rw [htr]⟩
     | loop e c₀ =>
@@ -175,7 +175,7 @@ theorem wsecTy_sound {P : Partition} :
             simp only [wexec]
             by_cases hb : evalE e σ ≠ 0
             · have hb' : evalE e σ' ≠ 0 := by rwa [hgv] at hb
-              rw [if_pos hb, if_pos hb']
+              rw [ite_eq_left hb, ite_eq_left hb']
               refine optLowEq_bind (ih c₀ hc₀ σ σ' hle) ?_
               intro r₁ r₁' hs₁ hcost₁ htr₁
               refine optLowEq_map
@@ -183,7 +183,7 @@ theorem wsecTy_sound {P : Partition} :
               intro r₂ r₂' hs₂ hcost₂ htr₂
               exact ⟨hs₂, by rw [hcost₁, hcost₂], by rw [htr₁, htr₂]⟩
             · have hb' : ¬ evalE e σ' ≠ 0 := by rwa [hgv] at hb
-              rw [if_neg hb, if_neg hb']
+              rw [ite_eq_right hb, ite_eq_right hb']
               exact ⟨hle, rfl, rfl⟩
 
 /-! ## The executable termination-sensitive checker -/
@@ -323,18 +323,18 @@ theorem wexec_mono :
     | ite e c₁ c₂ =>
         rw [wexec_ite_eq] at h ⊢
         by_cases hb : evalE e σ ≠ 0
-        · rw [if_pos hb] at h ⊢
+        · rw [ite_eq_left hb] at h ⊢
           cases h₁ : wexec m c₁ σ with
           | none => rw [h₁] at h; simp at h
           | some r => rw [ih h₁]; rw [h₁] at h; exact h
-        · rw [if_neg hb] at h ⊢
+        · rw [ite_eq_right hb] at h ⊢
           cases h₁ : wexec m c₂ σ with
           | none => rw [h₁] at h; simp at h
           | some r => rw [ih h₁]; rw [h₁] at h; exact h
     | loop e c₀ =>
         rw [wexec_loop_eq] at h ⊢
         by_cases hb : evalE e σ ≠ 0
-        · rw [if_pos hb] at h ⊢
+        · rw [ite_eq_left hb] at h ⊢
           cases h₁ : wexec m c₀ σ with
           | none => rw [h₁] at h; simp at h
           | some r₁ =>
@@ -343,7 +343,7 @@ theorem wexec_mono :
               cases h₂ : wexec m (.loop e c₀) r₁.1 with
               | none => rw [h₂] at h; simp at h
               | some r₂ => rw [ih h₂]; rw [h₂] at h; exact h
-        · rw [if_neg hb] at h ⊢; exact h
+        · rw [ite_eq_right hb] at h ⊢; exact h
 
 theorem wexec_mono_le {c : WCmd} {σ : Store} {o : Outcome} {n : Nat}
     (h : wexec n c σ = some o) : ∀ {m : Nat}, n ≤ m → wexec m c σ = some o := by
@@ -374,14 +374,14 @@ theorem wexec_embed_eq (c : Cmd) (σ : Store) :
       · obtain ⟨n₁, h₁⟩ := ih₁ σ
         refine ⟨n₁ + 1, ?_⟩
         show wexec (n₁ + 1) (.ite e (embed c₁) (embed c₂)) σ = _
-        rw [wexec_ite_eq, if_pos hb, h₁, Option.map_some]
+        rw [wexec_ite_eq, ite_eq_left hb, h₁, Option.map_some]
         show _ = some (eval (.ite e c₁ c₂) σ)
-        simp only [eval, if_pos hb]
+        simp only [eval, ite_eq_left hb]
       · obtain ⟨n₂, h₂⟩ := ih₂ σ
         refine ⟨n₂ + 1, ?_⟩
         show wexec (n₂ + 1) (.ite e (embed c₁) (embed c₂)) σ = _
-        rw [wexec_ite_eq, if_neg hb, h₂, Option.map_some]
+        rw [wexec_ite_eq, ite_eq_right hb, h₂, Option.map_some]
         show _ = some (eval (.ite e c₁ c₂) σ)
-        simp only [eval, if_neg hb]
+        simp only [eval, ite_eq_right hb]
 
 end ConfTyping

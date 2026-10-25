@@ -131,15 +131,15 @@ theorem usecTy_sound {P : Partition} :
             refine ⟨?_, rfl, rfl⟩
             by_cases hd : s.dead = true
             · have hd' : s'.dead = true := by rwa [hdd] at hd
-              rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+              rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd⟩
             · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-              rw [if_neg hd, if_neg hd']
+              rw [ite_eq_right hd, ite_eq_right hd']
               refine ⟨?_, hrd, hdd⟩
               intro z hz
               have hzy : z ≠ x := fun h => by rw [h, hy] at hz; cases hz
               show upd s.store x (pickAddr s.freed s.fresh) z
                  = upd s'.store x (pickAddr s'.freed s'.fresh) z
-              simp only [upd, if_neg hzy]; exact hst z hz
+              simp only [upd, ite_eq_right hzy]; exact hst z hz
     | skip => exact ⟨⟨hst, hrd, hdd⟩, rfl, rfl⟩
     | check r =>
         show uOptLowEq P (uexec (m+1) (.check r) π s) (uexec (m+1) (.check r) π s')
@@ -147,21 +147,21 @@ theorem usecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           by_cases hp : π r = true
-          · rw [if_pos hp, if_pos hp]; exact ⟨hst, hrd, hdd⟩
-          · rw [if_neg hp, if_neg hp]; exact ⟨hst, hrd, rfl⟩
+          · rw [ite_eq_left hp, ite_eq_left hp]; exact ⟨hst, hrd, hdd⟩
+          · rw [ite_eq_right hp, ite_eq_right hp]; exact ⟨hst, hrd, rfl⟩
     | access r =>
         show uOptLowEq P (uexec (m+1) (.access r) π s) (uexec (m+1) (.access r) π s')
         simp only [uexec]
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           exact ⟨hst, by simp [hrd], hdd⟩
     | assign x e =>
         show uOptLowEq P (uexec (m+1) (.assign x e) π s) (uexec (m+1) (.assign x e) π s')
@@ -169,23 +169,23 @@ theorem usecTy_sound {P : Partition} :
         refine ⟨?_, rfl, rfl⟩
         by_cases hd : s.dead = true
         · have hd' : s'.dead = true := by rwa [hdd] at hd
-          rw [if_pos hd, if_pos hd']; exact ⟨hst, hrd, hdd⟩
+          rw [ite_eq_left hd, ite_eq_left hd']; exact ⟨hst, hrd, hdd⟩
         · have hd' : ¬ s'.dead = true := by rwa [hdd] at hd
-          rw [if_neg hd, if_neg hd']
+          rw [ite_eq_right hd, ite_eq_right hd']
           refine ⟨?_, hrd, hdd⟩
           cases hc with
           | assignH _ _ hx =>
               intro y hy
               have hyx : y ≠ x := fun h => by rw [h, hx] at hy; cases hy
               show upd s.store x (evalE e s.store) y = upd s'.store x (evalE e s'.store) y
-              simp only [upd, if_neg hyx]; exact hst y hy
+              simp only [upd, ite_eq_right hyx]; exact hst y hy
           | assignL _ _ he =>
               intro y hy
               show upd s.store x (evalE e s.store) y = upd s'.store x (evalE e s'.store) y
               simp only [upd]
               by_cases hxy : y = x
-              · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hst]
-              · rw [if_neg hxy, if_neg hxy]; exact hst y hy
+              · rw [ite_eq_left hxy, ite_eq_left hxy, evalE_lowEq e he hst]
+              · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hst y hy
     | seq c₁ c₂ =>
         cases hc with
         | seq hc₁ hc₂ =>
@@ -204,11 +204,11 @@ theorem usecTy_sound {P : Partition} :
             simp only [uexec]
             by_cases hb : evalE e s.store ≠ 0
             · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-              rw [if_pos hb, if_pos hb']
+              rw [ite_eq_left hb, ite_eq_left hb']
               refine uOptLowEq_map (ih c₁ h₁ π s s' ⟨hst, hrd, hdd⟩) ?_
               intro r r' hs hcs htr; exact ⟨hs, by rw [hcs], by rw [htr]⟩
             · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-              rw [if_neg hb, if_neg hb']
+              rw [ite_eq_right hb, ite_eq_right hb']
               refine uOptLowEq_map (ih c₂ h₂ π s s' ⟨hst, hrd, hdd⟩) ?_
               intro r r' hs hcs htr; exact ⟨hs, by rw [hcs], by rw [htr]⟩
     | loop e c₀ =>
@@ -219,7 +219,7 @@ theorem usecTy_sound {P : Partition} :
             simp only [uexec]
             by_cases hb : evalE e s.store ≠ 0
             · have hb' : evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-              rw [if_pos hb, if_pos hb']
+              rw [ite_eq_left hb, ite_eq_left hb']
               refine uOptLowEq_bind (ih c₀ hc₀ π s s' ⟨hst, hrd, hdd⟩) ?_
               intro r₁ r₁' hs₁ hc1 ht1
               refine uOptLowEq_map
@@ -227,7 +227,7 @@ theorem usecTy_sound {P : Partition} :
               intro r₂ r₂' hs₂ hc2 ht2
               exact ⟨hs₂, by rw [hc1, hc2], by rw [ht1, ht2]⟩
             · have hb' : ¬ evalE e s'.store ≠ 0 := by rwa [hgv] at hb
-              rw [if_neg hb, if_neg hb']
+              rw [ite_eq_right hb, ite_eq_right hb']
               exact ⟨⟨hst, hrd, hdd⟩, rfl, rfl⟩
 
 /-! ## The executable checker -/

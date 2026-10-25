@@ -99,7 +99,7 @@ theorem postclosed_collapse (R : TwoSafety) (hpost : PostClosed R) :
     left
     intro c d
     have key := hpost (fun v => if v = a then c else d) a b hab
-    rw [if_pos rfl, if_neg (Ne.symm hne)] at key
+    rw [ite_eq_left rfl, ite_eq_right (Ne.symm hne)] at key
     exact key
   · right
     intro x x' hx
@@ -263,7 +263,7 @@ theorem A3_coarsen {k : Nat} (P : (Fin k → Val) → Prop) (hP : SimA3 P)
   have heq : (fun i => (if h : ∃ j, x j = x i then x' h.choose else .int 0)) = x' := by
     funext i
     have hex : ∃ j, x j = x i := ⟨i, rfl⟩
-    rw [dif_pos hex]
+    rw [dite_eq_left hex]
     exact hle hex.choose i hex.choose_spec
   rwa [heq] at hP'
 

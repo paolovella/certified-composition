@@ -229,7 +229,7 @@ theorem poolPreserves_step {I : Store → Prop} : ∀ (i : Nat) (P : List RThrea
               intro j hj
               have : j ∈ rest := by
                 by_cases hab : (rexec ins σ t.2).2.2 = true
-                · simp only [hab, if_pos] at hj; simp at hj
+                · simp only [hab, ite_eq_left] at hj; simp at hj
                 · simp only [Bool.not_eq_true] at hab
                   simpa [hab] using hj
               exact hp t (by simp) j (by rw [hins]; exact List.mem_cons_of_mem _ this)

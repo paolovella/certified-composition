@@ -148,14 +148,14 @@ theorem fcheck_safe :
               by_cases hb : evalE e σ ≠ 0
               · obtain ⟨s', hs', hli', hbd', hds'⟩ := ih₁ V V₁ (σ, h, n, L) hV₁ hinv
                 have hexec : fexec (.ite e c₁ c₂) (σ, h, n, L) = some s' := by
-                  show (if evalE e σ ≠ 0 then _ else _) = some s'; rw [if_pos hb]; exact hs'
+                  show (if evalE e σ ≠ 0 then _ else _) = some s'; rw [ite_eq_left hb]; exact hs'
                 refine ⟨s', hexec, ?_, ?_, ?_⟩
                 · intro z hz; exact hli' z (inter_subset_left hz)
                 · intro z hz; exact hbd' z (inter_subset_left hz)
                 · intro z hz w hw; exact hds' z (inter_subset_left hz) w (inter_subset_left hw)
               · obtain ⟨s', hs', hli', hbd', hds'⟩ := ih₂ V V₂ (σ, h, n, L) hV₂ hinv
                 have hexec : fexec (.ite e c₁ c₂) (σ, h, n, L) = some s' := by
-                  show (if evalE e σ ≠ 0 then _ else _) = some s'; rw [if_neg hb]; exact hs'
+                  show (if evalE e σ ≠ 0 then _ else _) = some s'; rw [ite_eq_right hb]; exact hs'
                 refine ⟨s', hexec, ?_, ?_, ?_⟩
                 · intro z hz; exact hli' z (inter_subset_right hz)
                 · intro z hz; exact hbd' z (inter_subset_right hz)
@@ -175,7 +175,7 @@ theorem fcheck_safe :
           · have hb := (hbd z hzV).2
             have hzn : σ z ≠ (n : Int) := by omega
             have h1 : upd σ x (n : Int) z = σ z := by simp [upd, hzx]
-            rw [h1]; simp only [updB, if_neg hzn]; exact hli z hzV
+            rw [h1]; simp only [updB, ite_eq_right hzn]; exact hli z hzV
       · intro z hz
         rcases List.mem_cons.mp hz with rfl | hzV
         · have hu : upd σ z (n : Int) z = (n : Int) := by simp [upd]
@@ -201,41 +201,41 @@ theorem fcheck_safe :
         rcases key z hz with hzx | ⟨hzV, hzx, hzlt⟩
         · rcases key w hw with hwx | ⟨hwV, hwx, hwlt⟩
           · exact absurd (hzx.trans hwx.symm) hzw
-          · rw [hσx z, hσx w, if_pos hzx, if_neg hwx]; omega
+          · rw [hσx z, hσx w, ite_eq_left hzx, ite_eq_right hwx]; omega
         · rcases key w hw with hwx | ⟨hwV, hwx, hwlt⟩
-          · rw [hσx z, hσx w, if_neg hzx, if_pos hwx]; omega
-          · rw [hσx z, hσx w, if_neg hzx, if_neg hwx]; exact hds z hzV w hwV hzw
+          · rw [hσx z, hσx w, ite_eq_right hzx, ite_eq_left hwx]; omega
+          · rw [hσx z, hσx w, ite_eq_right hzx, ite_eq_right hwx]; exact hds z hzV w hwV hzw
   | free x =>
       intro V V' s hchk hinv
       obtain ⟨σ, h, n, L⟩ := s
       simp only [fcheck] at hchk
       by_cases hxV : x ∈ V
-      · rw [if_pos hxV] at hchk
+      · rw [ite_eq_left hxV] at hchk
         simp only [Option.some.injEq] at hchk; subst hchk
         obtain ⟨hli, hbd, hds⟩ := hinv
         have hlx : L (σ x) = true := hli x hxV
         refine ⟨(σ, h, n, updB L (σ x) false), ?_, ?_, ?_, ?_⟩
-        · show (if L (σ x) then _ else _) = _; rw [if_pos hlx]
+        · show (if L (σ x) then _ else _) = _; rw [ite_eq_left hlx]
         · intro z hz
           have hzx : z ≠ x := ne_of_mem_remove hz
           have hzV := mem_of_mem_remove hz
           have hne : σ z ≠ σ x := hds z hzV x hxV hzx
-          simp only [updB, if_neg hne]; exact hli z hzV
+          simp only [updB, ite_eq_right hne]; exact hli z hzV
         · intro z hz; exact hbd z (mem_of_mem_remove hz)
         · intro z hz w hw hzw
           exact hds z (mem_of_mem_remove hz) w (mem_of_mem_remove hw) hzw
-      · rw [if_neg hxV] at hchk; simp at hchk
+      · rw [ite_eq_right hxV] at hchk; simp at hchk
   | load y x =>
       intro V V' s hchk hinv
       obtain ⟨σ, h, n, L⟩ := s
       simp only [fcheck] at hchk
       by_cases hxV : x ∈ V
-      · rw [if_pos hxV] at hchk
+      · rw [ite_eq_left hxV] at hchk
         simp only [Option.some.injEq] at hchk; subst hchk
         obtain ⟨hli, hbd, hds⟩ := hinv
         have hlx : L (σ x) = true := hli x hxV
         refine ⟨(upd σ y (h (σ x)), h, n, L), ?_, ?_, ?_, ?_⟩
-        · show (if L (σ x) then _ else _) = _; rw [if_pos hlx]
+        · show (if L (σ x) then _ else _) = _; rw [ite_eq_left hlx]
         · intro z hz
           have hzy : z ≠ y := ne_of_mem_remove hz
           have := hli z (mem_of_mem_remove hz); simpa [upd, hzy] using this
@@ -247,19 +247,19 @@ theorem fcheck_safe :
           have hwy : w ≠ y := ne_of_mem_remove hw
           have := hds z (mem_of_mem_remove hz) w (mem_of_mem_remove hw) hzw
           simpa [upd, hzy, hwy] using this
-      · rw [if_neg hxV] at hchk; simp at hchk
+      · rw [ite_eq_right hxV] at hchk; simp at hchk
   | store x e =>
       intro V V' s hchk hinv
       obtain ⟨σ, h, n, L⟩ := s
       simp only [fcheck] at hchk
       by_cases hxV : x ∈ V
-      · rw [if_pos hxV] at hchk
+      · rw [ite_eq_left hxV] at hchk
         simp only [Option.some.injEq] at hchk; subst hchk
         obtain ⟨hli, hbd, hds⟩ := hinv
         have hlx : L (σ x) = true := hli x hxV
         refine ⟨(σ, updH h (σ x) (evalE e σ), n, L), ?_, hli, hbd, hds⟩
-        show (if L (σ x) then _ else _) = _; rw [if_pos hlx]
-      · rw [if_neg hxV] at hchk; simp at hchk
+        show (if L (σ x) then _ else _) = _; rw [ite_eq_left hlx]
+      · rw [ite_eq_right hxV] at hchk; simp at hchk
 
 /-- **Certified use-after-free-safe by `decide`.** From the empty tracked set a
     checked program runs to a real state — never a memory error. -/

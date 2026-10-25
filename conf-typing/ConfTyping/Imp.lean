@@ -84,8 +84,8 @@ theorem eval_step : ∀ c σ, Step c σ (eval c σ).1 (eval c σ).2.1 (eval c σ
   | .ite e c1 c2, σ => by
       simp only [eval]
       by_cases h : evalE e σ ≠ 0
-      · rw [if_pos h]; exact .ifT h (eval_step c1 σ)
-      · rw [if_neg h]; exact .ifF (by simpa using h) (eval_step c2 σ)
+      · rw [ite_eq_left h]; exact .ifT h (eval_step c1 σ)
+      · rw [ite_eq_right h]; exact .ifF (by simpa using h) (eval_step c2 σ)
 
 /-- The relation has no outcomes the evaluator misses: every derivation
     agrees with `eval`. Hence the semantics is deterministic (Sem-Det). -/
@@ -99,10 +99,10 @@ theorem step_eval : Step c σ σ' t b → (σ', t, b) = eval c σ := by
       rw [← ih1, ← ih2]
   | ifT hne _ ih =>
       simp only [eval]
-      rw [if_pos hne, ← ih]
+      rw [ite_eq_left hne, ← ih]
   | ifF heq _ ih =>
       simp only [eval]
-      rw [if_neg (by simp [heq]), ← ih]
+      rw [ite_eq_right (by simp [heq]), ← ih]
 
 /-- (Sem-Det): the instrumented semantics is deterministic. -/
 theorem determinism

@@ -62,13 +62,13 @@ theorem narrowFix_spec {f : List String → Option (List String)} :
       · rw [hf] at h; simp at h
       · rw [hf, Option.bind_some] at h
         by_cases hs : (interStr W W₁ == W) = true
-        · rw [if_pos hs] at h
+        · rw [ite_eq_left hs] at h
           simp only [Option.some.injEq] at h
           subst h
           have he : interStr W W₁ = W := by simpa using hs
           exact ⟨fun _ hx => hx, W₁, hf,
                  fun x hx => interStr_right (by rw [he]; exact hx)⟩
-        · rw [if_neg hs] at h
+        · rw [ite_eq_right hs] at h
           obtain ⟨hsub, hrest⟩ := narrowFix_spec k (interStr W W₁) W' h
           exact ⟨fun x hx => interStr_left (hsub x hx), hrest⟩
 
@@ -120,17 +120,17 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
         | load =>
             simp only [jcheckW] at h
             by_cases hx : (memStr y V && (!P y || P x)) = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h
               obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
               rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
               · exact .loadL V x y h1 (by simpa using h')
               · exact .loadH V x y h1 h'
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
         | store =>
             simp only [jcheckW] at h
             by_cases hx : (memStr x V && (P x || !P y)) = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h
               obtain ⟨h1, h2⟩ := Bool.and_eq_true _ _ |>.mp hx
               rcases Bool.or_eq_true _ _ |>.mp h2 with h' | h'
@@ -138,66 +138,66 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
               · by_cases hpp : P x = true
                 · exact .storeH V x y h1 hpp
                 · exact .storeL V x y h1 (by simpa using hpp) (by simpa using h')
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
     | sop op x e =>
         cases op with
         | set =>
             simp only [jcheckW] at h
             by_cases hx : (P x || sexprLow P e) = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h
               rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
               · exact .setH V x e h'
               · exact .setL V x e h'
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
         | emit =>
             simp only [jcheckW] at h
             by_cases hx : sexprLow P e = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h
               exact .emit V x e hx
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
     | skip => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .skip V
     | check r => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .check V r
     | access r => simp only [jcheckW, Option.some.injEq] at h; subst h; exact .access V r
     | assign x e =>
         simp only [jcheckW] at h
         by_cases hx : (P x || exprLow P e) = true
-        · rw [if_pos hx] at h
+        · rw [ite_eq_left hx] at h
           simp only [Option.some.injEq] at h; subst h
           rcases Bool.or_eq_true _ _ |>.mp hx with h' | h'
           · exact .assignH V x e h'
           · exact .assignL V x e h'
-        · rw [if_neg hx] at h; simp at h
+        · rw [ite_eq_right hx] at h; simp at h
     | memop op x =>
         cases op with
         | alloc =>
             simp only [jcheckW] at h
             by_cases hx : P x = true
-            · rw [if_pos hx] at h; simp at h
-            · rw [if_neg hx] at h
+            · rw [ite_eq_left hx] at h; simp at h
+            · rw [ite_eq_right hx] at h
               simp only [Option.some.injEq] at h; subst h
               exact .alloc V x (by simpa using hx)
         | allocS =>
             simp only [jcheckW] at h
             by_cases hx : P x = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h
               exact .allocS V x hx
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
         | deref =>
             simp only [jcheckW] at h
             by_cases hx : memStr x V = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h; exact .deref V x hx
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
         | free =>
             simp only [jcheckW] at h
             by_cases hx : memStr x V = true
-            · rw [if_pos hx] at h
+            · rw [ite_eq_left hx] at h
               simp only [Option.some.injEq] at h; subst h
               exact .free V x hx
-            · rw [if_neg hx] at h; simp at h
+            · rw [ite_eq_right hx] at h; simp at h
     | seq c₁ c₂ =>
         simp only [jcheckW] at h
         rcases e₁ : jcheckW P k V c₁ with _ | V₁
@@ -207,7 +207,7 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
     | ite e c₁ c₂ =>
         simp only [jcheckW] at h
         by_cases hg : exprLow P e = true
-        · rw [if_pos hg] at h
+        · rw [ite_eq_left hg] at h
           rcases e₁ : jcheckW P k V c₁ with _ | V₁
           · rw [e₁] at h; simp at h
           · rcases e₂ : jcheckW P k V c₂ with _ | V₂
@@ -215,14 +215,14 @@ theorem jcheckW_sound {P : Partition} : ∀ (k : Nat) (c : UCmd) (V V' : List St
             · rw [e₁, e₂] at h
               simp only [Option.some.injEq] at h; subst h
               exact .iteL e hg (ih c₁ V V₁ e₁) (ih c₂ V V₂ e₂)
-        · rw [if_neg hg] at h; simp at h
+        · rw [ite_eq_right hg] at h; simp at h
     | loop e c₀ =>
         simp only [jcheckW] at h
         by_cases hg : exprLow P e = true
-        · rw [if_pos hg] at h
+        · rw [ite_eq_left hg] at h
           obtain ⟨hsub, W₁, hbody, hWW₁⟩ := narrowFix_spec (V.length + 1) V V' h
           exact .whileW e hg hsub (ih c₀ V' W₁ hbody) hWW₁
-        · rw [if_neg hg] at h; simp at h
+        · rw [ite_eq_right hg] at h; simp at h
 
 /-- **Both guarantees, from the widened checker.** Same statement as stage 1k's, now
     available for programs whose loops change the tracked set. -/
@@ -304,6 +304,6 @@ theorem narrowing_budget_is_computed (P : Partition) (k : Nat) (V : List String)
     (e : Expr) (c : UCmd) (hg : exprLow P e = true) :
     jcheckW P (k+1) V (.loop e c)
       = narrowFix (fun W => jcheckW P k W c) (V.length + 1) V := by
-  simp only [jcheckW, if_pos hg]
+  simp only [jcheckW, ite_eq_left hg]
 
 end ConfTyping

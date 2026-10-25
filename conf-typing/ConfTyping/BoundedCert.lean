@@ -117,7 +117,7 @@ theorem bF_grows : GrowsBy id bF 20 := by
 theorem bG_safe : BSafe id bP bG 11 := by
   intro y hy hp
   simp only [bP, bG, id] at *
-  rw [if_pos (by omega)]
+  rw [ite_eq_left (by omega)]
   omega
 
 /-- **`min` is unsound.** Both parts are certified — `f` to 81, `g` to 11 — and

@@ -48,18 +48,18 @@ theorem uexec_dead_unchanged : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : US
   | n + 1, c, π, s, r, hd, h => by
       cases c with
       | memop op x =>
-          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+          simp only [uexec, ite_eq_left hd, Option.some.injEq] at h; subst h; rfl
       | sop op x e =>
-          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+          simp only [uexec, ite_eq_left hd, Option.some.injEq] at h; subst h; rfl
       | hop op x y =>
-          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+          simp only [uexec, ite_eq_left hd, Option.some.injEq] at h; subst h; rfl
       | skip => simp only [uexec, Option.some.injEq] at h; subst h; rfl
       | assign x e =>
-          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+          simp only [uexec, ite_eq_left hd, Option.some.injEq] at h; subst h; rfl
       | check q =>
-          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+          simp only [uexec, ite_eq_left hd, Option.some.injEq] at h; subst h; rfl
       | access q =>
-          simp only [uexec, if_pos hd, Option.some.injEq] at h; subst h; rfl
+          simp only [uexec, ite_eq_left hd, Option.some.injEq] at h; subst h; rfl
       | seq c₁ c₂ =>
           rw [uexec_seq_eq] at h
           rcases e₁ : uexec n c₁ π s with _ | r₁
@@ -76,12 +76,12 @@ theorem uexec_dead_unchanged : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : US
       | ite e c₁ c₂ =>
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
               subst h; exact uexec_dead_unchanged n c₁ π s r₁ hd e₁
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             · rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -89,7 +89,7 @@ theorem uexec_dead_unchanged : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : US
       | loop e c₀ =>
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₀ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁, Option.bind_some] at h
@@ -101,7 +101,7 @@ theorem uexec_dead_unchanged : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : US
                 subst h
                 have hd1 : r₁.1.dead = true := by rw [h1]; exact hd
                 exact (uexec_dead_unchanged n (.loop e c₀) π r₁.1 r₂ hd1 e₂).trans h1
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h; rfl
 
 /-- **A dead run cannot leave a loop it is already inside.** The store is frozen, so a
@@ -110,7 +110,7 @@ theorem uexec_dead_loop_diverges : ∀ (n : Nat) (e : Expr) (c : UCmd) (π : Med
     (s : UState), s.dead = true → evalE e s.store ≠ 0 → uexec n (.loop e c) π s = none
   | 0,     _, _, _, _, _,  _  => rfl
   | n + 1, e, c, π, s, hd, hg => by
-      rw [uexec_loop_eq, if_pos hg]
+      rw [uexec_loop_eq, ite_eq_left hg]
       rcases e₁ : uexec n c π s with _ | r₁
       · simp
       · have h1 : r₁.1 = s := uexec_dead_unchanged n c π s r₁ hd e₁
@@ -167,14 +167,14 @@ theorem uexec_dead_cost : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
       | ite e c₁ c₂ =>
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
               subst h
               have := uexec_dead_cost n c₁ π s r₁ hd e₁
               simp only [deadCost]; omega
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             · rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -184,7 +184,7 @@ theorem uexec_dead_cost : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
       | loop e c₀ =>
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₀ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁, Option.bind_some] at h
@@ -193,7 +193,7 @@ theorem uexec_dead_cost : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState)
               have hg1 : evalE e r₁.1.store ≠ 0 := by rw [h1]; exact hg
               rw [uexec_dead_loop_diverges n e c₀ π r₁.1 hd1 hg1] at h
               simp at h
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h; simp [deadCost]
 
 /-! ## Admitting a certified While program — loops included -/

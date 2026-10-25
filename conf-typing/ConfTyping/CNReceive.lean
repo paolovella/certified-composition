@@ -217,7 +217,7 @@ def incrAt (a : CLoc) : CStore → CStore :=
 
 theorem incrAt_modifies (a : CLoc) : ModifiesOnly (incrAt a) (fun l => l = a) := by
   intro σ l hl
-  simp only [incrAt, if_neg hl]
+  simp only [incrAt, ite_eq_right hl]
 
 /-- **`qv_ == qv`, derived.** Composing the receptions of `incr_first(p,·)` and
     an increment through `q`, every location outside `{p, q}` is left exactly as

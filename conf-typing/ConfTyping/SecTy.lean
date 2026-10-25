@@ -74,7 +74,7 @@ theorem confinement_aux {P : Partition} {pc : Bool} {c : Cmd}
       intro _ σ x hx
       show upd σ y (evalE e σ) x = σ x
       simp only [upd]
-      rw [if_neg (fun hxy : x = y => by rw [hxy, hyH] at hx; cases hx)]
+      rw [ite_eq_right (fun hxy : x = y => by rw [hxy, hyH] at hx; cases hx)]
   | assignL y e _ => intro hpc; exact absurd hpc (by decide)
   | seq h₁ h₂ ih₁ ih₂ =>
       intro hpc σ x hx
@@ -110,15 +110,15 @@ theorem secTy_boundaryNI {P : Partition} {pc : Bool} {c : Cmd}
       intro σ σ' hle x hx
       show upd σ y (evalE e σ) x = upd σ' y (evalE e σ') x
       have hxy : x ≠ y := fun hxy => by rw [hxy, hyH] at hx; cases hx
-      simp only [upd, if_neg hxy]
+      simp only [upd, ite_eq_right hxy]
       exact hle x hx
   | assignL y e he =>
       intro σ σ' hle x hx
       show upd σ y (evalE e σ) x = upd σ' y (evalE e σ') x
       simp only [upd]
       by_cases hxy : x = y
-      · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hle]
-      · rw [if_neg hxy, if_neg hxy]; exact hle x hx
+      · rw [ite_eq_left hxy, ite_eq_left hxy, evalE_lowEq e he hle]
+      · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hle x hx
   | seq _ _ ih₁ ih₂ => exact boundaryNI_seq ih₁ ih₂
   | iteL e hg _ _ ih₁ ih₂ =>
       intro σ σ' hle

@@ -120,12 +120,12 @@ theorem cost_ite {e : Expr} {c₁ c₂ : WCmd} {k : Nat}
   | succ n =>
       rw [wexec_ite_eq] at h
       by_cases hg : evalE e σ ≠ 0
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         rcases hr : wexec n c₁ σ with _ | r
         · rw [hr] at h; simp at h
         · rw [hr] at h; simp only [Option.map_some, Option.some.injEq] at h
           subst h; exact Nat.add_le_add_left (h₁ n σ r hr) 1
-      · rw [if_neg hg] at h
+      · rw [ite_eq_right hg] at h
         rcases hr : wexec n c₂ σ with _ | r
         · rw [hr] at h; simp at h
         · rw [hr] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -216,12 +216,12 @@ theorem noAssign_preserves : ∀ (n : Nat) (x : String) (c : WCmd) (σ : Store) 
             simpa [noAssign] using hna
           rw [wexec_ite_eq] at h
           by_cases hg : evalE e σ ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases hr : wexec n a σ with _ | r
             · rw [hr] at h; simp at h
             · rw [hr] at h; simp only [Option.map_some, Option.some.injEq] at h
               subst h; exact noAssign_preserves n x a σ r ha hr
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases hr : wexec n b σ with _ | r
             · rw [hr] at h; simp at h
             · rw [hr] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -230,7 +230,7 @@ theorem noAssign_preserves : ∀ (n : Nat) (x : String) (c : WCmd) (σ : Store) 
           have ha : noAssign x a = true := by simpa [noAssign] using hna
           rw [wexec_loop_eq] at h
           by_cases hg : evalE e σ ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases hr₁ : wexec n a σ with _ | r₁
             · rw [hr₁] at h; simp at h
             · rw [hr₁, Option.bind_some] at h
@@ -240,7 +240,7 @@ theorem noAssign_preserves : ∀ (n : Nat) (x : String) (c : WCmd) (σ : Store) 
                 subst h
                 rw [noAssign_preserves n x (.loop e a) r₁.1 r₂ hna hr₂,
                     noAssign_preserves n x a σ r₁ ha hr₁]
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h; rfl
 
 /-- Decrement `x` by one. -/
@@ -273,7 +273,7 @@ theorem countdown_turn {x : String} {c : WCmd} {kc : Nat}
               simp only [dec1, wexec, Option.some.injEq] at hd
               subst hd
               refine ⟨by simpa using Nat.add_le_add_right hcost 1, ?_⟩
-              simp only [upd, evalE, hcx, if_true]
+              simp only [upd, evalE, hcx, ite_true]
               omega
 
 /-- **The loop bound is input-dependent.** With a counter the body never touches, the
@@ -288,7 +288,7 @@ theorem countdown_cost {x : String} {c : WCmd} {kc : Nat}
   | n + 1, σ, o, hpos, h => by
       rw [countdown, wexec_loop_eq] at h
       by_cases hg : evalE (.var x) σ ≠ 0
-      · rw [if_pos hg] at h
+      · rw [ite_eq_left hg] at h
         rcases hb : wexec n (.seq c (dec1 x)) σ with _ | r₁
         · rw [hb] at h; simp at h
         · rw [hb, Option.bind_some] at h
@@ -308,7 +308,7 @@ theorem countdown_cost {x : String} {c : WCmd} {kc : Nat}
             show 1 + r₁.2.1 + r₂.2.1 ≤ 1 + (σ x).toNat * (kc + 3)
             rw [hmul]
             omega
-      · rw [if_neg hg] at h
+      · rw [ite_eq_right hg] at h
         simp only [Option.some.injEq] at h
         subst h
         exact Nat.le_add_right 1 _
@@ -352,7 +352,7 @@ theorem spinU_cost_lb : ∀ v : Nat, ∃ (n : Nat) (o : Outcome),
         simp [evalE, ctrStore, upd] <;> omega
       refine ⟨max 2 n₀ + 1, (o₀.1, 1 + 2 + o₀.2.1, true :: ([] ++ o₀.2.2)), ?_,
         by simp only []; omega⟩
-      rw [spinU, countdown, wexec_loop_eq, if_pos hg, hb, Option.bind_some, hr]
+      rw [spinU, countdown, wexec_loop_eq, ite_eq_left hg, hb, Option.bind_some, hr]
       rfl
 
 /-- **Algorithmic-complexity DoS, as a theorem.** No uniform budget exists: for every

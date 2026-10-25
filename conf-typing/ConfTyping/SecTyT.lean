@@ -70,7 +70,7 @@ theorem secTyT_outNI {P : Partition} {c : Cmd} (h : SecTyT P c) : OutNI c P := b
       intro y hy
       have hyx : y ≠ x := fun h => by rw [h, hx] at hy; cases hy
       show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
-      simp only [upd, if_neg hyx]
+      simp only [upd, ite_eq_right hyx]
       exact hle y hy
   | assignL x e he =>
       intro σ σ' hle
@@ -79,8 +79,8 @@ theorem secTyT_outNI {P : Partition} {c : Cmd} (h : SecTyT P c) : OutNI c P := b
       show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
       simp only [upd]
       by_cases hyx : y = x
-      · rw [if_pos hyx, if_pos hyx, evalE_lowEq e he hle]
-      · rw [if_neg hyx, if_neg hyx]; exact hle y hy
+      · rw [ite_eq_left hyx, ite_eq_left hyx, evalE_lowEq e he hle]
+      · rw [ite_eq_right hyx, ite_eq_right hyx]; exact hle y hy
   | seq h₁ h₂ ih₁ ih₂ =>
       intro σ σ' hle
       obtain ⟨hs₁, hc₁, ht₁⟩ := ih₁ σ σ' hle
@@ -100,20 +100,20 @@ theorem secTyT_outNI {P : Partition} {c : Cmd} (h : SecTyT P c) : OutNI c P := b
         obtain ⟨hs, hc, ht⟩ := ih₁ σ σ' hle
         refine ⟨?_, ?_, ?_⟩
         · show lowEq P (eval (.ite e _ _) σ).1 (eval (.ite e _ _) σ').1
-          simp only [eval, if_pos hb, if_pos hb']; exact hs
+          simp only [eval, ite_eq_left hb, ite_eq_left hb']; exact hs
         · show (eval (.ite e _ _) σ).2.1 = (eval (.ite e _ _) σ').2.1
-          simp only [eval, if_pos hb, if_pos hb']; rw [hc]
+          simp only [eval, ite_eq_left hb, ite_eq_left hb']; rw [hc]
         · show (eval (.ite e _ _) σ).2.2 = (eval (.ite e _ _) σ').2.2
-          simp only [eval, if_pos hb, if_pos hb']; rw [ht]
+          simp only [eval, ite_eq_left hb, ite_eq_left hb']; rw [ht]
       · have hb' : ¬ evalE e σ' ≠ 0 := by rwa [hgv] at hb
         obtain ⟨hs, hc, ht⟩ := ih₂ σ σ' hle
         refine ⟨?_, ?_, ?_⟩
         · show lowEq P (eval (.ite e _ _) σ).1 (eval (.ite e _ _) σ').1
-          simp only [eval, if_neg hb, if_neg hb']; exact hs
+          simp only [eval, ite_eq_right hb, ite_eq_right hb']; exact hs
         · show (eval (.ite e _ _) σ).2.1 = (eval (.ite e _ _) σ').2.1
-          simp only [eval, if_neg hb, if_neg hb']; rw [hc]
+          simp only [eval, ite_eq_right hb, ite_eq_right hb']; rw [hc]
         · show (eval (.ite e _ _) σ).2.2 = (eval (.ite e _ _) σ').2.2
-          simp only [eval, if_neg hb, if_neg hb']; rw [ht]
+          simp only [eval, ite_eq_right hb, ite_eq_right hb']; rw [ht]
 
 /-- The full-outcome predicate is the channel claim `J_NI c (outO P) P`. -/
 theorem outNI_to_JNI {P : Partition} {c : Cmd} (h : OutNI c P) :
@@ -126,7 +126,7 @@ theorem outNI_to_JNI {P : Partition} {c : Cmd} (h : OutNI c P) :
     funext y
     cases hPy : P y with
     | true  => simp
-    | false => simp only [Bool.false_eq_true, if_false]; exact hs y hPy
+    | false => simp only [Bool.false_eq_true, ite_false]; exact hs y hPy
   · rw [hc, ht]
 
 /-- **Soundness.** A timing-sensitively typed component's whole instrumented

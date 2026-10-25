@@ -114,8 +114,8 @@ theorem qcheck_ni :
       refine ⟨fun z hz => ?_, hrel.2⟩
       simp only [qexec, updS]
       by_cases hzx : z = x
-      · rw [if_pos hzx, if_pos hzx]
-      · rw [if_neg hzx, if_neg hzx]
+      · rw [ite_eq_left hzx, ite_eq_left hzx]
+      · rw [ite_eq_right hzx, ite_eq_right hzx]
         exact hrel.1 z (fun hzT => hz (mem_vremove hzT hzx))
   | input x =>
       intro T T' inp inp' st st' hchk hrel
@@ -123,32 +123,32 @@ theorem qcheck_ni :
       refine ⟨fun z hz => ?_, hrel.2⟩
       have hzx : z ≠ x := fun e => by rw [e] at hz; exact hz (by simp)
       have hzT : z ∉ T := fun h => hz (List.mem_cons_of_mem x h)
-      simp only [qexec, updS, if_neg hzx]
+      simp only [qexec, updS, ite_eq_right hzx]
       exact hrel.1 z hzT
   | concat x y z =>
       intro T T' inp inp' st st' hchk hrel
       simp only [qcheck, Option.some.injEq] at hchk
       by_cases hyz : (decide (y ∈ T) || decide (z ∈ T)) = true
-      · rw [if_pos hyz] at hchk; subst hchk
+      · rw [ite_eq_left hyz] at hchk; subst hchk
         refine ⟨fun w hw => ?_, hrel.2⟩
         have hwx : w ≠ x := fun e => by rw [e] at hw; exact hw (by simp)
         have hwT : w ∉ T := fun h => hw (List.mem_cons_of_mem x h)
-        simp only [qexec, updS, if_neg hwx]
+        simp only [qexec, updS, ite_eq_right hwx]
         exact hrel.1 w hwT
-      · rw [if_neg hyz] at hchk; subst hchk
+      · rw [ite_eq_right hyz] at hchk; subst hchk
         simp only [Bool.or_eq_true, decide_eq_true_eq, not_or] at hyz
         refine ⟨fun w hw => ?_, hrel.2⟩
         simp only [qexec, updS]
         by_cases hwx : w = x
-        · rw [if_pos hwx, if_pos hwx, hrel.1 y hyz.1, hrel.1 z hyz.2]
-        · rw [if_neg hwx, if_neg hwx]
+        · rw [ite_eq_left hwx, ite_eq_left hwx, hrel.1 y hyz.1, hrel.1 z hyz.2]
+        · rw [ite_eq_right hwx, ite_eq_right hwx]
           exact hrel.1 w (fun hwT => hw (mem_vremove hwT hwx))
   | emitC x =>
       intro T T' inp inp' st st' hchk hrel
       simp only [qcheck] at hchk
       by_cases hxT : x ∈ T
-      · rw [if_pos hxT] at hchk; simp at hchk
-      · rw [if_neg hxT, Option.some.injEq] at hchk; subst hchk
+      · rw [ite_eq_left hxT] at hchk; simp at hchk
+      · rw [ite_eq_right hxT, Option.some.injEq] at hchk; subst hchk
         refine ⟨hrel.1, ?_⟩
         simp only [qexec]
         rw [hrel.2, hrel.1 x hxT]

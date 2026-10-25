@@ -138,11 +138,11 @@ theorem interStr_left : ∀ {A B : List String} {r : String},
   | [],      _, _, h => by simp [interStr] at h
   | x :: xs, B, r, h => by
       by_cases hx : memStr x B = true
-      · rw [interStr, if_pos hx] at h
+      · rw [interStr, ite_eq_left hx] at h
         rcases List.mem_cons.mp h with h' | h'
         · exact h' ▸ List.mem_cons_self ..
         · exact List.mem_cons_of_mem _ (interStr_left h')
-      · rw [interStr, if_neg hx] at h
+      · rw [interStr, ite_eq_right hx] at h
         exact List.mem_cons_of_mem _ (interStr_left h)
 
 theorem interStr_right : ∀ {A B : List String} {r : String},
@@ -150,11 +150,11 @@ theorem interStr_right : ∀ {A B : List String} {r : String},
   | [],      _, _, h => by simp [interStr] at h
   | x :: xs, B, r, h => by
       by_cases hx : memStr x B = true
-      · rw [interStr, if_pos hx] at h
+      · rw [interStr, ite_eq_left hx] at h
         rcases List.mem_cons.mp h with h' | h'
         · exact h' ▸ memStr_mem hx
         · exact interStr_right h'
-      · rw [interStr, if_neg hx] at h
+      · rw [interStr, ite_eq_right hx] at h
         exact interStr_right h
 
 /-! ## The decidable analysis -/
@@ -198,12 +198,12 @@ theorem medStep_inv {π : MedPolicy} {A A' : List String} {s : MedState} {b : Me
       simp only [medBase, Option.some.injEq] at hb
       subst hb
       by_cases hdead : s.dead = true
-      · simp only [medStep, if_pos hdead]
+      · simp only [medStep, ite_eq_left hdead]
         exact ⟨ha, hr, fun hc => absurd (hdead ▸ hc) (by simp)⟩
       · have hd0 : s.dead = false := by simpa using hdead
-        simp only [medStep, if_neg hdead]
+        simp only [medStep, ite_eq_right hdead]
         by_cases hp : π r = true
-        · simp only [if_pos hp]
+        · simp only [ite_eq_left hp]
           refine ⟨?_, hr, ?_⟩
           · intro q hq
             rcases List.mem_cons.mp hq with h | h
@@ -213,25 +213,25 @@ theorem medStep_inv {π : MedPolicy} {A A' : List String} {s : MedState} {b : Me
             rcases List.mem_cons.mp hq with h | h
             · exact h ▸ List.mem_cons_self ..
             · exact List.mem_cons_of_mem _ (hd hd0 q h)
-        · simp only [if_neg hp]
+        · simp only [ite_eq_right hp]
           exact ⟨ha, hr, fun hc => absurd hc (by simp)⟩
   | access r =>
       simp only [medBase] at hb
       by_cases hmem : memStr r A = true
-      · rw [if_pos hmem] at hb
+      · rw [ite_eq_left hmem] at hb
         simp only [Option.some.injEq] at hb
         subst hb
         by_cases hdead : s.dead = true
-        · simp only [medStep, if_pos hdead]
+        · simp only [medStep, ite_eq_left hdead]
           exact ⟨ha, hr, hd⟩
         · have hd0 : s.dead = false := by simpa using hdead
-          simp only [medStep, if_neg hdead]
+          simp only [medStep, ite_eq_right hdead]
           refine ⟨ha, ?_, hd⟩
           intro q hq
           rcases List.mem_cons.mp hq with h | h
           · exact h ▸ ha r (hd hd0 r (memStr_mem hmem))
           · exact hr q h
-      · rw [if_neg hmem] at hb; simp at hb
+      · rw [ite_eq_right hmem] at hb; simp at hb
 
 theorem medRunBody_inv {π : MedPolicy} : ∀ (bs : List MedBase) (A A' : List String)
     (s : MedState), MedInv π A s → medBase A bs = some A' →
@@ -249,10 +249,10 @@ theorem medRunBody_inv {π : MedPolicy} : ∀ (bs : List MedBase) (A A' : List S
       | access r =>
           simp only [medBase] at hb
           by_cases hmem : memStr r A = true
-          · rw [if_pos hmem] at hb
+          · rw [ite_eq_left hmem] at hb
             refine medRunBody_inv bs A A' _ (medStep_inv hinv ?_) hb
-            simp only [medBase, if_pos hmem]
-          · rw [if_neg hmem] at hb; simp at hb
+            simp only [medBase, ite_eq_left hmem]
+          · rw [ite_eq_right hmem] at hb; simp at hb
 
 /-- Intersecting at a join keeps only what **both** branches guarantee — so the
     invariant survives whichever branch actually ran. -/
@@ -286,10 +286,10 @@ theorem medRun_inv {π : MedPolicy} : ∀ (p : List MedInstr) (path : List Bool)
         · rw [hx, hy] at hc
           simp only [medRun]
           by_cases hp : path.headD true
-          · simp only [if_pos hp]
+          · simp only [ite_eq_left hp]
             exact medRun_inv is (path.tailD []) _ A' _
               (inv_of_interL (medRunBody_inv x A A₁ s hinv hx)) hc
-          · simp only [if_neg hp]
+          · simp only [ite_eq_right hp]
             exact medRun_inv is (path.tailD []) _ A' _
               (inv_of_interR (medRunBody_inv y A A₂ s hinv hy)) hc
 

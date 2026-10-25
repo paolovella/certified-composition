@@ -72,7 +72,7 @@ theorem TaintCert.loop {C C₁ : TaintEnv} {e : Expr} {c : UCmd} {Ks : List Nat}
         intro π s r hinv hr
         rw [uexec_loop_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec m c π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁, Option.bind_some] at hr
@@ -82,7 +82,7 @@ theorem TaintCert.loop {C C₁ : TaintEnv} {e : Expr} {c : UCmd} {Ks : List Nat}
               simp only [Option.map_some, Option.some.injEq] at hr
               subst hr
               exact ihm π r₁.1 r₂ (hb.env m π s r₁ hinv e₁) e₂
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           simp only [Option.some.injEq] at hr; subst hr; exact hinv
   · intro n
     induction n with
@@ -91,7 +91,7 @@ theorem TaintCert.loop {C C₁ : TaintEnv} {e : Expr} {c : UCmd} {Ks : List Nat}
         intro π s r hinv hr t ht
         rw [uexec_loop_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec m c π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁, Option.bind_some] at hr
@@ -104,7 +104,7 @@ theorem TaintCert.loop {C C₁ : TaintEnv} {e : Expr} {c : UCmd} {Ks : List Nat}
               rcases ihm π r₁.1 r₂ hi₁ e₂ t ht with h' | h'
               · exact hb.sink m π s r₁ hinv e₁ t h'
               · exact Or.inr h'
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           simp only [Option.some.injEq] at hr; subst hr; exact Or.inl ht
 
 theorem PathCert.loop {fs : String} {C C₁ : TaintEnv} {e : Expr} {c : UCmd}
@@ -119,7 +119,7 @@ theorem PathCert.loop {fs : String} {C C₁ : TaintEnv} {e : Expr} {c : UCmd}
         intro π s r hinv hr
         rw [uexec_loop_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec m c π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁, Option.bind_some] at hr
@@ -129,7 +129,7 @@ theorem PathCert.loop {fs : String} {C C₁ : TaintEnv} {e : Expr} {c : UCmd}
               simp only [Option.map_some, Option.some.injEq] at hr
               subst hr
               exact ihm π r₁.1 r₂ (hb.env m π s r₁ hinv e₁) e₂
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           simp only [Option.some.injEq] at hr; subst hr; exact hinv
   · intro n
     induction n with
@@ -138,7 +138,7 @@ theorem PathCert.loop {fs : String} {C C₁ : TaintEnv} {e : Expr} {c : UCmd}
         intro π s r hinv hr t ht
         rw [uexec_loop_eq] at hr
         by_cases hg : evalE e s.store ≠ 0
-        · rw [if_pos hg] at hr
+        · rw [ite_eq_left hg] at hr
           rcases e₁ : uexec m c π s with _ | r₁
           · rw [e₁] at hr; simp at hr
           · rw [e₁, Option.bind_some] at hr
@@ -151,7 +151,7 @@ theorem PathCert.loop {fs : String} {C C₁ : TaintEnv} {e : Expr} {c : UCmd}
               rcases ihm π r₁.1 r₂ hi₁ e₂ t ht with h' | h'
               · exact hb.path m π s r₁ hinv e₁ t h'
               · exact Or.inr h'
-        · rw [if_neg hg] at hr
+        · rw [ite_eq_right hg] at hr
           simp only [Option.some.injEq] at hr; subst hr; exact Or.inl ht
 
 /-! ## Narrowing the environment -/
@@ -173,13 +173,13 @@ theorem narrowEnv_spec {f : TaintEnv → Option TaintEnv} :
       · rw [hf] at h; simp at h
       · rw [hf, Option.bind_some] at h
         by_cases hs : (interNat C C₁ == C) = true
-        · rw [if_pos hs] at h
+        · rw [ite_eq_left hs] at h
           simp only [Option.some.injEq] at h
           subst h
           have he : interNat C C₁ = C := by simpa using hs
           exact ⟨fun _ hp => hp, C₁, hf,
                  fun p hp => interNat_right (by rw [he]; exact hp)⟩
-        · rw [if_neg hs] at h
+        · rw [ite_eq_right hs] at h
           obtain ⟨hsub, hrest⟩ := narrowEnv_spec k (interNat C C₁) C' h
           exact ⟨fun p hp => interNat_left (hsub p hp), hrest⟩
 
@@ -355,13 +355,13 @@ theorem pcheckW_sound (fs : String) : ∀ (k : Nat) (c : UCmd) (C C' : TaintEnv)
         | emit =>
             simp only [pcheckW] at h
             by_cases hq : (x == fs) = true
-            · rw [if_pos hq] at h
+            · rw [ite_eq_left hq] at h
               rcases hd : spath C 0 e with _ | d
               · rw [hd] at h; simp at h
               · rw [hd] at h
                 simp only [Option.some.injEq] at h; subst h
                 exact PathCert.emit x e d hd
-            · rw [if_neg hq] at h
+            · rw [ite_eq_right hq] at h
               simp only [Option.some.injEq] at h; subst h
               exact PathCert.emitElsewhere x e (by simpa using hq)
     | seq c₁ c₂ =>

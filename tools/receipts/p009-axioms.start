@@ -1,0 +1,4 @@
+started: 2026-10-25T15:41:03+01:00
+head: 163439a
+command: bash tools/axioms.sh --check
+log: tools/receipts/p009-axioms.log

@@ -204,47 +204,47 @@ theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
       | assign x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; simp
-          · simp only [if_neg hd]; simp
+          · simp only [ite_eq_left hd]; simp
+          · simp only [ite_eq_right hd]; simp
       | check q =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; simp
-          · simp only [if_neg hd]
+          · simp only [ite_eq_left hd]; simp
+          · simp only [ite_eq_right hd]
             by_cases hp : π q = true
-            · simp only [if_pos hp]; simp
-            · simp only [if_neg hp]; simp
+            · simp only [ite_eq_left hp]; simp
+            · simp only [ite_eq_right hp]; simp
       | access q =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; simp
-          · simp only [if_neg hd]; simp
+          · simp only [ite_eq_left hd]; simp
+          · simp only [ite_eq_right hd]; simp
       | sop op x e =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; simp
-          · simp only [if_neg hd]; cases op with
+          · simp only [ite_eq_left hd]; simp
+          · simp only [ite_eq_right hd]; cases op with
             | set  => simp
             | emit => simp
       | hop op x y =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; simp
-          · simp only [if_neg hd]
+          · simp only [ite_eq_left hd]; simp
+          · simp only [ite_eq_right hd]
             cases op with
             | load =>
                 by_cases hl : memInt (s.store y) s.live = true
-                · simp only [if_pos hl]; simp
-                · simp only [if_neg hl]; simp
+                · simp only [ite_eq_left hl]; simp
+                · simp only [ite_eq_right hl]; simp
             | store =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; simp
-                · simp only [if_neg hl]; simp
+                · simp only [ite_eq_left hl]; simp
+                · simp only [ite_eq_right hl]; simp
       | memop op x =>
           simp only [uexec, Option.some.injEq] at h; subst h
           by_cases hd : s.dead = true
-          · simp only [if_pos hd]; simp
-          · simp only [if_neg hd]
+          · simp only [ite_eq_left hd]; simp
+          · simp only [ite_eq_right hd]
             cases op with
             | alloc =>
                 show s.fresh ≤ bumpFresh s.freed s.fresh
@@ -258,12 +258,12 @@ theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
                 | cons _ _ => exact Int.le_refl _
             | deref =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; simp
-                · simp only [if_neg hl]; simp
+                · simp only [ite_eq_left hl]; simp
+                · simp only [ite_eq_right hl]; simp
             | free =>
                 by_cases hl : memInt (s.store x) s.live = true
-                · simp only [if_pos hl]; simp
-                · simp only [if_neg hl]; simp
+                · simp only [ite_eq_left hl]; simp
+                · simp only [ite_eq_right hl]; simp
       | seq c₁ c₂ =>
           rw [uexec_seq_eq] at h
           rcases e₁ : uexec n c₁ π s with _ | r₁
@@ -279,12 +279,12 @@ theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
       | ite e c₁ c₂ =>
           rw [uexec_ite_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₁ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁] at h; simp only [Option.map_some, Option.some.injEq] at h
               subst h; exact uexec_fresh_mono n c₁ π s r₁ e₁
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             rcases e₂ : uexec n c₂ π s with _ | r₂
             · rw [e₂] at h; simp at h
             · rw [e₂] at h; simp only [Option.map_some, Option.some.injEq] at h
@@ -292,7 +292,7 @@ theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
       | loop e c₀ =>
           rw [uexec_loop_eq] at h
           by_cases hg : evalE e s.store ≠ 0
-          · rw [if_pos hg] at h
+          · rw [ite_eq_left hg] at h
             rcases e₁ : uexec n c₀ π s with _ | r₁
             · rw [e₁] at h; simp at h
             · rw [e₁, Option.bind_some] at h
@@ -303,7 +303,7 @@ theorem uexec_fresh_mono : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState
                 subst h
                 exact Int.le_trans (uexec_fresh_mono n c₀ π s r₁ e₁)
                   (uexec_fresh_mono n (.loop e c₀) π r₁.1 r₂ e₂)
-          · rw [if_neg hg] at h
+          · rw [ite_eq_right hg] at h
             simp only [Option.some.injEq] at h; subst h; simp
 
 /-! **Defect 2, and what became of it.** When this was written, `uexec` never read or

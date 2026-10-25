@@ -179,38 +179,38 @@ theorem scheckA_ni {inp inp' : Int} {a : Atom} {T T' : List Nat} {s s' : SState}
       refine ⟨fun z hz => ?_, hrel.2⟩
       have hzx : z ≠ x := fun e => by rw [e] at hz; exact hz (by simp)
       have hzT : z ∉ T := fun h => hz (List.mem_cons_of_mem x h)
-      simp only [execA, supd, if_neg hzx]; exact hrel.1 z hzT
+      simp only [execA, supd, ite_eq_right hzx]; exact hrel.1 z hzT
   | const x =>
       simp only [scheckA, Option.some.injEq] at hchk; subst hchk
       refine ⟨fun z hz => ?_, hrel.2⟩
       simp only [execA, supd]
       by_cases hzx : z = x
-      · rw [if_pos hzx, if_pos hzx]
-      · rw [if_neg hzx, if_neg hzx]
+      · rw [ite_eq_left hzx, ite_eq_left hzx]
+      · rw [ite_eq_right hzx, ite_eq_right hzx]
         exact hrel.1 z (fun hzT => hz (List.mem_filter.mpr ⟨hzT, by simp [hzx]⟩))
   | cat x y z =>
       simp only [scheckA, Option.some.injEq] at hchk
       by_cases hyz : (decide (y ∈ T) || decide (z ∈ T)) = true
-      · rw [if_pos hyz] at hchk; subst hchk
+      · rw [ite_eq_left hyz] at hchk; subst hchk
         refine ⟨fun w hw => ?_, hrel.2⟩
         have hwx : w ≠ x := fun e => by rw [e] at hw; exact hw (by simp)
         have hwT : w ∉ T := fun h => hw (List.mem_cons_of_mem x h)
-        simp only [execA, supd, if_neg hwx]; exact hrel.1 w hwT
-      · rw [if_neg hyz] at hchk; subst hchk
+        simp only [execA, supd, ite_eq_right hwx]; exact hrel.1 w hwT
+      · rw [ite_eq_right hyz] at hchk; subst hchk
         simp only [Bool.or_eq_true, decide_eq_true_eq, not_or] at hyz
         refine ⟨fun w hw => ?_, hrel.2⟩
         simp only [execA, supd]
         by_cases hwx : w = x
         · have hy : σ y = σ' y := hrel.1 y hyz.1
           have hz : σ z = σ' z := hrel.1 z hyz.2
-          rw [if_pos hwx, if_pos hwx, hy, hz]
-        · rw [if_neg hwx, if_neg hwx]
+          rw [ite_eq_left hwx, ite_eq_left hwx, hy, hz]
+        · rw [ite_eq_right hwx, ite_eq_right hwx]
           exact hrel.1 w (fun hwT => hw (List.mem_filter.mpr ⟨hwT, by simp [hwx]⟩))
   | emit x =>
       simp only [scheckA] at hchk
       by_cases hxT : x ∈ T
-      · rw [if_pos hxT] at hchk; simp at hchk
-      · rw [if_neg hxT, Option.some.injEq] at hchk; subst hchk
+      · rw [ite_eq_left hxT] at hchk; simp at hchk
+      · rw [ite_eq_right hxT, Option.some.injEq] at hchk; subst hchk
         refine ⟨hrel.1, ?_⟩
         have ho : o = o' := hrel.2
         have hx : σ x = σ' x := hrel.1 x hxT

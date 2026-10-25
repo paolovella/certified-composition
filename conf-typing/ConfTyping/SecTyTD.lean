@@ -63,7 +63,7 @@ theorem iteTD_aux {P : Partition} {e : Expr} {c₁ c₂ : Cmd}
     OutReleases (.ite e c₁ c₂) P (relOf P (.ite e c₁ c₂)) := by
   intro σ σ' hle hφ
   by_cases hg : exprLow P e = true
-  · simp only [relOf, if_pos hg] at hφ
+  · simp only [relOf, ite_eq_left hg] at hφ
     injection hφ with hφ₁ hφ₂
     have hgv : evalE e σ = evalE e σ' := evalE_lowEq e hg hle
     by_cases hb : evalE e σ ≠ 0
@@ -71,21 +71,21 @@ theorem iteTD_aux {P : Partition} {e : Expr} {c₁ c₂ : Cmd}
       obtain ⟨hs, hc, ht⟩ := ih₁ σ σ' hle hφ₁
       refine ⟨?_, ?_, ?_⟩
       · show lowEq P (eval (.ite e c₁ c₂) σ).1 (eval (.ite e c₁ c₂) σ').1
-        simp only [eval, if_pos hb, if_pos hb']; exact hs
+        simp only [eval, ite_eq_left hb, ite_eq_left hb']; exact hs
       · show (eval (.ite e c₁ c₂) σ).2.1 = (eval (.ite e c₁ c₂) σ').2.1
-        simp only [eval, if_pos hb, if_pos hb']; rw [hc]
+        simp only [eval, ite_eq_left hb, ite_eq_left hb']; rw [hc]
       · show (eval (.ite e c₁ c₂) σ).2.2 = (eval (.ite e c₁ c₂) σ').2.2
-        simp only [eval, if_pos hb, if_pos hb']; rw [ht]
+        simp only [eval, ite_eq_left hb, ite_eq_left hb']; rw [ht]
     · have hb' : ¬ evalE e σ' ≠ 0 := by rwa [hgv] at hb
       obtain ⟨hs, hc, ht⟩ := ih₂ σ σ' hle hφ₂
       refine ⟨?_, ?_, ?_⟩
       · show lowEq P (eval (.ite e c₁ c₂) σ).1 (eval (.ite e c₁ c₂) σ').1
-        simp only [eval, if_neg hb, if_neg hb']; exact hs
+        simp only [eval, ite_eq_right hb, ite_eq_right hb']; exact hs
       · show (eval (.ite e c₁ c₂) σ).2.1 = (eval (.ite e c₁ c₂) σ').2.1
-        simp only [eval, if_neg hb, if_neg hb']; rw [hc]
+        simp only [eval, ite_eq_right hb, ite_eq_right hb']; rw [hc]
       · show (eval (.ite e c₁ c₂) σ).2.2 = (eval (.ite e c₁ c₂) σ').2.2
-        simp only [eval, if_neg hb, if_neg hb']; rw [ht]
-  · simp only [relOf, if_neg hg] at hφ
+        simp only [eval, ite_eq_right hb, ite_eq_right hb']; rw [ht]
+  · simp only [relOf, ite_eq_right hg] at hφ
     injection hφ with hbit hφr
     injection hφr with hφ₁ hφ₂
     injection hbit with hbit
@@ -97,20 +97,20 @@ theorem iteTD_aux {P : Partition} {e : Expr} {c₁ c₂ : Cmd}
       obtain ⟨hs, hc, ht⟩ := ih₁ σ σ' hle hφ₁
       refine ⟨?_, ?_, ?_⟩
       · show lowEq P (eval (.ite e c₁ c₂) σ).1 (eval (.ite e c₁ c₂) σ').1
-        simp only [eval, if_pos hb, if_pos hb']; exact hs
+        simp only [eval, ite_eq_left hb, ite_eq_left hb']; exact hs
       · show (eval (.ite e c₁ c₂) σ).2.1 = (eval (.ite e c₁ c₂) σ').2.1
-        simp only [eval, if_pos hb, if_pos hb']; rw [hc]
+        simp only [eval, ite_eq_left hb, ite_eq_left hb']; rw [hc]
       · show (eval (.ite e c₁ c₂) σ).2.2 = (eval (.ite e c₁ c₂) σ').2.2
-        simp only [eval, if_pos hb, if_pos hb']; rw [ht]
+        simp only [eval, ite_eq_left hb, ite_eq_left hb']; rw [ht]
     · have hb' : ¬ evalE e σ' ≠ 0 := fun h => hb (hbb.mpr h)
       obtain ⟨hs, hc, ht⟩ := ih₂ σ σ' hle hφ₂
       refine ⟨?_, ?_, ?_⟩
       · show lowEq P (eval (.ite e c₁ c₂) σ).1 (eval (.ite e c₁ c₂) σ').1
-        simp only [eval, if_neg hb, if_neg hb']; exact hs
+        simp only [eval, ite_eq_right hb, ite_eq_right hb']; exact hs
       · show (eval (.ite e c₁ c₂) σ).2.1 = (eval (.ite e c₁ c₂) σ').2.1
-        simp only [eval, if_neg hb, if_neg hb']; rw [hc]
+        simp only [eval, ite_eq_right hb, ite_eq_right hb']; rw [hc]
       · show (eval (.ite e c₁ c₂) σ).2.2 = (eval (.ite e c₁ c₂) σ').2.2
-        simp only [eval, if_neg hb, if_neg hb']; rw [ht]
+        simp only [eval, ite_eq_right hb, ite_eq_right hb']; rw [ht]
 
 theorem secTyTD_outReleases {P : Partition} {Δ : List Permit} {c : Cmd}
     (h : SecTyTD P Δ c) : OutReleases c P (relOf P c) := by
@@ -122,7 +122,7 @@ theorem secTyTD_outReleases {P : Partition} {Δ : List Permit} {c : Cmd}
       intro y hy
       have hyx : y ≠ x := fun h => by rw [h, hx] at hy; cases hy
       show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
-      simp only [upd, if_neg hyx]; exact hle y hy
+      simp only [upd, ite_eq_right hyx]; exact hle y hy
   | assignL x e he =>
       intro σ σ' hle _
       refine ⟨?_, rfl, rfl⟩
@@ -130,8 +130,8 @@ theorem secTyTD_outReleases {P : Partition} {Δ : List Permit} {c : Cmd}
       show upd σ x (evalE e σ) y = upd σ' x (evalE e σ') y
       simp only [upd]
       by_cases hxy : y = x
-      · rw [if_pos hxy, if_pos hxy, evalE_lowEq e he hle]
-      · rw [if_neg hxy, if_neg hxy]; exact hle y hy
+      · rw [ite_eq_left hxy, ite_eq_left hxy, evalE_lowEq e he hle]
+      · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hle y hy
   | assignD x e _ =>
       intro σ σ' hle hφ
       refine ⟨?_, rfl, rfl⟩
@@ -140,11 +140,11 @@ theorem secTyTD_outReleases {P : Partition} {Δ : List Permit} {c : Cmd}
       have hev : evalE e σ = evalE e σ' := by
         by_cases hl : exprLow P e = true
         · exact evalE_lowEq e hl hle
-        · simp only [relOf, if_neg hl] at hφ; injection hφ
+        · simp only [relOf, ite_eq_right hl] at hφ; injection hφ
       simp only [upd, hev]
       by_cases hxy : y = x
-      · rw [if_pos hxy, if_pos hxy]
-      · rw [if_neg hxy, if_neg hxy]; exact hle y hy
+      · rw [ite_eq_left hxy, ite_eq_left hxy]
+      · rw [ite_eq_right hxy, ite_eq_right hxy]; exact hle y hy
   | seq h₁ h₂ ih₁ ih₂ =>
       intro σ σ' hle hφ
       simp only [relOf, seqRelease] at hφ
@@ -173,7 +173,7 @@ theorem outReleases_to_releasesAtMost {P : Partition} {c : Cmd} {φ : Release}
     funext y
     cases hPy : P y with
     | true  => simp
-    | false => simp only [Bool.false_eq_true, if_false]; exact hs y hPy
+    | false => simp only [Bool.false_eq_true, ite_false]; exact hs y hPy
   · rw [hc, ht]
 
 /-- **Soundness.** A component typed timing-sensitively with declared guards
