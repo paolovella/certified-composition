@@ -1,0 +1,4 @@
+started: 2026-10-25T12:33:12+01:00
+head: 1493904
+command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/planted && lake env leanexport CertifiedComposition > /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/planted/planted.ndjson && cd /home/paolo/certified-composition && bash tools/gate/export-check.sh /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/planted/planted.ndjson
+log: tools/receipts/p002-export-planted.log

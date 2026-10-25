@@ -1485,6 +1485,35 @@ if ! grep -q '^exit: signal TERM$' "$rj/tools/receipts/selftest-term.end" 2>/dev
   echo "DRIFT: a job killed with TERM leaves no .end receipt (tools/run-job.sh, I-0002)"; fail=1
 fi
 rm -rf "$rj"
+# (g) The Lean 4.35 footprint pins stay (P0-02, S-435). Without the `BEq Int` instance, `==` on
+#     `Int` goes through `Int.instLinearOrderPackage` and 299 declarations pick up
+#     `Classical.choice`; without the `Std.le_refl` erasure, 6 `simp` proofs do. The manifest diff
+#     catches either one too; this names the cause.
+if ! grep -qx 'instance (priority := high) intBEqOfDecEq : BEq Int := instBEqOfDecidableEq' \
+     conf-typing/ConfTyping/Imp.lean 2>/dev/null; then
+  echo "DRIFT: the BEq Int pin is gone from conf-typing/ConfTyping/Imp.lean (P0-02)"; fail=1
+fi
+for m in AliasFix Attack HeapLoop MemSafe FreeLoop; do
+  if ! grep -qx 'attribute \[-simp\] Std.le_refl' "conf-typing/ConfTyping/$m.lean" 2>/dev/null; then
+    echo "DRIFT: conf-typing/ConfTyping/$m.lean no longer erases Std.le_refl from simp (P0-02)"; fail=1
+  fi
+done
+# (h) The toolchain the docs state is the one the lean-toolchain files pin. The root workspace and
+#     both mathlib-free packages share one version; transport-kernel keeps its own.
+tc=$(sed 's/.*://' conf-typing/lean-toolchain 2>/dev/null)
+tk=$(sed 's/.*://' transport-kernel/lean-toolchain 2>/dev/null)
+for f in lean-toolchain transport-calculus/lean-toolchain; do
+  if [ "$(sed 's/.*://' "$f" 2>/dev/null)" != "$tc" ]; then
+    echo "DRIFT: $f does not pin $tc like conf-typing/lean-toolchain"; fail=1
+  fi
+done
+if ! grep -q "conf-typing and transport-calculus are pinned to Lean \`$tc\`" README.md 2>/dev/null \
+   || ! grep -q "^\`$tk\` with its mathlib" README.md 2>/dev/null; then
+  echo "DRIFT: README.md states a toolchain other than $tc (packages) / $tk (transport-kernel)"; fail=1
+fi
+if ! grep -q "($tc), mathlib-free" conf-typing/README.md 2>/dev/null; then
+  echo "DRIFT: conf-typing/README.md states a toolchain other than $tc"; fail=1
+fi
 
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

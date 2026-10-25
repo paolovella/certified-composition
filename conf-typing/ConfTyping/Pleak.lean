@@ -22,7 +22,7 @@ def Phigh : Partition := fun x => x == "b"
 
 theorem wall_const : ∀ σ, (eval Pleak σ).2.1 = 2 := by
   intro σ
-  simp only [Pleak, eval, evalE]
+  simp only [Pleak, eval]
   split <;> rfl
 
 theorem wall_closure : J_NI Pleak wall Phigh := by

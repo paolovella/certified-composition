@@ -1,0 +1,19 @@
+# The repo-root workspace (P0-02). It exists so that `lake check`, which builds and exports inside a
+# bwrap sandbox that mounts only the project directory, can see both mathlib-free packages: run
+# from a package directory, conf-typing's `../transport-calculus` lies outside the sandbox
+# (S-435). transport-kernel (mathlib) is not part of it and keeps its own toolchain.
+name = "CertifiedComposition"
+defaultTargets = ["CertifiedComposition"]
+
+[[lean_lib]]
+name = "CertifiedComposition"
+# Not at the repo root: check-claims 1b treats a root-level .lean file as debris.
+srcDir = "workspace"
+
+[[require]]
+name = "TransportCalculus"
+path = "transport-calculus"
+
+[[require]]
+name = "ConfTyping"
+path = "conf-typing"

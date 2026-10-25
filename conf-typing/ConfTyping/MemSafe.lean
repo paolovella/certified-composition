@@ -27,6 +27,11 @@ import ConfTyping.Imp
 
 namespace ConfTyping
 
+-- Lean 4.35: plain `simp` closes `x ≤ x` on `Int` with `Std.le_refl` at the `Int` order
+-- package, which depends on `Classical.choice`. Use `Int.le_refl`, as under 4.31 (P0-02).
+attribute [-simp] Std.le_refl
+attribute [local simp] Int.le_refl
+
 /-! ## The heap machine -/
 
 /-- The heap: a total map on addresses; only the region `[0, n)` is allocated. -/

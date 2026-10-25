@@ -546,9 +546,11 @@ cd transport-calculus && lake build
 cd transport-kernel   && lake exe cache get && lake build
 ```
 
-All pinned to Lean `v4.31.0` (see each `lean-toolchain`); transport-kernel
-pins Physlib to a fixed commit sharing this repo's mathlib revision, so the
-cache is shared.
+conf-typing and transport-calculus are pinned to Lean `v4.35.0`, and so is the
+repo-root workspace that `lake check` runs from; transport-kernel stays on
+`v4.31.0` with its mathlib (see each `lean-toolchain`). transport-kernel pins
+Physlib to a fixed commit sharing this repo's mathlib revision, so the cache is
+shared.
 
 `tools/check-claims.sh` guards the READMEs against status drift (retired
 claims resurfacing, modules or notes going unmentioned); run it after landing

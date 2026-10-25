@@ -292,6 +292,18 @@ run_case "hook script deleted" drift \
 run_case "job receipts dropped from run-job" drift \
   bash -c 'sed -i "s/\.end/.fin/g" tools/run-job.sh'
 
+run_case "BEq Int pin deleted" drift \
+  bash -c 'sed -i "/^instance (priority := high) intBEqOfDecEq/d" conf-typing/ConfTyping/Imp.lean'
+
+run_case "Std.le_refl erasure deleted" drift \
+  bash -c 'sed -i "/^attribute \[-simp\] Std.le_refl$/d" conf-typing/ConfTyping/MemSafe.lean'
+
+run_case "README states a stale toolchain" drift \
+  bash -c 'sed -i "s/(v4\.35\.0), mathlib-free/(v4.31.0), mathlib-free/" conf-typing/README.md'
+
+run_case "root toolchain drifts from packages" drift \
+  bash -c 'echo leanprover/lean4:v4.34.0 > lean-toolchain'
+
 run_case "run-job loses its signal trap" drift \
   bash -c 'sed -i "/^for sig in TERM INT HUP; do$/,/^done$/d" tools/run-job.sh'
 

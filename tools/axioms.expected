@@ -269,7 +269,6 @@ ConfTyping.DState.ofNat_ctorIdx	ConfTyping.QueryEscape
 ConfTyping.DState.out.elim	ConfTyping.QueryEscape	
 ConfTyping.DState.qq.elim	ConfTyping.QueryEscape	
 ConfTyping.DState.recOn	ConfTyping.QueryEscape	
-ConfTyping.DState.toCtorIdx	ConfTyping.QueryEscape	
 ConfTyping.DbRel	ConfTyping.DbInjection	
 ConfTyping.DbState.casesOn	ConfTyping.DbInjection	
 ConfTyping.DbState.ctorIdx	ConfTyping.DbInjection	
@@ -310,7 +309,6 @@ ConfTyping.Dmd.noConfusionType	ConfTyping.LatticeFlow
 ConfTyping.Dmd.ofNat	ConfTyping.LatticeFlow	
 ConfTyping.Dmd.ofNat_ctorIdx	ConfTyping.LatticeFlow	
 ConfTyping.Dmd.recOn	ConfTyping.LatticeFlow	
-ConfTyping.Dmd.toCtorIdx	ConfTyping.LatticeFlow	
 ConfTyping.Dmd.top.elim	ConfTyping.LatticeFlow	
 ConfTyping.DoubleFreeLoop	ConfTyping.FreeLoop	
 ConfTyping.DoubleFreeLoopA	ConfTyping.AliasLoop	
@@ -327,7 +325,6 @@ ConfTyping.EvKind.ofNat_ctorIdx	ConfTyping.Typing
 ConfTyping.EvKind.policy.elim	ConfTyping.Typing	
 ConfTyping.EvKind.proof.elim	ConfTyping.Typing	
 ConfTyping.EvKind.recOn	ConfTyping.Typing	
-ConfTyping.EvKind.toCtorIdx	ConfTyping.Typing	
 ConfTyping.Expr.add.elim	ConfTyping.Imp	
 ConfTyping.Expr.add.noConfusion	ConfTyping.Imp	
 ConfTyping.Expr.below	ConfTyping.Imp	
@@ -516,7 +513,6 @@ ConfTyping.HOp.ofNat	ConfTyping.Unified
 ConfTyping.HOp.ofNat_ctorIdx	ConfTyping.Unified	
 ConfTyping.HOp.recOn	ConfTyping.Unified	
 ConfTyping.HOp.store.elim	ConfTyping.Unified	
-ConfTyping.HOp.toCtorIdx	ConfTyping.Unified	
 ConfTyping.HPleak	ConfTyping.HeapFlow	
 ConfTyping.HPsafe	ConfTyping.HeapFlow	
 ConfTyping.HRes.bind	ConfTyping.HeapLoop	
@@ -552,7 +548,6 @@ ConfTyping.JAssume.ofNat_ctorIdx	ConfTyping.IndexedBases
 ConfTyping.JAssume.preservation.elim	ConfTyping.IndexedBases	
 ConfTyping.JAssume.recOn	ConfTyping.IndexedBases	
 ConfTyping.JAssume.specSem.elim	ConfTyping.IndexedBases	
-ConfTyping.JAssume.toCtorIdx	ConfTyping.IndexedBases	
 ConfTyping.JAssume.typeSystem.elim	ConfTyping.IndexedBases	
 ConfTyping.JNI_is_rel	ConfTyping.TwoSafety	
 ConfTyping.JNI_postproc	ConfTyping.Obs	
@@ -664,7 +659,6 @@ ConfTyping.Lvl.ofNat_ctorIdx	ConfTyping.JasminSCT
 ConfTyping.Lvl.pub.elim	ConfTyping.JasminSCT	
 ConfTyping.Lvl.recOn	ConfTyping.JasminSCT	
 ConfTyping.Lvl.sec.elim	ConfTyping.JasminSCT	
-ConfTyping.Lvl.toCtorIdx	ConfTyping.JasminSCT	
 ConfTyping.MCmd.alloc.elim	ConfTyping.MemSafe	
 ConfTyping.MCmd.alloc.noConfusion	ConfTyping.MemSafe	
 ConfTyping.MCmd.assign.elim	ConfTyping.MemSafe	
@@ -756,7 +750,6 @@ ConfTyping.MemOp.noConfusionType	ConfTyping.Unified
 ConfTyping.MemOp.ofNat	ConfTyping.Unified	
 ConfTyping.MemOp.ofNat_ctorIdx	ConfTyping.Unified	
 ConfTyping.MemOp.recOn	ConfTyping.Unified	
-ConfTyping.MemOp.toCtorIdx	ConfTyping.Unified	
 ConfTyping.Minimal	ConfTyping.LoadBearing	
 ConfTyping.ModifiesOnly	ConfTyping.CNReceive	
 ConfTyping.Multiplex	ConfTyping.Pipeline	
@@ -920,7 +913,6 @@ ConfTyping.RCh.ofNat_ctorIdx	ConfTyping.LexReal
 ConfTyping.RCh.recOn	ConfTyping.LexReal	
 ConfTyping.RCh.rsemi.elim	ConfTyping.LexReal	
 ConfTyping.RCh.rsp.elim	ConfTyping.LexReal	
-ConfTyping.RCh.toCtorIdx	ConfTyping.LexReal	
 ConfTyping.RInstr.atom.elim	ConfTyping.Race	
 ConfTyping.RInstr.atom.noConfusion	ConfTyping.Race	
 ConfTyping.RInstr.base.elim	ConfTyping.Race	
@@ -1022,7 +1014,6 @@ ConfTyping.SOp.ofNat	ConfTyping.Unified
 ConfTyping.SOp.ofNat_ctorIdx	ConfTyping.Unified	
 ConfTyping.SOp.recOn	ConfTyping.Unified	
 ConfTyping.SOp.set.elim	ConfTyping.Unified	
-ConfTyping.SOp.toCtorIdx	ConfTyping.Unified	
 ConfTyping.SRegs	ConfTyping.Speculate	
 ConfTyping.SRel	ConfTyping.ParseSource	
 ConfTyping.SState	ConfTyping.ParseSource	
@@ -1159,7 +1150,6 @@ ConfTyping.Stratum.ofNat	ConfTyping.Typing
 ConfTyping.Stratum.ofNat_ctorIdx	ConfTyping.Typing	
 ConfTyping.Stratum.policy.elim	ConfTyping.Typing	
 ConfTyping.Stratum.recOn	ConfTyping.Typing	
-ConfTyping.Stratum.toCtorIdx	ConfTyping.Typing	
 ConfTyping.StringInert	ConfTyping.TaintCert	
 ConfTyping.StringInert.access	ConfTyping.TaintCert	propext
 ConfTyping.StringInert.assign	ConfTyping.TaintCert	propext
@@ -1179,7 +1169,6 @@ ConfTyping.TState.ofNat	ConfTyping.QueryEscape
 ConfTyping.TState.ofNat_ctorIdx	ConfTyping.QueryEscape	
 ConfTyping.TState.out.elim	ConfTyping.QueryEscape	
 ConfTyping.TState.recOn	ConfTyping.QueryEscape	
-ConfTyping.TState.toCtorIdx	ConfTyping.QueryEscape	
 ConfTyping.TaintCert.access	ConfTyping.TaintCert	propext
 ConfTyping.TaintCert.assign	ConfTyping.TaintCert	propext
 ConfTyping.TaintCert.casesOn	ConfTyping.TaintCert	
@@ -1262,7 +1251,6 @@ ConfTyping.UCh.ofNat_ctorIdx	ConfTyping.Unified
 ConfTyping.UCh.ord.elim	ConfTyping.Unified	
 ConfTyping.UCh.quote.elim	ConfTyping.Unified	
 ConfTyping.UCh.recOn	ConfTyping.Unified	
-ConfTyping.UCh.toCtorIdx	ConfTyping.Unified	
 ConfTyping.UCmd.access.elim	ConfTyping.Unified	
 ConfTyping.UCmd.access.noConfusion	ConfTyping.Unified	
 ConfTyping.UCmd.assign.elim	ConfTyping.Unified	
@@ -2103,6 +2091,7 @@ ConfTyping.instReprUCh	ConfTyping.Unified
 ConfTyping.instReprUCh.repr	ConfTyping.Unified	
 ConfTyping.instReprXObligation	ConfTyping.CrossToolIndex	propext
 ConfTyping.instReprXObligation.repr	ConfTyping.CrossToolIndex	propext
+ConfTyping.intBEqOfDecEq	ConfTyping.Imp	
 ConfTyping.inter	ConfTyping.MemSafe	propext
 ConfTyping.interNat	ConfTyping.TaintCert	
 ConfTyping.interNat_left	ConfTyping.TaintCert	propext
@@ -3126,7 +3115,6 @@ TransportCalculus.D3.noConfusionType	TransportCalculus
 TransportCalculus.D3.ofNat	TransportCalculus	
 TransportCalculus.D3.ofNat_ctorIdx	TransportCalculus	
 TransportCalculus.D3.recOn	TransportCalculus	
-TransportCalculus.D3.toCtorIdx	TransportCalculus	
 TransportCalculus.DirOrder.casesOn	TransportCalculus	
 TransportCalculus.DirOrder.ctorIdx	TransportCalculus	
 TransportCalculus.DirOrder.le	TransportCalculus	
@@ -3241,7 +3229,6 @@ TransportCalculus.P4.noConfusionType	TransportCalculus
 TransportCalculus.P4.ofNat	TransportCalculus	
 TransportCalculus.P4.ofNat_ctorIdx	TransportCalculus	
 TransportCalculus.P4.recOn	TransportCalculus	
-TransportCalculus.P4.toCtorIdx	TransportCalculus	
 TransportCalculus.PartialDom.casesOn	TransportCalculus	
 TransportCalculus.PartialDom.compat	TransportCalculus	
 TransportCalculus.PartialDom.compat_of_crossMono	TransportCalculus	Classical.choice,Quot.sound,propext

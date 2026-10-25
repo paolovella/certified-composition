@@ -1,0 +1,5 @@
+name = "GateWitness"
+defaultTargets = ["GateWitness"]
+
+[[lean_lib]]
+name = "GateWitness"

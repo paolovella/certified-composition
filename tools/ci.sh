@@ -57,6 +57,28 @@ if [ -x "$VERUS_BIN" ]; then
                 grep -q "^while c { alloc x ; free x } *ACCEPT" /tmp/lcheck-verdicts.txt'
 fi
 
+# The two kernel gates (P0-02). Route 1: `lake check` from the repo-root workspace builds,
+# exports and replays everything inside a bwrap sandbox and refuses any non-standard axiom.
+# Without a usable bwrap it cannot run, and that is a failure with its reason, not a skip.
+lake_check() {
+  if ! command -v bwrap >/dev/null 2>&1 || ! bwrap --ro-bind / / true >/dev/null 2>&1; then
+    echo "    ABSENT: bwrap missing or unprivileged user namespaces disabled; lake check cannot run"
+    return 1
+  fi
+  # The exit code is the verdict: on a refused axiom lake check still prints "Lean default kernel
+  # accepts" after its error, so grepping its output would pass a refusal.
+  lake build >/dev/null 2>&1 && lake check >/dev/null 2>&1
+}
+step "lake check from the root workspace (route 1)" lake_check
+# Route 2: the export replayed through all six bundled kernels, each run directly
+# (tools/gate/export-check.sh says why not `lake check --paranoid`).
+step "export accepted by all six kernels (route 2)" \
+     bash -c 'bash tools/gate/export-check.sh | tail -1 | grep -q "^export-check: all kernels accept$"'
+# ...and both refuse a planted axiom: without this, the two steps above would also pass for gates
+# that accept everything.
+step "both kernel gates refuse a planted axiom (witness)" \
+     bash -c 'bash tools/gate/witness.sh | grep -c "refuses$" | grep -qx 2'
+
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
 step "axiom manifest is current"   bash tools/axioms.sh --check
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'

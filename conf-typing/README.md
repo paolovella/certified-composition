@@ -2,7 +2,7 @@
 
 A machine-checked encoding of **Paper 1: the IMP timing instance** of the
 confidentiality-typing framework. Every result below is proved in Lean 4
-(v4.31.0), mathlib-free, with **no `sorry`** and only the three standard
+(v4.35.0), mathlib-free, with **no `sorry`** and only the three standard
 foundational axioms (`propext`, `Classical.choice`, `Quot.sound`) — the
 central meta-theorems use none of them.
 

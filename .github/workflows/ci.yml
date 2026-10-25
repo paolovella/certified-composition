@@ -22,10 +22,18 @@ jobs:
             | tar xz
           ./elan-init -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      # lake check (P0-02) sandboxes the build with bwrap, which needs unprivileged user
+      # namespaces; ubuntu-latest restricts them through AppArmor. If either step fails, the
+      # lake check step in tools/ci.sh reports bwrap ABSENT and fails: never a silent pass.
+      - name: Install bubblewrap and allow user namespaces
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Cache Lean builds
         uses: actions/cache@v4
         with:
           path: |
+            .lake
             conf-typing/.lake
             transport-calculus/.lake
           key: core-${{ runner.os }}-${{ hashFiles('**/lean-toolchain', '**/lakefile.*') }}

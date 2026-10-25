@@ -8,6 +8,13 @@
 
 namespace ConfTyping
 
+/-- `==` on `Int` is decided by `Int.instDecidableEq`, as under Lean 4.31. Lean 4.35 resolves
+    `BEq Int` through `Int.instLinearOrderPackage`, which depends on `Classical.choice`, and every
+    definition using `==` on `Int` inherited it (S-435: 299 of 305 footprint changes). Every
+    module imports this one, so the pin covers the package. Removing it changes
+    `tools/axioms.expected`; check-claims also guards it by name (P0-02). -/
+instance (priority := high) intBEqOfDecEq : BEq Int := instBEqOfDecidableEq
+
 /-! ## §1 Language -/
 
 inductive Expr where

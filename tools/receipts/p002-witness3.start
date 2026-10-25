@@ -1,0 +1,4 @@
+started: 2026-10-25T12:59:00+01:00
+head: 1493904
+command: bash tools/gate/witness.sh
+log: tools/receipts/p002-witness3.log

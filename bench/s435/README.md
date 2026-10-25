@@ -12,7 +12,7 @@ Everything here was produced on a scratch copy of the two mathlib-free packages 
 | `axioms-4.35-pinned.txt` | the same with the pin as well (experiment B) |
 | `AxiomsBlocked.lean` | footprint collector that treats named constants as opaque; with an empty set it reproduces `collectAxioms` exactly |
 | `AxPath.lean` | prints a shortest dependency path from a declaration to an axiom |
-| `nanoda.json` | nanoda config used directly (replace `S435_DIR`); run with `RUST_MIN_STACK=1073741824` |
+| `nanoda.json` | nanoda config used directly (replace `S435_DIR`); ~~run with `RUST_MIN_STACK=1073741824`~~ run with `ulimit -s unlimited` and one thread (corrected in `backlog/S-435.md`) |
 | `tsv.py` | regenerates `bench/s435.tsv` from the receipts' logs and the two manifests |
 
 Reproduce: copy `transport-calculus/` and `conf-typing/` side by side (no `.lake`), set the

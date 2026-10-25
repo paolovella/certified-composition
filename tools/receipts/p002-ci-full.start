@@ -1,0 +1,4 @@
+started: 2026-10-25T12:45:37+01:00
+head: 1493904
+command: bash tools/ci.sh
+log: tools/receipts/p002-ci-full.log

@@ -1,0 +1,4 @@
+started: 2026-10-25T12:24:22+01:00
+head: 1493904
+command: lake check
+log: tools/receipts/p002-lakecheck-ok.log
