@@ -1,0 +1,19 @@
+measure	lean	value	unit	receipt	note
+model modules	-	160	files	-	opencompl/sail-riscv-lean 51c635c460; 173614 lines; 135 build jobs
+model axioms	-	75	decls	-	all in LeanRV64D/RiscvExtras.lean: softfloat, terminal, reservations, random bits, config flags
+build, as published	v4.29.0	436	s	ssail-build-429	exit 0, 0 errors
+build, axioms made opaque	v4.29.0	374	s	ssail-opaque-429	exit 0; reuses the lean-sail build of the run above
+build, as published	v4.35.0	-	-	ssail-build-435b	fails in Defs (11/135): constructor tag of instruction.VIMCTYPE too big for the runtime; 102 errors, cascade
+changes needed for v4.35.0	v4.35.0	1342	lines	-	bench/sail/apply-435.sh: lean-sail +5 commits, 1257 assert->sail_assert, 3 dropped codegen errors, (+75 axiom->opaque)
+build with apply-435.sh --opaque, clean	v4.35.0	2011	s	ssail-opaque-435	exit 0; includes 130 s for SSailRefine
+module RvfiDii	v4.29.0	5.6	s	ssail-build-429	-
+module RvfiDii	v4.35.0	1794	s	ssail-opaque-435	x320; every other module over 2 s is within 8% of its 4.29 time; sum of module times 565 -> 2307 s
+module InstsEnd	v4.29.0	151	s	ssail-build-429	largest module at 4.29
+module InstsEnd	v4.35.0	153	s	ssail-opaque-435	-
+SSailRefine check	v4.29.0	26	s	-	timed by hand, against the 4.29 build
+SSailRefine check	v4.35.0	130	s	ssail-refine-check	-
+SSailRefine size	-	565	lines	-	32-way per-register lemmas generated
+ADDI proved	v4.35.0	yes	-	ssail-refine-check	addi_run: all imm, rs1, rd; axioms propext, Classical.choice, Quot.sound
+BEQ proved	v4.35.0	yes	-	ssail-refine-check	beq_run: all imm, rs1, rs2; 4-byte-aligned target, misa present; same three axioms
+BEQ axioms, model axioms kept	v4.35.0	+1	axiom	-	sys_enable_experimental_extensions, reached through currentlyEnabled; gone with --opaque
+LD proved	-	no	-	-	stated only (backlog/S-SAIL.md): path runs through translation, PMP and PMA

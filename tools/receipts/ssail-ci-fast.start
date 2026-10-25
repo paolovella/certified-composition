@@ -1,0 +1,4 @@
+started: 2026-10-25T17:23:03+01:00
+head: 66189ca
+command: bash tools/ci.sh --fast
+log: tools/receipts/ssail-ci-fast.log

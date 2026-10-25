@@ -1,0 +1,4 @@
+started: 2026-10-25T15:52:40+01:00
+head: 66189ca
+command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/sail/m429 && lake build 2>&1
+log: tools/receipts/ssail-build-429.log
