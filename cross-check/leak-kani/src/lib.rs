@@ -372,6 +372,71 @@ mod split {
     cell!(no_leak_seq, can_alloc_seq, leaks_seq, T_SEQ);
     cell!(no_leak_ite, can_alloc_ite, leaks_ite, T_ITE);
     cell!(no_leak_loop, can_alloc_loop, leaks_loop, T_LOOP);
+
+    /// The seq root's cells at the 60-minute cap, cut again by the root's two children. A seq
+    /// root at node 0 has `l`, `r` in 1..=4 (`well_formed`), so these 16 cells cover the seq
+    /// cell; `seq_cells_cover` proves it. Leaks are already witnessed for seq (`leaks_seq`).
+    #[kani::proof]
+    fn seq_cells_cover() {
+        let mut p: [Node; NN] = kani::any();
+        p[0].tag = T_SEQ;
+        kani::assume(well_formed(&p));
+        assert!(p[0].l >= 1 && p[0].l <= 4 && p[0].r >= 1 && p[0].r <= 4);
+    }
+
+    macro_rules! seq_cell {
+        ($leak:ident, $alloc:ident, $l:expr, $r:expr) => {
+            #[kani::proof]
+            #[kani::unwind(8)]
+            fn $leak() {
+                let mut p: [Node; NN] = kani::any();
+                p[0].tag = T_SEQ;
+                p[0].l = $l;
+                p[0].r = $r;
+                kani::assume(well_formed(&p));
+                kani::assume(leak_safe(&p));
+                let br: [bool; NN] = kani::any();
+                let mut st = St::new();
+                let iters: [u8; NN] = kani::any();
+                exec(&p, 0, &mut st, &br, &iters, NN);
+                if !st.dead {
+                    assert!(st.live == 0, "leakSafe accepted a program that leaks");
+                }
+            }
+            #[kani::proof]
+            #[kani::unwind(8)]
+            fn $alloc() {
+                let mut p: [Node; NN] = kani::any();
+                p[0].tag = T_SEQ;
+                p[0].l = $l;
+                p[0].r = $r;
+                kani::assume(well_formed(&p));
+                kani::assume(leak_safe(&p));
+                let br: [bool; NN] = kani::any();
+                let mut st = St::new();
+                let iters: [u8; NN] = kani::any();
+                exec(&p, 0, &mut st, &br, &iters, NN);
+                assert!(st.dead || st.fresh == 0, "witness: an accepted program that allocates");
+            }
+        };
+    }
+
+    seq_cell!(no_leak_seq_l1_r1, can_alloc_seq_l1_r1, 1, 1);
+    seq_cell!(no_leak_seq_l1_r2, can_alloc_seq_l1_r2, 1, 2);
+    seq_cell!(no_leak_seq_l1_r3, can_alloc_seq_l1_r3, 1, 3);
+    seq_cell!(no_leak_seq_l1_r4, can_alloc_seq_l1_r4, 1, 4);
+    seq_cell!(no_leak_seq_l2_r1, can_alloc_seq_l2_r1, 2, 1);
+    seq_cell!(no_leak_seq_l2_r2, can_alloc_seq_l2_r2, 2, 2);
+    seq_cell!(no_leak_seq_l2_r3, can_alloc_seq_l2_r3, 2, 3);
+    seq_cell!(no_leak_seq_l2_r4, can_alloc_seq_l2_r4, 2, 4);
+    seq_cell!(no_leak_seq_l3_r1, can_alloc_seq_l3_r1, 3, 1);
+    seq_cell!(no_leak_seq_l3_r2, can_alloc_seq_l3_r2, 3, 2);
+    seq_cell!(no_leak_seq_l3_r3, can_alloc_seq_l3_r3, 3, 3);
+    seq_cell!(no_leak_seq_l3_r4, can_alloc_seq_l3_r4, 3, 4);
+    seq_cell!(no_leak_seq_l4_r1, can_alloc_seq_l4_r1, 4, 1);
+    seq_cell!(no_leak_seq_l4_r2, can_alloc_seq_l4_r2, 4, 2);
+    seq_cell!(no_leak_seq_l4_r3, can_alloc_seq_l4_r3, 4, 3);
+    seq_cell!(no_leak_seq_l4_r4, can_alloc_seq_l4_r4, 4, 4);
 }
 
 #[cfg(test)]

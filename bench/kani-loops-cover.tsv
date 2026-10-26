@@ -1,0 +1,3 @@
+cell	root	verdict	meaning	symex_s	vccs_after_simplification	solver_s	wall_s	receipt
+cells_cover	-	SUCCESSFUL	the cells cover every well_formed program	0.1	25	0.0	1	p008-kani-cells_cover
+seq_cells_cover	-	SUCCESSFUL	the cells cover every well_formed program	0.1	29	0.0	1	p008-kani-seq_cells_cover

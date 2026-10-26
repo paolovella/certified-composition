@@ -1,0 +1,33 @@
+cell	root	verdict	meaning	symex_s	vccs_after_simplification	solver_s	wall_s	receipt
+no_leak_seq_l1_r1	seq_l1_r1	SUCCESSFUL	no accepted program with this root leaks	169.5	33005	778.7	1025	p008-kani-no_leak_seq_l1_r1
+can_alloc_seq_l1_r1	seq_l1_r1	FAILED	witness found: an accepted program with this root allocates	189.7	33005	1165.5	1434	p008-kani-can_alloc_seq_l1_r1
+no_leak_seq_l1_r2	seq_l1_r2	SUCCESSFUL	no accepted program with this root leaks	188.6	33005	1347.1	1620	p008-kani-no_leak_seq_l1_r2
+can_alloc_seq_l1_r2	seq_l1_r2	FAILED	witness found: an accepted program with this root allocates	187.9	33005	1607.8	1901	p008-kani-can_alloc_seq_l1_r2
+no_leak_seq_l1_r3	seq_l1_r3	SUCCESSFUL	no accepted program with this root leaks	186.3	33005	846.8	1129	p008-kani-no_leak_seq_l1_r3
+can_alloc_seq_l1_r3	seq_l1_r3	FAILED	witness found: an accepted program with this root allocates	186.8	33005	724.2	1005	p008-kani-can_alloc_seq_l1_r3
+no_leak_seq_l1_r4	seq_l1_r4	SUCCESSFUL	no accepted program with this root leaks	186.8	33005	465.4	743	p008-kani-no_leak_seq_l1_r4
+can_alloc_seq_l1_r4	seq_l1_r4	FAILED	witness found: an accepted program with this root allocates	187.0	33005	313.0	586	p008-kani-can_alloc_seq_l1_r4
+no_leak_seq_l2_r1	seq_l2_r1	SUCCESSFUL	no accepted program with this root leaks	189.3	33005	1219.7	1509	p008-kani-no_leak_seq_l2_r1
+can_alloc_seq_l2_r1	seq_l2_r1	FAILED	witness found: an accepted program with this root allocates	189.8	33005	1573.7	1882	p008-kani-can_alloc_seq_l2_r1
+no_leak_seq_l2_r2	seq_l2_r2	SUCCESSFUL	no accepted program with this root leaks	186.3	33005	233.6	508	p008-kani-no_leak_seq_l2_r2
+can_alloc_seq_l2_r2	seq_l2_r2	FAILED	witness found: an accepted program with this root allocates	186.4	33005	150.9	424	p008-kani-can_alloc_seq_l2_r2
+no_leak_seq_l2_r3	seq_l2_r3	SUCCESSFUL	no accepted program with this root leaks	183.8	33005	297.4	570	p008-kani-no_leak_seq_l2_r3
+can_alloc_seq_l2_r3	seq_l2_r3	FAILED	witness found: an accepted program with this root allocates	185.8	33005	322.2	600	p008-kani-can_alloc_seq_l2_r3
+no_leak_seq_l2_r4	seq_l2_r4	SUCCESSFUL	no accepted program with this root leaks	185.6	33005	173.2	444	p008-kani-no_leak_seq_l2_r4
+can_alloc_seq_l2_r4	seq_l2_r4	FAILED	witness found: an accepted program with this root allocates	184.2	33005	221.0	496	p008-kani-can_alloc_seq_l2_r4
+no_leak_seq_l3_r1	seq_l3_r1	SUCCESSFUL	no accepted program with this root leaks	183.8	33005	804.1	1095	p008-kani-no_leak_seq_l3_r1
+can_alloc_seq_l3_r1	seq_l3_r1	FAILED	witness found: an accepted program with this root allocates	185.5	33005	751.7	1037	p008-kani-can_alloc_seq_l3_r1
+no_leak_seq_l3_r2	seq_l3_r2	SUCCESSFUL	no accepted program with this root leaks	186.6	33005	321.4	595	p008-kani-no_leak_seq_l3_r2
+can_alloc_seq_l3_r2	seq_l3_r2	FAILED	witness found: an accepted program with this root allocates	185.9	33005	461.3	739	p008-kani-can_alloc_seq_l3_r2
+no_leak_seq_l3_r3	seq_l3_r3	SUCCESSFUL	no accepted program with this root leaks	185.3	33005	106.9	362	p008-kani-no_leak_seq_l3_r3
+can_alloc_seq_l3_r3	seq_l3_r3	SUCCESSFUL	no accepted program with this root allocates	185.8	33005	101.9	357	p008-kani-can_alloc_seq_l3_r3
+no_leak_seq_l3_r4	seq_l3_r4	SUCCESSFUL	no accepted program with this root leaks	184.7	33005	112.8	384	p008-kani-no_leak_seq_l3_r4
+can_alloc_seq_l3_r4	seq_l3_r4	FAILED	witness found: an accepted program with this root allocates	186.0	33005	107.0	379	p008-kani-can_alloc_seq_l3_r4
+no_leak_seq_l4_r1	seq_l4_r1	SUCCESSFUL	no accepted program with this root leaks	183.8	33005	308.5	588	p008-kani-no_leak_seq_l4_r1
+can_alloc_seq_l4_r1	seq_l4_r1	FAILED	witness found: an accepted program with this root allocates	184.8	33005	403.5	686	p008-kani-can_alloc_seq_l4_r1
+no_leak_seq_l4_r2	seq_l4_r2	SUCCESSFUL	no accepted program with this root leaks	182.5	33005	162.1	434	p008-kani-no_leak_seq_l4_r2
+can_alloc_seq_l4_r2	seq_l4_r2	FAILED	witness found: an accepted program with this root allocates	183.4	33005	201.8	476	p008-kani-can_alloc_seq_l4_r2
+no_leak_seq_l4_r3	seq_l4_r3	SUCCESSFUL	no accepted program with this root leaks	182.7	33005	173.8	445	p008-kani-no_leak_seq_l4_r3
+can_alloc_seq_l4_r3	seq_l4_r3	FAILED	witness found: an accepted program with this root allocates	182.0	33005	123.3	395	p008-kani-can_alloc_seq_l4_r3
+no_leak_seq_l4_r4	seq_l4_r4	SUCCESSFUL	no accepted program with this root leaks	186.3	33005	46.7	295	p008-kani-no_leak_seq_l4_r4
+can_alloc_seq_l4_r4	seq_l4_r4	SUCCESSFUL	no accepted program with this root allocates	184.9	33005	66.5	312	p008-kani-can_alloc_seq_l4_r4
