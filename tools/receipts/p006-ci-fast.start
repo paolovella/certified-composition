@@ -1,0 +1,4 @@
+started: 2026-10-26T01:27:46+01:00
+head: 4510492
+command: bash tools/ci.sh --fast
+log: tools/receipts/p006-ci-fast.log

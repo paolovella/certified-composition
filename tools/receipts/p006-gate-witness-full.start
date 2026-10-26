@@ -1,0 +1,4 @@
+started: 2026-10-26T00:51:09+01:00
+head: 4510492
+command: bash tools/gate/base-gate-witness.sh --full
+log: tools/receipts/p006-gate-witness-full.log

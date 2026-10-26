@@ -2,18 +2,36 @@
 # Everything that must hold before a commit is honest. The CI workflow calls this and
 # nothing else, so what runs on push is exactly what runs locally -- the two cannot drift.
 #
-#   tools/ci.sh          full run (includes the mathlib package; slow)
-#   tools/ci.sh --fast   skip transport-kernel (mathlib), for the inner loop
+#   tools/ci.sh                  full run (includes the mathlib package; slow)
+#   tools/ci.sh --fast           skip transport-kernel (mathlib), for the inner loop
+#   tools/ci.sh --require-heavy  full run on the heavy runner: an absent tool is a failure
+#
+# A step that does not run is never silent (P0-06): it prints DEFERRED or ABSENT with the
+# reason, and the last line lists every step not run.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-FAST=0
-[ "${1:-}" = "--fast" ] && FAST=1
+FAST=0; HEAVY=0
+for a in "$@"; do
+  case "$a" in
+    --fast) FAST=1 ;;
+    --require-heavy) HEAVY=1 ;;
+    *) echo "ci.sh: unknown option $a"; exit 2 ;;
+  esac
+done
+[ "$FAST" = 1 ] && [ "$HEAVY" = 1 ] && { echo "ci.sh: --fast and --require-heavy contradict"; exit 2; }
 
 fail=0
+notrun=()
 step() {
   printf '\n=== %s\n' "$1"; shift
   if "$@"; then printf '    ok\n'; else printf '    FAILED\n'; fail=1; fi
+}
+# not_run <step> <DEFERRED|ABSENT> <reason>: an ABSENT tool fails under --require-heavy.
+not_run() {
+  printf '\n=== %s\n    %s: %s\n' "$1" "$2" "$3"
+  if [ "$2" = ABSENT ] && [ "$HEAVY" = 1 ]; then printf '    FAILED\n'; fail=1; fi
+  notrun+=("$1")
 }
 
 build() {  # build a lake package, succeed only on a clean build
@@ -23,7 +41,11 @@ build() {  # build a lake package, succeed only on a clean build
 
 step "conf-typing builds"          build conf-typing
 step "transport-calculus builds"   build transport-calculus
-[ "$FAST" = 0 ] && step "transport-kernel builds (mathlib)" build transport-kernel
+if [ "$FAST" = 0 ]; then
+  step "transport-kernel builds (mathlib)" build transport-kernel
+else
+  not_run "transport-kernel builds (mathlib)" DEFERRED "--fast; the full run and the heavy runner build it"
+fi
 
 # The stage D combinator is an executable, so `lake build` on the library does not cover
 # it. Build it and run it on the emission corpus: a parser that stops parsing real bytes
@@ -35,10 +57,12 @@ step "certcompose builds and consumes the emission" \
 
 # The cross-check crate is an independent re-implementation used as an adversary. Its
 # concrete witnesses are cheap and must not rot; the Kani harnesses are minutes-long and are
-# run by hand, not here. Skipped when cargo is absent so the Lean gates still run.
+# run by hand, not here. Without cargo the step is reported ABSENT, so the Lean gates still run.
 if command -v cargo >/dev/null 2>&1; then
   step "cross-check witnesses (independent Rust port)" \
        bash -c 'cd cross-check/leak-kani && cargo test --quiet 2>&1 | grep -q "test result: ok"'
+else
+  not_run "cross-check witnesses (independent Rust port)" ABSENT "cargo not on PATH"
 fi
 
 # Stage K's verified checker. Verus is not assumed present (it is not on PATH by default
@@ -55,7 +79,30 @@ if [ -x "$VERUS_BIN" ]; then
                 grep -q "^b06, repaired *ACCEPT"     /tmp/lcheck-verdicts.txt &&
                 grep -q "^while c { alloc x } *REFUSE"          /tmp/lcheck-verdicts.txt &&
                 grep -q "^while c { alloc x ; free x } *ACCEPT" /tmp/lcheck-verdicts.txt'
+else
+  not_run "verus lcheck verifies and runs" ABSENT "no Verus at $VERUS_BIN"
 fi
+
+# certcheck is the tool the README tells a reader to run (P0-06). Each documented example must
+# get the verdict the README states: the accepted one exits 0, each rejected one exits 3 and
+# names its checker. The two secret examples need `--secret pw`; without it, secret-branch.uc
+# is accepted (correction of record in README.md).
+certcheck_examples() (  # a subshell: the cd must not leak into the steps after it
+  cd conf-typing && lake build certcheck >/dev/null 2>&1 || return 1
+  local b=./.lake/build/bin/certcheck out rc
+  out=$("$b" examples/handler.uc); rc=$?
+  [ "$rc" = 0 ] && echo "$out" | grep -q "^examples/handler.uc: ACCEPTED$" || { echo "    handler.uc: exit $rc"; return 1; }
+  local ex flag want
+  for ex in injection:string-integrity unmediated:certificate use-after-free:certificate \
+            unbounded-loop:certificate secret-leak:certificate secret-branch:certificate; do
+    want=${ex#*:}; ex=${ex%%:*}; flag=()
+    case "$ex" in secret-*) flag=(--secret pw) ;; esac
+    out=$("$b" "examples/rejected/$ex.uc" "${flag[@]}" 2>&1); rc=$?
+    [ "$rc" = 3 ] && echo "$out" | grep -q ": REJECTED by the $want checker" \
+      || { echo "    $ex.uc: exit $rc, $(echo "$out" | head -1)"; return 1; }
+  done
+)
+step "certcheck gives every documented example its verdict" certcheck_examples
 
 # The two kernel gates (P0-02). Route 1: `lake check` from the repo-root workspace builds,
 # exports and replays everything inside a bwrap sandbox and refuses any non-standard axiom.
@@ -78,6 +125,11 @@ step "export accepted by all six kernels (route 2)" \
 # that accept everything.
 step "both kernel gates refuse a planted axiom (witness)" \
      bash -c 'bash tools/gate/witness.sh | grep -c "refuses$" | grep -qx 2'
+# The base-branch gate's own rules (Ring 0 classifier, manifest additions only), each with an
+# accepted and a refused PR. The two cases that run ci.sh are --full, outside ci.sh: inside it
+# they would recurse.
+step "base gate: ring0 and manifest rules accept and refuse (witness)" \
+     bash -c 'bash tools/gate/base-gate-witness.sh | tail -1 | grep -qE "^base-gate witnesses: 8 passed, 0 failed$"'
 
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
 step "axiom manifest is current"   bash tools/axioms.sh --check
@@ -88,5 +140,7 @@ step "walk-check (numeric claims in the notes)" \
      bash -c 'python3 tools/walk-check.py | tail -1 | grep -q "^all checks PASS$"'
 
 printf '\n'
-if [ "$fail" = 0 ]; then printf 'CI: all steps passed\n'; else printf 'CI: FAILURES ABOVE\n'; fi
+nr=""
+[ "${#notrun[@]}" -gt 0 ] && nr="; ${#notrun[@]} not run: $(IFS=';'; echo "${notrun[*]}" | sed 's/;/; /g')"
+if [ "$fail" = 0 ]; then printf 'CI: all steps that ran passed%s\n' "$nr"; else printf 'CI: FAILURES ABOVE%s\n' "$nr"; fi
 exit "$fail"

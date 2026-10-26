@@ -307,6 +307,12 @@ run_case "root toolchain drifts from packages" drift \
 run_case "run-job loses its signal trap" drift \
   bash -c 'sed -i "/^for sig in TERM INT HUP; do$/,/^done$/d" tools/run-job.sh'
 
+run_case "base gate stops classifying CLAUDE.md" drift \
+  bash -c 'sed -i "s/\"CLAUDE.md\", //" tools/gate/base-gate.sh'
+
+run_case "CLAUDE.md adds a Ring 0 path the gate lacks" drift \
+  bash -c 'sed -i "s/and any frozen statement file\./\`l-core\/\`, and any frozen statement file./" CLAUDE.md'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

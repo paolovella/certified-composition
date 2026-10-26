@@ -72,7 +72,15 @@ and prints the certificate — a cost budget good for every input and every fuel
 authority the program requires, and the delimiter count of everything it emits.
 `examples/rejected/` has one file per failure class (unmediated access, use-after-free,
 unsanitized emit, secret leak, secret branch, unbounded loop); exit 0 accept, 2 parse
-error, 3 reject. `source_certified` is the verdict as a theorem.
+error, 3 reject. The two secret examples name their secret input:
+`certcheck examples/rejected/secret-branch.uc --secret pw`. `tools/ci.sh` checks every one of
+these verdicts. `source_certified` is the verdict as a theorem.
+
+*Correction of record (2026-10-26, P0-06):* from `9e6042b` until this correction, this
+paragraph gave no `--secret` flag, and nothing ran the examples; a guard checked only that the
+files exist. Run as the paragraph said, `secret-branch.uc` is *accepted*, because no variable is
+secret, and `secret-leak.uc` is rejected by the string-integrity checker rather than as a leak.
+With `--secret pw` both are rejected by the certificate checker.
 
 Two honest limits, both stated at more length in `conf-typing/README.md`: the parser's
 round trip is proved for the expression layer and **not** for the statement layer, so the
@@ -525,9 +533,17 @@ else — so what gates a push is exactly what a working session runs, and the tw
 drift:
 
 ```
-tools/ci.sh          # all three packages, no-sorry, and every guard
-tools/ci.sh --fast   # skips the mathlib package, for the inner loop
+tools/ci.sh                  # all three packages, no-sorry, and every guard
+tools/ci.sh --fast           # skips the mathlib package, for the inner loop
+tools/ci.sh --require-heavy  # the heavy runner: a missing tool (cargo, Verus) is a failure
 ```
+
+A step that does not run says so: `DEFERRED` or `ABSENT` with the reason, and the last line
+lists every step not run. A pull request is also judged by **master's** gate, not its own
+(`tools/gate/base-gate.sh`, run by `.github/workflows/gate.yml` on `pull_request_target`):
+master's `tools/` and `.github/` are laid over the PR tree before `ci.sh` runs. A PR that
+touches a Ring 0 path fails the gate's `ring0` check and needs the user's key. A PR that
+removes or changes a line of `tools/axioms.expected` fails `manifest`.
 
 The gates are: the three Lean packages build; no `sorry` in any tracked source;
 `check-claims` (drift between prose and theorem names, and now between CI and this

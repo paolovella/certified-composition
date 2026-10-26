@@ -1,0 +1,90 @@
+name: gate
+
+# The base-branch gate (P0-06, PLAN-2026-10 §7). `pull_request_target` runs this file and the
+# gate as they are on master, never as the PR has them, so a PR cannot weaken what judges it.
+# tools/gate/base-gate.sh overlays master's tools/ and .github/ onto the PR tree and runs them.
+#
+# The PR's code is built here, so the job holds nothing worth stealing: a read-only token, no
+# secrets, credentials not persisted. Caches are only restored, never saved: a PR able to write
+# the cache could poison what master's own CI restores later.
+#
+# Ring 0 PRs fail the `ring0` check by design; they merge only with the user's key.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master (the gate)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: Check out the PR head (judged)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          persist-credentials: false
+      - name: Install elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      # as in ci.yml: lake check needs bwrap and unprivileged user namespaces.
+      - name: Install bubblewrap and allow user namespaces
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Restore Lean builds (read-only)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            pr/.lake
+            pr/conf-typing/.lake
+            pr/transport-calculus/.lake
+          key: gate-${{ runner.os }}-${{ hashFiles('pr/**/lean-toolchain', 'pr/**/lakefile.*') }}
+      - name: base-gate (master's gate on the PR tree)
+        run: bash base/tools/gate/base-gate.sh base pr
+
+  # The heavy tier (mathlib, Verus, cargo) on the user's self-hosted runner, labelled `heavy`.
+  # With no such runner online the job waits, so a required heavy check fails closed. It never
+  # runs for a fork: that would run a stranger's code on the user's machine.
+  heavy:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, heavy]
+    steps:
+      - name: Check out master (the gate)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      # `clean: false` keeps the build caches (mathlib) between runs on this machine; everything
+      # else a previous PR left behind is removed, so one PR cannot plant files for the next.
+      - name: Check out the PR head (judged)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          clean: false
+          persist-credentials: false
+      - name: Remove leftovers, keeping the build caches
+        run: git -C pr clean -ffdx -e .lake
+      - name: Fetch mathlib oleans
+        working-directory: pr/transport-kernel
+        run: lake exe cache get
+      - name: base-gate --heavy (master's gate, every tool required)
+        run: bash base/tools/gate/base-gate.sh --heavy base pr

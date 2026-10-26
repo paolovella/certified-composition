@@ -1514,6 +1514,18 @@ fi
 if ! grep -q "($tc), mathlib-free" conf-typing/README.md 2>/dev/null; then
   echo "DRIFT: conf-typing/README.md states a toolchain other than $tc"; fail=1
 fi
+# (i) The base-branch gate classifies Ring 0 by its own list (P0-06). Every path CLAUDE.md names
+#     as Ring 0 must be in it, or a PR touching that path would pass as an ordinary change.
+r0=$(sed -n '/Ring 0 means:/,/frozen statement file\./p' CLAUDE.md 2>/dev/null | tr '\n' ' ' \
+     | sed 's/.*Ring 0 means://' | grep -o '`[^`]*`' | tr -d '`')
+[ -n "$r0" ] || { echo "DRIFT: CLAUDE.md no longer states what Ring 0 means"; fail=1; }
+while IFS= read -r g; do
+  [ -n "$g" ] || continue
+  case "$g" in */) g="${g}*" ;; esac
+  if ! grep -qF "\"$g\"" tools/gate/base-gate.sh 2>/dev/null; then
+    echo "DRIFT: CLAUDE.md names $g as Ring 0, but tools/gate/base-gate.sh does not classify it"; fail=1
+  fi
+done <<< "$r0"
 
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

@@ -6,6 +6,24 @@ landed.
 
 ## Repository verification
 
+- **A pull request is judged by master's gate, and nothing skips without saying so**
+  (2026-10-26, P0-06; `tools/gate/base-gate.sh`, `.github/workflows/gate.yml`, `tools/ci.sh`).
+  Two of the findings listed under 2026-10-23 below are now addressed in code: CI ran the PR's
+  own `tools/ci.sh`, and the Verus and Rust steps vanished when the tool was absent.
+  - `gate.yml` runs on `pull_request_target`, so the workflow comes from master. It lays
+    master's `tools/` and `.github/` over the PR tree and runs `ci.sh` there.
+  - Two rules exist only in the gate. A PR touching Ring 0 fails `ring0` and needs the user's
+    key. A PR that removes or changes a line of the axiom manifest fails `manifest`.
+  - A PR that rewrites `ci.sh` to `exit 0` and breaks a proof passes its own `ci.sh` and fails
+    master's (`base-gate-witness.sh --full`).
+  - `ci.sh` now prints `DEFERRED`/`ABSENT` for every step it does not run, and `--require-heavy`
+    makes an absent tool a failure.
+  - Not done: branch protection, the self-hosted heavy runner, and the live GitHub test of a
+    weakening PR. The live test can only run once `gate.yml` is on master.
+  - Found on the way: the README never said that the secret examples need `--secret pw`. Run as
+    written, `rejected/secret-branch.uc` is accepted. A correction of record is in the README,
+    and `ci.sh` now runs every documented example.
+
 - **The axiom claims, checked for the first time: 185 hold, 3 did not** (2026-10-23, P0-01;
   `conf-typing/AxiomManifest.lean`, `tools/axioms.expected`, `tools/axioms.sh`,
   `tools/axiom-claims.py`). The docs say "axiom-free" / "choice-free" / "propext-only" about
