@@ -11,6 +11,9 @@ ROOT=$(pwd)
 SUMMARIZE=0; [ "${1:-}" = --summarize ] && { SUMMARIZE=1; shift; }
 CAP=${1:-3600}
 JOBS=${2:-1}
+# a per-cell address-space cap (18 GB of the 23 GB machine), so a cell that needs more fails by
+# itself instead of starving the session
+MEMKB=${MEMKB:-18000000}
 tags="skip alloc free assign load check seq ite loop"
 cells=()
 for t in $tags; do cells+=("no_leak_$t" "can_alloc_$t" "leaks_$t"); done
@@ -18,10 +21,10 @@ for t in $tags; do cells+=("no_leak_$t" "can_alloc_$t" "leaks_$t"); done
 one() {  # one HARNESS: run it with receipts; the log is the job's
   local h=$1
   RUNJOB_ROOT="$ROOT" tools/run-job.sh "p008-kani-$h" -- bash -c \
-    "cd '$ROOT/cross-check/leak-kani' && timeout $CAP cargo kani --harness split::$h 2>&1 \
+    "cd '$ROOT/cross-check/leak-kani' && ulimit -v $MEMKB && timeout $CAP cargo kani --harness split::$h 2>&1 \
        | grep -E 'VERIFICATION|Runtime Symex|Runtime Solver|VCC|Failed Checks|Complete'" >/dev/null
 }
-export -f one; export ROOT CAP
+export -f one; export ROOT CAP MEMKB
 if [ "$SUMMARIZE" = 0 ]; then
   ( cd cross-check/leak-kani && cargo kani --only-codegen >/dev/null 2>&1 ) || true
   printf '%s\n' "${cells[@]}" | xargs -P "$JOBS" -I{} bash -c 'one {}'

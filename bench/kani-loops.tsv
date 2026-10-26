@@ -1,28 +1,28 @@
 cell	root	verdict	meaning	symex_s	vccs_after_simplification	solver_s	wall_s	receipt
 no_leak_skip	skip	SUCCESSFUL	no accepted program with this root leaks	0.2	40	0.0	1	p008-kani-no_leak_skip
-can_alloc_skip	skip	SUCCESSFUL	no accepted program with this root allocates	0.2	40	7.0	1	p008-kani-can_alloc_skip
-leaks_skip	skip	SUCCESSFUL	no program with this root leaks	0.2	37	8.6	1	p008-kani-leaks_skip
-no_leak_alloc	alloc	SUCCESSFUL	no accepted program with this root leaks	0.2	54	0.0	2	p008-kani-no_leak_alloc
-can_alloc_alloc	alloc	SUCCESSFUL	no accepted program with this root allocates	0.2	54	9.8	2	p008-kani-can_alloc_alloc
-leaks_alloc	alloc	FAILED	witness found: a program with this root leaks	0.2	50	0.0	2	p008-kani-leaks_alloc
-no_leak_free	free	SUCCESSFUL	no accepted program with this root leaks	0.2	51	9.1	1	p008-kani-no_leak_free
-can_alloc_free	free	SUCCESSFUL	no accepted program with this root allocates	0.2	50	9.3	1	p008-kani-can_alloc_free
-leaks_free	free	SUCCESSFUL	no program with this root leaks	0.2	47	8.8	2	p008-kani-leaks_free
-no_leak_assign	assign	SUCCESSFUL	no accepted program with this root leaks	0.2	44	6.0	1	p008-kani-no_leak_assign
-can_alloc_assign	assign	SUCCESSFUL	no accepted program with this root allocates	0.2	44	5.6	1	p008-kani-can_alloc_assign
-leaks_assign	assign	SUCCESSFUL	no program with this root leaks	0.2	40	8.9	1	p008-kani-leaks_assign
-no_leak_load	load	SUCCESSFUL	no accepted program with this root leaks	0.2	44	5.3	2	p008-kani-no_leak_load
-can_alloc_load	load	SUCCESSFUL	no accepted program with this root allocates	0.2	44	3.4	2	p008-kani-can_alloc_load
-leaks_load	load	SUCCESSFUL	no program with this root leaks	0.2	40	8.6	1	p008-kani-leaks_load
-no_leak_check	check	SUCCESSFUL	no accepted program with this root leaks	0.2	41	8.5	1	p008-kani-no_leak_check
-can_alloc_check	check	SUCCESSFUL	no accepted program with this root allocates	0.2	41	9.7	1	p008-kani-can_alloc_check
-leaks_check	check	SUCCESSFUL	no program with this root leaks	0.2	38	9.8	1	p008-kani-leaks_check
-no_leak_seq	seq	NO VERDICT (signal TERM)	open	0.0	0	0.0	304	p008-kani-no_leak_seq
-can_alloc_seq	seq	NO VERDICT (signal TERM)	open	0.0	0	0.0	304	p008-kani-can_alloc_seq
-leaks_seq	seq	NO VERDICT (signal TERM)	open	0.0	0	0.0	304	p008-kani-leaks_seq
-no_leak_ite	ite	NOT RUN	open	0.0	0	0.0		p008-kani-no_leak_ite
-can_alloc_ite	ite	NOT RUN	open	0.0	0	0.0		p008-kani-can_alloc_ite
-leaks_ite	ite	NOT RUN	open	0.0	0	0.0		p008-kani-leaks_ite
-no_leak_loop	loop	NOT RUN	open	0.0	0	0.0		p008-kani-no_leak_loop
-can_alloc_loop	loop	NOT RUN	open	0.0	0	0.0		p008-kani-can_alloc_loop
-leaks_loop	loop	NOT RUN	open	0.0	0	0.0		p008-kani-leaks_loop
+can_alloc_skip	skip	SUCCESSFUL	no accepted program with this root allocates	0.2	40	0.0	1	p008-kani-can_alloc_skip
+leaks_skip	skip	SUCCESSFUL	no program with this root leaks	0.2	37	7.1	3	p008-kani-leaks_skip
+no_leak_alloc	alloc	SUCCESSFUL	no accepted program with this root leaks	0.2	54	9.6	1	p008-kani-no_leak_alloc
+can_alloc_alloc	alloc	SUCCESSFUL	no accepted program with this root allocates	0.2	54	7.4	1	p008-kani-can_alloc_alloc
+leaks_alloc	alloc	FAILED	witness found: a program with this root leaks	0.2	50	0.0	1	p008-kani-leaks_alloc
+no_leak_free	free	SUCCESSFUL	no accepted program with this root leaks	0.2	51	7.5	1	p008-kani-no_leak_free
+can_alloc_free	free	SUCCESSFUL	no accepted program with this root allocates	0.2	50	6.7	0	p008-kani-can_alloc_free
+leaks_free	free	SUCCESSFUL	no program with this root leaks	0.2	47	8.4	1	p008-kani-leaks_free
+no_leak_assign	assign	SUCCESSFUL	no accepted program with this root leaks	0.2	44	7.2	1	p008-kani-no_leak_assign
+can_alloc_assign	assign	SUCCESSFUL	no accepted program with this root allocates	0.2	44	7.6	1	p008-kani-can_alloc_assign
+leaks_assign	assign	SUCCESSFUL	no program with this root leaks	0.2	40	9.7	1	p008-kani-leaks_assign
+no_leak_load	load	SUCCESSFUL	no accepted program with this root leaks	0.2	44	4.5	1	p008-kani-no_leak_load
+can_alloc_load	load	SUCCESSFUL	no accepted program with this root allocates	0.2	44	2.7	1	p008-kani-can_alloc_load
+leaks_load	load	SUCCESSFUL	no program with this root leaks	0.2	40	0.0	1	p008-kani-leaks_load
+no_leak_check	check	SUCCESSFUL	no accepted program with this root leaks	0.2	41	0.0	1	p008-kani-no_leak_check
+can_alloc_check	check	SUCCESSFUL	no accepted program with this root allocates	0.2	41	0.0	1	p008-kani-can_alloc_check
+leaks_check	check	SUCCESSFUL	no program with this root leaks	0.2	38	9.9	1	p008-kani-leaks_check
+no_leak_seq	seq	NO VERDICT (0)	open	147.7	33031	992.2	3870	p008-kani-no_leak_seq
+can_alloc_seq	seq	NO VERDICT (0)	open	192.5	33031	592.2	3858	p008-kani-can_alloc_seq
+leaks_seq	seq	FAILED	witness found: a program with this root leaks	31.5	30092	3131.4	3454	p008-kani-leaks_seq
+no_leak_ite	ite	SUCCESSFUL	no accepted program with this root leaks	166.8	32522	1317.7	1660	p008-kani-no_leak_ite
+can_alloc_ite	ite	FAILED	witness found: an accepted program with this root allocates	177.2	32522	2051.1	2299	p008-kani-can_alloc_ite
+leaks_ite	ite	FAILED	witness found: a program with this root leaks	27.9	29583	655.5	725	p008-kani-leaks_ite
+no_leak_loop	loop	SUCCESSFUL	no accepted program with this root leaks	94.4	31569	1443.9	1597	p008-kani-no_leak_loop
+can_alloc_loop	loop	FAILED	witness found: an accepted program with this root allocates	95.0	31569	1419.2	1574	p008-kani-can_alloc_loop
+leaks_loop	loop	FAILED	witness found: a program with this root leaks	29.5	30097	860.8	934	p008-kani-leaks_loop

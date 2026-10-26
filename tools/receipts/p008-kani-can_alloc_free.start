@@ -1,4 +1,4 @@
-started: 2026-10-26T03:22:56+01:00
-head: 5e0530a
-command: bash -c cd '/tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-tk/cross-check/leak-kani' && timeout 3600 cargo kani --harness split::can_alloc_free 2>&1        | grep -E 'VERIFICATION|Runtime Symex|Runtime Solver|VCC|Failed Checks|Complete'
+started: 2026-10-26T09:08:44+01:00
+head: 50018c8
+command: bash -c cd '/tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-tk/cross-check/leak-kani' && ulimit -v 18000000 && timeout 3600 cargo kani --harness split::can_alloc_free 2>&1        | grep -E 'VERIFICATION|Runtime Symex|Runtime Solver|VCC|Failed Checks|Complete'
 log: tools/receipts/p008-kani-can_alloc_free.log
