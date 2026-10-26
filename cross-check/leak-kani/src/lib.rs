@@ -296,6 +296,84 @@ mod attack {
     }
 }
 
+// ------------------------------------------------------------------ the split (P0-08)
+
+/// The three `attack` harnesses again, cut into one cell per root tag, so each cell is a
+/// search Kani can finish. The tag is *assigned*: with `kani::assume(p[0].tag == T)` symbolic
+/// execution still explores every tag (a skip-root cell ran past 600 s), while an assigned
+/// constant is pruned. Every program with root tag T, and only those, is reached either way. `well_formed` caps every tag at `T_LOOP`, so the cells `0..=8`
+/// cover every program; `split::cells_cover` proves it. The macro writes every cell from one
+/// body, so cells cannot differ except in the tag.
+#[cfg(kani)]
+mod split {
+    use super::*;
+
+    #[kani::proof]
+    fn cells_cover() {
+        let p: [Node; NN] = kani::any();
+        kani::assume(well_formed(&p));
+        assert!(p[0].tag <= T_LOOP);
+    }
+
+    macro_rules! cell {
+        ($leak:ident, $alloc:ident, $some:ident, $tag:expr) => {
+            /// No accepted program with this root leaks (refuted = a defect in `LeakCert.lean`).
+            #[kani::proof]
+            #[kani::unwind(8)]
+            fn $leak() {
+                let mut p: [Node; NN] = kani::any();
+                p[0].tag = $tag; // assigned, not assumed: symex then prunes the other tags
+                kani::assume(well_formed(&p));
+                kani::assume(leak_safe(&p));
+                let br: [bool; NN] = kani::any();
+                let mut st = St::new();
+                let iters: [u8; NN] = kani::any();
+                exec(&p, 0, &mut st, &br, &iters, NN);
+                if !st.dead {
+                    assert!(st.live == 0, "leakSafe accepted a program that leaks");
+                }
+            }
+            /// Vacuity witness: refuted = an accepted program with this root allocates.
+            #[kani::proof]
+            #[kani::unwind(8)]
+            fn $alloc() {
+                let mut p: [Node; NN] = kani::any();
+                p[0].tag = $tag; // assigned, not assumed: symex then prunes the other tags
+                kani::assume(well_formed(&p));
+                kani::assume(leak_safe(&p));
+                let br: [bool; NN] = kani::any();
+                let mut st = St::new();
+                let iters: [u8; NN] = kani::any();
+                exec(&p, 0, &mut st, &br, &iters, NN);
+                assert!(st.dead || st.fresh == 0, "witness: an accepted program that allocates");
+            }
+            /// Vacuity witness: refuted = some program with this root leaks.
+            #[kani::proof]
+            #[kani::unwind(8)]
+            fn $some() {
+                let mut p: [Node; NN] = kani::any();
+                p[0].tag = $tag; // assigned, not assumed: symex then prunes the other tags
+                kani::assume(well_formed(&p));
+                let br: [bool; NN] = kani::any();
+                let mut st = St::new();
+                let iters: [u8; NN] = kani::any();
+                exec(&p, 0, &mut st, &br, &iters, NN);
+                assert!(st.dead || st.live == 0, "witness: a program that leaks");
+            }
+        };
+    }
+
+    cell!(no_leak_skip, can_alloc_skip, leaks_skip, T_SKIP);
+    cell!(no_leak_alloc, can_alloc_alloc, leaks_alloc, T_ALLOC);
+    cell!(no_leak_free, can_alloc_free, leaks_free, T_FREE);
+    cell!(no_leak_assign, can_alloc_assign, leaks_assign, T_ASSIGN);
+    cell!(no_leak_load, can_alloc_load, leaks_load, T_LOAD);
+    cell!(no_leak_check, can_alloc_check, leaks_check, T_CHECK);
+    cell!(no_leak_seq, can_alloc_seq, leaks_seq, T_SEQ);
+    cell!(no_leak_ite, can_alloc_ite, leaks_ite, T_ITE);
+    cell!(no_leak_loop, can_alloc_loop, leaks_loop, T_LOOP);
+}
+
 #[cfg(test)]
 mod concrete {
     use super::*;
