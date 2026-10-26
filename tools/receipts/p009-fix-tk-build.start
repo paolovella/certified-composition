@@ -1,0 +1,4 @@
+started: 2026-10-26T02:05:05+01:00
+head: 7f39dab
+command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-p009/transport-kernel && lake build 2>&1 | tail -5 && cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-p009/transport-calculus && lake build 2>&1 | grep -c 'has been deprecated'
+log: tools/receipts/p009-fix-tk-build.log
