@@ -705,8 +705,8 @@ theorem sfind_le (p : Nat → Prop) [DecidablePred p] :
   | fuel + 1, start, m, hm, hs, _ => by
       show (if p start then start else sfind p (start + 1) fuel) ≤ m
       by_cases hp : p start
-      · rw [ite_eq_left hp]; exact hs
-      · rw [ite_eq_right hp]
+      · rw [if_pos hp]; exact hs
+      · rw [if_neg hp]
         have hne : start ≠ m := fun h => hp (h ▸ hm)
         exact sfind_le p fuel (start + 1) m hm (by omega) (by omega)
 
@@ -717,8 +717,8 @@ theorem sfind_p (p : Nat → Prop) [DecidablePred p] :
   | fuel + 1, start, ⟨m, hs, hlt, hpm⟩ => by
       show p (if p start then start else sfind p (start + 1) fuel)
       by_cases hp : p start
-      · rw [ite_eq_left hp]; exact hp
-      · rw [ite_eq_right hp]
+      · rw [if_pos hp]; exact hp
+      · rw [if_neg hp]
         have hne : start ≠ m := fun h => hp (h ▸ hpm)
         exact sfind_p p fuel (start + 1) ⟨m, by omega, by omega, hpm⟩
 
@@ -990,7 +990,7 @@ theorem le_monotonize {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
   rw [monotonize_eq]
   have h := Classical.choose_spec
     (hpb w (fun v _ => if _h : WI.lt v w then monotonize WI hpb c v else c v)) w (WI.le_refl w)
-  rw [dite_eq_right (fun hlt : WI.lt w w => hlt.2 (WI.le_refl w))] at h
+  rw [dif_neg (fun hlt : WI.lt w w => hlt.2 (WI.le_refl w))] at h
   exact h
 
 /-- The monotonized chain is monotone across a strict step (the `v < w` slots of the choice). -/
@@ -1000,7 +1000,7 @@ theorem monotonize_lt_mono {W D : Type} (WI : WellIndex W) {le : D → D → Pro
   rw [monotonize_eq WI hpb c w]
   have h := Classical.choose_spec
     (hpb w (fun v _ => if _h : WI.lt v w then monotonize WI hpb c v else c v)) v hvw.1
-  rw [dite_eq_left hvw] at h
+  rw [dif_pos hvw] at h
   exact h
 
 theorem monotonize_mono {W D : Type} (WI : WellIndex W) {le : D → D → Prop}
@@ -1157,7 +1157,7 @@ theorem prefixBounded_of_sigmaDirected {W D : Type} (WI : WellIndex W) {le : D �
   obtain ⟨n, hn⟩ := he v hv
   subst hn
   have h := hb n
-  rw [dite_eq_left hv] at h
+  rw [dif_pos hv] at h
   exact h
 
 /-- **Wall one: σ-directedness closes the ω₁-like case.** A σ-directed distance with a
@@ -1285,7 +1285,7 @@ theorem evalP_not_key : ∀ (p : List (Nat × Nat)) (ξ : Nat),
   | (k, v) :: rest, ξ, h => by
     have hne : ξ ≠ k := fun he => h v (he ▸ List.mem_cons_self ..)
     show (if ξ = k then v else evalP rest ξ) = 1
-    rw [ite_eq_right hne]
+    rw [if_neg hne]
     exact evalP_not_key rest ξ (fun u hu => h u (List.mem_cons_of_mem _ hu))
 
 /-- Every key of a patch list is at most its running key-maximum. -/
@@ -1305,8 +1305,8 @@ theorem evalP_le_maxValP : ∀ (p : List (Nat × Nat)) (ξ : Nat), evalP p ξ �
   | (k, v) :: rest, ξ => by
     show (if ξ = k then v else evalP rest ξ) ≤ Nat.max v (maxValP rest)
     by_cases h : ξ = k
-    · rw [ite_eq_left h]; exact Nat.le_max_left _ _
-    · rw [ite_eq_right h]; exact Nat.le_trans (evalP_le_maxValP rest ξ) (Nat.le_max_right _ _)
+    · rw [if_pos h]; exact Nat.le_max_left _ _
+    · rw [if_neg h]; exact Nat.le_trans (evalP_le_maxValP rest ξ) (Nat.le_max_right _ _)
 
 /-- Levels: `ℕ ∪ {∞}` (`none` = the limit level with full domain). -/
 def leLvl : Option Nat → Option Nat → Prop
@@ -1379,8 +1379,8 @@ theorem evalP_mergeP_of_mem : ∀ (l p q : List (Nat × Nat)) (ξ v : Nat), (ξ,
   | (k, w) :: rest, p, q, ξ, v, h => by
     show (if ξ = k then Nat.max (evalP p k) (evalP q k) else _) = _
     by_cases hk : ξ = k
-    · rw [ite_eq_left hk, hk]
-    · rw [ite_eq_right hk]
+    · rw [if_pos hk, hk]
+    · rw [if_neg hk]
       cases h with
       | head => exact absurd rfl hk
       | tail _ h => exact evalP_mergeP_of_mem rest p q ξ v h
@@ -1431,7 +1431,7 @@ theorem fb_not_sigma_directed : ¬ SigmaDirected Fb leF := by
   obtain ⟨⟨l, v⟩, hb⟩ := hσ (fun n => (none, [(0, n)]))
   have he : evalP [(0, evalP v 0 + 1)] 0 = evalP v 0 + 1 := by
     show (if 0 = 0 then evalP v 0 + 1 else evalP [] 0) = evalP v 0 + 1
-    rw [ite_eq_left rfl]
+    rw [if_pos rfl]
   have h : evalP [(0, evalP v 0 + 1)] 0 ≤ evalP v 0 :=
     (hb (evalP v 0 + 1)).2 0 trivial
   rw [he] at h
@@ -1449,12 +1449,12 @@ theorem evalP_zeroEvens_le_one : ∀ (n ξ : Nat), evalP (zeroEvens n) ξ ≤ 1
   | n + 1, ξ => by
     show evalP (if n % 2 = 0 then (n, 0) :: zeroEvens n else zeroEvens n) ξ ≤ 1
     by_cases h : n % 2 = 0
-    · rw [ite_eq_left h]
+    · rw [if_pos h]
       show (if ξ = n then 0 else evalP (zeroEvens n) ξ) ≤ 1
       by_cases hξ : ξ = n
-      · rw [ite_eq_left hξ]; exact Nat.zero_le 1
-      · rw [ite_eq_right hξ]; exact evalP_zeroEvens_le_one n ξ
-    · rw [ite_eq_right h]; exact evalP_zeroEvens_le_one n ξ
+      · rw [if_pos hξ]; exact Nat.zero_le 1
+      · rw [if_neg hξ]; exact evalP_zeroEvens_le_one n ξ
+    · rw [if_neg h]; exact evalP_zeroEvens_le_one n ξ
 
 theorem evalP_zeroEvens_even : ∀ (n ξ : Nat), ξ < n → ξ % 2 = 0 → evalP (zeroEvens n) ξ = 0
   | 0,     _, hlt, _   => by omega
@@ -1462,15 +1462,15 @@ theorem evalP_zeroEvens_even : ∀ (n ξ : Nat), ξ < n → ξ % 2 = 0 → evalP
     show evalP (if n % 2 = 0 then (n, 0) :: zeroEvens n else zeroEvens n) ξ = 0
     by_cases hξ : ξ = n
     · subst hξ
-      rw [ite_eq_left hev]
+      rw [if_pos hev]
       show (if ξ = ξ then 0 else evalP (zeroEvens ξ) ξ) = 0
-      rw [ite_eq_left rfl]
+      rw [if_pos rfl]
     · by_cases h : n % 2 = 0
-      · rw [ite_eq_left h]
+      · rw [if_pos h]
         show (if ξ = n then 0 else evalP (zeroEvens n) ξ) = 0
-        rw [ite_eq_right hξ]
+        rw [if_neg hξ]
         exact evalP_zeroEvens_even n ξ (by omega) hev
-      · rw [ite_eq_right h]
+      · rw [if_neg h]
         exact evalP_zeroEvens_even n ξ (by omega) hev
 
 /-- The dip family: level `n`, floor `1` zeroed on the evens below `n`. Its pointwise sup
@@ -1502,18 +1502,18 @@ theorem fb_no_minimal_ub :
       refine ⟨(hu n).1, fun ξ hξ => ?_⟩
       show evalP (zeroEvens n) ξ ≤ (if ξ = ξ₀ then 0 else evalP v ξ)
       by_cases hξeq : ξ = ξ₀
-      · rw [ite_eq_left hξeq]
+      · rw [if_pos hξeq]
         have h0 : evalP (zeroEvens n) ξ = 0 :=
           evalP_zeroEvens_even n ξ hξ (by rw [hξeq]; exact hev)
         omega
-      · rw [ite_eq_right hξeq]
+      · rw [if_neg hξeq]
         exact (hu n).2 ξ hξ
     · -- below the given bound
       refine ⟨leLvl_refl l, fun ξ _ => ?_⟩
       show (if ξ = ξ₀ then 0 else evalP v ξ) ≤ evalP v ξ
       by_cases hξeq : ξ = ξ₀
-      · rw [ite_eq_left hξeq]; exact Nat.zero_le _
-      · rw [ite_eq_right hξeq]; exact Nat.le_refl _
+      · rw [if_pos hξeq]; exact Nat.zero_le _
+      · rw [if_neg hξeq]; exact Nat.le_refl _
     · -- strictly: the given bound is 1 at ξ₀, the new one is 0
       intro hle
       have hl : l = none := by
@@ -1523,7 +1523,7 @@ theorem fb_no_minimal_ub :
       have h := hle.2 ξ₀ (by rw [hl]; exact trivial)
       have h0 : evalP ((ξ₀, 0) :: v) ξ₀ = 0 := by
         show (if ξ₀ = ξ₀ then 0 else evalP v ξ₀) = 0
-        rw [ite_eq_left rfl]
+        rw [if_pos rfl]
       rw [hv₀, h0] at h
       omega
 
@@ -1539,15 +1539,15 @@ theorem evalP_ladder_lt : ∀ (k j ξ : Nat), ξ < j → evalP (ladder k j) ξ =
   | k, j + 1, ξ, h => by
     show (if ξ = j then k else evalP (ladder k j) ξ) = k
     by_cases hξ : ξ = j
-    · rw [ite_eq_left hξ]
-    · rw [ite_eq_right hξ]
+    · rw [if_pos hξ]
+    · rw [if_neg hξ]
       exact evalP_ladder_lt k j ξ (by omega)
 
 theorem evalP_ladder_ge : ∀ (k j ξ : Nat), j ≤ ξ → evalP (ladder k j) ξ = 1
   | _, 0,     _, _ => rfl
   | k, j + 1, ξ, h => by
     show (if ξ = j then k else evalP (ladder k j) ξ) = 1
-    rw [ite_eq_right (by omega)]
+    rw [if_neg (by omega)]
     exact evalP_ladder_ge k j ξ (by omega)
 
 /-- The ladders are cofinal: every element is dominated once the rung exceeds its patch
@@ -1631,17 +1631,17 @@ theorem no_injection_into_list {A : Type} :
       · intro m n hmn
         have h1 := hinj _ _ hmn
         by_cases hm : m < k <;> by_cases hn : n < k
-        · rw [ite_eq_left hm, ite_eq_left hn] at h1; exact h1
-        · rw [ite_eq_left hm, ite_eq_right hn] at h1; omega
-        · rw [ite_eq_right hm, ite_eq_left hn] at h1; omega
-        · rw [ite_eq_right hm, ite_eq_right hn] at h1; omega
+        · rw [if_pos hm, if_pos hn] at h1; exact h1
+        · rw [if_pos hm, if_neg hn] at h1; omega
+        · rw [if_neg hm, if_pos hn] at h1; omega
+        · rw [if_neg hm, if_neg hn] at h1; omega
       · intro n
         have hne : f (if n < k then n else n + 1) ≠ a := by
           intro he
           have := hinj _ k (he.trans hk.symm)
           by_cases hn : n < k
-          · rw [ite_eq_left hn] at this; omega
-          · rw [ite_eq_right hn] at this; omega
+          · rw [if_pos hn] at this; omega
+          · rw [if_neg hn] at this; omega
         cases hall (if n < k then n else n + 1) with
         | head => exact absurd rfl hne
         | tail _ hmem => exact hmem
@@ -1694,8 +1694,8 @@ theorem pair_bound (hσ : SigmaDirected W WI.le) (a b : W) :
     ∃ c, WI.le a c ∧ WI.le b c := by
   obtain ⟨c, hc⟩ := hσ (fun n => if n = 0 then a else b)
   refine ⟨c, ?_, ?_⟩
-  · have := hc 0; rw [ite_eq_left rfl] at this; exact this
-  · have := hc 1; rw [ite_eq_right (by omega)] at this; exact this
+  · have := hc 0; rw [if_pos rfl] at this; exact this
+  · have := hc 1; rw [if_neg (by omega)] at this; exact this
 
 /-- Strictly-above elements exist (unboundedness + totality). -/
 theorem exists_gt (hub : ∀ w, ∃ w', ¬ WI.le w' w) (w : W) : ∃ s, WI.lt w s := by
@@ -1886,14 +1886,14 @@ theorem reps_implies_trivial
   by_cases h : WI.le u wstar
   · -- below the escape bound: `E` is the `sstar` floor; coherence covers the difference
     have hus : WI.lt u sstar := WellIndex.lt_of_le_of_lt WI h hsstar
-    have hEu : E u = C.e sstar u := dite_eq_left h
+    have hEu : E u = C.e sstar u := dif_pos h
     exact Or.inl (Or.inl ⟨hus, huv, fun he => hne (hEu ▸ he)⟩)
   · -- above: `E` is the stable value, attained at `γ`; fiber + coherence cover it
     obtain ⟨n, hfn⟩ := hf u huv.1
     subst hfn
-    have hEu : E (f n) = Classical.choose (hstable (f n) h) := dite_eq_right h
+    have hEu : E (f n) = Classical.choose (hstable (f n) h) := dif_neg h
     have hgn : g n = Classical.choose (Classical.choose_spec (hstable (f n) h)).1 :=
-      dite_eq_left h
+      dif_pos h
     have hwu := Classical.choose_spec (Classical.choose_spec (hstable (f n) h)).1
     rw [← hgn] at hwu
     have hγlt : WI.lt (f n) γ := WellIndex.lt_of_lt_of_le WI huv hvγ
@@ -1926,9 +1926,9 @@ def chiLt (n ξ : Nat) : Nat := if ξ < n then 1 else 0
 theorem chiLt_mono {n m : Nat} (h : n ≤ m) (ξ : Nat) : chiLt n ξ ≤ chiLt m ξ := by
   show (if ξ < n then 1 else 0) ≤ (if ξ < m then 1 else 0)
   by_cases hξ : ξ < n
-  · rw [ite_eq_left hξ, ite_eq_left (by omega)]
+  · rw [if_pos hξ, if_pos (by omega)]
     exact Nat.le_refl 1
-  · rw [ite_eq_right hξ]
+  · rw [if_neg hξ]
     exact Nat.zero_le _
 
 /-- The family is pairwise finitely-differing ("coherent" at index ℕ). -/
@@ -1940,7 +1940,7 @@ theorem chiLt_coherent (n m : Nat) : FiniteP (fun ξ => chiLt n ξ ≠ chiLt m �
     · exact Or.inr (List.mem_range.mpr h2)
     · refine absurd ?_ hξ
       show (if ξ < n then 1 else 0) = (if ξ < m then 1 else 0)
-      rw [ite_eq_right h1, ite_eq_right h2]
+      rw [if_neg h1, if_neg h2]
 
 /-- **The concentration step fails at index ℕ.** Every coordinate of the coherent,
     level-monotone family `χ_{<n}` moves: the mover set of level `0` is all of ℕ — not
@@ -1955,7 +1955,7 @@ theorem omega_concentration_fails :
     intro ξ
     refine hL ξ ⟨ξ + 1, ?_⟩
     show (if ξ < ξ + 1 then 1 else 0) > (if ξ < 0 then 1 else 0)
-    rw [ite_eq_left (by omega), ite_eq_right (by omega)]
+    rw [if_pos (by omega), if_neg (by omega)]
     omega
   have := mem_le_foldMax L (L.foldr Nat.max 0 + 1) (hall _)
   omega
@@ -2214,26 +2214,26 @@ theorem PartialDom.compat_of_crossMono {D : Type} {O : DirOrder D} {L : LegalSys
   · -- cross-monotonicity of the union, by 4 cases on membership of `u`, `u'`
     intro u u' hu hu' huu'
     by_cases hpu : p.inDom u <;> by_cases hpu' : p.inDom u'
-    · simp only [ite_eq_left hpu, ite_eq_left hpu']; exact p.mono hpu hpu' huu'
-    · simp only [ite_eq_left hpu, ite_eq_right hpu']
+    · simp only [if_pos hpu, if_pos hpu']; exact p.mono hpu hpu' huu'
+    · simp only [if_pos hpu, if_neg hpu']
       exact cross_pq u u' hpu (hu'.resolve_left hpu') huu'
-    · simp only [ite_eq_right hpu, ite_eq_left hpu']
+    · simp only [if_neg hpu, if_pos hpu']
       exact cross_qp u u' (hu.resolve_left hpu) hpu' huu'
-    · simp only [ite_eq_right hpu, ite_eq_right hpu']
+    · simp only [if_neg hpu, if_neg hpu']
       exact q.mono (hu.resolve_left hpu) (hu'.resolve_left hpu') huu'
   · -- domination of the union
     intro u hu w hw
     by_cases hpu : p.inDom u
-    · simp only [ite_eq_left hpu]; exact p.dominates hpu w hw
-    · simp only [ite_eq_right hpu]; exact q.dominates (hu.resolve_left hpu) w hw
+    · simp only [if_pos hpu]; exact p.dominates hpu w hw
+    · simp only [if_neg hpu]; exact q.dominates (hu.resolve_left hpu) w hw
   · -- `r` extends `p`
-    intro u hpu; exact ⟨Or.inl hpu, ite_eq_left hpu⟩
+    intro u hpu; exact ⟨Or.inl hpu, if_pos hpu⟩
   · -- `r` extends `q` (uses `agree` on the overlap)
     intro u hqu
     refine ⟨Or.inr hqu, ?_⟩
     by_cases hpu : p.inDom u
-    · simp only [ite_eq_left hpu]; exact agree u hpu hqu
-    · simp only [ite_eq_right hpu]
+    · simp only [if_pos hpu]; exact agree u hpu hqu
+    · simp only [if_neg hpu]
 
 /-! ### The single-element case, machine-checked (ZFC)
 
