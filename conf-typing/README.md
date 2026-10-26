@@ -96,6 +96,7 @@ lake build          # builds all four layers
 | `ConfTyping/Speculate.lean` | brick 33 / `VULN-COVERAGE.md` row 9 | speculative execution: a transient-execution machine with demonic misprediction — Spectre-v1 as a theorem (`spectre_leaks`), architecturally invisible (`arch_indistinguishable`), and a fence check whose soundness makes speculation observationally inert (`spec_inert`) |
 | `ConfTyping/Race.lean` | brick 32 / `VULN-COVERAGE.md` row 8 | races and TOCTOU: a demonic-scheduling small-step machine — the attack (`toctou_interleaving_unsafe`), the atomic fix safe under every interleaving, and a decidable check that reduces the concurrent obligation to a sequential one |
 | `ConfTyping/QueryEscape.lean` | brick 31 / `VULN-COVERAGE.md` row 3 | string literals with escapes: complete escaping proved sound and faithful, the unescaped-escape bug and the escaper/tokenizer convention mismatch proved injectable — escaping is a ledger entry (`escaping_no_silent_discharge`), parameterization is not |
+| `ConfTyping/Witnesses.lean` | P0-04 | the missing sides of the witness registry: for the 17 checkers that lacked an accepted or a refused witness (four lacked both), what was missing, each by `decide`. `WitnessRegistry.lean` (not in the library) computes the registry; `tools/witnesses.sh --check` requires every checker to have both |
 
 ## House rules learned the hard way
 

@@ -133,6 +133,11 @@ step "base gate: ring0 and manifest rules accept and refuse (witness)" \
 
 step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
 step "axiom manifest is current"   bash tools/axioms.sh --check
+# P0-04: every checker has an accepted and a refused witness, computed from the environment;
+# and the registry itself both counts and misses (registry-witness.sh).
+step "witness registry: every checker accepts and refuses" bash tools/witnesses.sh --check
+step "witness registry finds what is missing (witness)" \
+     bash -c 'bash tools/gate/registry-witness.sh | tail -1 | grep -qx "registry witnesses: 4 passed, 0 failed"'
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \
      bash -c 'bash tools/guard-selftest.sh | tail -1 | grep -qE "^guard self-test: [0-9]+ passed, 0 failed$"'
