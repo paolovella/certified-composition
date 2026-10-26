@@ -6,6 +6,15 @@ landed.
 
 ## Repository verification
 
+- **The Kani loop search finishes: no accepted 5-node program leaks** (2026-10-26, P0-08;
+  `cross-check/leak-kani` `mod split`, `bench/kani-loops/run.sh`, `bench/kani-loops*.tsv`).
+  The search that died in August (`I-0001`) is cut by the root's tag, and the `seq` root again
+  by its two children. Each of the 24 cells finished within 60 minutes and 18 GB, with
+  receipts. Two harnesses check that the cells cover every program. Leaking programs and
+  accepted allocating programs both exist in the space, so "no leak" is not vacuous. The bound
+  is 5 nodes and two loop iterations. `LeakFree` on aborting runs stays ledgered (VULN-COVERAGE
+  row 6).
+
 - **A pull request is judged by master's gate, and nothing skips without saying so**
   (2026-10-26, P0-06; `tools/gate/base-gate.sh`, `.github/workflows/gate.yml`, `tools/ci.sh`).
   Two of the findings listed under 2026-10-23 below are now addressed in code: CI ran the PR's
