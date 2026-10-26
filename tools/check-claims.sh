@@ -1498,21 +1498,21 @@ for m in AliasFix Attack HeapLoop MemSafe FreeLoop; do
     echo "DRIFT: conf-typing/ConfTyping/$m.lean no longer erases Std.le_refl from simp (P0-02)"; fail=1
   fi
 done
-# (h) The toolchain the docs state is the one the lean-toolchain files pin. The root workspace and
-#     both mathlib-free packages share one version; transport-kernel keeps its own.
+# (h) The toolchain the docs state is the one the lean-toolchain files pin. Since P0-10 the root
+#     workspace and all three packages share one version: transport-kernel builds the
+#     transport-calculus sources itself, so two toolchains forced names valid in both (P0-09).
 tc=$(sed 's/.*://' conf-typing/lean-toolchain 2>/dev/null)
-tk=$(sed 's/.*://' transport-kernel/lean-toolchain 2>/dev/null)
-for f in lean-toolchain transport-calculus/lean-toolchain; do
+for f in lean-toolchain transport-calculus/lean-toolchain transport-kernel/lean-toolchain; do
   if [ "$(sed 's/.*://' "$f" 2>/dev/null)" != "$tc" ]; then
     echo "DRIFT: $f does not pin $tc like conf-typing/lean-toolchain"; fail=1
   fi
 done
-if ! grep -q "conf-typing and transport-calculus are pinned to Lean \`$tc\`" README.md 2>/dev/null \
-   || ! grep -q "^\`$tk\` with its mathlib" README.md 2>/dev/null; then
-  echo "DRIFT: README.md states a toolchain other than $tc (packages) / $tk (transport-kernel)"; fail=1
+if ! grep -q "conf-typing, transport-calculus and transport-kernel are pinned to Lean \`$tc\`" README.md 2>/dev/null; then
+  echo "DRIFT: README.md states a toolchain other than $tc"; fail=1
 fi
-if ! grep -q "($tc), mathlib-free" conf-typing/README.md 2>/dev/null; then
-  echo "DRIFT: conf-typing/README.md states a toolchain other than $tc"; fail=1
+if ! grep -q "($tc), mathlib-free" conf-typing/README.md 2>/dev/null \
+   || ! grep -q "needs Lean ${tc#v}\." transport-kernel/README.md 2>/dev/null; then
+  echo "DRIFT: conf-typing/README.md or transport-kernel/README.md states a toolchain other than $tc"; fail=1
 fi
 # (i) The base-branch gate classifies Ring 0 by its own list (P0-06). Every path CLAUDE.md names
 #     as Ring 0 must be in it, or a PR touching that path would pass as an ordinary change.

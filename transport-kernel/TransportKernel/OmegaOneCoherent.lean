@@ -22,7 +22,7 @@
   (`nontrivial_coherent_no_reps`). To our knowledge this is the first machine-checked
   theorem about coherent sequences on ω₁.
 -/
-import Mathlib.Data.Nat.Lattice
+import Mathlib.Order.Lattice.Nat
 import Mathlib.Data.Set.Card
 import Mathlib.Data.Set.Countable
 import Mathlib.SetTheory.Cardinal.Regular
@@ -90,7 +90,8 @@ theorem sigmaDirected_omegaOne : TransportCalculus.SigmaDirected OmegaOne (· �
     exact aleph0_lt_aleph_one
   refine ⟨ToType.mk ⟨_, Set.mem_Iio.mpr hsup⟩, fun n => ?_⟩
   show f n ≤ ToType.mk ⟨_, Set.mem_Iio.mpr hsup⟩
-  rw [OmegaOne.le_iff, OmegaOne.ord_mk]
+  -- 4.35: the hypothesis is passed explicitly; `rw` no longer infers it from `Set.mem_Iio.mpr`.
+  rw [OmegaOne.le_iff, OmegaOne.ord_mk hsup]
   exact le_ciSup Ordinal.bddAbove_of_small n
 
 /-- Segments of ω₁ are countable: cardinalities below ℵ₁ are at most ℵ₀. -/
@@ -144,7 +145,7 @@ theorem unbounded_omegaOne : ∀ w : OmegaOne, ∃ w', ¬ w' ≤ w := by
       _ = ℵ₀ := by simp
       _ < ℵ₁ := aleph0_lt_aleph_one
   refine ⟨ToType.mk ⟨_, Set.mem_Iio.mpr hsucc⟩, ?_⟩
-  rw [OmegaOne.le_iff, OmegaOne.ord_mk]
+  rw [OmegaOne.le_iff, OmegaOne.ord_mk hsucc]
   exact not_le.mpr (lt_add_one _)
 
 /-- A base point: `0 < ω₁`. -/
@@ -478,7 +479,7 @@ theorem omega1_downDip_trivial
     have hsn : D.att hbad ≤ s := by
       have h0 := hs n
       rw [hn] at h0
-      rwa [dif_pos hbad] at h0
+      rwa [dite_eq_left hbad] at h0
     exact le_trans (le_trans hsn hsp) (le_of_lt hpδ)
   have h1 : C.e δ u = D.Eval u := D.eval_eq_of_honest hbad hhon hatt
   have h2 : C.e δ u = C.e w u := by

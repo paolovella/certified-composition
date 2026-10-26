@@ -304,6 +304,9 @@ run_case "README states a stale toolchain" drift \
 run_case "root toolchain drifts from packages" drift \
   bash -c 'echo leanprover/lean4:v4.34.0 > lean-toolchain'
 
+run_case "transport-kernel toolchain drifts back" drift \
+  bash -c 'echo leanprover/lean4:v4.31.0 > transport-kernel/lean-toolchain'
+
 run_case "run-job loses its signal trap" drift \
   bash -c 'sed -i "/^for sig in TERM INT HUP; do$/,/^done$/d" tools/run-job.sh'
 

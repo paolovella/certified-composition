@@ -5,7 +5,7 @@ and proves `Bridge.comp` with **zero axioms**). This repo does the thing a
 mathlib-free abstraction cannot do for itself: **plug the interface into objects
 someone else built**, and see whether it receives them.
 
-Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.31.0.
+Requires the mathlib olean cache (`lake exe cache get`); needs Lean 4.35.0.
 
 ## The three-tier cost ledger (so it isn't rediscovered mid-session)
 

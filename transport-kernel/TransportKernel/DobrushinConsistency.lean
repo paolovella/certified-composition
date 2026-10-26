@@ -16,7 +16,8 @@
   - `dpi_via_measure` — the payoff: the finite DPI re-derived as a *corollary* of the
     measure-theoretic one, so the two developments provably agree where they overlap.
 -/
-import Mathlib.MeasureTheory.Measure.Dirac
+import Mathlib.MeasureTheory.Measure.Dirac.Def
+import Mathlib.MeasureTheory.Measure.Dirac.Basic
 import Mathlib.Tactic
 import TransportKernel.DobrushinReceive
 import TransportKernel.DobrushinMeasureReceive

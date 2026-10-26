@@ -10,7 +10,7 @@
   `D = ℝ` (TV distances) by multiplication, and `Bridge.comp` reproduces the
   submultiplicative bound `η(K)·η(L)` — advanced composition, as certificate accumulation.
 -/
-import Mathlib.Data.NNReal.Basic
+import Mathlib.Basic.NNReal.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Tactic
 import TransportKernel.LipschitzReceive   -- reuse the GradedAction/Bridge core
