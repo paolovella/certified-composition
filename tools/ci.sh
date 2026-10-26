@@ -138,6 +138,15 @@ step "axiom manifest is current"   bash tools/axioms.sh --check
 step "witness registry: every checker accepts and refuses" bash tools/witnesses.sh --check
 step "witness registry finds what is missing (witness)" \
      bash -c 'bash tools/gate/registry-witness.sh | tail -1 | grep -qx "registry witnesses: 4 passed, 0 failed"'
+# P0-05: every mechanical rule mutant of every checker is killed, and the per-site verdicts match
+# tools/mutants.expected. A few minutes, so the full run and the heavy runner only.
+if [ "$FAST" = 0 ]; then
+  step "rule mutants: every one killed, table current" python3 tools/mutants.py --check --jobs 4
+  step "rule mutants: the runner finds a survivor (witness)" \
+       bash -c 'bash tools/gate/mutants-witness.sh | tail -1 | grep -qx "mutant runner witnesses: 2 passed, 0 failed"'
+else
+  not_run "rule mutants: every one killed, table current" DEFERRED "--fast; the full run and the heavy runner run them"
+fi
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \
      bash -c 'bash tools/guard-selftest.sh | tail -1 | grep -qE "^guard self-test: [0-9]+ passed, 0 failed$"'

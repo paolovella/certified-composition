@@ -1526,6 +1526,12 @@ while IFS= read -r g; do
     echo "DRIFT: CLAUDE.md names $g as Ring 0, but tools/gate/base-gate.sh does not classify it"; fail=1
   fi
 done <<< "$r0"
+# (j) The mutant table covers today's checkers (P0-05). Building every mutant takes minutes and
+#     runs only in the full CI; this needs no build, so an edited checker cannot leave a stale
+#     table behind a --fast run.
+if [ -f tools/mutants.expected ] && ! python3 tools/mutants.py --sites-check >/dev/null 2>&1; then
+  echo "DRIFT: tools/mutants.expected does not list today's checker sites; run tools/mutants.py --write"; fail=1
+fi
 
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

@@ -310,6 +310,9 @@ run_case "run-job loses its signal trap" drift \
 run_case "base gate stops classifying CLAUDE.md" drift \
   bash -c 'sed -i "s/\"CLAUDE.md\", //" tools/gate/base-gate.sh'
 
+run_case "a checker gains a mutation site" drift \
+  bash -c 'sed -i "s/^  | _,  .skip => true\$/  | _,  .skip => if true then true else false/" conf-typing/ConfTyping/SecTyD.lean'
+
 run_case "CLAUDE.md adds a Ring 0 path the gate lacks" drift \
   bash -c 'sed -i "s/and any frozen statement file\./\`l-core\/\`, and any frozen statement file./" CLAUDE.md'
 

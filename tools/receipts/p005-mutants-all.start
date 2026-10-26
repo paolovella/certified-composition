@@ -1,0 +1,4 @@
+started: 2026-10-26T01:57:04+01:00
+head: 7f39dab
+command: python3 tools/mutants.py --jobs 6
+log: tools/receipts/p005-mutants-all.log

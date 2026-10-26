@@ -5,7 +5,7 @@ ConfTyping.allcheck	9	6	ConfTyping.bigHandler_allcheck	ConfTyping.allcheck_refus
 ConfTyping.bcheck	1	1	ConfTyping.loopHandler_checks	ConfTyping.bcheck_refuses_wild_deref
 ConfTyping.costCheck	1	1	ConfTyping.costCheck_accepts_skip	ConfTyping.costCheck_refuses_unbounded_loop
 ConfTyping.dbcheck	1	1	ConfTyping.dbcheck_accepts_input	ConfTyping.sound_rejects_stored
-ConfTyping.dbcheckNaive	1	1	ConfTyping.naive_accepts_stored	ConfTyping.dbcheckNaive_refuses_tainted_emit
+ConfTyping.dbcheckNaive	2	1	ConfTyping.dbcheckNaive_accepts_emitP	ConfTyping.dbcheckNaive_refuses_tainted_emit
 ConfTyping.fcheck	1	2	ConfTyping.fpsafe_checks	ConfTyping.double_free_rejected
 ConfTyping.flcheck	1	2	ConfTyping.allocfree_checks	ConfTyping.doublefree_loop_rejected
 ConfTyping.hcheck	1	1	ConfTyping.hcheck_accepts_skip	ConfTyping.leak_rejected
@@ -23,7 +23,7 @@ ConfTyping.qcheck	1	1	ConfTyping.safe_accepted	ConfTyping.unsafe_rejected
 ConfTyping.scheck	4	4	ConfTyping.safe_chars_accepted	ConfTyping.unsafe_chars_rejected
 ConfTyping.scheckA	1	1	ConfTyping.scheckA_accepts_const	ConfTyping.scheckA_refuses_tainted_emit
 ConfTyping.secCheck	3	2	ConfTyping.multiplex_checks_A	ConfTyping.leaky_rejected
-ConfTyping.secCheckD	2	1	ConfTyping.pfull_accepted_declared	ConfTyping.pfull_rejected_undeclared
+ConfTyping.secCheckD	3	1	ConfTyping.pfull_accepted_declared	ConfTyping.pfull_rejected_undeclared
 ConfTyping.secCheckT	1	1	ConfTyping.secCheckT_accepts_skip	ConfTyping.ptime_rejected_T
 ConfTyping.secCheckTD	1	1	ConfTyping.ptime_checksTD	ConfTyping.ptime_rejected_TD
 ConfTyping.slcheck	1	5	ConfTyping.memory_safety_always_allowed_it	ConfTyping.attack_free_through_a_second_name
@@ -31,7 +31,7 @@ ConfTyping.specCheck	1	2	ConfTyping.fixed_accepted	ConfTyping.benign_rejected
 ConfTyping.tcheck	1	2	ConfTyping.sanitised_query_checks	ConfTyping.injection_rejected
 ConfTyping.tcheckW	2	1	ConfTyping.loopHandler_strings	ConfTyping.tcheckW_refuses_injection
 ConfTyping.ucheck	1	1	ConfTyping.handler_checks	ConfTyping.handler_without_check_rejected
-ConfTyping.ucheckNI	1	1	ConfTyping.handler_checks_NI	ConfTyping.secret_loop_still_rejected
+ConfTyping.ucheckNI	2	1	ConfTyping.handler_checks_NI	ConfTyping.secret_loop_still_rejected
 ConfTyping.umcheck	1	2	ConfTyping.umcheck_accepts_alloc_deref	ConfTyping.clobbered_pointer_rejected
 ConfTyping.wcheck	1	1	ConfTyping.wcheck_accepts_skip	ConfTyping.wleak_rejected
 ConfTyping.xcheck	5	1	ConfTyping.bigHandler_checks	ConfTyping.xcheck_refuses_wild_deref

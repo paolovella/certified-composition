@@ -11,6 +11,7 @@ import ConfTyping.MemCert
 import ConfTyping.ParseSource
 import ConfTyping.PathTraversal
 import ConfTyping.Pleak
+import ConfTyping.SecTyD
 import ConfTyping.SecTyT
 import ConfTyping.SpecFused
 import ConfTyping.StringLoop
@@ -96,5 +97,20 @@ theorem scheckA_accepts_const : (scheckA [] (.const 2)).isSome = true := by deci
 
 /-- Emitting a location that holds untrusted input. -/
 theorem scheckA_refuses_tainted_emit : scheckA [2] (.emit 2) = none := by decide
+
+/-! ### Killing the P0-05 survivors
+
+The mechanical mutants (`tools/mutants.py`) found three rules no theorem constrained: each could
+refuse and every proof still went through. One accepting witness each kills them. -/
+
+/-- `secCheckD` could refuse `skip`. -/
+theorem secCheckD_accepts_skip : secCheckD Phigh [] false .skip = true := by decide
+
+/-- `ucheckNI` could refuse `skip`. -/
+theorem ucheckNI_accepts_skip : ucheckNI Psec .skip = true := by decide
+
+/-- The naive database checker could refuse a parameterised emit. -/
+theorem dbcheckNaive_accepts_emitP : (dbcheckNaive ([], []) (.emitP [] [] 0)).isSome = true := by
+  decide
 
 end ConfTyping

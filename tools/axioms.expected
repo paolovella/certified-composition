@@ -1725,6 +1725,7 @@ ConfTyping.dataSegs	ConfTyping.QueryEscape
 ConfTyping.db_injection_free_of_check	ConfTyping.DbInjection	Quot.sound,propext
 ConfTyping.dbcheck	ConfTyping.DbInjection	Quot.sound,propext
 ConfTyping.dbcheckNaive	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.dbcheckNaive_accepts_emitP	ConfTyping.Witnesses	Quot.sound,propext
 ConfTyping.dbcheckNaive_refuses_tainted_emit	ConfTyping.Witnesses	Quot.sound,propext
 ConfTyping.dbcheck_accepts_input	ConfTyping.Witnesses	Quot.sound,propext
 ConfTyping.dbcheck_ni	ConfTyping.DbInjection	Quot.sound,propext
@@ -2685,6 +2686,7 @@ ConfTyping.sctGA	ConfTyping.HeteroCompose	Quot.sound,propext
 ConfTyping.sctLvlGA	ConfTyping.JasminSCT	propext
 ConfTyping.secCheck	ConfTyping.SecTy	
 ConfTyping.secCheckD	ConfTyping.SecTyD	propext
+ConfTyping.secCheckD_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.secCheckD_sound	ConfTyping.SecTyD	propext
 ConfTyping.secCheckT	ConfTyping.SecTyT	
 ConfTyping.secCheckTD	ConfTyping.SecTyTD	propext
@@ -2932,6 +2934,7 @@ ConfTyping.uaf_errors	ConfTyping.MemFree	propext
 ConfTyping.uaf_rejected	ConfTyping.MemFree	propext
 ConfTyping.ucheck	ConfTyping.Bundle	propext
 ConfTyping.ucheckNI	ConfTyping.UnifiedNI	propext
+ConfTyping.ucheckNI_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.ucheckNI_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheck_sound	ConfTyping.Bundle	Quot.sound,propext
 ConfTyping.ucost_of_cost	ConfTyping.Unified	Quot.sound,propext
