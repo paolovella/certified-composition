@@ -117,6 +117,23 @@ lake_check() {
   lake build >/dev/null 2>&1 && lake check >/dev/null 2>&1
 }
 step "lake check from the root workspace (route 1)" lake_check
+# The frozen statements (P0-03). `lake comparator` builds and exports inside the same bwrap sandbox,
+# where only the root .lake is writable, so the tree is built first. It must accept the real
+# solution and refuse a weakened one; ring0.lock covers what it cannot see, an edited definition.
+lake_comparator() {
+  if ! command -v bwrap >/dev/null 2>&1 || ! bwrap --ro-bind / / true >/dev/null 2>&1; then
+    echo "    ABSENT: bwrap missing or unprivileged user namespaces disabled; lake comparator cannot run"
+    return 1
+  fi
+  lake build StatementsProof >/dev/null 2>&1 && lake comparator >/dev/null 2>&1
+}
+step "frozen statements: lake comparator accepts the solution" lake_comparator
+step "frozen statements: the comparator refuses a weakened solution (witness)" \
+     bash -c 'bash tools/gate/comparator-witness.sh | tail -1 | grep -qx "comparator witnesses: 2 passed, 0 failed"'
+step "ring0.lock is current"       bash tools/ring0-lock.sh --check
+step "ring0.lock catches what the comparator cannot (witness)" \
+     bash -c 'bash tools/gate/ring0-lock-witness.sh | tail -1 | grep -qx "ring0.lock witnesses: 3 passed, 0 failed"'
+
 # Route 2: the export replayed through all six bundled kernels, each run directly
 # (tools/gate/export-check.sh says why not `lake check --paranoid`).
 step "export accepted by all six kernels (route 2)" \
@@ -131,7 +148,9 @@ step "both kernel gates refuse a planted axiom (witness)" \
 step "base gate: ring0 and manifest rules accept and refuse (witness)" \
      bash -c 'bash tools/gate/base-gate-witness.sh | tail -1 | grep -qE "^base-gate witnesses: 8 passed, 0 failed$"'
 
-step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | xargs grep -n "\\bsorry\\b"'
+# `sorry` is allowed in exactly one file, the frozen-statement challenge (P0-03); check-claims (k)
+# polices that file.
+step "no sorry in our sources"     bash -c '! git ls-files "*.lean" | grep -vxF workspace/Statements.lean | xargs grep -n "\\bsorry\\b"'
 step "axiom manifest is current"   bash tools/axioms.sh --check
 # P0-04: every checker has an accepted and a refused witness, computed from the environment;
 # and the registry itself both counts and misses (registry-witness.sh).

@@ -1,13 +1,23 @@
 # The repo-root workspace (P0-02). It exists so that `lake check`, which builds and exports inside a
 # bwrap sandbox that mounts only the project directory, can see both mathlib-free packages: run
 # from a package directory, conf-typing's `../transport-calculus` lies outside the sandbox
-# (S-435). transport-kernel (mathlib) is not part of it and keeps its own toolchain.
+# (S-435). transport-kernel (mathlib) is not part of it.
 name = "CertifiedComposition"
 defaultTargets = ["CertifiedComposition"]
 
 [[lean_lib]]
 name = "CertifiedComposition"
 # Not at the repo root: check-claims 1b treats a root-level .lean file as debris.
+srcDir = "workspace"
+
+# The frozen statements (P0-03): the challenge and its solution for `lake comparator`. Not default
+# targets, so `lake check` and the export never see the challenge's `sorryAx`.
+[[lean_lib]]
+name = "Statements"
+srcDir = "workspace"
+
+[[lean_lib]]
+name = "StatementsProof"
 srcDir = "workspace"
 
 [[require]]

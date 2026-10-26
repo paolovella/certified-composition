@@ -8,11 +8,20 @@ fail=0
 
 # 1. Banned proof tokens in staged Lean files (CLAUDE.md house rules): each one either leaves a
 #    hole (sorry) or adds a trusted-compiler axiom (native_decide, bv_decide).
+#    One exemption, for `sorry` only: workspace/Statements.lean, the frozen-statement challenge
+#    (P0-03, the user's decision of 2026-10-26). check-claims (k) polices what it may contain.
+CHALLENGE=workspace/Statements.lean
 staged_lean=$(git diff --cached --name-only --diff-filter=ACM -- '*.lean')
 if [ -n "$staged_lean" ]; then
   if git diff --cached -U0 -- $staged_lean | grep -E '^\+' | grep -v '^+++' \
-       | grep -nE '\bsorry\b|by native_decide|^\+[[:space:]]*native_decide|\bbv_decide\b|^\+[[:space:]]*axiom '; then
-    echo "pre-commit: banned token in a staged Lean change (sorry / native_decide / bv_decide / axiom)"
+       | grep -nE 'by native_decide|^\+[[:space:]]*native_decide|\bbv_decide\b|^\+[[:space:]]*axiom '; then
+    echo "pre-commit: banned token in a staged Lean change (native_decide / bv_decide / axiom)"
+    fail=1
+  fi
+  not_challenge=$(echo "$staged_lean" | grep -vxF "$CHALLENGE")
+  if [ -n "$not_challenge" ] && git diff --cached -U0 -- $not_challenge | grep -E '^\+' \
+       | grep -v '^+++' | grep -nE '\bsorry\b'; then
+    echo "pre-commit: sorry in a staged Lean change (allowed only in $CHALLENGE)"
     fail=1
   fi
 fi

@@ -22,7 +22,11 @@ run_case() {                      # run_case <name> <expect: pass|drift> <mutati
   local tmp; tmp=$(mktemp -d)
   ( cd "$REPO" && git ls-files -co --exclude-standard -z \
       | tar --null -T - -cf - ) 2>/dev/null | tar -x -C "$tmp" 2>/dev/null
-  ( cd "$tmp" && "$@" ) >/dev/null 2>&1
+  # A mutation that fails (for instance one that checks its own anchor matched) is reported: a
+  # case whose mutation did not apply passes vacuously (P0-03 found one).
+  if ! ( cd "$tmp" && "$@" ) >/dev/null 2>&1; then
+    printf '  FAIL  %-38s the mutation did not apply\n' "$name"; fail=$((fail+1)); rm -rf "$tmp"; return
+  fi
   local out; out=$(cd "$tmp" && bash tools/check-claims.sh 2>&1)
   local got="pass"; echo "$out" | grep -q "^DRIFT" && got="drift"
   if [ "$got" = "$expect" ]; then
@@ -316,8 +320,20 @@ run_case "base gate stops classifying CLAUDE.md" drift \
 run_case "a checker gains a mutation site" drift \
   bash -c 'sed -i "s/^  | _,  .skip => true\$/  | _,  .skip => if true then true else false/" conf-typing/ConfTyping/SecTyD.lean'
 
+run_case "the challenge gains a def" drift \
+  bash -c 'printf "\nnamespace ConfTyping\ndef frozenHole : Nat := sorry\nend ConfTyping\n" >> workspace/Statements.lean'
+
+run_case "a challenge sorry hides inside a proof" drift \
+  bash -c 'sed -i "0,/ := sorry\$/s// := by exact sorry/" workspace/Statements.lean'
+
+run_case "a file imports the challenge" drift \
+  bash -c 'sed -i "s/^import TransportCalculus\$/import TransportCalculus\nimport Statements/" workspace/StatementsProof.lean'
+
+run_case "comparator.json drops a frozen name" drift \
+  bash -c 'python3 -c "import json;c=json.load(open(\"comparator.json\"));c[\"theorem_names\"].pop();json.dump(c,open(\"comparator.json\",\"w\"))"'
+
 run_case "CLAUDE.md adds a Ring 0 path the gate lacks" drift \
-  bash -c 'sed -i "s/and any frozen statement file\./\`l-core\/\`, and any frozen statement file./" CLAUDE.md'
+  bash -c 'sed -i "s/^frozen statement file\.\$/\`l-core\/\`, and frozen statement file./" CLAUDE.md && grep -q "^\`l-core/\`, and frozen statement file\.\$" CLAUDE.md'
 
 echo
 echo "guard self-test: $pass passed, $fail failed"

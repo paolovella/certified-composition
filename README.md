@@ -545,6 +545,14 @@ master's `tools/` and `.github/` are laid over the PR tree before `ci.sh` runs. 
 touches a Ring 0 path fails the gate's `ring0` check and needs the user's key. A PR that
 removes or changes a line of `tools/axioms.expected` fails `manifest`.
 
+**Frozen statements** (Ring 0). `workspace/Statements.lean` states 25 results the repo rests on:
+every checker's soundness theorem, `leakSafe_sound`, `source_certified` and `Bridge.comp_cert`.
+`lake comparator` (`comparator.json`) checks that `workspace/StatementsProof.lean` proves exactly
+those statements, with no axiom beyond the standard three. That file is the only one allowed
+`sorry`, as the challenge's bodies. A statement can also be weakened by editing a definition it
+mentions, which the comparator cannot see. So `tools/ring0.lock` hashes every definition in the
+frozen statements' dependency closure, 587 of them, and CI fails on any change.
+
 The gates are: the three Lean packages build; no `sorry` in any tracked source;
 `check-claims` (drift between prose and theorem names, and now between CI and this
 script); `guard-selftest` (each guard family is mutated and must fire — a negative test

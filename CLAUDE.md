@@ -24,7 +24,8 @@ claim here is absolute, and each one carries its versions.
 
 Until `l-core/` exists, Ring 0 means: `tools/`, `.github/`, `CLAUDE.md`, `.claude/`,
 `*/lean-toolchain`, `*/lakefile*`, `*/lake-manifest.json`, the root workspace (`lean-toolchain`,
-`lakefile.toml`, `lake-manifest.json`, `workspace/`), and any frozen statement file.
+`lakefile.toml`, `lake-manifest.json`, `workspace/`), `comparator.json`, and any
+frozen statement file.
 
 ## Session protocol
 
@@ -54,7 +55,9 @@ Until `l-core/` exists, Ring 0 means: `tools/`, `.github/`, `CLAUDE.md`, `.claud
   a harness proving the search can find things.
 - **No `sorry`, no `native_decide`, no `bv_decide`, no new axioms.** Kernel `decide`/`rfl`
   only. Avoid `termination_by` in semantics, validator and compiler code, because it must reduce
-  in the kernel.
+  in the kernel. One exemption, the user's decision of 2026-10-26: `sorry` is allowed in
+  `workspace/Statements.lean`, the frozen-statement challenge, and nowhere else. There it is the
+  whole body of each `Frozen.` theorem, and nothing imports the file (check-claims (k)).
 - **Edits:** grep the exact anchor text from the file in the same session before any anchored
   edit. Chain dependent shell steps with `&&`. Run `git show --stat` after committing. Prefer the
   Edit/Write tools to heredocs for tracked files.

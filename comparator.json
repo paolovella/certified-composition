@@ -1,0 +1,37 @@
+{
+  "challenge_module": "Statements",
+  "solution_module": "StatementsProof",
+  "theorem_names": [
+    "ConfTyping.Frozen.allcheck_sound",
+    "ConfTyping.Frozen.bcheck_sound",
+    "ConfTyping.Frozen.costCheck_sound",
+    "ConfTyping.Frozen.hcheck_sound",
+    "ConfTyping.Frozen.jcheckW_sound",
+    "ConfTyping.Frozen.jcheck_sound",
+    "ConfTyping.Frozen.medCheck_sound",
+    "ConfTyping.Frozen.pathCheck_sound",
+    "ConfTyping.Frozen.pcheckW_sound",
+    "ConfTyping.Frozen.pcheck_sound",
+    "ConfTyping.Frozen.secCheckD_sound",
+    "ConfTyping.Frozen.secCheckTD_sound",
+    "ConfTyping.Frozen.secCheckT_sound",
+    "ConfTyping.Frozen.secCheck_sound",
+    "ConfTyping.Frozen.slcheck_sound",
+    "ConfTyping.Frozen.specCheck_sound",
+    "ConfTyping.Frozen.tcheckW_sound",
+    "ConfTyping.Frozen.tcheck_sound",
+    "ConfTyping.Frozen.ucheckNI_sound",
+    "ConfTyping.Frozen.ucheck_sound",
+    "ConfTyping.Frozen.umcheck_sound",
+    "ConfTyping.Frozen.wcheck_sound",
+    "ConfTyping.Frozen.leakSafe_sound",
+    "ConfTyping.Src.Frozen.source_certified",
+    "TransportCalculus.Frozen.Bridge.comp_cert"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

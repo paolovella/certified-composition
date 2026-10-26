@@ -1532,6 +1532,49 @@ done <<< "$r0"
 if [ -f tools/mutants.expected ] && ! python3 tools/mutants.py --sites-check >/dev/null 2>&1; then
   echo "DRIFT: tools/mutants.expected does not list today's checker sites; run tools/mutants.py --write"; fail=1
 fi
+# (k) The frozen-statement challenge (P0-03) is the one file allowed `sorry`. It may hold only
+#     `Frozen.` theorems whose whole body is `sorry`, nothing may import it, and comparator.json
+#     must name exactly its theorems, never fewer than the ratchet (25 on 2026-10-26).
+if [ -f workspace/Statements.lean ]; then
+  if ! out=$(python3 -I - <<'PYK'
+import json, re, sys
+src = open("workspace/Statements.lean").read()
+code = re.sub(r"/-.*?-/", "", src, flags=re.S)
+code = re.sub(r"--[^\n]*", "", code)
+errs = []
+thms = []
+cur = None
+for line in code.split("\n"):
+    m = re.match(r"^namespace (\S+)", line)
+    if m: cur = m.group(1)
+    m = re.match(r"^theorem (Frozen\.\S+)", line)
+    if m: thms.append(f"{cur}.{m.group(1)}")
+    if re.match(r"^\s*(def|abbrev|instance|axiom|opaque|example|structure|inductive|class|macro|"
+                r"syntax|elab|notation|infix|set_option|attribute|noncomputable|private|local)\b", line):
+        errs.append("declares something other than a theorem: " + line.strip()[:60])
+    if re.match(r"^theorem ", line) and not line.startswith("theorem Frozen."):
+        errs.append("a theorem outside Frozen.: " + line.strip()[:60])
+sorries = len(re.findall(r"\bsorry\b", code))
+bodies = len(re.findall(r":= sorry\s*$", code, flags=re.M))
+if sorries != bodies or bodies != len(thms):
+    errs.append(f"{sorries} sorry, {bodies} `:= sorry` bodies, {len(thms)} Frozen theorems: must all agree")
+cfg = json.load(open("comparator.json"))
+if sorted(cfg.get("theorem_names", [])) != sorted(thms):
+    errs.append("comparator.json theorem_names differ from the Frozen theorems of Statements.lean")
+if len(thms) < 25:
+    errs.append(f"{len(thms)} frozen statements, below the ratchet of 25")
+if cfg.get("permitted_axioms") != ["propext", "Quot.sound", "Classical.choice"]:
+    errs.append("comparator.json permits other than the standard three axioms")
+print("; ".join(errs))
+sys.exit(1 if errs else 0)
+PYK
+  ); then
+    echo "DRIFT: workspace/Statements.lean or comparator.json: $out"; fail=1
+  fi
+  if grep -rlE '^import Statements$' --include='*.lean' --exclude-dir=.lake . 2>/dev/null | grep -q .; then
+    echo "DRIFT: a Lean file imports Statements, the challenge that holds sorry (P0-03)"; fail=1
+  fi
+fi
 
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

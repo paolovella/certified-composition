@@ -77,7 +77,7 @@ b, p = files(sys.argv[1]), files(sys.argv[2])
 changed = sorted(f for f in set(b) | set(p) if b.get(f) != p.get(f))
 RING0 = ["tools/*", ".github/*", "CLAUDE.md", ".claude/*", "*/lean-toolchain", "*/lakefile*",
          "*/lake-manifest.json", "lean-toolchain", "lakefile.toml", "lake-manifest.json",
-         "workspace/*", "AUTONOMY"]
+         "workspace/*", "comparator.json", "AUTONOMY"]
 DATA = ["tools/axioms.expected", "tools/receipts/*"]
 for f in changed:
     if any(fnmatch.fnmatch(f, g) for g in RING0) and not any(fnmatch.fnmatch(f, g) for g in DATA):
