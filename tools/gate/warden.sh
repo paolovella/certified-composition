@@ -9,7 +9,9 @@
 # Runs only when the PR changes tools/checkers.lock; otherwise it says so and passes. The
 # prompt is BASE's .claude/agents/boundary-warden.md, so a PR cannot rewrite its reviewer. The
 # agent is `claude -p` with Read, Grep and Glob only, in --restricted mode (the PR's settings
-# and hooks are not loaded), and --bare when ANTHROPIC_API_KEY is set (CI). It never executes
+# and hooks are not loaded), and --bare when ANTHROPIC_API_KEY is set. With
+# CLAUDE_CODE_OAUTH_TOKEN instead (a subscription token, `claude setup-token`) it runs without
+# --bare, which accepts only an API key; --restricted still keeps the PR's settings out. It never executes
 # PR code, which is why the workflow can give this job the key and not the build job.
 # The report and the answer are kept in OUT_DIR (default: a temporary directory).
 set -uo pipefail
