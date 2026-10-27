@@ -42,6 +42,7 @@ for k in $drifted; do
   file=$(cd "$pr" && grep -rlE "^(private |protected )?def ${short}( |$)" conf-typing/ConfTyping transport-calculus 2>/dev/null | head -1)
   if [ -z "$file" ]; then echo "defining module: NOT FOUND"; continue; fi
   echo "defining module: $file; diff since $fromlabel:"
-  if [ -n "$from" ]; then git -C "$pr" diff "$from" -- "$file" | sed 's/^/  /'
-  else diff -u "$base/$file" "$pr/$file" | sed 's/^/  /'; fi
+  # diff exits 1 when the files differ, which is the expected case here, not a failure
+  if [ -n "$from" ]; then { git -C "$pr" diff "$from" -- "$file" || true; } | sed 's/^/  /'
+  else { diff -u "$base/$file" "$pr/$file" || true; } | sed 's/^/  /'; fi
 done
