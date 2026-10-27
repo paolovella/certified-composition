@@ -132,7 +132,7 @@ step "frozen statements: the comparator refuses a weakened solution (witness)" \
      bash -c 'bash tools/gate/comparator-witness.sh | tail -1 | grep -qx "comparator witnesses: 2 passed, 0 failed"'
 step "ring0.lock is current"       bash tools/ring0-lock.sh --check
 step "ring0.lock catches what the comparator cannot (witness)" \
-     bash -c 'bash tools/gate/ring0-lock-witness.sh | tail -1 | grep -qx "ring0.lock witnesses: 3 passed, 0 failed"'
+     bash -c 'bash tools/gate/ring0-lock-witness.sh | tail -1 | grep -qx "ring0.lock witnesses: 5 passed, 0 failed"'
 
 # Route 2: the export replayed through all six bundled kernels, each run directly
 # (tools/gate/export-check.sh says why not `lake check --paranoid`).
@@ -146,7 +146,7 @@ step "both kernel gates refuse a planted axiom (witness)" \
 # accepted and a refused PR. The two cases that run ci.sh are --full, outside ci.sh: inside it
 # they would recurse.
 step "base gate: ring0 and manifest rules accept and refuse (witness)" \
-     bash -c 'bash tools/gate/base-gate-witness.sh | tail -1 | grep -qE "^base-gate witnesses: 8 passed, 0 failed$"'
+     bash -c 'bash tools/gate/base-gate-witness.sh | tail -1 | grep -qE "^base-gate witnesses: 15 passed, 0 failed$"'
 
 # `sorry` is allowed in exactly one file, the frozen-statement challenge (P0-03); check-claims (k)
 # polices that file.

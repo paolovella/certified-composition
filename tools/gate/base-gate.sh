@@ -13,9 +13,18 @@
 #             the check fails: such a PR merges only with the user's key.
 #   manifest  every line of BASE's tools/axioms.expected must still be in the PR's: the
 #             manifest may grow, not change (PLAN-2026-10 §7, tier G-C).
+#   checkers  at most CHECKER_LIMIT checkers may differ between BASE's tools/checkers.lock and
+#             the PR's (P0-11). A checker edit cannot weaken a frozen statement, which must still
+#             be proved against tools/ring0.lock, so it needs no key; the limit keeps one change
+#             from rewriting the checkers wholesale. ci checks that the PR's checkers.lock is
+#             current.
+#   mutants   every row of the PR's tools/mutants.expected is `killed`: a checker edit moves the
+#             mutation sites, so the table moves with it, but no survivor merges without the key.
+#             ci checks the sites are today's; the heavy runner rebuilds every mutant.
 #   ci        BASE's tools/ci.sh --fast runs on the overlaid copy.
 # Gate code = tools/ and .github/ minus the data a PR may change: tools/axioms.expected (judged
-# by `manifest`) and tools/receipts/ (written by every long job).
+# by `manifest`), tools/checkers.lock (`checkers`), tools/mutants.expected (`mutants`) and
+# tools/receipts/ (written by every long job).
 #
 # GATE_ONLY="ring0 manifest" runs only those checks and prints no verdict. It exists for the
 # refused witnesses (tools/gate/base-gate-witness.sh); the workflow never sets it.
@@ -24,6 +33,8 @@
 # gives it a read-only token and no secrets.
 set -uo pipefail
 HEAVY=0; [ "${1:-}" = --heavy ] && { HEAVY=1; shift; }
+CHECKER_LIMIT=3   # checkers one change may touch without the user's key (P0-11)
+DATA_FILES="axioms.expected checkers.lock mutants.expected"   # under tools/
 [ $# -eq 2 ] || { echo "usage: base-gate.sh [--heavy] BASE_DIR PR_DIR"; exit 2; }
 base=$(cd "$1" && pwd) && pr=$(cd "$2" && pwd) || exit 2
 only=${GATE_ONLY:-}
@@ -46,12 +57,13 @@ done
 
 overlay() {
   local keep="$tmp/keep"; mkdir -p "$keep"
-  [ -f "$work/tools/axioms.expected" ] && cp "$work/tools/axioms.expected" "$keep/"
+  local f
+  for f in $DATA_FILES; do [ -f "$work/tools/$f" ] && cp "$work/tools/$f" "$keep/"; done
   [ -d "$work/tools/receipts" ] && cp -a "$work/tools/receipts" "$keep/"
   rm -rf "$work/tools" "$work/.github"
   ( cd "$base" && git ls-files -co --exclude-standard -z tools .github | tar --null -T - -cf - ) | tar -x -C "$work"
   rm -rf "$work/tools/receipts"
-  [ -f "$keep/axioms.expected" ] && cp "$keep/axioms.expected" "$work/tools/axioms.expected"
+  for f in $DATA_FILES; do [ -f "$keep/$f" ] && cp "$keep/$f" "$work/tools/$f"; done
   [ -d "$keep/receipts" ] && cp -a "$keep/receipts" "$work/tools/receipts"
   return 0
 }
@@ -78,7 +90,7 @@ changed = sorted(f for f in set(b) | set(p) if b.get(f) != p.get(f))
 RING0 = ["tools/*", ".github/*", "CLAUDE.md", ".claude/*", "*/lean-toolchain", "*/lakefile*",
          "*/lake-manifest.json", "lean-toolchain", "lakefile.toml", "lake-manifest.json",
          "workspace/*", "comparator.json", "AUTONOMY"]
-DATA = ["tools/axioms.expected", "tools/receipts/*"]
+DATA = ["tools/axioms.expected", "tools/checkers.lock", "tools/mutants.expected", "tools/receipts/*"]
 for f in changed:
     if any(fnmatch.fnmatch(f, g) for g in RING0) and not any(fnmatch.fnmatch(f, g) for g in DATA):
         print(f)
@@ -104,6 +116,35 @@ manifest() {
   echo "gate: manifest additions only ($added added)"
 }
 
+checkers() {
+  local b="$base/tools/checkers.lock" p="$work/tools/checkers.lock" touched n
+  [ -f "$p" ] || { echo "gate: checkers.lock MISSING in the PR"; return 1; }
+  if [ ! -f "$b" ]; then
+    echo "gate: checkers: the base has no tools/checkers.lock, so there is no limit to apply (Ring 0 decides this PR)"
+    return 0
+  fi
+  touched=$(LC_ALL=C comm -3 <(LC_ALL=C sort "$b") <(LC_ALL=C sort "$p") | sed 's/^\t//' | cut -f2 | LC_ALL=C sort -u)
+  n=$(printf '%s' "$touched" | grep -c . || true)
+  if [ "$n" -gt "$CHECKER_LIMIT" ]; then
+    echo "gate: checkers: $n changed, over the limit of $CHECKER_LIMIT; needs the user's key:"
+    echo "$touched" | sed 's/^/  /'
+    return 1
+  fi
+  echo "gate: checkers: $n changed (limit $CHECKER_LIMIT)${touched:+: $(echo $touched)}"
+}
+
+mutants() {
+  local p="$work/tools/mutants.expected" bad
+  [ -f "$p" ] || { echo "gate: mutants.expected MISSING in the PR"; return 1; }
+  bad=$(grep -v '^mutants: ' "$p" | awk -F'\t' '$4 != "killed"')
+  if [ -n "$bad" ] || ! grep -qE '^mutants: .* 0 survived, 0 unexplained$' "$p"; then
+    echo "gate: mutants: rows not killed ($(printf '%s' "$bad" | grep -c . || true)), needs the user's key:"
+    printf '%s\n' "$bad" | head -10 | sed 's/^/  /'
+    return 1
+  fi
+  echo "gate: mutants: all $(grep -vc '^mutants: ' "$p") killed"
+}
+
 ci() {
   local mode=--fast; [ "$HEAVY" = 1 ] && mode=--require-heavy
   ( cd "$work" && bash tools/ci.sh "$mode" ) > "$tmp/ci.log" 2>&1
@@ -115,6 +156,8 @@ ci() {
 overlay
 want ring0    && { ring0    || fail=1; }
 want manifest && { manifest || fail=1; }
+want checkers && { checkers || fail=1; }
+want mutants  && { mutants  || fail=1; }
 want ci       && { ci       || fail=1; }
 if [ -n "$only" ]; then
   echo "gate: partial run (GATE_ONLY=$only), no verdict"

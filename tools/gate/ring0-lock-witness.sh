@@ -8,6 +8,10 @@
 #                weakens it, so both need the user's key. (`True` breaks the proofs, and
 #                `k + 0` a unification, so the refusal would be the build's, not the lock's.)
 #   challenge    one byte of the challenge's prose changes.
+# And the checker case (P0-11), where the lock must let the edit through:
+#   checker      `costCheck`, which `costCheck_sound` names, returns `some (0 + 1)` for `skip`.
+#                Its proof still holds, so ring0.lock must stay current while checkers.lock goes
+#                stale (refused until rewritten), and after `--checkers` the check passes.
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)"
 REPO=$(pwd)
@@ -61,5 +65,27 @@ refuses definition "$tmp/d"
 copy "$tmp/c"
 sed -i '0,/frozen statements (P0-03/s//frozen statements  (P0-03/' "$tmp/c/workspace/Statements.lean"
 refuses challenge "$tmp/c"
+copy "$tmp/k"
+python3 -I - "$tmp/k/conf-typing/ConfTyping/CostBound.lean" <<'EOF2'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+old = "  | .skip       => some 1\n"
+assert s.count(old) == 1, "costCheck skip case not found"
+s = s.replace(old, "  | .skip       => some (0 + 1)\n")
+open(p, "w").write(s)
+EOF2
+if ( cd "$tmp/k" && bash tools/ring0-lock.sh --check ) > "$tmp/k1.log" 2>&1; then
+  printf '  FAIL  %-12s checkers.lock did not change\n' checker-stale; fail=$((fail+1))
+elif grep -q "^ring0-lock: tools/checkers.lock is stale" "$tmp/k1.log" && ! grep -q "ring0.lock does not match" "$tmp/k1.log"; then
+  printf '  ok    %-12s ring0.lock current, checkers.lock stale\n' checker-stale; pass=$((pass+1))
+else
+  printf '  FAIL  %-12s refused for another reason: %s\n' checker-stale "$(tail -1 "$tmp/k1.log")"; fail=$((fail+1))
+fi
+if ( cd "$tmp/k" && bash tools/ring0-lock.sh --checkers && bash tools/ring0-lock.sh --check && lake comparator ) > "$tmp/k2.log" 2>&1; then
+  printf '  ok    %-12s accepted after --checkers, and the comparator agrees\n' checker; pass=$((pass+1))
+else
+  printf '  FAIL  %-12s not accepted: %s\n' checker "$(tail -1 "$tmp/k2.log")"; fail=$((fail+1))
+fi
 echo "ring0.lock witnesses: $pass passed, $fail failed"
 [ "$fail" = 0 ]

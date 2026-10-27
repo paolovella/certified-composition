@@ -551,7 +551,12 @@ every checker's soundness theorem, `leakSafe_sound`, `source_certified` and `Bri
 those statements, with no axiom beyond the standard three. That file is the only one allowed
 `sorry`, as the challenge's bodies. A statement can also be weakened by editing a definition it
 mentions, which the comparator cannot see. So `tools/ring0.lock` hashes every definition in the
-frozen statements' dependency closure, 587 of them, and CI fails on any change.
+frozen statements' dependency closure that does not pass through a checker, 390 of them, and CI
+fails on any change. The checkers the statements name are left out: an edit to one cannot weaken
+a statement, which must still be proved against the locked definitions. Their hashes are in
+`tools/checkers.lock`, which a change may rewrite (`tools/ring0-lock.sh --checkers`), and the base
+gate passes such a change without the user's key if it touches at most 3 checkers and every
+row of `tools/mutants.expected` is still `killed`.
 
 The gates are: the three Lean packages build; no `sorry` in any tracked source;
 `check-claims` (drift between prose and theorem names, and now between CI and this

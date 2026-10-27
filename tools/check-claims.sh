@@ -1576,5 +1576,21 @@ PYK
   fi
 fi
 
+# (l) The checker limit and the lock's size, as the README states them (P0-11), are the gate's
+# and the lock's: a prose number that drifts from CHECKER_LIMIT would misstate what merges
+# without the user's key.
+if [ -f tools/checkers.lock ]; then
+  lim=$(sed -n 's/^CHECKER_LIMIT=\([0-9]*\).*/\1/p' tools/gate/base-gate.sh)
+  rlim=$(grep -oE 'if it touches at most [0-9]+ checkers' README.md | grep -oE '[0-9]+')
+  meaning=$(grep -vcE $'^(file\t|frozen statements\t|checkers\t)' tools/ring0.lock)
+  rmeaning=$(grep -oE 'pass through a checker, [0-9]+ of them' README.md | grep -oE '[0-9]+')
+  if [ -z "$lim" ] || [ "$lim" != "$rlim" ]; then
+    echo "DRIFT: README states a checker limit of '${rlim:-none}', tools/gate/base-gate.sh has CHECKER_LIMIT=${lim:-none}"; fail=1
+  fi
+  if [ "$meaning" != "$rmeaning" ]; then
+    echo "DRIFT: README says ring0.lock locks ${rmeaning:-no} definitions; it holds $meaning"; fail=1
+  fi
+fi
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

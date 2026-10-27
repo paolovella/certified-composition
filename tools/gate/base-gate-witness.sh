@@ -2,7 +2,8 @@
 # Witnesses for the base-branch gate (P0-06). BASE is this working tree; each case builds a PR
 # tree from it with one change and expects the gate's verdict on that check.
 #
-#   tools/gate/base-gate-witness.sh          the quick cases (ring0, manifest), seconds
+#   tools/gate/base-gate-witness.sh          the quick cases (ring0, manifest, checkers,
+#                                            mutants), seconds
 #   tools/gate/base-gate-witness.sh --full   also the two that run ci.sh (~10 min each)
 #
 # The full refused case is the one PLAN-2026-10 §14 names: a PR that rewrites tools/ci.sh to
@@ -57,6 +58,32 @@ case_ pr-drops-manifest-line "manifest" 1 "^gate: manifest lines REMOVED or CHAN
   bash -c 'sed -i 1d tools/axioms.expected'
 case_ pr-changes-a-footprint "manifest" 1 "^gate: manifest lines REMOVED or CHANGED (1)" \
   bash -c 'sed -i "1s/\t[^\t]*$/\tpropext/" tools/axioms.expected'
+# P0-11: checkers.lock and mutants.expected are data a PR may change, within the gate's rules.
+# bump N: change the hash of the first entry of each of the first N checkers in checkers.lock,
+# as an edit to N checkers would.
+bump() {
+  python3 -I - "$1" <<'EOF2'
+import sys
+n = int(sys.argv[1]); p = "tools/checkers.lock"
+rows = open(p).read().splitlines(); done = []
+for i, r in enumerate(rows):
+    f = r.split("\t")
+    if f[1] not in done and len(done) < n:
+        done.append(f[1]); f[3] = str(int(f[3]) ^ 1); rows[i] = "\t".join(f)
+assert len(done) == n
+open(p, "w").write("\n".join(rows) + "\n")
+EOF2
+}
+export -f bump
+case_ pr-touches-only-checkers-lock "ring0" 0 "^gate: ring0 untouched$" bash -c 'bump 1'
+case_ unchanged-pr-checkers "checkers" 0 "^gate: checkers: 0 changed (limit 3)$" true
+case_ pr-changes-one-checker "checkers" 0 "^gate: checkers: 1 changed (limit 3): " bash -c 'bump 1'
+case_ pr-changes-three-checkers "checkers" 0 "^gate: checkers: 3 changed (limit 3): " bash -c 'bump 3'
+case_ pr-changes-four-checkers "checkers" 1 "^gate: checkers: 4 changed, over the limit of 3" bash -c 'bump 4'
+case_ pr-touches-only-mutants-table "ring0 mutants" 0 "^gate: mutants: all 318 killed$" \
+  bash -c 'sed -i "1s/:[0-9]*:/:999:/" tools/mutants.expected'
+case_ pr-mutant-survives "mutants" 1 "^gate: mutants: rows not killed (1)" \
+  bash -c 'sed -i "1s/\tkilled$/\tsurvived/" tools/mutants.expected'
 
 if [ "$FULL" = 1 ]; then
   case_ unchanged-pr-full "" 0 "^gate: PASS$" true

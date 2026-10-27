@@ -6,6 +6,20 @@ landed.
 
 ## Repository verification
 
+- **A checker edit passes the lock; what a statement means does not** (2026-10-27, P0-11;
+  `tools/gate/Ring0Lock.lean`, `tools/checkers.lock`, `tools/gate/base-gate.sh`). The lock had
+  covered 587 constants, 197 of them only because a frozen statement names its checker. So every
+  checker edit, which the plan puts in Ring 1, waited for the user's key. The lock now stops at the
+  23 checkers: `tools/ring0.lock` keeps 390 definitions of meaning, and each checker's own
+  closure goes to `tools/checkers.lock`, which a change may rewrite.
+  - The comparator still makes each soundness theorem be re-proved against the locked meaning,
+    and the accept witnesses still fail the build if a checker starts refusing them.
+  - The base gate passes a change that touches at most 3 checkers and keeps every mutant
+    `killed` (`checkers` and `mutants` rules). More needs the key.
+  - Witnesses: an equivalent `costCheck` edit leaves `ring0.lock` current and passes after
+    `--checkers`; the `CostAtMost` edit is still refused; the gate accepts 1 and 3 changed
+    checkers and refuses 4; a mutant table with a survivor is refused.
+
 - **The Kani loop search finishes: no accepted 5-node program leaks** (2026-10-26, P0-08;
   `cross-check/leak-kani` `mod split`, `bench/kani-loops/run.sh`, `bench/kani-loops*.tsv`).
   The search that died in August (`I-0001`) is cut by the root's tag, and the `seq` root again

@@ -335,6 +335,12 @@ run_case "comparator.json drops a frozen name" drift \
 run_case "CLAUDE.md adds a Ring 0 path the gate lacks" drift \
   bash -c 'sed -i "s/^frozen statement file\.\$/\`l-core\/\`, and frozen statement file./" CLAUDE.md && grep -q "^\`l-core/\`, and frozen statement file\.\$" CLAUDE.md'
 
+run_case "the README raises the checker limit" drift \
+  bash -c 'sed -i "s/if it touches at most 3 checkers/if it touches at most 9 checkers/" README.md && grep -q "at most 9 checkers" README.md'
+
+run_case "ring0.lock loses a definition the README counts" drift \
+  bash -c 'sed -i "\$d" tools/ring0.lock'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
