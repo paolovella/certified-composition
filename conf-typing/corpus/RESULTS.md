@@ -81,3 +81,15 @@ relies on). That is a real change and it should be its own stage.
 by the same person who wrote the rules. Driving it to zero would be re-rigging by a slower
 route. The number that matters next is on a corpus this author did not write — which is
 what §5 Stage A of `../PLAN-2026-08.md` should have said, and now does.
+
+---
+
+# Re-run 2026-10-28, Lean v4.35.0, same corpus, unchanged
+
+After the 4.35 move (P0-02), the deprecation renames (P0-09) and every Phase 0 gate, the 25
+programs were run again with the same command (`certcheck p/NN.uc --secret pw,scopy`, receipt
+`corpus-rerun-build`). The verdicts are the same as after stage 2k: **21/25 accepted**; 09, 11
+and 21 correctly refused; **24 still falsely refused (4%)**. Nothing since August changed what
+the checkers accept. That is a regression check, not new evidence: the corpus is still the one
+written by the rules' author, and the next number has to come from tasks this author did not
+write (`research/2026-10/STOCKTAKE-2026-10-27.md` §4.1, §5.1).
