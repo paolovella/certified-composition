@@ -1,4 +1,4 @@
 started: 2026-10-26T21:47:42+01:00
-head: e428014
+head: 8186bdd
 command: bash /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-tk/bench/kani-loops/run.sh --cover 3600 1
 log: tools/receipts/p008-kani-cover.log

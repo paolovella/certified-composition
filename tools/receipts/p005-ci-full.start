@@ -1,4 +1,4 @@
 started: 2026-10-26T02:29:17+01:00
-head: dfd26ce
+head: 30a63e7
 command: bash tools/ci.sh
 log: tools/receipts/p005-ci-full.log

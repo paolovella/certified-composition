@@ -1,4 +1,4 @@
 started: 2026-10-26T14:43:23+01:00
-head: e428014
+head: 8186bdd
 command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-p003/transport-kernel && lake exe cache get 2>&1 | tr '\r' '\n' | grep -E 'Decompressed|No files|error' | tail -3
 log: tools/receipts/p003-cache-get.log

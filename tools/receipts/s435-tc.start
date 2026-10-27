@@ -1,4 +1,4 @@
 started: 2026-10-23T21:17:28+02:00
-head: fdcb1a4
+head: ee149a0
 command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/cbe1e5c5-1c8d-4aa0-b648-aecd0fe50c94/scratchpad/s435/transport-calculus && lake build
 log: tools/receipts/s435-tc.log

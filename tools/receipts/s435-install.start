@@ -1,4 +1,4 @@
 started: 2026-10-23T20:59:24+02:00
-head: fdcb1a4
+head: ee149a0
 command: elan toolchain install leanprover/lean4:v4.35.0
 log: tools/receipts/s435-install.log

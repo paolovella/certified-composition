@@ -67,7 +67,7 @@ down.discard("ConfTyping.Pleak")
 mods = sorted(deps) + ["TransportCalculus"]
 rows = [
     "# S-435 (backlog/S-435.md): conf-typing + transport-calculus moved from Lean v4.31.0 to v4.35.0 on a",
-    "# scratch copy of 24c5961. errors_unmodified: errors building the unmodified source (receipt",
+    "# scratch copy of 13be027. errors_unmodified: errors building the unmodified source (receipt",
     "# s435b-ct1). reached_unmodified: no if the module imports Pleak, so that build never reached it.",
     "# warnings: the full build after the one Pleak fix (s435b-ctA, s435b-tc). footprint_changed:",
     "# declarations whose axiom set differs from tools/axioms.expected after the Pleak fix (every one",

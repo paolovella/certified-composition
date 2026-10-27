@@ -6,6 +6,12 @@ landed.
 
 ## Repository verification
 
+- **History rewritten before the repository went public** (2026-10-27). Commit messages on
+  every branch were rewritten to drop co-author trailers; every tree is byte-identical, so no
+  file and no result changed. Every hash did. The files' citations of old hashes (receipts'
+  `head:`, correction-of-record notes, `tools/checkers.baseline`) now name the new ones, and
+  `history/2026-10-27-commit-map.tsv` maps all 244 old hashes to new for anything else.
+
 - **A boundary warden watches the checkers drift, and can only escalate** (2026-10-27, P0-12;
   `.claude/agents/boundary-warden.md`, `tools/gate/warden.sh`, `tools/checkers.baseline`). The
   3-checker limit is per change. Many changes in a row may rewrite every checker, and the user

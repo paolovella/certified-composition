@@ -1,4 +1,4 @@
 started: 2026-10-25T15:40:34+01:00
-head: 163439a
+head: e5f8fe1
 command: bash -c cd conf-typing && lake build 2>&1 | tail -n +1 && cd ../transport-calculus && lake build 2>&1
 log: tools/receipts/p009-build.log

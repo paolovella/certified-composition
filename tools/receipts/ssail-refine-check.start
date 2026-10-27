@@ -1,4 +1,4 @@
 started: 2026-10-25T17:19:26+01:00
-head: 66189ca
+head: 844849e
 command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/sail/m435o && lake env lean -o SSailRefine.olean SSailRefine.lean 2>&1 && LEAN_PATH=$(lake env printenv LEAN_PATH):$PWD lake env lean AxR.lean
 log: tools/receipts/ssail-refine-check.log

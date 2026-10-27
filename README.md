@@ -76,7 +76,7 @@ error, 3 reject. The two secret examples name their secret input:
 `certcheck examples/rejected/secret-branch.uc --secret pw`. `tools/ci.sh` checks every one of
 these verdicts. `source_certified` is the verdict as a theorem.
 
-*Correction of record (2026-10-26, P0-06):* from `9e6042b` until this correction, this
+*Correction of record (2026-10-26, P0-06):* from `a9e5c62` until this correction, this
 paragraph gave no `--secret` flag, and nothing ran the examples; a guard checked only that the
 files exist. Run as the paragraph said, `secret-branch.uc` is *accepted*, because no variable is
 secret, and `secret-leak.uc` is rejected by the string-integrity checker rather than as a leak.

@@ -1,4 +1,4 @@
 started: 2026-10-25T15:41:22+01:00
-head: 163439a
+head: e5f8fe1
 command: bash tools/ci.sh --fast
 log: tools/receipts/p009-ci-fast.log

@@ -1,4 +1,4 @@
 started: 2026-10-24T17:41:10+02:00
-head: fdcb1a4
+head: ee149a0
 command: python3 bench/kernel/run.py /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/kb4 --only ^scale(002|008|016|032|064|128)__(elabT|bcheckT|compileT)__kernel$
 log: tools/receipts/skernel4-term.log

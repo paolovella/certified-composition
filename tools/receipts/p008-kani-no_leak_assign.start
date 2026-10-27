@@ -1,4 +1,4 @@
 started: 2026-10-26T09:08:45+01:00
-head: 50018c8
+head: 91e358d
 command: bash -c cd '/tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-tk/cross-check/leak-kani' && ulimit -v 18000000 && timeout 3600 cargo kani --harness split::no_leak_assign 2>&1        | grep -E 'VERIFICATION|Runtime Symex|Runtime Solver|VCC|Failed Checks|Complete'
 log: tools/receipts/p008-kani-no_leak_assign.log

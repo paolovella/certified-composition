@@ -1,4 +1,4 @@
 started: 2026-10-25T16:05:50+01:00
-head: 66189ca
+head: 844849e
 command: bash /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/sail/patch-loop.sh /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/sail/m435
 log: tools/receipts/ssail-patch-435b.log

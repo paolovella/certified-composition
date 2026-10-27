@@ -1,5 +1,5 @@
 boundary: 1 drifted, 1 changed by this PR
-baseline commit: e69eaeb79155725be194e5b2482056a887c9d6db
+baseline commit: 744b969b4f1655f2666518dfa7ac1345a434aa3b
 
 === checker ConfTyping.costCheck
 changed by this PR: yes

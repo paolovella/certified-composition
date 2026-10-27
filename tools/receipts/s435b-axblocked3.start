@@ -1,4 +1,4 @@
 started: 2026-10-24T17:57:30+02:00
-head: 24c5961
+head: 13be027
 command: bash -c cd /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/conf-typing && timeout 1200 lake env lean AxiomsBlocked2.lean > /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/s435/ax-blocked2.txt
 log: tools/receipts/s435b-axblocked3.log

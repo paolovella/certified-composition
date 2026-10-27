@@ -1,4 +1,4 @@
 started: 2026-10-25T09:12:15+01:00
-head: 237942b
+head: 01206b8
 command: bash tools/ci.sh --fast
 log: tools/receipts/p002-plan-ci.log
