@@ -114,3 +114,5 @@ theorem determinism
   exact ⟨hs, ht, hb⟩
 
 end ConfTyping
+
+theorem gateWitnessBroken : (1 : Nat) = 2 := rfl
