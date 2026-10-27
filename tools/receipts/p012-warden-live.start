@@ -1,0 +1,4 @@
+started: 2026-10-27T02:02:40+01:00
+head: e69eaeb
+command: bash /tmp/claude-1000/-home-paolo-certified-composition/5e4a1c2c-1140-4e75-bb1b-903be6e0c32d/scratchpad/wt-p003/tools/gate/warden-witness.sh --live
+log: tools/receipts/p012-warden-live.log

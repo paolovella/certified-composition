@@ -4,6 +4,9 @@
 #   tools/ring0-lock.sh             rewrite both (only with the user's key: ring0.lock is Ring 0)
 #   tools/ring0-lock.sh --checkers  rewrite only tools/checkers.lock; fail if ring0.lock is stale
 #   tools/ring0-lock.sh --check     fail, showing the diff, if either is stale
+#   tools/ring0-lock.sh --baseline  rewrite tools/checkers.baseline from the current checkers
+#                                   (only with the user's key: it is the sign-off the boundary
+#                                   warden measures drift from, P0-12)
 # ring0.lock holds the SHA-256 of the challenge and its comparator config, the list of checkers,
 # and one structural hash per definition in the frozen statements' dependency closure that does
 # not pass through a checker (tools/gate/Ring0Lock.lean). That part is why the lock exists: a
@@ -45,10 +48,17 @@ case "$mode" in
     cp "$freshc" tools/checkers.lock
     echo "ring0-lock: ring0.lock current; wrote tools/checkers.lock ($(grep -c . "$freshc") entries)"
     ;;
+  --baseline)
+    if ! diff -q tools/checkers.lock "$freshc" >/dev/null; then
+      echo "ring0-lock: tools/checkers.lock is stale; run --checkers first"; exit 1
+    fi
+    { printf 'baseline\t%s\n' "$(git rev-parse HEAD)"; cat "$freshc"; } > tools/checkers.baseline
+    echo "ring0-lock: wrote tools/checkers.baseline at $(git rev-parse --short HEAD) ($(grep -c . "$freshc") entries)"
+    ;;
   "")
     cp "$fresh" tools/ring0.lock
     cp "$freshc" tools/checkers.lock
     echo "ring0-lock: wrote tools/ring0.lock ($(grep -c . "$fresh") entries) and tools/checkers.lock ($(grep -c . "$freshc"))"
     ;;
-  *) echo "usage: ring0-lock.sh [--check|--checkers]"; exit 2 ;;
+  *) echo "usage: ring0-lock.sh [--check|--checkers|--baseline]"; exit 2 ;;
 esac

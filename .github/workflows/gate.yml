@@ -4,7 +4,7 @@ name: gate
 # gate as they are on master, never as the PR has them, so a PR cannot weaken what judges it.
 # tools/gate/base-gate.sh overlays master's tools/ and .github/ onto the PR tree and runs them.
 #
-# The PR's code is built here, so the job holds nothing worth stealing: a read-only token, no
+# The PR's code is built in `gate`, so that job holds nothing worth stealing: a read-only token, no
 # secrets, credentials not persisted. Caches are only restored, never saved: a PR able to write
 # the cache could poison what master's own CI restores later.
 #
@@ -58,6 +58,44 @@ jobs:
           key: gate-${{ runner.os }}-${{ hashFiles('pr/**/lean-toolchain', 'pr/**/lakefile.*') }}
       - name: base-gate (master's gate on the PR tree)
         run: bash base/tools/gate/base-gate.sh base pr
+
+  # The boundary warden (P0-12): when a PR changes a checker, an agent reads the checkers' drift
+  # since the user's last sign-off (tools/checkers.baseline) and may escalate. This is the only
+  # job holding a secret, so it never builds or runs PR code: both trees are data, the warden's
+  # tools are Read, Grep and Glob, and its prompt comes from master. Its `clear` grants nothing;
+  # `escalate`, a malformed answer, a fork or a missing key fail the job, and the PR then needs
+  # the user's key. The answer is uploaded for the user to read.
+  warden:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master (the gate)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: Check out the PR head (data only, never run)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Claude Code (pinned)
+        run: npm install -g @anthropic-ai/claude-code@2.1.311
+      - name: boundary warden
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WARDEN_NO_AGENT: ${{ github.event.pull_request.head.repo.full_name != github.repository && 'a fork' || (secrets.ANTHROPIC_API_KEY == '' && 'no ANTHROPIC_API_KEY secret' || '') }}
+        run: bash base/tools/gate/warden.sh base pr warden-out
+      - name: Keep the warden's report and answer
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: warden
+          path: warden-out
+          if-no-files-found: ignore
 
   # The heavy tier (mathlib, Verus, cargo) on the user's self-hosted runner, labelled `heavy`.
   # With no such runner online the job waits, so a required heavy check fails closed. It never

@@ -1,0 +1,68 @@
+boundary: 1 drifted, 1 changed by this PR
+baseline commit: e69eaeb79155725be194e5b2482056a887c9d6db
+
+=== checker ConfTyping.costCheck
+changed by this PR: yes
+entries differing from the baseline:
+  - checker ConfTyping.WCmd.below
+  - checker ConfTyping.WCmd.brecOn
+  - checker ConfTyping.WCmd.brecOn.go
+  + checker ConfTyping.costCheck
+  - checker ConfTyping.costCheck
+  - checker ConfTyping.costCheck._f
+  - checker ConfTyping.costCheck._sparseCasesOn_1
+  - checker ConfTyping.costCheck.match_1
+  + checker ConfTyping.costCheck.match_1
+  - checker ConfTyping.costCheck.match_4
+frozen statement:
+  theorem Frozen.costCheck_sound : ∀ (c : WCmd) (k : Nat), costCheck c = some k → CostAtMost c k := sorry
+defining module: conf-typing/ConfTyping/CostBound.lean; diff since the baseline commit:
+  diff --git a/conf-typing/ConfTyping/CostBound.lean b/conf-typing/ConfTyping/CostBound.lean
+  index 1d6a6e3..ab5500d 100644
+  --- a/conf-typing/ConfTyping/CostBound.lean
+  +++ b/conf-typing/ConfTyping/CostBound.lean
+  @@ -137,12 +137,8 @@ theorem cost_ite {e : Expr} {c₁ c₂ : WCmd} {k : Nat}
+   def costCheck : WCmd → Option Nat
+     | .skip       => some 1
+     | .assign _ _ => some 1
+  -  | .seq a b    => match costCheck a, costCheck b with
+  -                   | some x, some y => some (x + y)
+  -                   | _, _ => none
+  -  | .ite _ a b  => match costCheck a, costCheck b with
+  -                   | some x, some y => some (1 + max x y)
+  -                   | _, _ => none
+  +  | .seq _ _    => none
+  +  | .ite _ _ _  => none
+     | .loop _ _   => none
+   
+   /-- **The checker is sound**: a computed budget is a uniform budget. -/
+  @@ -151,27 +147,8 @@ theorem costCheck_sound : ∀ (c : WCmd) (k : Nat), costCheck c = some k → Cos
+         simp only [costCheck, Option.some.injEq] at h; subst h; exact cost_skip
+     | .assign x e, k, h => by
+         simp only [costCheck, Option.some.injEq] at h; subst h; exact cost_assign x e
+  -  | .seq a b, k, h => by
+  -      simp only [costCheck] at h
+  -      rcases ha : costCheck a with _ | x
+  -      · rw [ha] at h; simp at h
+  -      · rcases hb : costCheck b with _ | y
+  -        · rw [ha, hb] at h; simp at h
+  -        · rw [ha, hb] at h
+  -          simp only [Option.some.injEq] at h
+  -          subst h
+  -          exact cost_seq (costCheck_sound a x ha) (costCheck_sound b y hb)
+  -  | .ite e a b, k, h => by
+  -      simp only [costCheck] at h
+  -      rcases ha : costCheck a with _ | x
+  -      · rw [ha] at h; simp at h
+  -      · rcases hb : costCheck b with _ | y
+  -        · rw [ha, hb] at h; simp at h
+  -        · rw [ha, hb] at h
+  -          simp only [Option.some.injEq] at h
+  -          subst h
+  -          exact cost_ite ((costCheck_sound a x ha).mono (Nat.le_max_left x y))
+  -                         ((costCheck_sound b y hb).mono (Nat.le_max_right x y))
+  +  | .seq _ _, _, h => by simp [costCheck] at h
+  +  | .ite _ _ _, _, h => by simp [costCheck] at h
+     | .loop _ _, _, h => by simp [costCheck] at h
+   
+   /-! ## Loops: where uniformity is lost -/

@@ -1,0 +1,5 @@
+No findings.
+
+**ConfTyping.costCheck** (`conf-typing/ConfTyping/CostBound.lean:138`): the only change since the baseline is `.skip => some 1` becoming `.skip => some (0 + 1)`. That is the same value, so the checker accepts exactly the same programs and computes exactly the same budgets. That's why the `_f` entry was replaced by an equal-looking one. I read the full definition and the soundness proof at lines 136–164. They don't use any trust attributes, `partial`, or `termination_by`, they don't copy any locked definitions, and the docstring still matches the code. The drift is one line in one checker. The `sorry` in the frozen statement is the report's usual way of printing a statement, not something in the code.
+
+WARDEN: clear

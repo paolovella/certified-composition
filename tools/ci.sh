@@ -128,11 +128,23 @@ lake_comparator() {
   lake build StatementsProof >/dev/null 2>&1 && lake comparator >/dev/null 2>&1
 }
 step "frozen statements: lake comparator accepts the solution" lake_comparator
+check_baseline() {
+  [ -f tools/checkers.baseline ] || return 1
+  sed -n '1p' tools/checkers.baseline | grep -qE $'^baseline\t[0-9a-f]{40}$' || return 1
+  # every checker the baseline covers is one ring0.lock lists, and the reverse
+  diff <(tail -n +2 tools/checkers.baseline | cut -f2 | LC_ALL=C sort -u) \
+       <(sed -n $'s/^checkers\t[0-9]*\t//p' tools/ring0.lock | tr ' ' '\n' | LC_ALL=C sort -u) >/dev/null
+}
 step "frozen statements: the comparator refuses a weakened solution (witness)" \
      bash -c 'bash tools/gate/comparator-witness.sh | tail -1 | grep -qx "comparator witnesses: 2 passed, 0 failed"'
 step "ring0.lock is current"       bash tools/ring0-lock.sh --check
 step "ring0.lock catches what the comparator cannot (witness)" \
      bash -c 'bash tools/gate/ring0-lock-witness.sh | tail -1 | grep -qx "ring0.lock witnesses: 5 passed, 0 failed"'
+# P0-12: the boundary warden's mechanical half (verdict parser, drift report). The agent runs in
+# the gate workflow's warden job; its live witnesses are `warden-witness.sh --live`.
+step "checkers.baseline names a commit and the checkers ring0.lock lists" check_baseline
+step "boundary warden: parser and drift report (witness)" \
+     bash -c 'bash tools/gate/warden-witness.sh | tail -1 | grep -qx "warden witnesses: 9 passed, 0 failed"'
 
 # Route 2: the export replayed through all six bundled kernels, each run directly
 # (tools/gate/export-check.sh says why not `lake check --paranoid`).

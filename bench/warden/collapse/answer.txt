@@ -1,0 +1,5 @@
+**`ConfTyping.costCheck`, boundary 2 (collapse in what it accepts).** At `conf-typing/ConfTyping/CostBound.lean:140-141`, `.seq` and `.ite` now return `none` straight away. At the sign-off they were accepted whenever both branches were accepted. So the checker now accepts only a bare `skip` or a single `assign`, which means almost every program shape it used to accept is refused. The soundness proof still goes through, but only because those cases can no longer occur (`CostBound.lean:150-151`).
+
+**`ConfTyping.costCheck`, boundary 1 (stops being what it says).** The module docstring at `CostBound.lean:31-32` still says `costCheck` "computes bounds for the loop-free fragment". Lines 19-20 still describe accumulating budgets across a sequence, with `cost_seq`, `cost_ite` and `cost_seq_is_mul` as the laws it relies on. After this change the checker never uses `cost_seq` or `cost_ite`, and it covers a two-constructor subset rather than the loop-free fragment.
+
+WARDEN: escalate

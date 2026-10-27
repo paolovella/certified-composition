@@ -1,0 +1,24 @@
+boundary: 1 drifted, 1 changed by this PR
+baseline commit: e69eaeb79155725be194e5b2482056a887c9d6db
+
+=== checker ConfTyping.costCheck
+changed by this PR: yes
+entries differing from the baseline:
+  + checker ConfTyping.costCheck._f
+  - checker ConfTyping.costCheck._f
+frozen statement:
+  theorem Frozen.costCheck_sound : ∀ (c : WCmd) (k : Nat), costCheck c = some k → CostAtMost c k := sorry
+defining module: conf-typing/ConfTyping/CostBound.lean; diff since the baseline commit:
+  diff --git a/conf-typing/ConfTyping/CostBound.lean b/conf-typing/ConfTyping/CostBound.lean
+  index 1d6a6e3..23ab520 100644
+  --- a/conf-typing/ConfTyping/CostBound.lean
+  +++ b/conf-typing/ConfTyping/CostBound.lean
+  @@ -135,7 +135,7 @@ theorem cost_ite {e : Expr} {c₁ c₂ : WCmd} {k : Nat}
+   
+   /-- A static budget: `none` at a `loop`, where no uniform bound exists in general. -/
+   def costCheck : WCmd → Option Nat
+  -  | .skip       => some 1
+  +  | .skip       => some (0 + 1)
+     | .assign _ _ => some 1
+     | .seq a b    => match costCheck a, costCheck b with
+                      | some x, some y => some (x + y)

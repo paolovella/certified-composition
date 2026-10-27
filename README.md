@@ -558,6 +558,17 @@ a statement, which must still be proved against the locked definitions. Their ha
 gate passes such a change without the user's key if it touches at most 3 checkers and every
 row of `tools/mutants.expected` is still `killed`.
 
+The limit is per change, so several changes in a row may rewrite every checker; that is how
+they evolve. A **boundary warden** watches the sum. `tools/checkers.baseline` records the
+checkers as of the user's last sign-off. When a change touches a checker, the gate workflow's
+`warden` job hands an agent (`.claude/agents/boundary-warden.md`, read-only tools, prompt from
+master) the drift since that sign-off (`tools/gate/boundary-report.sh`). The agent can only
+escalate: its `clear` grants nothing the mechanical gate did not, while `escalate`, a malformed
+answer, a fork or a missing key mean the change needs the user's key. The user moves the
+baseline (`tools/ring0-lock.sh --baseline`) after reading a report. It looks for what no rule
+states: a checker that no longer does what its docstring says, collapses in what it accepts,
+rebuilds locked meaning out of the lock's reach, or picks up trust (`implemented_by`, `partial`).
+
 The gates are: the three Lean packages build; no `sorry` in any tracked source;
 `check-claims` (drift between prose and theorem names, and now between CI and this
 script); `guard-selftest` (each guard family is mutated and must fire — a negative test

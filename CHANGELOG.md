@@ -6,6 +6,19 @@ landed.
 
 ## Repository verification
 
+- **A boundary warden watches the checkers drift, and can only escalate** (2026-10-27, P0-12;
+  `.claude/agents/boundary-warden.md`, `tools/gate/warden.sh`, `tools/checkers.baseline`). The
+  3-checker limit is per change. Many changes in a row may rewrite every checker, and the user
+  wants that to be possible, with an agent watching that no boundary is crossed on the way.
+  - `tools/checkers.baseline` is the user's sign-off.
+  - When a PR changes a checker, the gate workflow's `warden` job gives an agent the drift since
+    then. The agent has read-only tools, its prompt comes from master, and it never runs PR
+    code.
+  - `clear` grants nothing. `escalate`, a malformed answer, a fork or a missing key mean the
+    user's key.
+  - Live witnesses: an equivalent `costCheck` rewrite was cleared. A sound `costCheck` that
+    refuses every `seq` and `ite` passes every mechanical rule, and was escalated.
+
 - **A checker edit passes the lock; what a statement means does not** (2026-10-27, P0-11;
   `tools/gate/Ring0Lock.lean`, `tools/checkers.lock`, `tools/gate/base-gate.sh`). The lock had
   covered 587 constants, 197 of them only because a frozen statement names its checker. So every
