@@ -71,6 +71,8 @@ ConfTyping.A_physical	ConfTyping.Obs
 ConfTyping.A_remote	ConfTyping.Obs	
 ConfTyping.AcceptGoal	ConfTyping.LoadBearing	
 ConfTyping.Addr	ConfTyping.Speculate	
+ConfTyping.AddrEq	ConfTyping.AddrLeak	
+ConfTyping.AddrEq.mono	ConfTyping.AddrLeak	
 ConfTyping.AliasFreeLoop	ConfTyping.AliasLoop	
 ConfTyping.AliasOK	ConfTyping.AliasSafe	
 ConfTyping.AliasUAF	ConfTyping.AliasSafe	
@@ -2174,6 +2176,9 @@ ConfTyping.joint	ConfTyping.Joint
 ConfTyping.joint_cons_fst	ConfTyping.Joint	Quot.sound,propext
 ConfTyping.joint_cons_snd	ConfTyping.Joint	Quot.sound,propext
 ConfTyping.joint_to_perchannel	ConfTyping.Joint	Quot.sound,propext
+ConfTyping.jsecTy_addrEq	ConfTyping.AddrLeak	Classical.choice,Quot.sound,propext
+ConfTyping.jsecTy_addrs	ConfTyping.AddrLeak	Classical.choice,Quot.sound,propext
+ConfTyping.jsecTy_addrs_initU	ConfTyping.AddrLeak	Classical.choice,Quot.sound,propext
 ConfTyping.jsecTy_sound	ConfTyping.HeapJoint	Classical.choice,Quot.sound,propext
 ConfTyping.kerLE	ConfTyping.TwoSafety	
 ConfTyping.ksafety_above_twosafety	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
@@ -2710,7 +2715,13 @@ ConfTyping.secTyT_outNI	ConfTyping.SecTyT	propext
 ConfTyping.secTyT_sound	ConfTyping.SecTyT	Quot.sound,propext
 ConfTyping.secTy_boundaryNI	ConfTyping.SecTy	propext
 ConfTyping.secretAddr	ConfTyping.Speculate	
+ConfTyping.secretAddrProg	ConfTyping.AddrLeak	
+ConfTyping.secretAddrProg_refused	ConfTyping.AddrLeak	propext
+ConfTyping.secretAddrProg_trace_differs	ConfTyping.AddrLeak	propext
 ConfTyping.secretCell	ConfTyping.SpecFactor	
+ConfTyping.secretCellProg	ConfTyping.AddrLeak	
+ConfTyping.secretCellProg_checks	ConfTyping.AddrLeak	propext
+ConfTyping.secretCellProg_trace	ConfTyping.AddrLeak	propext
 ConfTyping.secretCell_traceEq	ConfTyping.SpecFactor	propext
 ConfTyping.secretLifecycle	ConfTyping.HeapRetire	
 ConfTyping.secretLifecycle_checks	ConfTyping.HeapRetire	propext
@@ -2926,6 +2937,9 @@ ConfTyping.uFixed_refused_reads_nothing	ConfTyping.Unified
 ConfTyping.uLowEq	ConfTyping.UnifiedNI	
 ConfTyping.uLowEqA	ConfTyping.HeapJoint	
 ConfTyping.uNI_of_check	ConfTyping.UnifiedNI	propext
+ConfTyping.uOptAddr	ConfTyping.AddrLeak	propext
+ConfTyping.uOptAddr_map	ConfTyping.AddrLeak	propext
+ConfTyping.uOptAddr_mono_left	ConfTyping.AddrLeak	propext
 ConfTyping.uOptLowEq	ConfTyping.UnifiedNI	propext
 ConfTyping.uOptLowEqA	ConfTyping.HeapJoint	propext
 ConfTyping.uOptLowEqA.toLowEq	ConfTyping.HeapJoint	propext
@@ -2938,6 +2952,7 @@ ConfTyping.uOptLowEq_map	ConfTyping.UnifiedNI	propext
 ConfTyping.uOptLowEq_mapE	ConfTyping.HeapJoint	propext
 ConfTyping.uVictim	ConfTyping.Unified	
 ConfTyping.uVictim_not_mediated	ConfTyping.Unified	propext
+ConfTyping.uaddrs	ConfTyping.AddrLeak	propext
 ConfTyping.uaf_errors	ConfTyping.MemFree	propext
 ConfTyping.uaf_rejected	ConfTyping.MemFree	propext
 ConfTyping.ucheck	ConfTyping.Bundle	propext
@@ -3102,6 +3117,8 @@ ConfTyping.ξ0	ConfTyping.Ledger
 ConfTyping.ξ1	ConfTyping.Ledger	
 ConfTyping.σ0	ConfTyping.Pleak	
 ConfTyping.σ1	ConfTyping.Pleak	
+ConfTyping.σSecret5	ConfTyping.AddrLeak	
+ConfTyping.σSecret7	ConfTyping.AddrLeak	
 ConfTyping.σ_b1	ConfTyping.Pleak	
 ConfTyping.σ_b2	ConfTyping.Pleak	
 ConfTyping.σhi	ConfTyping.SpecTrace	

@@ -35,6 +35,8 @@ predicted events, cost and return values. The plan estimates **45–65 sessions*
 Spikes: S-435 (bump in place), S-KERNEL (kernel evaluation feasible for passes to ~2k nodes, not
 for a text parser), S-SAIL (proof route, with conditions: ADDI and BEQ proved, LD stated) are done.
 S-OBS, S-PRIM and S-COST are not started.
+*Update 2026-10-28:* S-OBS is done. The proof goes through (`AddrLeak.lean`, `jsecTy_addrs`), so
+no fallback allocator is needed.
 
 ### The language, the compiler, the core: not started
 

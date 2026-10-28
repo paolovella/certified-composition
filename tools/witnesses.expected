@@ -11,7 +11,7 @@ ConfTyping.fcheck	1	2	ConfTyping.fpsafe_checks	ConfTyping.double_free_rejected
 ConfTyping.flcheck	1	2	ConfTyping.allocfree_checks	ConfTyping.doublefree_loop_rejected
 ConfTyping.hcheck	1	1	ConfTyping.hcheck_accepts_skip	ConfTyping.leak_rejected
 ConfTyping.hlcheck	1	1	ConfTyping.loopalloc_checks	ConfTyping.loop_wild_rejected
-ConfTyping.jcheck	3	10	ConfTyping.public_value_into_a_secret_cell	ConfTyping.allocating_loop_rejected
+ConfTyping.jcheck	4	11	ConfTyping.public_value_into_a_secret_cell	ConfTyping.allocating_loop_rejected
 ConfTyping.jcheckList	1	1	ConfTyping.jcheckList_accepts_empty	ConfTyping.jcheckList_refuses_wild_deref
 ConfTyping.jcheckW	1	1	ConfTyping.widened_agrees_on_safeHeapProg	ConfTyping.jcheckW_refuses_wild_deref
 ConfTyping.lcheck	1	1	ConfTyping.lcheck_accepts_alloc_free	ConfTyping.lcheck_refuses_free_unallocated
