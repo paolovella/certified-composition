@@ -1,0 +1,2 @@
+corpus/blind/p/10.uc: REJECTED by the certificate checker
+  (budget / mediation / flow / memory safety)

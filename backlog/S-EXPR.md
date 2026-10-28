@@ -7,7 +7,7 @@ deps: []
 closes: ['the false-rejection rate has only ever been measured on the rules author''s own 25 programs']
 acceptance: a frozen task list written before any program; programs written by an author with no access to the checkers' source; inexpressible / accepted / correctly refused / falsely refused counted, with the holdout half sealed
 kill: more than 30% of expressible safe tasks falsely refused, or more than 30% inexpressible, means the witness language needs redesign before Phase 3 (PLAN-2026-10 §8)
-status: planned
+status: done
 ---
 
 ## Plan
@@ -40,3 +40,26 @@ but a false refusal is not burden, it is a wall. This spike gives that bet its f
 
 Not done here: fixing any false refusal. Fixes are their own items, measured against this
 frozen set.
+
+## Log
+
+- 2026-10-28, branch `s-expr/blind`. Steps 1–5 as planned.
+  - Both agents ran as `claude -p --restricted`, with file tools confined to an otherwise empty
+    directory (receipts `sexpr-task-writer`, `sexpr-blind-author`). The user started them
+    ("start a separate agent").
+  - The task list (9d48c6b) and all programs (bc5638f) were committed before any checker run.
+    The open half was reported (a960c05) before the holdout was run.
+  - **Result** (`conf-typing/corpus/blind/RESULTS.md`):
+    - SAFE: 3/32 inexpressible; 23/29 accepted; **6/29 falsely refused (21%)**.
+    - UNSAFE: 8/8 refused.
+    - The kill rule does not fire.
+  - **Causes of the false refusals:** nested counted loops 2; the `if` join 1; an undocumented
+    secret-pointer rule 3, which is a defect in the reference the measurer wrote.
+  - **Not covered by acceptance:** 06 is accepted with a path-traversal hole, because `san` is
+    quote-only. 29 is certified without bounds.
+  - Follow-ups for the user to file or decline:
+    - document the secret-pointer rule;
+    - nested counted loops, open since August;
+    - the `if` join;
+    - `san`'s name, or `certcheck` running `PathCert`;
+    - a second blind author on the same tasks.

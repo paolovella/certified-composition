@@ -1,0 +1,20 @@
+04	SAFE	rc=0	ACCEPTED
+06	SAFE	rc=0	ACCEPTED
+10	SAFE	rc=3	REJECTED by the certificate checker
+11	SAFE	rc=3	REJECTED by the certificate checker
+12	SAFE	rc=0	ACCEPTED
+13	SAFE	rc=0	ACCEPTED
+14	SAFE	rc=0	ACCEPTED
+17	SAFE	rc=0	ACCEPTED
+21	SAFE	rc=0	ACCEPTED
+24	SAFE	INEXPRESSIBLE
+25	SAFE	rc=0	ACCEPTED
+26	SAFE	rc=0	ACCEPTED
+27	SAFE	INEXPRESSIBLE
+30	SAFE	rc=0	ACCEPTED
+31	SAFE	rc=0	ACCEPTED
+32	SAFE	rc=0	ACCEPTED
+34	UNSAFE	rc=3	REJECTED by the string-integrity checker
+35	UNSAFE	rc=3	REJECTED by the certificate checker
+38	UNSAFE	rc=3	REJECTED by the certificate checker
+39	UNSAFE	rc=3	REJECTED by the certificate checker

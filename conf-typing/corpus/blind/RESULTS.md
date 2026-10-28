@@ -78,3 +78,67 @@ because the language has no comparisons, lengths, arrays or string operations. T
 
 The holdout is reported below, unsealed after this section was committed, with no rule and no
 reference changed.
+
+## Holdout (20 tasks: 16 SAFE, 4 UNSAFE), unsealed 2026-10-28 after a960c05
+
+No rule and no reference changed between the two halves.
+
+| | count | |
+|---|---|---|
+| SAFE tasks | 16 | |
+| inexpressible | 2 | 24: no lengths or substrings, so no truncating copy; 27: no comparison |
+| expressible | 14 | |
+| accepted | 12 | **86%** |
+| **falsely refused** | **2** | **14%** |
+| UNSAFE correctly refused | 4/4 | 34 path traversal by concatenation, 35 use-after-free, 38 secret decides a branch, 39 unbounded loop |
+
+| # | task | why refused | kind |
+|---|---|---|---|
+| 11 | retry five times with a fixed delay | a delay loop nested inside the retry loop | **checker limit** (nested counted loops, as 20) |
+| 10 | branch on a public role flag, key kept in a secret cell | the secret-cell pointer was not marked secret | **reference defect** (as 09, 22); accepted when it is |
+
+Coverage of the 12 accepted programs (the measurer's judgment): **7 yes** (13, 14, 25, 26, 30,
+31, 32), **4 partly** (04, 12, 17, 21: bounded and memory-safe, but the out-of-bounds property
+has no meaning in a language without indices), and **1 no**:
+
+- **06 is accepted, and the task's property does not hold.** The program builds
+  `"/srv/uploads/" ++ san ( input )`. `san` neutralizes the `'` delimiter only, so `../` passes
+  through. The certificate is true (there is no quote injection), but a blind author read
+  `san` as a general sanitizer and wrote a path-traversal hole the checker cannot see. The
+  repo's path-traversal certificate (`PathCert`) is not part of `certcheck`.
+
+The halves differ by 13 points in false refusals (27% and 14%), under the 15-point threshold, so
+the open half was not unrepresentative.
+
+## Combined (40 tasks)
+
+| | open | holdout | all |
+|---|---|---|---|
+| SAFE inexpressible | 1/16 | 2/16 | **3/32 (9%)** |
+| SAFE accepted / expressible | 11/15 | 12/14 | **23/29 (79%)** |
+| **SAFE falsely refused** | 4/15 | 2/14 | **6/29 (21%)** |
+| UNSAFE refused | 4/4 | 4/4 | **8/8** |
+| accepted carrying the task's property in full | 6/11 | 7/12 | **13/23** |
+
+The six false refusals have three causes:
+- **nested counted loops: 2** (20, 11);
+- **the `if` join intersecting tracked pointers: 1** (18);
+- **the undocumented secret-pointer rule: 3** (09, 22, 10).
+
+Fixing the reference would leave 3/29 (10%), all checker limits that the repo has recorded
+since August.
+
+**Verdict against the kill rule** (over 30% falsely refused or inexpressible): **it does not
+fire** (21% and 9%). The bet survives its first blind measurement, with four qualifications:
+
+1. **The number that moved is the false-refusal rate:** 4% on the author's corpus, 21% blind.
+   Half of it is documentation, not the checker.
+2. **Inexpressibility looks low only because the author approximated** (31 of 37 programs).
+   Taken as written, the tasks need comparisons, lengths, arrays, functions and early return,
+   which is exactly the PLAN-2026-10 §3 surface the L core is meant to add.
+3. **Acceptance is not the task's property.** 2 of 23 accepted programs (06, 29) are certified
+   for something that does not include what the task asked for, and 06 is a real hole. `san`'s
+   name promises more than it does. L's typed sinks (`SinkKind` with per-sink classifiers,
+   PLAN-2026-10 §3) are the fix the plan already names.
+4. **One author, one run, 40 tasks.** A second blind author on the same tasks would show how
+   much of this is the author.
