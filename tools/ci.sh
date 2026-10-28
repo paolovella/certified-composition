@@ -158,7 +158,7 @@ step "both kernel gates refuse a planted axiom (witness)" \
 # accepted and a refused PR. The two cases that run ci.sh are --full, outside ci.sh: inside it
 # they would recurse.
 step "base gate: ring0 and manifest rules accept and refuse (witness)" \
-     bash -c 'bash tools/gate/base-gate-witness.sh | tail -1 | grep -qE "^base-gate witnesses: 15 passed, 0 failed$"'
+     bash -c 'bash tools/gate/base-gate-witness.sh | tail -1 | grep -qE "^base-gate witnesses: 21 passed, 0 failed$"'
 
 # `sorry` is allowed in exactly one file, the frozen-statement challenge (P0-03); check-claims (k)
 # polices that file.
