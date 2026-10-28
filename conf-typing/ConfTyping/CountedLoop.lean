@@ -500,7 +500,9 @@ def usize : UCmd → Nat
     is one clause. The loop body is checked by `bcheckF` itself, so counted loops nest
     (EXPR-02; until 2026-10-28 the body went to `allcheck`, which has no loop rule, and
     nesting was "a follow-on, not a claim"). The fuel only makes the recursion structural:
-    `bcheck` passes `usize c`, which is always enough, and fuel 0 refuses. -/
+    `bcheck` passes `usize c`. Fuel only ever refuses (fuel 0), so soundness holds at any fuel
+    (`bcheckF_sound`); that `usize c` is enough for every program is not proved, only
+    witnessed by `decide` on the programs here (the boundary warden asked, 2026-10-28). -/
 def bcheckF (P : Partition) :
     Nat → List String → List String → UCmd → Option (List String × List String × Nat)
   | 0, _, _, _ => none

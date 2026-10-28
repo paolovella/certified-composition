@@ -54,3 +54,4 @@ refusal in August's corpus (24) and two in the blind set (11, 20).
     The boundary warden reviews the `bcheck` change on GitHub; this is its first real case.
   - Full CI run 1 (`expr02-ci-full`) failed one step: the warden witness pinned "0 drifted" and "1 drifted", true only while the tree equals the baseline. With `bcheck` drifted, as it now is, both cases failed. It now checks this PR's own change (0, and `costCheck` marked "changed by this PR: yes") and leaves the drifted total, which depends on history, unpinned.
   - Full CI green (`expr02-ci-full2`, 897 s).
+  - The boundary warden cleared PR #6 (run on GitHub, answer kept as the `warden` artifact). It noted one unchecked claim: the docstring said the fuel `usize c` "is always enough", and that is not proved. Reworded to what holds (sound at any fuel; enough only witnessed). Open: prove `usize c ≤ n → bcheckF P n A V c = bcheckF P (usize c) A V c`.
