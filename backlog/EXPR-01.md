@@ -7,7 +7,7 @@ deps: [S-EXPR]
 closes: ['S-EXPR follow-up']
 acceptance: a blind reader of the reference can write an accepted secret cell; certcheck names the unmarked pointer when it refuses for this reason
 kill: -
-status: planned
+status: in-progress
 ---
 
 ## Plan
@@ -25,3 +25,7 @@ reference the blind author was given.
    a hint on refusal (Ring 3: the hint is untrusted text; the verdict is unchanged).
 3. Witnesses: `09.uc` without the flag is refused and the hint names `tokcell`; with the flag it
    is accepted. `tools/ci.sh` checks both, as it does the documented examples.
+
+## Log
+
+- 2026-10-28: steps 1 and 2 done. The rule is stated in the README ("Running it") and in `corpus/blind/REFERENCE-v2.md` (v1 unchanged). `certcheck` prints a hint naming each unmarked `secret` pointer on refusal; checked by hand: 09 refused with `hint: secret tokcell ...`, accepted with `--secret token,tokcell`, `use-after-free.uc` refused with no hint. Step 3's CI witness edits `tools/ci.sh` (Ring 0), so it goes in a separate PR for the user's key.

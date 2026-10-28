@@ -26,6 +26,17 @@ def partitionOf (names : List String) : Partition := fun x => names.contains x
 def splitCommas (s : String) : List String :=
   (s.splitOn ",").filter (fun w => !w.isEmpty)
 
+/-- The pointers a program allocates with `secret x`. The checker accepts `secret x` only when
+    `x` itself is secret (`FullCert`'s `allocS` case), which S-EXPR found no document stated;
+    a refusal names the unmarked ones (EXPR-01). The hint is untrusted text: the verdict is
+    `bcheck`'s alone. -/
+def secretCells : UCmd → List String
+  | .memop .allocS x => [x]
+  | .seq a b         => secretCells a ++ secretCells b
+  | .ite _ a b       => secretCells a ++ secretCells b
+  | .loop _ a        => secretCells a
+  | _                => []
+
 def parseArgs : List String → Option (String × List String)
   | [path]                            => some (path, [])
   | [path, "--secret", names]         => some (path, splitCommas names)
@@ -58,6 +69,8 @@ def main (args : List String) : IO UInt32 := do
           | none, _ =>
               IO.eprintln s!"{path}: REJECTED by the certificate checker"
               IO.eprintln "  (budget / mediation / flow / memory safety)"
+              for x in (secretCells c).eraseDups.filter (fun x => !P x) do
+                IO.eprintln s!"  hint: `secret {x}` is refused unless `{x}` is itself marked secret (--secret ...,{x})"
               return 3
           | _, none =>
               IO.eprintln s!"{path}: REJECTED by the string-integrity checker"

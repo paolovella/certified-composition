@@ -76,6 +76,12 @@ error, 3 reject. The two secret examples name their secret input:
 `certcheck examples/rejected/secret-branch.uc --secret pw`. `tools/ci.sh` checks every one of
 these verdicts. `source_certified` is the verdict as a theorem.
 
+A cell for secret data is allocated with `secret p`, and **the pointer `p` must be marked secret
+too** (`--secret pw,p`): the checker refuses `secret p` otherwise (`FullCert`'s `allocS` case).
+No document said so until 2026-10-28, when a blind author hit it three times
+(`conf-typing/corpus/blind/RESULTS.md`). `certcheck` now names the unmarked pointer when it
+refuses for this reason.
+
 *Correction of record (2026-10-26, P0-06):* from `a9e5c62` until this correction, this
 paragraph gave no `--secret` flag, and nothing ran the examples; a guard checked only that the
 files exist. Run as the paragraph said, `secret-branch.uc` is *accepted*, because no variable is
