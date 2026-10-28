@@ -1526,6 +1526,12 @@ ConfTyping.bcb_not_touches	ConfTyping.HeteroCompose	Quot.sound,propext
 ConfTyping.bcb_not_trace_inert	ConfTyping.HeteroCompose	Quot.sound,propext
 ConfTyping.bcb_reconciles	ConfTyping.HeteroCompose	
 ConfTyping.bcheck	ConfTyping.CountedLoop	propext
+ConfTyping.bcheckF	ConfTyping.CountedLoop	propext
+ConfTyping.bcheckF_accepts_skip	ConfTyping.Witnesses	propext
+ConfTyping.bcheckF_refuses_wild_deref	ConfTyping.Witnesses	propext
+ConfTyping.bcheckF_sound	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.bcheck_accepts_nested_loops	ConfTyping.Witnesses	propext
+ConfTyping.bcheck_refuses_nested_double_free	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_sound	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.benign	ConfTyping.InjectionReal	
@@ -3000,6 +3006,7 @@ ConfTyping.use_after_free_rejected	ConfTyping.MemLinear	propext
 ConfTyping.usecTy_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.usefree_loop_errors	ConfTyping.FreeLoop	Quot.sound,propext
 ConfTyping.usefree_loop_rejected	ConfTyping.FreeLoop	Quot.sound,propext
+ConfTyping.usize	ConfTyping.CountedLoop	propext
 ConfTyping.vBal	ConfTyping.Race	
 ConfTyping.validB	ConfTyping.MemSafe	
 ConfTyping.value_predicate_not_admissible	ConfTyping.Integrity	

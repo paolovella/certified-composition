@@ -6,6 +6,14 @@ landed.
 
 ## Repository verification
 
+- **Counted loops nest** (2026-10-28, EXPR-02; `CountedLoop.lean`). `bcheck` checked a
+  counted loop's body with `allcheck`, which has no loop rule. That was August's last false
+  refusal, and two of the six in the blind measurement.
+  - The body now goes to a fuelled `bcheckF`, which still reduces in the kernel.
+  - `Frozen.bcheck_sound` is unchanged, and `ring0.lock` did not move.
+  - August corpus 22/25. The blind 11 and 20 are accepted; 8/8 unsafe programs are still
+    refused.
+
 - **History rewritten before the repository went public** (2026-10-27). Commit messages on
   every branch were rewritten to drop co-author trailers; every tree is byte-identical, so no
   file and no result changed. Every hash did. The files' citations of old hashes (receipts'

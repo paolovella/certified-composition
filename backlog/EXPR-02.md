@@ -7,7 +7,7 @@ deps: [S-EXPR]
 closes: ['S-EXPR follow-up']
 acceptance: corpus program 24 and blind programs 11 and 20 are accepted; bcheck_sound still proved and Frozen.bcheck_sound unchanged; every existing witness still decides
 kill: -
-status: planned
+status: in-progress
 ---
 
 ## Plan
@@ -29,3 +29,28 @@ refusal in August's corpus (24) and two in the blind set (11, 20).
    bodies go in `Witnesses.lean`. The nested double-free (`for { for { free p } }`) is refused.
    The mutant table is regenerated, and every mutant must be killed.
 5. Re-run both corpora. The frozen ones are only reported, not tuned against.
+
+## Log
+
+- 2026-10-28, branch `expr-02/nested-loops`. Steps 1–5 as planned.
+  - `bcheckF` (fuelled) and `usize` (structural), with `bcheck := bcheckF (usize c)`. No
+    `termination_by`. `bcheckF_sound` proved by induction on fuel on the first build;
+    `bcheck_sound` is a corollary with its statement unchanged.
+  - Locks: `ring0.lock` unchanged, so the meaning did not move. In `checkers.lock` only `bcheck`
+    changed (1 of the limit of 3).
+  - Registry 37 → 38 checkers, since `bcheckF` is a checker and has its own pair; 0 missing.
+    Manifest +7 lines, none removed.
+  - Mutants 319/319 killed: `bcheck`'s five sites moved into `bcheckF`, plus the fuel-0 site.
+  - Kernel witnesses: `bcheck_accepts_nested_loops` (budget 34),
+    `bcheck_refuses_nested_double_free`, and `bcheckF`'s accept/refuse pair.
+  - Effect (reported only):
+    - August corpus 21/25 → **22/25**; 24 is accepted, and 09, 11 and 21 are still refused.
+    - Blind set: 11 and 20 are accepted; all 8 unsafe programs are still refused. The
+      remaining safe refusals are 09, 10 and 22 (EXPR-01's rule) and 18 (EXPR-03).
+  - `tools/gate/base-gate-witness.sh` hard-coded "all 318 killed"; it now reads the count from
+    the table.
+  - Merge path: `tools/witnesses.expected` and `tools/gate/base-gate-witness.sh` are Ring 0,
+    and only `checkers.lock` and `mutants.expected` are data, so this PR needs the user's key.
+    The boundary warden reviews the `bcheck` change on GitHub; this is its first real case.
+  - Full CI run 1 (`expr02-ci-full`) failed one step: the warden witness pinned "0 drifted" and "1 drifted", true only while the tree equals the baseline. With `bcheck` drifted, as it now is, both cases failed. It now checks this PR's own change (0, and `costCheck` marked "changed by this PR: yes") and leaves the drifted total, which depends on history, unpinned.
+  - Full CI green (`expr02-ci-full2`, 897 s).
