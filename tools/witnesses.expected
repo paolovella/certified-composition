@@ -2,7 +2,8 @@ ConfTyping.acheck	1	1	ConfTyping.alias_ok_accepted	ConfTyping.alias_uaf_rejected
 ConfTyping.alcheck	1	3	ConfTyping.aliasfree_checks	ConfTyping.alias_uaf_loop_rejected
 ConfTyping.alcheck2	4	1	ConfTyping.nested_checks	ConfTyping.alcheck2_refuses_uaf_loop
 ConfTyping.allcheck	9	6	ConfTyping.bigHandler_allcheck	ConfTyping.allcheck_refuses_loopHandler
-ConfTyping.bcheck	1	1	ConfTyping.loopHandler_checks	ConfTyping.bcheck_refuses_wild_deref
+ConfTyping.bcheck	2	2	ConfTyping.bcheck_accepts_nested_loops	ConfTyping.bcheck_refuses_nested_double_free
+ConfTyping.bcheckF	1	1	ConfTyping.bcheckF_accepts_skip	ConfTyping.bcheckF_refuses_wild_deref
 ConfTyping.costCheck	1	1	ConfTyping.costCheck_accepts_skip	ConfTyping.costCheck_refuses_unbounded_loop
 ConfTyping.dbcheck	1	1	ConfTyping.dbcheck_accepts_input	ConfTyping.sound_rejects_stored
 ConfTyping.dbcheckNaive	2	1	ConfTyping.dbcheckNaive_accepts_emitP	ConfTyping.dbcheckNaive_refuses_tainted_emit
@@ -35,4 +36,4 @@ ConfTyping.ucheckNI	2	1	ConfTyping.handler_checks_NI	ConfTyping.secret_loop_stil
 ConfTyping.umcheck	1	2	ConfTyping.umcheck_accepts_alloc_deref	ConfTyping.clobbered_pointer_rejected
 ConfTyping.wcheck	1	1	ConfTyping.wcheck_accepts_skip	ConfTyping.wleak_rejected
 ConfTyping.xcheck	5	1	ConfTyping.bigHandler_checks	ConfTyping.xcheck_refuses_wild_deref
-registry: 37 checkers, 0 missing a witness
+registry: 38 checkers, 0 missing a witness

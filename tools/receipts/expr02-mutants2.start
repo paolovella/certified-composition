@@ -1,0 +1,4 @@
+started: 2026-10-28T02:46:02+01:00
+head: a55e1f7
+command: python3 tools/mutants.py --write --jobs 4
+log: tools/receipts/expr02-mutants2.log

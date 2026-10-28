@@ -113,4 +113,24 @@ theorem ucheckNI_accepts_skip : ucheckNI Psec .skip = true := by decide
 theorem dbcheckNaive_accepts_emitP : (dbcheckNaive ([], []) (.emitP [] [] 0)).isSome = true := by
   decide
 
+/-! ## EXPR-02: counted loops nest
+
+    The pre-EXPR-02 `bcheck` refused every nested counted loop: its loop rule checked the body
+    with `allcheck`, which has no loop rule. S-EXPR's blind programs 11 and 20 and the August
+    corpus's 24 hit it. The body now goes to the fuelled checker itself. -/
+
+/-- A loop inside a loop, allocating and freeing each turn, is accepted: budget 34. -/
+theorem bcheck_accepts_nested_loops :
+    bcheck Psec [] [] (forU "i" 2 (forU "j" 3 (.seq (.memop .alloc "t") (.memop .free "t"))))
+      = some ([], [], 34) := by decide
+
+/-- Nesting is not a hole: freeing one pointer on every inner turn is still a double free. -/
+theorem bcheck_refuses_nested_double_free :
+    bcheck Psec [] [] (.seq (.memop .alloc "p") (forU "i" 2 (forU "j" 2 (.memop .free "p"))))
+      = none := by decide
+
+/-- The fuelled checker's own pair. -/
+theorem bcheckF_accepts_skip : (bcheckF Psec 1 [] [] .skip).isSome = true := by decide
+theorem bcheckF_refuses_wild_deref : bcheckF Psec 4 [] [] (.memop .deref "p") = none := by decide
+
 end ConfTyping

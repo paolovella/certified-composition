@@ -51,11 +51,12 @@ allcheck	conf-typing/ConfTyping/FullCert.lean:161:86	refuse->accept	killed
 allcheck	conf-typing/ConfTyping/FullCert.lean:170:42	refuse->accept	killed
 allcheck	conf-typing/ConfTyping/FullCert.lean:171:35	refuse->accept	killed
 allcheck	conf-typing/ConfTyping/FullCert.lean:172:30	refuse->accept	killed
-bcheck	conf-typing/ConfTyping/CountedLoop.lean:504:22	refuse->accept	killed
-bcheck	conf-typing/ConfTyping/CountedLoop.lean:505:23	refuse->accept	killed
-bcheck	conf-typing/ConfTyping/CountedLoop.lean:506:16	refuse->accept	killed
-bcheck	conf-typing/ConfTyping/CountedLoop.lean:516:19	refuse->accept	killed
-bcheck	conf-typing/ConfTyping/CountedLoop.lean:517:12	refuse->accept	killed
+bcheckF	conf-typing/ConfTyping/CountedLoop.lean:508:19	refuse->accept	killed
+bcheckF	conf-typing/ConfTyping/CountedLoop.lean:517:22	refuse->accept	killed
+bcheckF	conf-typing/ConfTyping/CountedLoop.lean:518:23	refuse->accept	killed
+bcheckF	conf-typing/ConfTyping/CountedLoop.lean:519:16	refuse->accept	killed
+bcheckF	conf-typing/ConfTyping/CountedLoop.lean:529:19	refuse->accept	killed
+bcheckF	conf-typing/ConfTyping/CountedLoop.lean:530:12	refuse->accept	killed
 costCheck	conf-typing/ConfTyping/CostBound.lean:138:20	accept->refuse	killed
 costCheck	conf-typing/ConfTyping/CostBound.lean:139:20	accept->refuse	killed
 costCheck	conf-typing/ConfTyping/CostBound.lean:141:40	accept->refuse	killed
@@ -316,4 +317,4 @@ umcheck	conf-typing/ConfTyping/MemCert.lean:288:30	refuse->accept	killed
 wcheck	conf-typing/ConfTyping/WhileImp.lean:192:21	accept->refuse	killed
 xcheck	conf-typing/ConfTyping/AllFive.lean:57:40	accept->refuse	killed
 xcheck	conf-typing/ConfTyping/AllFive.lean:58:13	refuse->accept	killed
-mutants: 318 built, 318 killed, 0 stillborn, 0 survived, 0 unexplained
+mutants: 319 built, 319 killed, 0 stillborn, 0 survived, 0 unexplained

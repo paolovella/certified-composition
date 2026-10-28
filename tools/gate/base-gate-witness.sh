@@ -80,7 +80,9 @@ case_ unchanged-pr-checkers "checkers" 0 "^gate: checkers: 0 changed (limit 3)$"
 case_ pr-changes-one-checker "checkers" 0 "^gate: checkers: 1 changed (limit 3): " bash -c 'bump 1'
 case_ pr-changes-three-checkers "checkers" 0 "^gate: checkers: 3 changed (limit 3): " bash -c 'bump 3'
 case_ pr-changes-four-checkers "checkers" 1 "^gate: checkers: 4 changed, over the limit of 3" bash -c 'bump 4'
-case_ pr-touches-only-mutants-table "ring0 mutants" 0 "^gate: mutants: all 318 killed$" \
+# the table's own row count: a checker edit that moves sites must not break this witness
+nmut=$(grep -vc '^mutants: ' "$REPO/tools/mutants.expected")
+case_ pr-touches-only-mutants-table "ring0 mutants" 0 "^gate: mutants: all $nmut killed$" \
   bash -c 'sed -i "1s/:[0-9]*:/:999:/" tools/mutants.expected'
 case_ pr-mutant-survives "mutants" 1 "^gate: mutants: rows not killed (1)" \
   bash -c 'sed -i "1s/\tkilled$/\tsurvived/" tools/mutants.expected'

@@ -2359,6 +2359,27 @@ functional postcondition (`pv_ == pv + 1u32`) is not modelled at all. Those four
 stated in the module header and in `corpus/cn/SOURCES.md`, and a drift guard fires if the
 caveat is ever deleted.
 
+## Counted loops nest (`CountedLoop.lean`) — EXPR-02, 2026-10-28
+
+The remaining false refusal of stage 2k, and two of the six in the blind measurement (S-EXPR,
+`corpus/blind/RESULTS.md`), had one cause: the counted-loop rule checked its body with
+`allcheck`, which has no loop rule. The body now goes to the checker itself.
+
+- **The fuelled checker.** `bcheckF P n` recurses on fuel. `bcheck P A V c := bcheckF P
+  (usize c) A V c`, where `usize` is a structural size, so the recursion stays structural and
+  the kernel still reduces it for `decide`. Fuel 0 refuses.
+- **Soundness.** `bcheckF_sound` holds at every fuel, by induction on the fuel. `bcheck_sound`
+  is unchanged in statement (`Frozen.bcheck_sound`) and is now a corollary. `ring0.lock` did not
+  move, and only `bcheck`'s entries in `checkers.lock` did.
+- **Witnesses:**
+  - `bcheck_accepts_nested_loops` accepts a 2×3 nest at budget 34;
+  - `bcheck_refuses_nested_double_free` refuses a nest that frees on every turn;
+  - `bcheckF` has its own pair.
+  - The mutant table keeps `bcheck`'s five sites, now in `bcheckF`, plus the fuel-0 site.
+    319/319 killed.
+- **Effect** (reported, not tuned against): August's program 24 and the blind 11 and 20 are
+  accepted. The other verdicts of both corpora are unchanged.
+
 ## Widening the counted loop (`CountedLoop.lean`) — stage 2k, and the first measured rule
 
 Stage 2j's `for` rule demanded the loop body return the mediation set **unchanged**. The
@@ -2413,6 +2434,8 @@ and it is named here rather than guessed at.
 an `ite` goes straight to `allcheck`, so every earlier result applies verbatim, and
 `asFor` reads the counted-loop idiom off raw syntax. The loop body is checked by
 `allcheck`, so it may not itself contain a loop — nesting is a follow-on, not a claim.
+*(2026-10-28, EXPR-02: the body is now checked by `bcheckF` itself, so counted loops nest;
+see "Counted loops nest" above.)*
 
 **The artifact.** `loopHandler` carries **all five certificates while iterating**: budget
 40 over every input and every fuel, a mediated read *inside* the loop, noninterference,
