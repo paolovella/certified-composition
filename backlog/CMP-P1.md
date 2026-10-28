@@ -16,3 +16,4 @@ See PLAN-2026-10.md. Write the concrete steps here before starting work.
 
 ## Log
 
+- 2026-10-28: the sketch is lost (I-0003). Only `compile` and `TCmd` survive, in `bench/kernel/gen.py`. P1 is rebuilt as PH1 step 5; this item closes with PH1.
