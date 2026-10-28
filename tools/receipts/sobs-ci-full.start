@@ -1,0 +1,4 @@
+started: 2026-10-28T10:01:12+01:00
+head: f0f005b
+command: bash tools/ci.sh
+log: tools/receipts/sobs-ci-full.log

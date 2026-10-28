@@ -94,3 +94,4 @@ import ConfTyping.IndexedBases
 import ConfTyping.MinimalCompose
 import ConfTyping.CrossToolIndex
 import ConfTyping.Witnesses
+import ConfTyping.AddrLeak

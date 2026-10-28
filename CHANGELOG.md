@@ -6,6 +6,14 @@ landed.
 
 ## Repository verification
 
+- **Addresses can join the observation: S-OBS goes through** (2026-10-28; `AddrLeak.lean`).
+  PLAN-2026-10 flagged `JSecTy` as the riskiest certificate to move from state to observation.
+  - `jsecTy_addrs`: two Low-equal runs of a typed program expose the same address trace,
+    secret cells included, because tracked pointers come only from the synchronised allocator.
+  - The public-only allocator fallback is not needed.
+  - Witnesses: an accepted secret-cell program, and a refused program whose trace shows the
+    secret.
+
 - **The witness registry is data a change may grow, never shrink** (2026-10-28, P0-13;
   `tools/gate/base-gate.sh`). EXPR-02 added a checker (`bcheckF`) and could not pass master's
   gate without the key, because the registry was gate code. Now the gate's `registry` rule lets
