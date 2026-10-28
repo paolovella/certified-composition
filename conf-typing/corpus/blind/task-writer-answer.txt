@@ -1,0 +1,8 @@
+Done. I wrote `TASKS.md` with exactly 40 numbered tasks in the required format: a title line, a blank line, then `NN. [SAFE|UNSAFE] text [property]`.
+
+Breakdown:
+- **32 SAFE** (tasks 1–32) and **8 UNSAFE** (tasks 33–40), matching the ~32/8 target.
+- Coverage spans the CWE Top 25 themes: injection (SQL/shell/log/HTML), path traversal, missing authorization, use-after-free, double free, out-of-bounds, sensitive-data exposure, timing leaks, and resource exhaustion.
+- Ordinary handler patterns included: login, retry, pagination, caching, batch processing, parse-then-emit, cleanup on every path, nested loops, conditional allocation, and store-now/read-later.
+- Deliberately stretchy tasks (31, 32) probe functions and records, as the brief asked, without assuming the language has them.
+- Each task is 1–3 sentences of prose ending with a bracketed property, and the UNSAFE ones describe insecure requests a checker should refuse. No syntax or code was invented.
