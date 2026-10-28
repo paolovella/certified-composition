@@ -1,0 +1,7 @@
+name = "LCore"
+defaultTargets = ["LCore"]
+
+# The trusted core of L (PLAN-2026-10 §2). LCore/Kernel/ is Ring 0: changed only with the user's key.
+# Mathlib-free, like every package here except transport-kernel.
+[[lean_lib]]
+name = "LCore"

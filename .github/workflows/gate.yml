@@ -55,6 +55,7 @@ jobs:
             pr/.lake
             pr/conf-typing/.lake
             pr/transport-calculus/.lake
+            pr/l-core/.lake
           key: gate-${{ runner.os }}-${{ hashFiles('pr/**/lean-toolchain', 'pr/**/lakefile.*') }}
       - name: base-gate (master's gate on the PR tree)
         run: bash base/tools/gate/base-gate.sh base pr

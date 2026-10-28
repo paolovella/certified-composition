@@ -6,6 +6,13 @@ landed.
 
 ## Repository verification
 
+- **L's trusted core begins: `Beh`, `Lang`, three certificate shapes, `PassCert`** (2026-10-28,
+  PH1 steps 1–4; `l-core/LCore/Kernel/`, Ring 0). One observation for every language. Every
+  certificate is a `trace`, `rel` or `bound` instance. A certified pass carries all three
+  shapes by `trace_transfer`, `rel_transfer` and `bound_transfer`, and passes compose
+  (`PassCert.seq`), all with no axioms. So no certificate is ever proved per pass. Each shape is
+  shown inhabited and refuted on a toy language.
+
 - **Addresses can join the observation: S-OBS goes through** (2026-10-28; `AddrLeak.lean`).
   PLAN-2026-10 flagged `JSecTy` as the riskiest certificate to move from state to observation.
   - `jsecTy_addrs`: two Low-equal runs of a typed program expose the same address trace,

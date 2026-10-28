@@ -1502,7 +1502,7 @@ done
 #     workspace and all three packages share one version: transport-kernel builds the
 #     transport-calculus sources itself, so two toolchains forced names valid in both (P0-09).
 tc=$(sed 's/.*://' conf-typing/lean-toolchain 2>/dev/null)
-for f in lean-toolchain transport-calculus/lean-toolchain transport-kernel/lean-toolchain; do
+for f in lean-toolchain transport-calculus/lean-toolchain transport-kernel/lean-toolchain l-core/lean-toolchain; do
   if [ "$(sed 's/.*://' "$f" 2>/dev/null)" != "$tc" ]; then
     echo "DRIFT: $f does not pin $tc like conf-typing/lean-toolchain"; fail=1
   fi

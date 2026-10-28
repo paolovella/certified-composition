@@ -8,6 +8,11 @@ name = "ConfTyping"
 name = "TransportCalculus"
 path = "../transport-calculus"
 
+# L's trusted core (PH1); the UCmd adapter and P1 build on it.
+[[require]]
+name = "LCore"
+path = "../l-core"
+
 [[lean_exe]]
 name = "certcheck"
 root = "Main"

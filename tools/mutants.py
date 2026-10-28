@@ -90,6 +90,7 @@ def run(site, base):
         shutil.copytree(CT, os.path.join(work, "conf-typing"), symlinks=True)
         shutil.copytree(os.path.join(ROOT, "transport-calculus"),
                         os.path.join(work, "transport-calculus"), symlinks=True)
+        shutil.copytree(os.path.join(ROOT, "l-core"), os.path.join(work, "l-core"), symlinks=True)
         rel = os.path.relpath(path, CT)
         mp = os.path.join(work, "conf-typing", rel)
         lines = open(mp, encoding="utf-8").read().split("\n")
@@ -147,6 +148,7 @@ def main():
     shutil.copytree(CT, os.path.join(work, "conf-typing"), symlinks=True)
     shutil.copytree(os.path.join(ROOT, "transport-calculus"), os.path.join(work, "transport-calculus"),
                     symlinks=True)
+    shutil.copytree(os.path.join(ROOT, "l-core"), os.path.join(work, "l-core"), symlinks=True)
     if subprocess.run(["lake", "build"], cwd=os.path.join(work, "conf-typing"),
                       capture_output=True).returncode != 0:
         print("mutants: the unmutated copy does not build; no verdict")

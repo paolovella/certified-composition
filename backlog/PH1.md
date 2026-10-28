@@ -60,4 +60,23 @@ Order: 1–4 first, as one PR for the user's key, with each shape inhabited and 
 toy `Lang`. Then 6, 5, 7. Each step builds and runs CI before the next.
 
 ## Log
-
+- 2026-10-28, branch `ph1/spine`: **steps 1–4, the kernel** (`l-core/LCore/Kernel/`, Ring 0).
+  - `Obs` (`Beh` = events, leakage, cost, outcome), `Lang`, the three certificate shapes
+    (`Cert.trace`, `Cert.rel`, `Cert.bound`) and `PassCert`, with `trace_transfer`,
+    `rel_transfer`, `bound_transfer` and `PassCert.seq`. The transfer theorems and the
+    composition use no axioms.
+  - Design: `Beh` is all observable, so `rel` is one equation. `PassCert.sim` is an equation
+    at a program-dependent fuel. That fits lockstep passes like P1; the prefix and stability
+    laws wait for the first pass that needs them, as the kernel's docstring says.
+  - Witnesses (`LCore/Witnesses.lean`, not Ring 0): each shape is inhabited and refuted on a
+    toy language. A padding pass carries all three certificates, with the budget transformed
+    (3 → 4), and keeps a real leak distinguishable. Composition is exercised too.
+  - Wiring:
+    - `conf-typing` requires `l-core`; the axiom manifest audits `LCore`; the root workspace
+      imports it, so `lake check` and the six-kernel export see it;
+    - CI step "l-core builds";
+    - CLAUDE.md names `l-core/LCore/Kernel/` as Ring 0, and so does the gate;
+    - gate witnesses: a kernel edit is flagged as Ring 0, an edit outside the kernel is not
+      (23 quick cases);
+    - the toolchain guard covers `l-core/lean-toolchain`.
+  - CI: the first two full runs failed. Run 1: every tool that copies `conf-typing` to build mutants or witnesses (`mutants.py`, the registry, mutant, gate, comparator, lock and warden witnesses) did not copy `l-core`, which `conf-typing` now requires. Fixed in all of them, plus the CI caches. Run 2: the axiom manifest was generated before the composition witness was added. Run 3 green (`ph1-ci-full3`, 1037 s).

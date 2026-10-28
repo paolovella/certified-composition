@@ -54,7 +54,7 @@ mkdir -p "$work"
 ( cd "$pr" && git ls-files -co --exclude-standard -z | tar --null -T - -cf - ) | tar -x -C "$work"
 cp -a "$pr/.git" "$work/.git"
 # transport-kernel/.lake (mathlib, ~7.5 GB) only for --heavy: the hosted gate runs --fast.
-caches=(.lake conf-typing/.lake transport-calculus/.lake)
+caches=(.lake conf-typing/.lake transport-calculus/.lake l-core/.lake)
 [ "$HEAVY" = 1 ] && caches+=(transport-kernel/.lake)
 for d in "${caches[@]}"; do
   [ -d "$pr/$d" ] && mkdir -p "$work/$(dirname "$d")" && cp -a --reflink=auto "$pr/$d" "$work/$d"
@@ -94,7 +94,7 @@ b, p = files(sys.argv[1]), files(sys.argv[2])
 changed = sorted(f for f in set(b) | set(p) if b.get(f) != p.get(f))
 RING0 = ["tools/*", ".github/*", "CLAUDE.md", ".claude/*", "*/lean-toolchain", "*/lakefile*",
          "*/lake-manifest.json", "lean-toolchain", "lakefile.toml", "lake-manifest.json",
-         "workspace/*", "comparator.json", "AUTONOMY"]
+         "workspace/*", "comparator.json", "AUTONOMY", "l-core/LCore/Kernel/*"]
 DATA = ["tools/axioms.expected", "tools/checkers.lock", "tools/mutants.expected",
         "tools/witnesses.expected", "tools/receipts/*"]
 for f in changed:
