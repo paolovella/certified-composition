@@ -90,6 +90,10 @@ of annotation burden and false positives. The 2026-08 plan rejected "keep buildi
   tasks with a sealed holdout (§8), does not exist yet. **Until it does, the central bet of L is
   unmeasured.**
 
+  *Update 2026-10-28 (S-EXPR):* measured once, blind. 21% of expressible safe programs were
+  falsely refused, against 4% on the author's corpus; 9% of tasks were inexpressible; 8/8 unsafe
+  programs were refused. The kill rule (30%) does not fire. See `conf-typing/corpus/blind/RESULTS.md`.
+
 **4.2 "There is no property on which we lead; the asset is the algebra" (PLAN-2026-08 §3).** The
 two things judged novel were the checked composition algebra (`Bridge.pair_comp_cert`, componentwise
 with no interaction term) and the trusted base computed from the artifact (`needs`, `Ledger`).
