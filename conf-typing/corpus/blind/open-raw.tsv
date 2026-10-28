@@ -1,0 +1,20 @@
+01	rc=0	corpus/blind/p/01.uc: ACCEPTED
+02	INEXPRESSIBLE
+03	rc=0	corpus/blind/p/03.uc: ACCEPTED
+05	rc=0	corpus/blind/p/05.uc: ACCEPTED
+07	rc=0	corpus/blind/p/07.uc: ACCEPTED
+08	rc=0	corpus/blind/p/08.uc: ACCEPTED
+09	rc=3	corpus/blind/p/09.uc: REJECTED by the certificate checker
+15	rc=0	corpus/blind/p/15.uc: ACCEPTED
+16	rc=0	corpus/blind/p/16.uc: ACCEPTED
+18	rc=3	corpus/blind/p/18.uc: REJECTED by the certificate checker
+19	rc=0	corpus/blind/p/19.uc: ACCEPTED
+20	rc=3	corpus/blind/p/20.uc: REJECTED by the certificate checker
+22	rc=3	corpus/blind/p/22.uc: REJECTED by the certificate checker
+23	rc=0	corpus/blind/p/23.uc: ACCEPTED
+28	rc=0	corpus/blind/p/28.uc: ACCEPTED
+29	rc=0	corpus/blind/p/29.uc: ACCEPTED
+33	rc=3	corpus/blind/p/33.uc: REJECTED by the string-integrity checker
+36	rc=3	corpus/blind/p/36.uc: REJECTED by the certificate checker
+37	rc=3	corpus/blind/p/37.uc: REJECTED by the certificate checker
+40	rc=3	corpus/blind/p/40.uc: REJECTED by the certificate checker
