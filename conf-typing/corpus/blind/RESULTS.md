@@ -1,15 +1,23 @@
 # S-EXPR results: blind tasks, blind programs
 
 Method (`backlog/S-EXPR.md`), each step committed before the next:
-1. **The task list** (`TASKS.md`, 9d48c6b) was written by an isolated agent that never saw the
+1. **The task list** (`TASKS.md`, b43b601) was written by an isolated agent that never saw the
    language. Its whole input was `BRIEF.md`.
 2. **The split** (`SPLIT.md`) has a recorded seed: 20 open, 20 holdout.
-3. **The programs** (`p/`, `MANIFEST.tsv`, bc5638f) were written by a second isolated agent.
+3. **The programs** (`p/`, `MANIFEST.tsv`, 29bcb61) were written by a second isolated agent.
    Its only inputs were `REFERENCE.md`, `AUTHOR-BRIEF.md` and `TASKS.md`. It ran as
    `claude -p --restricted` with Read, Write and Glob confined to that directory, so it could
    not read the checkers' source or run `certcheck`.
 4. The checker was run on the open half only: `certcheck p/NN.uc [--secret <MANIFEST secrets>]`,
    output in `out/`.
+
+*Correction of record (2026-10-28):* until this correction, the hashes cited here for the
+task list, the programs and the open-half report were ~~9d48c6b~~, ~~bc5638f~~ and
+~~a960c05~~. Those are the branch commits, and the PR was merged by rebase, which gives every
+commit a new hash. They are not on master. The same commits are on master as `b43b601`,
+`29bcb61` and `869c465`, with their author times unchanged (01:02, 01:06, 01:08; holdout
+01:09), which is the evidence of order. PRs are now merged with merge commits, so cited branch
+hashes stay valid.
 
 ## Open half (20 tasks: 16 SAFE, 4 UNSAFE), 2026-10-28
 
@@ -79,7 +87,7 @@ because the language has no comparisons, lengths, arrays or string operations. T
 The holdout is reported below, unsealed after this section was committed, with no rule and no
 reference changed.
 
-## Holdout (20 tasks: 16 SAFE, 4 UNSAFE), unsealed 2026-10-28 after a960c05
+## Holdout (20 tasks: 16 SAFE, 4 UNSAFE), unsealed 2026-10-28 after 869c465
 
 No rule and no reference changed between the two halves.
 
@@ -142,3 +150,26 @@ fire** (21% and 9%). The bet survives its first blind measurement, with four qua
    PLAN-2026-10 §3) are the fix the plan already names.
 4. **One author, one run, 40 tasks.** A second blind author on the same tasks would show how
    much of this is the author.
+
+## Replication: a second blind author (EXPR-05), 2026-10-28
+
+Same frozen `TASKS.md`, the same v1 `REFERENCE.md` and the same brief, given to a fresh isolated
+author (`claude -p --restricted`, receipt `expr05-author2`). Its programs (`p2/`, 8904668) were
+committed before any run. Both authors were measured with the same checker, master before
+EXPR-02 (`author2-raw.tsv`, `out2/`).
+
+| | author 1 | author 2 |
+|---|---|---|
+| SAFE inexpressible | 3/32 (02, 24, 27) | 2/32 (02, 27) |
+| **SAFE falsely refused** | **6/29 (21%)** | **5/30 (17%)** |
+| UNSAFE refused | 8/8 | 8/8 |
+
+**Agreement: 38 of 40 tasks get the same verdict.**
+- The two differences: author 2 kept 18's allocation and free inside one branch, which
+  avoids the `if`-join limit and is a valid design for the task. Author 2 also wrote 24 as one
+  cell and a counted loop, an approximation that keeps little of "truncate to N bytes".
+- The shared false refusals have the same causes in both authors' programs: the secret-pointer
+  rule (09, 10, 22, each with `certcheck`'s new hint) and nested counted loops (11, 20).
+
+So the S-EXPR numbers are not one author's style. The false refusals come from the language
+and its documentation, and they recur in the same places.

@@ -1,0 +1,40 @@
+01	01.uc	-	profile lookup is access to resource profile and returning it is an emit to html; the caller check is the monitor's check
+02	none	-	the language has no equality, subtraction or comparison operator to compare the password with the credential, and no way to return a result that depends on a secret without that result counting as a leak
+03	03.uc	-	formatted response approximated by an integer stored in the buffer cell; error path selected by free integer flag err; one free after the if covers both paths
+04	04.uc	-	no arrays: the record block is one heap cell; the fixed maximum is a counted loop of 32 and flag more stands for slot index below the requested count
+05	05.uc	-	no parameter binding: the bound id is approximated by san ( input ) inside a quoted literal; spaces in SQL replaced by underscores
+06	06.uc	-	no path resolution or string comparison: the containment check/rejection is approximated by san ( input ) before the fs sink
+07	07.uc	-	request method is a literal; stripping control characters is approximated by san ( input ) for the log sink
+08	08.uc	-	HTML escaping is san ( input ) inside literal markup
+09	09.uc	token	upstream call is access upstream; token is held in a secret cell and never placed in any public cell or emitted
+10	10.uc	key	role flag is a free integer variable; session key is held in a secret cell and never used in a condition
+11	11.uc	-	downstream call is access downstream and its success is free integer ok; give-up after success approximated by a done flag in a 5-iteration counted loop; fixed delay is an inner counted loop of skip
+12	12.uc	-	no arrays: page size cap is a counted loop of 20; flag more stands for remaining rows; offset is an opaque integer position that is only advanced
+13	13.uc	-	cache hit is free integer flag hit; computing the value is access db; storing into the cache is emit to cache sink
+14	14.uc	-	bounded list is a counted loop of 10; every job id is the single resource job; whether the caller may touch the job is free integer flag owns
+15	15.uc	-	no parser: method field is a literal and path field is san ( input ); output buffer holds only an integer length
+16	16.uc	-	the two failure points are free integer flags fail1 and fail2; no early return so the single free follows the nested if
+17	17.uc	-	no arrays: the fixed-size connection array is a counted loop of 8 over resource conns; open state is free flag open and closing is a log emit
+18	18.uc	-	allocation, use and free of the scratch buffer are all inside the flag branch
+19	19.uc	-	both requests in one program: storing the note is an emit to db with san ( input ); reading it back is access notes after check notes
+20	20.uc	-	grid cells are access grid; aggregation adds free integer count into total
+21	21.uc	-	no comparison operator: range validation is free integer flag inrange; typed error is a distinct literal; resources freed once after the if
+22	22.uc	pw	no hash function: hash approximated by ( pw + salt ); the hash is stored in a secret cell and the plaintext is never stored or emitted
+23	23.uc	-	no string comparison: matching the untrusted command name is approximated by free integer flags isrestart and isstatus; the shell sink only ever receives fixed literals
+24	24.uc	-	no bytes or arrays: the N-byte buffer is one cell and the copy is a counted loop of 16; flag more stands for input bytes remaining
+25	25.uc	-	no early return: the denial is the else branch; the authorization outcome is free integer flag allowed, with check record before the access
+26	26.uc	-	the growable buffer is one cell whose contents accumulate across a counted loop of 10
+27	none	-	the language has no equality, subtraction or comparison operator to compare the submitted code with the expected code, and no way to return a result that depends on a secret without that result counting as a leak
+28	28.uc	-	no string comparison: the host allowlist is selected by free integer flags hosta and hostb with fixed literal hosts; canonicalizing the path is san ( input ); the location sink is a sink named location
+29	29.uc	-	no comparison operator: length-versus-capacity test is free integer flag fits; the body read is a counted loop bounded by the capacity of 64
+30	30.uc	-	database connection is a heap cell; query error is free integer flag err; released once after the if
+31	31.uc	-	no functions: the helper is inlined as check doc and its reported result is free integer authorized
+32	32.uc	-	no records: name, role and quota are three separate heap cells; ownership is free integer flag owner with check record before the update
+33	33.uc	-	spaces in SQL replaced by underscores; untrusted term concatenated without san
+34	34.uc	-	opening the file is an emit to fs with the raw input
+35	35.uc	-	writing a trailing byte is store buf b after free on the err path
+36	36.uc	-	the loop is a counted loop of 3 that frees the same pointer each iteration
+37	37.uc	key,k	response body is a public heap cell that receives the session key loaded from its secret cell when verbose is set
+38	38.uc	sb,m	first-byte match is approximated by m = ( sb + guess ); the slower branch is an extra counted loop of 100
+39	39.uc	-	terminator not yet found is free integer more, updated from untrusted next each iteration
+40	40.uc	-	reading the resource is access profile with no check
