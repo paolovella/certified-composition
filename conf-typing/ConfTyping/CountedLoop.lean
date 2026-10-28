@@ -501,8 +501,8 @@ def usize : UCmd → Nat
     (EXPR-02; until 2026-10-28 the body went to `allcheck`, which has no loop rule, and
     nesting was "a follow-on, not a claim"). The fuel only makes the recursion structural:
     `bcheck` passes `usize c`. Fuel only ever refuses (fuel 0), so soundness holds at any fuel
-    (`bcheckF_sound`); that `usize c` is enough for every program is not proved, only
-    witnessed by `decide` on the programs here (the boundary warden asked, 2026-10-28). -/
+    (`bcheckF_sound`), and `usize c` is enough: more fuel never changes the verdict
+    (`bcheckF_enough`, asked for by the boundary warden on 2026-10-28). -/
 def bcheckF (P : Partition) :
     Nat → List String → List String → UCmd → Option (List String × List String × Nat)
   | 0, _, _, _ => none
@@ -620,6 +620,58 @@ theorem bcheckF_sound {P : Partition} : ∀ (n : Nat) (c : UCmd) (A V A' V' : Li
 theorem bcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String) (k : Nat),
     bcheck P A V c = some (A', V', k) → FullCert P A V c A' V' k :=
   fun c A V A' V' k h => bcheckF_sound (usize c) c A V A' V' k h
+
+theorem usize_pos : ∀ c : UCmd, 1 ≤ usize c := by
+  intro c; cases c <;> simp [usize]
+
+theorem usize_forU (i : String) (k : Nat) (body : UCmd) :
+    usize (forU i k body) = usize body + 5 := by
+  simp [forU, countU, decOne, usize]; omega
+
+/-- One more unit of fuel changes nothing once the fuel covers the program. -/
+theorem bcheckF_succ {P : Partition} : ∀ (n : Nat) (c : UCmd) (A V : List String),
+    usize c ≤ n → bcheckF P (n + 1) A V c = bcheckF P n A V c := by
+  intro n
+  induction n with
+  | zero => intro c A V h; have := usize_pos c; omega
+  | succ n ih =>
+  intro c A V h
+  cases c with
+  | seq c₁ c₂ =>
+      rcases hf : asFor (.seq c₁ c₂) with _ | ⟨i, k, body⟩
+      · have h₁ : usize c₁ ≤ n := by simp [usize] at h; omega
+        have h₂ : usize c₂ ≤ n := by simp [usize] at h; omega
+        have e₁ : ∀ A V, bcheckF P (n + 1) A V c₁ = bcheckF P n A V c₁ := fun A V => ih c₁ A V h₁
+        have e₂ : ∀ A V, bcheckF P (n + 1) A V c₂ = bcheckF P n A V c₂ := fun A V => ih c₂ A V h₂
+        simp only [bcheckF, hf, e₁, e₂]
+      · have hc := asFor_eq hf
+        have hb : usize body ≤ n := by rw [hc, usize_forU] at h; omega
+        simp only [bcheckF, hf, ih body _ _ hb]
+  | ite e c₁ c₂ =>
+      have h₁ : usize c₁ ≤ n := by simp [usize] at h; omega
+      have h₂ : usize c₂ ≤ n := by simp [usize] at h; omega
+      simp only [bcheckF, ih c₁ _ _ h₁, ih c₂ _ _ h₂]
+  | skip => rfl
+  | assign _ _ => rfl
+  | check _ => rfl
+  | access _ => rfl
+  | memop _ _ => rfl
+  | sop _ _ _ => rfl
+  | hop _ _ _ => rfl
+  | loop _ _ => rfl
+
+/-- **`usize c` is enough fuel** (EXPR-02's open point, raised by the boundary warden): any fuel
+    at least `usize c` gives `bcheck`'s verdict, so `bcheck` never refuses for want of fuel. -/
+theorem bcheckF_enough {P : Partition} (c : UCmd) (A V : List String) :
+    ∀ n, usize c ≤ n → bcheckF P n A V c = bcheck P A V c := by
+  intro n h
+  induction n with
+  | zero => have := usize_pos c; omega
+  | succ m ih =>
+      by_cases hm : usize c ≤ m
+      · rw [bcheckF_succ m c A V hm]; exact ih hm
+      · have : usize c = m + 1 := by omega
+        simp [bcheck, this]
 
 /-! ## A program that iterates -/
 
