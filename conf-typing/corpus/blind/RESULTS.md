@@ -142,3 +142,26 @@ fire** (21% and 9%). The bet survives its first blind measurement, with four qua
    PLAN-2026-10 §3) are the fix the plan already names.
 4. **One author, one run, 40 tasks.** A second blind author on the same tasks would show how
    much of this is the author.
+
+## Replication: a second blind author (EXPR-05), 2026-10-28
+
+Same frozen `TASKS.md`, the same v1 `REFERENCE.md` and the same brief, given to a fresh isolated
+author (`claude -p --restricted`, receipt `expr05-author2`). Its programs (`p2/`, 8e54f24) were
+committed before any run. Both authors were measured with the same checker, master before
+EXPR-02 (`author2-raw.tsv`, `out2/`).
+
+| | author 1 | author 2 |
+|---|---|---|
+| SAFE inexpressible | 3/32 (02, 24, 27) | 2/32 (02, 27) |
+| **SAFE falsely refused** | **6/29 (21%)** | **5/30 (17%)** |
+| UNSAFE refused | 8/8 | 8/8 |
+
+**Agreement: 38 of 40 tasks get the same verdict.**
+- The two differences: author 2 kept 18's allocation and free inside one branch, which
+  avoids the `if`-join limit and is a valid design for the task. Author 2 also wrote 24 as one
+  cell and a counted loop, an approximation that keeps little of "truncate to N bytes".
+- The shared false refusals have the same causes in both authors' programs: the secret-pointer
+  rule (09, 10, 22, each with `certcheck`'s new hint) and nested counted loops (11, 20).
+
+So the S-EXPR numbers are not one author's style. The false refusals come from the language
+and its documentation, and they recur in the same places.
