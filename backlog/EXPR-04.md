@@ -7,7 +7,7 @@ deps: [S-EXPR]
 closes: ['S-EXPR follow-up']
 acceptance: a fs emit built from `san ( input )` that allows `../` is refused, or san's name and documentation say what it neutralizes; the blind program 06 is refused
 kill: -
-status: planned
+status: in-progress
 ---
 
 ## Plan
@@ -25,3 +25,12 @@ Two routes, to decide before code:
    §3's typed sinks (`SinkKind` with one delimiter classifier per sink).
 
 Recommended: route 1 now, route 2 as part of PH3's sinks.
+
+## Log
+
+- 2026-10-28, branch `expr-04/san-scope`. Route 1 done; route 2 (PathCert in `certcheck`, then
+  PH3's typed sinks) stays open.
+  - The README states that `san` is quote-only.
+  - `certcheck` adds a note to an accepted program for each `fs` emit with a non-literal path.
+    The note is Ring 3 text, and the verdict is unchanged. Checked: blind 06 gets the note, and
+    `examples/handler.uc` does not.
