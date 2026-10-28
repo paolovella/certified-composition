@@ -80,3 +80,19 @@ toy `Lang`. Then 6, 5, 7. Each step builds and runs CI before the next.
       (23 quick cases);
     - the toolchain guard covers `l-core/lean-toolchain`.
   - CI: the first two full runs failed. Run 1: every tool that copies `conf-typing` to build mutants or witnesses (`mutants.py`, the registry, mutant, gate, comparator, lock and warden witnesses) did not copy `l-core`, which `conf-typing` now requires. Fixed in all of them, plus the CI caches. Run 2: the axiom manifest was generated before the composition witness was added. Run 3 green (`ph1-ci-full3`, 1037 s).
+- 2026-10-28, branch `ph1/ucmd-lang` (stacked on `ph1/spine`): **step 6, UCmd as the first
+  `Lang`** (`conf-typing/ConfTyping/LAdapter.lean`, not Ring 0).
+  - `ucmdLang P π`: the input is the initial store, Low-equality is `lowEq P`, and the
+    observation is built from `uexec` and `uaddrs`:
+    - events: reads, then emits;
+    - leakage: the branch trace, then the address trace;
+    - outcome: abort if dead, done otherwise, and `fuel` with an empty record when the fuel
+      runs out.
+  - **Adequacy** (`bcheck_lcore`): a program `bcheck` accepts carries `Cert.bound k`,
+    `Cert.trace (mediated π)` and `Cert.rel` on `ucmdLang`, from `bcheck_sound`,
+    `jsecTy_sound` and S-OBS's `jsecTy_addrs`.
+  - Witnesses: `loopHandler_lcore` (the loop handler, budget 40, all three shapes);
+    `secretBranch_not_rel` (a secret branch is not `rel`, decided).
+  - Limits, stated: v1 events record reads and emits in two lists, not interleaved, and a
+    fuel-exhausted run records nothing (`uexec` gives no prefix).
+  - Full CI green (`ph1-ucmd-ci-full`, 1018 s).

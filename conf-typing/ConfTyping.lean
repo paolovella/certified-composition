@@ -95,3 +95,4 @@ import ConfTyping.MinimalCompose
 import ConfTyping.CrossToolIndex
 import ConfTyping.Witnesses
 import ConfTyping.AddrLeak
+import ConfTyping.LAdapter

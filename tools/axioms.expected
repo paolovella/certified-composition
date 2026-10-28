@@ -1535,6 +1535,7 @@ ConfTyping.bcheckF_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheckF_sound	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheckF_succ	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheck_accepts_nested_loops	ConfTyping.Witnesses	propext
+ConfTyping.bcheck_lcore	ConfTyping.LAdapter	Classical.choice,Quot.sound,propext
 ConfTyping.bcheck_refuses_nested_double_free	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_sound	ConfTyping.CountedLoop	Quot.sound,propext
@@ -2262,6 +2263,7 @@ ConfTyping.loopFix_terminates	ConfTyping.AliasFix	Quot.sound,propext
 ConfTyping.loopHandler	ConfTyping.CountedLoop	
 ConfTyping.loopHandler_checks	ConfTyping.CountedLoop	propext
 ConfTyping.loopHandler_five	ConfTyping.CountedLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loopHandler_lcore	ConfTyping.LAdapter	Classical.choice,Quot.sound,propext
 ConfTyping.loopHandler_strings	ConfTyping.CountedLoop	propext
 ConfTyping.loopHandler_trace_is_low	ConfTyping.CountedLoop	Classical.choice,Quot.sound,propext
 ConfTyping.loopQuery	ConfTyping.StringLoop	
@@ -2309,6 +2311,7 @@ ConfTyping.medStep_inv	ConfTyping.Mediation	propext
 ConfTyping.med_fixed_accepted	ConfTyping.Mediation	propext
 ConfTyping.med_victim_bypasses	ConfTyping.Mediation	propext
 ConfTyping.med_victim_rejected	ConfTyping.Mediation	propext
+ConfTyping.mediated	ConfTyping.LAdapter	
 ConfTyping.mediation_generated_policy_carried	ConfTyping.Mediation	Quot.sound,propext
 ConfTyping.memA	ConfTyping.Speculate	
 ConfTyping.memB	ConfTyping.Speculate	
@@ -2718,6 +2721,8 @@ ConfTyping.secretAddr	ConfTyping.Speculate
 ConfTyping.secretAddrProg	ConfTyping.AddrLeak	
 ConfTyping.secretAddrProg_refused	ConfTyping.AddrLeak	propext
 ConfTyping.secretAddrProg_trace_differs	ConfTyping.AddrLeak	propext
+ConfTyping.secretBranch	ConfTyping.LAdapter	
+ConfTyping.secretBranch_not_rel	ConfTyping.LAdapter	propext
 ConfTyping.secretCell	ConfTyping.SpecFactor	
 ConfTyping.secretCellProg	ConfTyping.AddrLeak	
 ConfTyping.secretCellProg_checks	ConfTyping.AddrLeak	propext
@@ -2930,7 +2935,9 @@ ConfTyping.twoCells_checks	ConfTyping.HeapLabel	propext
 ConfTyping.twoCells_labels	ConfTyping.HeapLabel	
 ConfTyping.twoLive	ConfTyping.SpecUnified	
 ConfTyping.typed_but_wall_leaks	ConfTyping.SecTy	Classical.choice,Quot.sound,propext
+ConfTyping.uBeh	ConfTyping.LAdapter	propext
 ConfTyping.uCtr	ConfTyping.CostBound	
+ConfTyping.uEvents	ConfTyping.LAdapter	
 ConfTyping.uFixed	ConfTyping.Unified	
 ConfTyping.uFixed_permitted_reads	ConfTyping.Unified	
 ConfTyping.uFixed_refused_reads_nothing	ConfTyping.Unified	
@@ -2955,11 +2962,13 @@ ConfTyping.uVictim_not_mediated	ConfTyping.Unified	propext
 ConfTyping.uaddrs	ConfTyping.AddrLeak	propext
 ConfTyping.uaf_errors	ConfTyping.MemFree	propext
 ConfTyping.uaf_rejected	ConfTyping.MemFree	propext
+ConfTyping.uchCode	ConfTyping.LAdapter	
 ConfTyping.ucheck	ConfTyping.Bundle	propext
 ConfTyping.ucheckNI	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheckNI_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.ucheckNI_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheck_sound	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.ucmdLang	ConfTyping.LAdapter	propext
 ConfTyping.ucost_of_cost	ConfTyping.Unified	Quot.sound,propext
 ConfTyping.uembed	ConfTyping.Unified	
 ConfTyping.uembed_mediated	ConfTyping.Unified	Quot.sound,propext
@@ -3117,6 +3126,7 @@ ConfTyping.ξ0	ConfTyping.Ledger
 ConfTyping.ξ1	ConfTyping.Ledger	
 ConfTyping.σ0	ConfTyping.Pleak	
 ConfTyping.σ1	ConfTyping.Pleak	
+ConfTyping.σSecret0	ConfTyping.LAdapter	
 ConfTyping.σSecret5	ConfTyping.AddrLeak	
 ConfTyping.σSecret7	ConfTyping.AddrLeak	
 ConfTyping.σ_b1	ConfTyping.Pleak	
