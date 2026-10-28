@@ -487,17 +487,30 @@ theorem asFor_eq : ∀ {c : UCmd} {i : String} {k : Nat} {body : UCmd},
 
 /-! ## One checker, loops included -/
 
+/-- A structural size, so `bcheck` can give `bcheckF` enough fuel without well-founded
+    recursion: the kernel must reduce the checker for `decide` (CLAUDE.md). -/
+def usize : UCmd → Nat
+  | .seq a b   => usize a + usize b + 1
+  | .ite _ a b => usize a + usize b + 1
+  | .loop _ a  => usize a + 1
+  | _          => 1
+
 /-- `allcheck`, plus the counted-loop rule. Everything that is not a `seq` or an `ite`
     goes straight to `allcheck`, so every earlier result applies verbatim; the new content
-    is one clause. The loop body is checked by `allcheck`, so it may not itself contain a
-    loop — nesting is a follow-on, not a claim. -/
-def bcheck (P : Partition) :
-    List String → List String → UCmd → Option (List String × List String × Nat)
-  | A, V, .seq c₁ c₂ =>
+    is one clause. The loop body is checked by `bcheckF` itself, so counted loops nest
+    (EXPR-02; until 2026-10-28 the body went to `allcheck`, which has no loop rule, and
+    nesting was "a follow-on, not a claim"). The fuel only makes the recursion structural:
+    `bcheck` passes `usize c`. Fuel only ever refuses (fuel 0), so soundness holds at any fuel
+    (`bcheckF_sound`); that `usize c` is enough for every program is not proved, only
+    witnessed by `decide` on the programs here (the boundary warden asked, 2026-10-28). -/
+def bcheckF (P : Partition) :
+    Nat → List String → List String → UCmd → Option (List String × List String × Nat)
+  | 0, _, _, _ => none
+  | n + 1, A, V, .seq c₁ c₂ =>
       match asFor (.seq c₁ c₂) with
       | some (i, k, body) =>
           if !(P i) && noWrite i body then
-            match allcheck P A (dropStr i V) body with
+            match bcheckF P n A (dropStr i V) body with
             | some (A₂, V₂, b) =>
                 if subStr A A₂ && V₂ == dropStr i V then
                   some (A, dropStr i V, 2 + k * (b + 2))
@@ -505,47 +518,56 @@ def bcheck (P : Partition) :
             | none => none
           else none
       | none =>
-          (bcheck P A V c₁).bind fun p₁ =>
-            (bcheck P p₁.1 p₁.2.1 c₂).map fun p₂ =>
+          (bcheckF P n A V c₁).bind fun p₁ =>
+            (bcheckF P n p₁.1 p₁.2.1 c₂).map fun p₂ =>
               (p₂.1, p₂.2.1, p₁.2.2 + p₂.2.2)
-  | A, V, .ite e c₁ c₂ =>
+  | n + 1, A, V, .ite e c₁ c₂ =>
       if exprLow P e then
-        match bcheck P A V c₁, bcheck P A V c₂ with
+        match bcheckF P n A V c₁, bcheckF P n A V c₂ with
         | some p₁, some p₂ =>
             some (interStr p₁.1 p₂.1, interStr p₁.2.1 p₂.2.1, 1 + max p₁.2.2 p₂.2.2)
         | _, _ => none
       else none
-  | A, V, c => allcheck P A V c
+  | _ + 1, A, V, c => allcheck P A V c
 
-/-- **The checker is sound, loops included.** One run, and the result is the same
-    `FullCert` every earlier stage consumes — so the budget, mediation, noninterference
-    and memory-safety guarantees attach to a program that iterates. -/
-theorem bcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String) (k : Nat),
-    bcheck P A V c = some (A', V', k) → FullCert P A V c A' V' k := by
+/-- The checker `certcheck` runs and `Frozen.bcheck_sound` names. -/
+def bcheck (P : Partition) (A V : List String) (c : UCmd) :
+    Option (List String × List String × Nat) :=
+  bcheckF P (usize c) A V c
+
+/-- **The fuelled checker is sound, at every fuel.** Induction on the fuel; each case is the
+    pre-EXPR-02 proof with the loop body's certificate coming from the induction hypothesis
+    instead of `allcheck_sound`. -/
+theorem bcheckF_sound {P : Partition} : ∀ (n : Nat) (c : UCmd) (A V A' V' : List String) (k : Nat),
+    bcheckF P n A V c = some (A', V', k) → FullCert P A V c A' V' k := by
+  intro n
+  induction n with
+  | zero => intro c A V A' V' k h; simp [bcheckF] at h
+  | succ n ih =>
   intro c
-  induction c with
-  | seq c₁ c₂ ih₁ ih₂ =>
+  cases c with
+  | seq c₁ c₂ =>
       intro A V A' V' k h
       rcases hf : asFor (.seq c₁ c₂) with _ | ⟨i, k₀, body⟩
-      · simp only [bcheck, hf] at h
-        rcases e₁ : bcheck P A V c₁ with _ | p₁
+      · simp only [bcheckF, hf] at h
+        rcases e₁ : bcheckF P n A V c₁ with _ | p₁
         · rw [e₁] at h; simp at h
         rw [e₁, Option.bind_some] at h
-        rcases e₂ : bcheck P p₁.1 p₁.2.1 c₂ with _ | p₂
+        rcases e₂ : bcheckF P n p₁.1 p₁.2.1 c₂ with _ | p₂
         · rw [e₂] at h; simp at h
         rw [e₂] at h
         simp only [Option.map_some, Option.some.injEq, Prod.mk.injEq] at h
-        have f₁ := ih₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁])
-        have f₂ := ih₂ p₁.1 p₁.2.1 p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂])
+        have f₁ := ih c₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁])
+        have f₂ := ih c₂ p₁.1 p₁.2.1 p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂])
         obtain ⟨hA, hV, hk⟩ := h
         subst hA; subst hV; subst hk
         exact ⟨UCert.seq f₁.bundle f₂.bundle, .seq f₁.joint f₂.joint⟩
       · rw [asFor_eq hf]
-        simp only [bcheck, hf] at h
+        simp only [bcheckF, hf] at h
         split at h
         · rename_i hcond
           simp only [Bool.and_eq_true] at hcond
-          rcases eb : allcheck P A (dropStr i V) body with _ | q
+          rcases eb : bcheckF P n A (dropStr i V) body with _ | q
           · rw [eb] at h; simp at h
           rw [eb] at h
           split at h
@@ -558,29 +580,29 @@ theorem bcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String) 
               simp only [Option.some.injEq, Prod.mk.injEq] at h
               obtain ⟨hA, hV, hk⟩ := h
               subst hA; subst hV; subst hk
-              have hq : allcheck P A (dropStr i V) body = some (A₂, dropStr i V, b) := by
+              have hq : bcheckF P n A (dropStr i V) body = some (A₂, dropStr i V, b) := by
                 rw [eb, hfix2.2]
-              have hbody := allcheck_sound body A (dropStr i V) A₂ (dropStr i V) b hq
+              have hbody := ih body A (dropStr i V) A₂ (dropStr i V) b hq
               exact ⟨UCert.forU hcond.2 (subStr_mem hfix2.1) hbody.bundle,
                      JSecTy.forU (by simpa using hcond.1) hbody.joint⟩
             · cases h
           · cases h
         · cases h
-  | ite e c₁ c₂ ih₁ ih₂ =>
+  | ite e c₁ c₂ =>
       intro A V A' V' k h
-      simp only [bcheck] at h
+      simp only [bcheckF] at h
       split at h
       · rename_i he
-        rcases e₁ : bcheck P A V c₁ with _ | p₁
+        rcases e₁ : bcheckF P n A V c₁ with _ | p₁
         · rw [e₁] at h; simp at h
-        rcases e₂ : bcheck P A V c₂ with _ | p₂
+        rcases e₂ : bcheckF P n A V c₂ with _ | p₂
         · rw [e₁, e₂] at h; simp at h
         rw [e₁, e₂] at h
         simp only [Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨hA, hV, hk⟩ := h
         subst hA; subst hV; subst hk
-        have f₁ := ih₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁])
-        have f₂ := ih₂ A V p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂])
+        have f₁ := ih c₁ A V p₁.1 p₁.2.1 p₁.2.2 (by rw [e₁])
+        have f₂ := ih c₂ A V p₂.1 p₂.2.1 p₂.2.2 (by rw [e₂])
         exact ⟨UCert.ite f₁.bundle f₂.bundle, .iteL e he f₁.joint f₂.joint⟩
       · cases h
   | skip => intro A V A' V' k h; exact allcheck_sound _ _ _ _ _ _ h
@@ -591,6 +613,13 @@ theorem bcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String) 
   | sop _ _ _ => intro A V A' V' k h; exact allcheck_sound _ _ _ _ _ _ h
   | hop _ _ _ => intro A V A' V' k h; exact allcheck_sound _ _ _ _ _ _ h
   | loop _ _ => intro A V A' V' k h; exact allcheck_sound _ _ _ _ _ _ h
+
+/-- **The checker is sound, loops included.** One run, and the result is the same
+    `FullCert` every earlier stage consumes — so the budget, mediation, noninterference
+    and memory-safety guarantees attach to a program that iterates, nested loops too. -/
+theorem bcheck_sound {P : Partition} : ∀ (c : UCmd) (A V A' V' : List String) (k : Nat),
+    bcheck P A V c = some (A', V', k) → FullCert P A V c A' V' k :=
+  fun c A V A' V' k h => bcheckF_sound (usize c) c A V A' V' k h
 
 /-! ## A program that iterates -/
 

@@ -49,7 +49,9 @@ verdict parse-empty 1 ''
 
 # the report: unchanged, then one checker drifted (its lock entry and its source)
 out=$(bash tools/gate/boundary-report.sh "$REPO" "$REPO" 2>&1)
-if [ "$(echo "$out" | head -1)" = "boundary: 0 drifted, 0 changed by this PR" ]; then ok report-unchanged "0 drifted"
+# The drifted total depends on how far master has moved since the baseline; what the report
+# must get right is this PR's own change: none here, costCheck below.
+if echo "$out" | head -1 | grep -qE "^boundary: [0-9]+ drifted, 0 changed by this PR$"; then ok report-unchanged "0 changed by this PR"
 else bad report-unchanged "$(echo "$out" | head -1)"; fi
 mkdir -p "$tmp/r"
 ( cd "$REPO" && git ls-files -co --exclude-standard -z | tar --null -T - -cf - ) | tar -x -C "$tmp/r"
@@ -65,8 +67,9 @@ for i, r in enumerate(rows):
 open(p, "w").write("\n".join(rows) + "\n")
 EOF
 out=$(bash tools/gate/boundary-report.sh "$REPO" "$tmp/r" 2>&1)
-if [ "$(echo "$out" | head -1)" = "boundary: 1 drifted, 1 changed by this PR" ] \
+if echo "$out" | head -1 | grep -qE "^boundary: [1-9][0-9]* drifted, 1 changed by this PR$" \
    && echo "$out" | grep -q "^=== checker ConfTyping.costCheck$" \
+   && echo "$out" | grep -A1 "^=== checker ConfTyping.costCheck$" | grep -q "^changed by this PR: yes$" \
    && echo "$out" | grep -qF "+  | .skip       => some (0 + 1)" \
    && echo "$out" | grep -q "theorem Frozen.costCheck_sound"; then
   ok report-drift "costCheck found, with its statement and diff"
