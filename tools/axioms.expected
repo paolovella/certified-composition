@@ -1528,8 +1528,10 @@ ConfTyping.bcb_reconciles	ConfTyping.HeteroCompose
 ConfTyping.bcheck	ConfTyping.CountedLoop	propext
 ConfTyping.bcheckF	ConfTyping.CountedLoop	propext
 ConfTyping.bcheckF_accepts_skip	ConfTyping.Witnesses	propext
+ConfTyping.bcheckF_enough	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheckF_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheckF_sound	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.bcheckF_succ	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheck_accepts_nested_loops	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_nested_double_free	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_wild_deref	ConfTyping.Witnesses	propext
@@ -3007,6 +3009,8 @@ ConfTyping.usecTy_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.usefree_loop_errors	ConfTyping.FreeLoop	Quot.sound,propext
 ConfTyping.usefree_loop_rejected	ConfTyping.FreeLoop	Quot.sound,propext
 ConfTyping.usize	ConfTyping.CountedLoop	propext
+ConfTyping.usize_forU	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.usize_pos	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.vBal	ConfTyping.Race	
 ConfTyping.validB	ConfTyping.MemSafe	
 ConfTyping.value_predicate_not_admissible	ConfTyping.Integrity	
