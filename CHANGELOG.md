@@ -6,6 +6,11 @@ landed.
 
 ## Repository verification
 
+- **The witness registry is data a change may grow, never shrink** (2026-10-28, P0-13;
+  `tools/gate/base-gate.sh`). EXPR-02 added a checker (`bcheckF`) and could not pass master's
+  gate without the key, because the registry was gate code. Now the gate's `registry` rule lets
+  a change add checkers that have both witnesses. It still refuses any lost checker or witness.
+
 - **Counted loops nest** (2026-10-28, EXPR-02; `CountedLoop.lean`). `bcheck` checked a
   counted loop's body with `allcheck`, which has no loop rule. That was August's last false
   refusal, and two of the six in the blind measurement.

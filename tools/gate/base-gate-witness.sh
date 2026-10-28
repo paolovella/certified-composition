@@ -87,6 +87,20 @@ case_ pr-touches-only-mutants-table "ring0 mutants" 0 "^gate: mutants: all $nmut
 case_ pr-mutant-survives "mutants" 1 "^gate: mutants: rows not killed (1)" \
   bash -c 'sed -i "1s/\tkilled$/\tsurvived/" tools/mutants.expected'
 
+# P0-13: the witness registry may grow, never shrink.
+case_ pr-adds-a-checker "ring0 registry" 0 "^gate: registry: [0-9]* checkers, 1 added: ConfTyping.zzcheck$" \
+  bash -c 'sed -i "s/^registry: \([0-9]*\) checkers/registry: X checkers/" tools/witnesses.expected && n=$(grep -c "^ConfTyping\." tools/witnesses.expected) && sed -i "/^registry: /i ConfTyping.zzcheck\t1\t1\tConfTyping.zz_accepts\tConfTyping.zz_refuses" tools/witnesses.expected && sed -i "s/^registry: X checkers/registry: $((n+1)) checkers/" tools/witnesses.expected'
+case_ pr-touches-only-registry "ring0" 0 "^gate: ring0 untouched$" \
+  bash -c 'sed -i "/^registry: /i ConfTyping.zzcheck\t1\t1\tConfTyping.zz_accepts\tConfTyping.zz_refuses" tools/witnesses.expected'
+case_ pr-drops-a-checker "registry" 1 "^gate: registry SHRANK .*ConfTyping.acheck removed" \
+  bash -c 'sed -i "/^ConfTyping\.acheck\t/d" tools/witnesses.expected'
+case_ pr-loses-a-refused-witness "registry" 1 "^gate: registry SHRANK .*ConfTyping.acheck witnesses 1/1 -> 1/0" \
+  bash -c 'sed -i "s/^\(ConfTyping\.acheck\t1\t\)1\t/\10\t/" tools/witnesses.expected'
+case_ pr-adds-a-checker-without-refusal "registry" 1 "^gate: registry SHRANK .*ConfTyping.zzcheck has 1 accepted, 0 refused" \
+  bash -c 'sed -i "/^registry: /i ConfTyping.zzcheck\t1\t0\tConfTyping.zz_accepts\t-" tools/witnesses.expected'
+case_ pr-reports-a-missing-witness "registry" 1 "^gate: registry SHRANK .*summary" \
+  bash -c 'sed -i "s/, 0 missing a witness$/, 1 missing a witness/" tools/witnesses.expected'
+
 if [ "$FULL" = 1 ]; then
   case_ unchanged-pr-full "" 0 "^gate: PASS$" true
   # the weakening PR: its own ci.sh says yes to anything, and one proof is broken.

@@ -18,13 +18,18 @@
 #             be proved against tools/ring0.lock, so it needs no key; the limit keeps one change
 #             from rewriting the checkers wholesale. ci checks that the PR's checkers.lock is
 #             current.
+#   registry  the PR's tools/witnesses.expected may grow, never shrink (P0-13): every checker in
+#             BASE's registry is still there, no checker's accepted or refused count goes down,
+#             every checker has at least one of each, and none is missing a witness. A change
+#             that adds a checker (EXPR-02 added `bcheckF`) then needs no key. ci checks the
+#             PR's registry is current.
 #   mutants   every row of the PR's tools/mutants.expected is `killed`: a checker edit moves the
 #             mutation sites, so the table moves with it, but no survivor merges without the key.
 #             ci checks the sites are today's; the heavy runner rebuilds every mutant.
 #   ci        BASE's tools/ci.sh --fast runs on the overlaid copy.
 # Gate code = tools/ and .github/ minus the data a PR may change: tools/axioms.expected (judged
-# by `manifest`), tools/checkers.lock (`checkers`), tools/mutants.expected (`mutants`) and
-# tools/receipts/ (written by every long job).
+# by `manifest`), tools/checkers.lock (`checkers`), tools/mutants.expected (`mutants`),
+# tools/witnesses.expected (`registry`) and tools/receipts/ (written by every long job).
 #
 # GATE_ONLY="ring0 manifest" runs only those checks and prints no verdict. It exists for the
 # refused witnesses (tools/gate/base-gate-witness.sh); the workflow never sets it.
@@ -34,7 +39,7 @@
 set -uo pipefail
 HEAVY=0; [ "${1:-}" = --heavy ] && { HEAVY=1; shift; }
 CHECKER_LIMIT=3   # checkers one change may touch without the user's key (P0-11)
-DATA_FILES="axioms.expected checkers.lock mutants.expected"   # under tools/
+DATA_FILES="axioms.expected checkers.lock mutants.expected witnesses.expected"   # under tools/
 [ $# -eq 2 ] || { echo "usage: base-gate.sh [--heavy] BASE_DIR PR_DIR"; exit 2; }
 base=$(cd "$1" && pwd) && pr=$(cd "$2" && pwd) || exit 2
 only=${GATE_ONLY:-}
@@ -90,7 +95,8 @@ changed = sorted(f for f in set(b) | set(p) if b.get(f) != p.get(f))
 RING0 = ["tools/*", ".github/*", "CLAUDE.md", ".claude/*", "*/lean-toolchain", "*/lakefile*",
          "*/lake-manifest.json", "lean-toolchain", "lakefile.toml", "lake-manifest.json",
          "workspace/*", "comparator.json", "AUTONOMY"]
-DATA = ["tools/axioms.expected", "tools/checkers.lock", "tools/mutants.expected", "tools/receipts/*"]
+DATA = ["tools/axioms.expected", "tools/checkers.lock", "tools/mutants.expected",
+        "tools/witnesses.expected", "tools/receipts/*"]
 for f in changed:
     if any(fnmatch.fnmatch(f, g) for g in RING0) and not any(fnmatch.fnmatch(f, g) for g in DATA):
         print(f)
@@ -133,6 +139,47 @@ checkers() {
   echo "gate: checkers: $n changed (limit $CHECKER_LIMIT)${touched:+: $(echo $touched)}"
 }
 
+registry() {
+  local b="$base/tools/witnesses.expected" p="$work/tools/witnesses.expected" out
+  [ -f "$p" ] || { echo "gate: registry MISSING in the PR"; return 1; }
+  [ -f "$b" ] || { echo "gate: registry: the base has none, nothing to compare (Ring 0 decides this PR)"; return 0; }
+  out=$(python3 -I - "$b" "$p" <<'PYR'
+import re, sys
+def load(f):
+    rows, summary = {}, None
+    for l in open(f).read().splitlines():
+        if l.startswith("registry: "):
+            summary = l
+            continue
+        c = l.split("\t")
+        if len(c) >= 3 and c[1].isdigit() and c[2].isdigit():
+            rows[c[0]] = (int(c[1]), int(c[2]))
+    return rows, summary
+b, _ = load(sys.argv[1]); p, ps = load(sys.argv[2])
+errs = []
+for k, (a, r) in sorted(b.items()):
+    if k not in p:
+        errs.append(f"{k} removed")
+    elif p[k][0] < a or p[k][1] < r:
+        errs.append(f"{k} witnesses {a}/{r} -> {p[k][0]}/{p[k][1]}")
+for k, (a, r) in sorted(p.items()):
+    if a < 1 or r < 1:
+        errs.append(f"{k} has {a} accepted, {r} refused")
+if not ps or not re.fullmatch(r"registry: \d+ checkers, 0 missing a witness", ps):
+    errs.append(f"summary: {ps}")
+added = sorted(set(p) - set(b))
+if errs:
+    print("FAIL\t" + "; ".join(errs[:10]))
+else:
+    print(f"OK\t{len(p)} checkers, {len(added)} added" + (": " + " ".join(added) if added else ""))
+PYR
+  )
+  case "$out" in
+    OK*)   echo "gate: registry: ${out#OK	}" ;;
+    *)     echo "gate: registry SHRANK or a checker lacks a witness, needs the user's key: ${out#FAIL	}"; return 1 ;;
+  esac
+}
+
 mutants() {
   local p="$work/tools/mutants.expected" bad
   [ -f "$p" ] || { echo "gate: mutants.expected MISSING in the PR"; return 1; }
@@ -157,6 +204,7 @@ overlay
 want ring0    && { ring0    || fail=1; }
 want manifest && { manifest || fail=1; }
 want checkers && { checkers || fail=1; }
+want registry && { registry || fail=1; }
 want mutants  && { mutants  || fail=1; }
 want ci       && { ci       || fail=1; }
 if [ -n "$only" ]; then
