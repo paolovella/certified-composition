@@ -7,7 +7,7 @@ deps: [S-EXPR]
 closes: ['S-EXPR follow-up']
 acceptance: corpus program 24 and blind programs 11 and 20 are accepted; bcheck_sound still proved and Frozen.bcheck_sound unchanged; every existing witness still decides
 kill: -
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -56,3 +56,4 @@ refusal in August's corpus (24) and two in the blind set (11, 20).
   - Full CI green (`expr02-ci-full2`, 897 s).
   - The boundary warden cleared PR #6 (run on GitHub, answer kept as the `warden` artifact). It noted one unchecked claim: the docstring said the fuel `usize c` "is always enough", and that is not proved. Reworded to what holds (sound at any fuel; enough only witnessed). Open: prove `usize c ≤ n → bcheckF P n A V c = bcheckF P (usize c) A V c`.
   - On GitHub (PR #6): `gate` fails on `ring0` (expected) and on `ci`. The `ci` failures are version skew, not the change: master's gate judges with master's `tools/witnesses.expected`, which does not list `bcheckF`, and with master's copies of the two witnesses that pinned counts. P0-11 made `checkers.lock` and `mutants.expected` data but not the registry, so a checker change that adds a checker cannot pass the gate without the key. Proposed G-0 follow-up: make `witnesses.expected` data under a rule that every checker keeps an accepted and a refused witness and none disappears. Locally, with the PR's own tools, full CI is green.
+- 2026-10-28, branch `expr-02/fuel-enough`: the open point is proved. `bcheckF_succ` (once the fuel covers the program, one more unit changes nothing) and `bcheckF_enough` (`usize c ≤ n → bcheckF P n A V c = bcheck P A V c`), both propext/Quot.sound. So `bcheck` never refuses for lack of fuel. The docstring now cites the theorem. Mutant sites, `ring0.lock` and `checkers.lock` are unchanged. Done.
