@@ -1592,5 +1592,40 @@ if [ -f tools/checkers.lock ]; then
   fi
 fi
 
+# (m) Phase 1's exit, as PLAN-2026-10 §14 asks: `ucmd_p1_carries` is proved with no
+# certificate-specific pass lemma. In P1.lean, only `ucmd_p1_carries` may mention a certificate
+# (bcheck, FullCert, UCert, jsecTy, mediated, Cert.), and its proof may use only the kernel's
+# three transfer theorems and the adapter's `bcheck_lcore`.
+if [ -f conf-typing/ConfTyping/P1.lean ]; then
+  if ! out=$(python3 -I - conf-typing/ConfTyping/P1.lean <<'PYM'
+import re, sys
+src = open(sys.argv[1]).read()
+code = re.sub(r"/-.*?-/", "", src, flags=re.S)
+code = re.sub(r"--[^\n]*", "", code)
+decls = re.split(r"\n(?=(?:theorem|def|structure|inductive|abbrev|instance) )", code)
+cert = re.compile(r"\b(bcheck\w*|FullCert|UCert|jsecTy\w*|mediated)\b|\bCert\.")
+errs, found = [], False
+for d in decls:
+    m = re.match(r"(theorem|def|structure|inductive|abbrev|instance) (\S+)", d)
+    if not m: continue
+    name = m.group(2)
+    if name == "ucmd_p1_carries":
+        found = True
+        body = d.split(":= by", 1)[-1]
+        used = set(re.findall(r"[A-Za-z_][\w.]*", body))
+        allowed = {"bound_transfer", "trace_transfer", "rel_transfer", "bcheck_lcore",
+                   "obtain", "exact", "rfl", "p1Pass", "P", "π", "h", "hb", "ht", "hr"}
+        extra = sorted(u for u in used if u.split(".")[-1] not in allowed and not u.startswith("("))
+        if extra: errs.append("ucmd_p1_carries uses " + ", ".join(extra))
+    elif cert.search(d):
+        errs.append(name + " mentions a certificate")
+if not found: errs.append("ucmd_p1_carries is missing")
+print("; ".join(errs)); sys.exit(1 if errs else 0)
+PYM
+  ); then
+    echo "DRIFT: P1.lean: $out (PLAN-2026-10 §14: no certificate-specific pass lemma)"; fail=1
+  fi
+fi
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

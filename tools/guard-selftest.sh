@@ -341,6 +341,12 @@ run_case "the README raises the checker limit" drift \
 run_case "ring0.lock loses a definition the README counts" drift \
   bash -c 'sed -i "\$d" tools/ring0.lock'
 
+run_case "P1 gains a certificate-specific pass lemma" drift \
+  bash -c 'printf "\ntheorem p1_cheat : True := by have := @bcheck_sound; trivial\n" >> conf-typing/ConfTyping/P1.lean'
+
+run_case "ucmd_p1_carries proves through a certificate" drift \
+  bash -c 'python3 -c "p=\"conf-typing/ConfTyping/P1.lean\";s=open(p).read();a=\"  obtain ⟨hb, ht, hr⟩ := bcheck_lcore h π\n\";assert a in s;open(p,\"w\").write(s.replace(a,a+\"  have _x := @jsecTy_sound\n\"))"'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

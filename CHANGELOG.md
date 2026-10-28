@@ -6,6 +6,15 @@ landed.
 
 ## Repository verification
 
+- **Phase 1's exit: certificates survive the first compiler pass by the kernel alone**
+  (2026-10-28, PH1; `LAdapter.lean`, `P1.lean`). UCmd is L's first `Lang`, and a `bcheck`-
+  accepted program carries the kernel's `bound`, `trace` and `rel` shapes (`bcheck_lcore`). P1
+  compiles names to slots, and its simulation makes it a `PassCert` with identity transformers.
+  `ucmd_p1_carries` shows budget, mediation and noninterference (addresses included) surviving
+  P1 through the three transfer theorems, with no certificate-specific pass proof. A
+  check-claims guard keeps it that way. The original P1 sketch had been lost from a scratchpad
+  (I-0003) and was rebuilt.
+
 - **L's trusted core begins: `Beh`, `Lang`, three certificate shapes, `PassCert`** (2026-10-28,
   PH1 steps 1–4; `l-core/LCore/Kernel/`, Ring 0). One observation for every language. Every
   certificate is a `trace`, `rel` or `bound` instance. A certified pass carries all three

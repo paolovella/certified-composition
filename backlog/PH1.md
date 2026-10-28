@@ -96,3 +96,33 @@ toy `Lang`. Then 6, 5, 7. Each step builds and runs CI before the next.
   - Limits, stated: v1 events record reads and emits in two lists, not interleaved, and a
     fuel-exhausted run records nothing (`uexec` gives no prefix).
   - Full CI green (`ph1-ucmd-ci-full`, 1018 s).
+- 2026-10-28, same branch: **step 5, P1 (names to slots), and step 7, the exit.**
+  (`conf-typing/ConfTyping/P1.lean`, not Ring 0; CMP-P1 rebuilt after I-0003.)
+  - The slot machine (`SlotState`, `texec`) mirrors `uexec` with a `Nat`-indexed integer
+    store. `compile T` maps each variable `x` to slot `slotOf T x`. `slotLang` is the slot
+    machine as an L `Lang`; a program carries its table, so `PassCert.enc` is the identity.
+    That is a design point the plan's sketch did not have: `enc` cannot depend on the program,
+    but the table does.
+  - `texec_compile` (the simulation): with a table that lists each variable once and covers
+    the program, the compiled run is the source run, with the slot store read through the
+    table. `taddrs_compile`: same addresses.
+  - `p1Pass : PassCert (ucmdLang P π) (slotLang P π)`, with **identity** leakage and cost
+    transformers: a compiled program's observation equals its source's.
+  - **`ucmd_p1_carries`, the Phase 1 exit**: a `bcheck`-accepted program keeps its budget,
+    mediation and noninterference (addresses in the leakage) after P1, by the kernel's
+    `bound_transfer`, `trace_transfer` and `rel_transfer` alone. Guard (m) enforces it: in
+    `P1.lean`, only `ucmd_p1_carries` may mention a certificate, and its proof may use only
+    the three transfer theorems and `bcheck_lcore`. Self-test 78; two cases fire it.
+  - `texec_frame`: compiled code never writes a slot outside its table.
+  - Witnesses:
+    - `p1Demo_runs`: decided; the compiled program reads `db` as its source does;
+    - `collide_breaks_simulation`: decided; with a table that does not cover the program,
+      two variables share a slot and the observation changes.
+  - Deviation from the plan, stated: `colliding_slots_leak` (NI broken by a collision) cannot
+    arise from this compiler. `slotOf` is injective on the table, and only names outside the
+    table can collide, which is a coverage failure. The collision witness is therefore about
+    the simulation, not about NI.
+- **Phase 1's exit is met** (PLAN-2026-10 §12: `ucmd_p1_carries` with zero certificate-specific
+  pass proofs). PH1 stays in progress until the kernel (PR #14, Ring 0) and this branch merge
+  with the user's key.
+  - Full CI green (`ph1-p1-ci-full`, 954 s).
