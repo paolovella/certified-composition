@@ -1,0 +1,19 @@
+I wrote 37 programs and `MANIFEST.tsv`, and declared 3 tasks inexpressible. I couldn't run the checker, so nothing has been validated.
+
+**Inexpressible (`none` in the manifest):**
+- **02 and 27:** the language has no equality or comparison operator, so a password or one-time code can't be compared at all, let alone in constant time.
+- **24:** there are no byte buffers, string lengths or substring operations, so copying input into an N-byte buffer with truncation can't be written.
+
+**Common approximations** (each one is noted on its task's line in the manifest):
+- **Checks the language can't do become input flags.** Range tests, allowlist matches, cache hit/miss, the outcome of an authorization check and error points are public integer flags (for example `inrange`, `hostallowed`, `fits`, `err`).
+- **Bounded quantities use the fixed cap.** Where a count should be "N up to a maximum", the program always loops the full maximum.
+- **No functions or records:** in 31 the helper is written inline as `check`, and in 32 the record's fields are three separate heap cells.
+- **Parameter binding and path containment (05, 06):** these become `san` applied to the untrusted text inside the query or path.
+- **Hashing (22):** the hash is modelled as `( pw + salt )` and kept in a secret cell.
+- **Secret leaks:** integers can't be emitted, so 37 leaks the session key by storing it into a public heap cell that stands for the response body. In 38 the first-byte match is modelled as the sum of the secret byte and the guess, used as the branch condition.
+
+**Two choices that could affect results:**
+- **18** frees the scratch buffer under a second `if flag`, the same flag that guarded the allocation, because that is the natural way to write it. If the checker doesn't link the two branches, it may refuse this SAFE program.
+- **31** is arguably inexpressible because there are no functions. I chose to inline the helper because the task's real point is authorization; you may want to score it differently.
+
+The UNSAFE tasks (33–40) are written with the insecure behaviour left in, as the brief asked.
