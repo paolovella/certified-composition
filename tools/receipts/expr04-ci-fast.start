@@ -1,0 +1,4 @@
+started: 2026-10-28T02:32:25+01:00
+head: f68c2ca
+command: bash tools/ci.sh --fast
+log: tools/receipts/expr04-ci-fast.log

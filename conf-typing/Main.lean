@@ -37,6 +37,25 @@ def secretCells : UCmd → List String
   | .loop _ a        => secretCells a
   | _                => []
 
+/-- Is this string expression a literal, built only from literals? -/
+def sexprLit : SExpr → Bool
+  | .lit _   => true
+  | .cat a b => sexprLit a && sexprLit b
+  | .san a   => sexprLit a
+  | .var _   => false
+
+/-- The `fs` emits whose path is not a literal. `certcheck` certifies `'`-delimiter
+    integrity only: `san` neutralizes `'`, not `../`, and the repo's path certificate
+    (`PathCert`) is not run here. S-EXPR's blind 06 was accepted with a traversal hole that
+    way, so an accepted program with such an emit is told so (EXPR-04). The note is untrusted
+    text; the verdict is unchanged. -/
+def fsEmits : UCmd → Nat
+  | .sop .emit "fs" e => if sexprLit e then 0 else 1
+  | .seq a b          => fsEmits a + fsEmits b
+  | .ite _ a b        => fsEmits a + fsEmits b
+  | .loop _ a         => fsEmits a
+  | _                 => 0
+
 def parseArgs : List String → Option (String × List String)
   | [path]                            => some (path, [])
   | [path, "--secret", names]         => some (path, splitCommas names)
@@ -65,6 +84,11 @@ def main (args : List String) : IO UInt32 := do
               IO.println ""
               IO.println "  certified: bounded cost, mediated reads, noninterference,"
               IO.println "             memory safety, injection-free emission."
+              let nfs := fsEmits c
+              if nfs > 0 then
+                IO.println ""
+                IO.println s!"  note: {nfs} emit(s) to `fs` with a non-literal path. Not certified: path"
+                IO.println "        traversal. `san` neutralizes the ' delimiter only, not `../`."
               return 0
           | none, _ =>
               IO.eprintln s!"{path}: REJECTED by the certificate checker"

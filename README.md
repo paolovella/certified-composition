@@ -82,6 +82,13 @@ No document said so until 2026-10-28, when a blind author hit it three times
 (`conf-typing/corpus/blind/RESULTS.md`). `certcheck` now names the unmarked pointer when it
 refuses for this reason.
 
+**`san` neutralizes the `'` delimiter and nothing else.** It is not a general sanitizer: it
+does not stop `../` in a path, or control characters in a log. `certcheck` certifies
+`'`-delimiter integrity for every sink. Path containment (`PathCert`) is proved in the repo, but
+`certcheck` does not run it, so an accepted program that emits a non-literal path to `fs` gets
+a note saying path traversal is not certified (EXPR-04; S-EXPR's blind 06 was accepted with
+exactly that hole).
+
 *Correction of record (2026-10-26, P0-06):* from `a9e5c62` until this correction, this
 paragraph gave no `--secret` flag, and nothing ran the examples; a guard checked only that the
 files exist. Run as the paragraph said, `secret-branch.uc` is *accepted*, because no variable is
