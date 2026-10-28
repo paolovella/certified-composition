@@ -1,0 +1,4 @@
+started: 2026-10-28T09:17:11+01:00
+head: 50ef838
+command: bash tools/ci.sh
+log: tools/receipts/p013-ci-full.log

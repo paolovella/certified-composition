@@ -569,7 +569,9 @@ fails on any change. The checkers the statements name are left out: an edit to o
 a statement, which must still be proved against the locked definitions. Their hashes are in
 `tools/checkers.lock`, which a change may rewrite (`tools/ring0-lock.sh --checkers`), and the base
 gate passes such a change without the user's key if it touches at most 3 checkers and every
-row of `tools/mutants.expected` is still `killed`.
+row of `tools/mutants.expected` is still `killed`. A change may also grow the witness registry
+(`tools/witnesses.expected`, P0-13): it may add a checker that has an accepted and a refused
+witness, but it may not drop a checker or lower a checker's witness counts without the key.
 
 The limit is per change, so several changes in a row may rewrite every checker; that is how
 they evolve. A **boundary warden** watches the sum. `tools/checkers.baseline` records the
