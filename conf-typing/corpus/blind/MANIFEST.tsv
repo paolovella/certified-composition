@@ -1,0 +1,40 @@
+01	01.uc	-	Returning the profile is modeled as emitting a fixed string to the html sink.
+02	none	-	The language has no equality or comparison operator, so a password cannot be compared at all, let alone in constant time.
+03	03.uc	-	The success/error outcome is a public integer flag ok; the formatted response is a fixed literal.
+04	04.uc	-	No arrays or comparison: the block is one heap cell, and the slot count is always the fixed maximum (16) via a counted loop instead of min(count, max).
+05	05.uc	-	No parameter binding exists; the untrusted id is passed through san inside a quoted literal context instead.
+06	06.uc	-	No string inspection to test containment; the filename is sanitized with san before being joined to the base directory and sent to the fs sink.
+07	07.uc	-	The request method is a fixed literal; the user agent is the untrusted input passed through san.
+08	08.uc	-	-
+09	09.uc	token	Integers cannot be passed to a resource, so the token is held in a secret cell and the upstream call is modeled as check/access of resource upstream.
+10	10.uc	key	The session key is held in a secret cell and never used; the role flag is a public integer variable.
+11	11.uc	-	The downstream call is access downstream and the fixed delay is a 3-iteration skip loop; with no early exit, all 5 attempts always run.
+12	12.uc	-	The page size is the fixed cap (20) as a counted loop; offset cannot be expressed without arithmetic on indices and is omitted.
+13	13.uc	-	The hit/miss outcome is a public flag hit; writing to the cache is modeled as a second access cache.
+14	14.uc	-	The bounded job list is a 10-iteration counted loop over one resource job; the caller's per-job permission is a public flag allowed.
+15	15.uc	-	Parsing and normalization are modeled as storing a field count in the buffer and emitting the sanitized input.
+16	16.uc	-	The two failure points are public flags fail1 and fail2.
+17	17.uc	-	No arrays: each of 8 connection records is a cell allocated per loop iteration, and closing is logged then freed.
+18	18.uc	-	-
+19	19.uc	-	The two requests are modeled as one sequential program; storing the note is an access to resource notes plus a heap cell.
+20	20.uc	-	Per-cell counts are a single integer variable count; the result is stored in a heap cell since integers cannot be emitted.
+21	21.uc	-	No comparison operator: the range test outcome is a public flag inrange, and the typed error is a distinct literal.
+22	22.uc	pw,hash	No hash function: the hash is modeled as ( pw + salt ), stored in a secret cell and persisted via access creds.
+23	23.uc	-	No string comparison: matching the command name against the allowlist is modeled by public flags oprestart and opstatus; only fixed literals reach sh.
+24	none	-	There are no byte buffers, string lengths or substring operations, so copying and truncating input to N bytes cannot be written.
+25	25.uc	-	The outcome of the authorization check is a public flag granted, and early return is modeled as the else branch.
+26	26.uc	-	The growable buffer is one heap cell whose stored length grows by chunk on each of 10 iterations.
+27	none	-	The language has no equality or comparison operator, so the one-time code cannot be compared in constant time.
+28	28.uc	-	No string comparison or URL parsing: the allowlist match is a public flag hostallowed, the host is a fixed literal, and the path is sanitized; the sink is named location.
+29	29.uc	-	No comparison: the length-vs-capacity test is a public flag fits, and reading the body is a counted loop bounded by the 64-unit capacity.
+30	30.uc	-	The connection is a heap cell, and the mid-query error is a public flag err.
+31	31.uc	-	No functions: the helper is inlined as check report, and its success result is the flag ok.
+32	32.uc	-	No records: the name, role and quota fields are three separate heap cells, and ownership is a public flag owner.
+33	33.uc	-	-
+34	34.uc	-	-
+35	35.uc	-	Writing the trailing byte is modeled as storing an integer into the freed cell.
+36	36.uc	-	-
+37	37.uc	key	Integers cannot be emitted, so the response body is a public heap cell that receives the session key when verbose is set.
+38	38.uc	secretbyte	No comparison: the first-byte match is modeled as the sum ( secretbyte + guess ) used as the branch condition; the slow branch is a 100-iteration loop.
+39	39.uc	-	Finding the terminator is the public integer more, which is never updated, so the while loop has no bound.
+40	40.uc	-	-
