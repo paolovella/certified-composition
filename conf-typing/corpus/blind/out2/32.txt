@@ -1,0 +1,10 @@
+p2/32.uc: ACCEPTED
+
+  cost budget          14   (over every input and every fuel)
+  requires authority   []
+  pointers still held  []
+  emitted delimiters   [0, 0]
+  secret variables     []
+
+  certified: bounded cost, mediated reads, noninterference,
+             memory safety, injection-free emission.

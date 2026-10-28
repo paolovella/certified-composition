@@ -1,0 +1,25 @@
+I wrote 38 programs, declared 2 tasks inexpressible, and wrote `MANIFEST.tsv` with one line per task. I couldn't run the checker, so none of the programs have been checked.
+
+**Inexpressible: 02 and 27** (the password login and the one-time code check). Both need to compare a submitted value with a stored secret and return success or failure. The language has no equality, subtraction or comparison operator, so the comparison can't be written. There is also no way to return a result that depends on a secret without it counting as a leak. Writing only the fixed-time loop would have dropped the actual comparison, so I didn't write those two.
+
+**Approximations used across the safe programs** (each is listed per task in the manifest):
+- **Yes/no decisions:** a free integer flag stands in for range checks, allowlist matches, command-name matching, length-versus-capacity tests, "check failed" and error conditions. Examples are `inrange`, `fits`, `hosta` and `isrestart`. The language has no comparisons and integers can't be read out of `input`.
+- **Cleaning untrusted text:** `san ( input )` stands in for SQL parameter binding (05), the "stays inside the allowed directory" check (06), and escaping for the log and HTML sinks.
+- **Buffers, arrays and records:** each is a single heap cell. A counted loop stands in for a bounded list, the page-size cap, or the N-byte limit.
+- **Missing language features:**
+  - No early return: denial goes in the `else` branch (25).
+  - No functions: the helper is written inline (31).
+  - No records: each field is its own cell (32).
+  - No hash function: the hash is `( pw + salt )`, kept in a secret cell (22).
+- **SQL text:** string literals can't contain spaces, so I used underscores instead.
+
+**How each unsafe program breaks its rule:**
+- **33, 34:** raw `input` goes into the `db` and `fs` sinks without `san`.
+- **35:** a `store` into the buffer after it was freed.
+- **36:** a `free` inside a loop that runs 3 times on the same pointer.
+- **37:** a value loaded from the secret key's cell is stored into a public response cell.
+- **38:** a branch on a value derived from the secret, where one side runs an extra loop.
+- **39:** a `while` loop controlled by untrusted data.
+- **40:** an `access` with no `check` before it.
+
+**One guess the checker might not share:** in 37 there's no way to emit an integer, so the leak is modelled as storing the key into a public cell. I listed both `key` and the loaded copy `k` as secrets.

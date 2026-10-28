@@ -47,8 +47,8 @@ frozen set.
   - Both agents ran as `claude -p --restricted`, with file tools confined to an otherwise empty
     directory (receipts `sexpr-task-writer`, `sexpr-blind-author`). The user started them
     ("start a separate agent").
-  - The task list (9d48c6b) and all programs (bc5638f) were committed before any checker run.
-    The open half was reported (a960c05) before the holdout was run.
+  - The task list (b43b601) and all programs (29bcb61) were committed before any checker run.
+    The open half was reported (869c465) before the holdout was run.
   - **Result** (`conf-typing/corpus/blind/RESULTS.md`):
     - SAFE: 3/32 inexpressible; 23/29 accepted; **6/29 falsely refused (21%)**.
     - UNSAFE: 8/8 refused.

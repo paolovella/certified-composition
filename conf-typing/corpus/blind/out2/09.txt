@@ -1,0 +1,3 @@
+p2/09.uc: REJECTED by the certificate checker
+  (budget / mediation / flow / memory safety)
+  hint: `secret tc` is refused unless `tc` is itself marked secret (--secret ...,tc)
