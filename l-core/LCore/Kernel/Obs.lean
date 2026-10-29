@@ -10,7 +10,11 @@
 -/
 namespace LCore
 
-/-- How a run ended. `fuel` means the fuel ran out: the record is a prefix of a longer run. -/
+/-- How a run ended. `fuel` means the fuel ran out.
+
+    Correction of record (2026-10-29, F0). From 30f0720 this said the record then
+    ~~is a prefix of a longer run~~. Nothing checked it (there is no fuel law), and
+    `ucmdLang` gives an empty record. Fuel laws are item F2; guard (n). -/
 inductive Outcome where
   | done
   | abort

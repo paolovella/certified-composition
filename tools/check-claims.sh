@@ -1592,5 +1592,16 @@ if [ -f tools/checkers.lock ]; then
   fi
 fi
 
+# (n) The kernel may say a fuelled run "is a prefix" only once it has a fuel law (F0, F2). From
+# 30f0720 to 2026-10-29 Cert.lean said so with nothing behind it, which made every trace and
+# bound certificate vacuous on runs that never finish. Struck text (~~...~~) is a correction of
+# record and is skipped. The law counts when the kernel defines `Lawful`.
+if [ -d l-core/LCore/Kernel ]; then
+  pref=$(sed 's/~~[^~]*~~//g' l-core/LCore/Kernel/*.lean | grep -ciE 'is a prefix|are prefixes' || true)
+  if [ "$pref" -gt 0 ] && ! grep -qE '^(structure|class|def) Lang\.?Lawful|^(structure|class) Lawful' l-core/LCore/Kernel/*.lean; then
+    echo "DRIFT: l-core/LCore/Kernel says a run is a prefix, but the kernel has no fuel law (Lawful); F2"; fail=1
+  fi
+fi
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

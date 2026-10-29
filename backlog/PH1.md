@@ -97,3 +97,12 @@ toy `Lang`. Then 6, 5, 7. Each step builds and runs CI before the next.
     stage refuses the pipeline). A first proof of `seq` used `simp`'s injectivity lemmas and
     picked up `propext`; the axiom manifest showed it, and the proof was rewritten with
     `rw`/`cases`. Full CI green (`ph1-seq-ci-full`, 962 s).
+- 2026-10-29, **correction of record (F0).** From 30f0720 to today, `Cert.lean`'s docstring
+  said ~~a fuelled run that stops early is a prefix, and each shape must hold of it too~~.
+  Nothing checked it, and it is false (no fuel laws; `ucmdLang` reports an out-of-fuel run as
+  an empty record), so `trace` and `bound` hold vacuously on runs that never finish. The
+  docstring now carries the correction, and check-claims guard (n) refuses the claim until
+  the kernel has a fuel law (F2). Two self-test cases: the claim without a law fires, the
+  claim with one passes. On its first run the guard also caught `Obs.lean`, which said an
+  out-of-fuel record ~~is a prefix of a longer run~~; corrected the same way. PH1's exit is restated as the foundation's S1–S3
+  (research/2026-10/FOUNDATION-2026-10-29.md).
