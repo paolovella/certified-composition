@@ -1240,6 +1240,7 @@ ConfTyping.TRun.noConfusionType	ConfTyping.UTrace
 ConfTyping.TRun.out	ConfTyping.UTrace	
 ConfTyping.TRun.recOn	ConfTyping.UTrace	
 ConfTyping.TRun.seqT	ConfTyping.UTrace	
+ConfTyping.TRun.seqT_cost_le	ConfTyping.BudgetT	
 ConfTyping.TRun.seqT_done	ConfTyping.UTrace	propext
 ConfTyping.TRun.seqT_ext	ConfTyping.UTrace	propext
 ConfTyping.TRun.seqT_fuel	ConfTyping.UTrace	propext
@@ -1402,9 +1403,11 @@ ConfTyping.Unsafe	ConfTyping.QueryProgram
 ConfTyping.Untrusted	ConfTyping.Integrity	
 ConfTyping.UseFreeLoop	ConfTyping.FreeLoop	
 ConfTyping.Vacuity.body_kills	ConfTyping.Vacuity	propext
+ConfTyping.Vacuity.loopHandler_boundT	ConfTyping.Vacuity	Quot.sound,propext
 ConfTyping.Vacuity.loop_diverges	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.refuseAll	ConfTyping.Vacuity	
 ConfTyping.Vacuity.vacProg	ConfTyping.Vacuity	
+ConfTyping.Vacuity.vacProg_budgetT	ConfTyping.Vacuity	Quot.sound,propext
 ConfTyping.Vacuity.vacProg_checks	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.vacProg_diverges	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.vacProg_emits_first	ConfTyping.Vacuity	
@@ -1629,11 +1632,13 @@ ConfTyping.bcb_reconciles	ConfTyping.HeteroCompose
 ConfTyping.bcheck	ConfTyping.CountedLoop	propext
 ConfTyping.bcheckF	ConfTyping.CountedLoop	propext
 ConfTyping.bcheckF_accepts_skip	ConfTyping.Witnesses	propext
+ConfTyping.bcheckF_budgetT	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.bcheckF_enough	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheckF_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheckF_sound	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheckF_succ	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheck_accepts_nested_loops	ConfTyping.Witnesses	propext
+ConfTyping.bcheck_boundT	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.bcheck_lcore	ConfTyping.LAdapter	Classical.choice,Quot.sound,propext
 ConfTyping.bcheck_refuses_nested_double_free	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_wild_deref	ConfTyping.Witnesses	propext
@@ -1817,6 +1822,7 @@ ConfTyping.cost_skip	ConfTyping.CostBound	Quot.sound,propext
 ConfTyping.countU	ConfTyping.CountedLoop	
 ConfTyping.countU_auth	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.countU_cost	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.countU_costT	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.countU_turn	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.countdown	ConfTyping.CostBound	
 ConfTyping.countdown_cost	ConfTyping.CostBound	Quot.sound,propext
@@ -2971,6 +2977,8 @@ ConfTyping.startsWithL	ConfTyping.JasminCert
 ConfTyping.stepEv	ConfTyping.UTrace	propext
 ConfTyping.stepRel	ConfTyping.PathTraversal	
 ConfTyping.stepT	ConfTyping.UTrace	propext
+ConfTyping.stepT_cost	ConfTyping.BudgetT	Quot.sound,propext
+ConfTyping.stepT_cost_le_of	ConfTyping.BudgetT	propext
 ConfTyping.stepT_done_agree	ConfTyping.UTrace	propext
 ConfTyping.stepT_ne	ConfTyping.UTrace	propext
 ConfTyping.step_eval	ConfTyping.Imp	propext
@@ -3067,6 +3075,7 @@ ConfTyping.trustEq	ConfTyping.Integrity
 ConfTyping.tsize	ConfTyping.UTrace	propext
 ConfTyping.tup	ConfTyping.Obs	
 ConfTyping.tupd	ConfTyping.P1	
+ConfTyping.turn_costT	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.twelve_attacks_refused	ConfTyping.Attack	propext
 ConfTyping.twoCells	ConfTyping.HeapLabel	
 ConfTyping.twoCells_checks	ConfTyping.HeapLabel	propext
@@ -3121,9 +3130,12 @@ ConfTyping.uexecS_ite_eq	ConfTyping.SpecUnified	propext
 ConfTyping.uexecS_loop_eq	ConfTyping.SpecUnified	propext
 ConfTyping.uexecS_uexec	ConfTyping.SpecFused	propext
 ConfTyping.uexecT	ConfTyping.UTrace	propext
+ConfTyping.uexecT_atomic_cost	ConfTyping.BudgetT	Quot.sound,propext
+ConfTyping.uexecT_dead_cost	ConfTyping.BudgetT	propext
 ConfTyping.uexecT_diverge	ConfTyping.UTrace	Quot.sound,propext
 ConfTyping.uexecT_done_agree	ConfTyping.UTrace	Quot.sound,propext
 ConfTyping.uexecT_ext	ConfTyping.UTrace	Quot.sound,propext
+ConfTyping.uexecT_noWrite	ConfTyping.BudgetT	propext
 ConfTyping.uexec_atomic	ConfTyping.SpecFused	propext
 ConfTyping.uexec_dead	ConfTyping.LeakCert	propext
 ConfTyping.uexec_dead_cost	ConfTyping.BundleLoop	Quot.sound,propext

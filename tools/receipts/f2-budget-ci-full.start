@@ -1,0 +1,4 @@
+started: 2026-10-29T19:25:57+01:00
+head: 6002da8
+command: bash tools/ci.sh
+log: tools/receipts/f2-budget-ci-full.log

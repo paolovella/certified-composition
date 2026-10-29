@@ -98,4 +98,5 @@ import ConfTyping.AddrLeak
 import ConfTyping.LAdapter
 import ConfTyping.P1
 import ConfTyping.UTrace
+import ConfTyping.BudgetT
 import ConfTyping.Vacuity

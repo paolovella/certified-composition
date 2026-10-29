@@ -13,7 +13,7 @@
   the first step, and its cost grows without bound. When F2 lands, this file's statement is
   inverted, and the two theorems become the before and after of the fix.
 -/
-import ConfTyping.UTrace
+import ConfTyping.BudgetT
 
 namespace ConfTyping.Vacuity
 
@@ -128,5 +128,19 @@ theorem vacProg_not_vacuous :
   refine ⟨fun h => ?_, fun h => ?_⟩
   · have := h 10 (fun _ => 0); rw [vacProg_halts] at this; cases this
   · have := h 10 (fun _ => 0); rw [vacProg_halts] at this; cases this
+
+/-- **The budget is carried, and it is not trivial.** On `ucmdLangT`, `bcheck`'s budget 12
+    holds of `vacProg` on every run (`bcheck_boundT`), and a budget of 3 does not: the run
+    costs 4 before it halts. -/
+theorem vacProg_budgetT :
+    LCore.Cert.bound (ucmdLangT Psec refuseAll) 12 vacProg
+  ∧ ¬ LCore.Cert.bound (ucmdLangT Psec refuseAll) 3 vacProg := by
+  refine ⟨bcheck_boundT vacProg_checks refuseAll, fun h => ?_⟩
+  have := h 10 (fun _ => 0); rw [vacProg_halts] at this
+  exact absurd this (by decide)
+
+/-- The repo's loop handler keeps its budget of 40 on every run of the lawful language. -/
+theorem loopHandler_boundT (π : MedPolicy) : LCore.Cert.bound (ucmdLangT Psec π) 40 loopHandler :=
+  bcheck_boundT loopHandler_checks π
 
 end ConfTyping.Vacuity
