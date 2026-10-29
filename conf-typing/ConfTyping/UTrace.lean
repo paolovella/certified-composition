@@ -236,4 +236,121 @@ theorem ucmdLangT_lawful (P : Partition) (π : MedPolicy) : (ucmdLangT P π).Law
     rw [this]
   diverge c := ⟨tsize c, fun n σ h => uexecT_diverge n c π (initU σ) h⟩
 
+/-! ## The bridge to `uexec` -/
+
+/-- The branch bits of a leakage trace, in order. -/
+def lkBr : List LCore.Lk → List Bool :=
+  List.filterMap fun | .branch b => some b | _ => none
+
+/-- The addresses of a leakage trace, in order. -/
+def lkAddr : List LCore.Lk → List Int :=
+  List.filterMap fun | .addr a => some a | _ => none
+
+def atomic : UCmd → Bool
+  | .seq .. | .ite .. | .loop .. => false
+  | _ => true
+
+set_option hygiene false in
+local macro "agree_tac" : tactic =>
+  `(tactic| (simp only [stepT, uexec, uaddrs] at h ⊢; (repeat (split at h)) <;>
+              simp_all [lkBr, lkAddr, List.filterMap_map]))
+
+/-- An atomic step that finishes is `uexec`'s and `uaddrs`'s step, at any fuel. -/
+theorem stepT_done_agree (c : UCmd) (hc : atomic c = true) (n : Nat) (π : MedPolicy) (s : UState)
+    (h : (stepT c π s).out = .done) :
+    uexec (n + 1) c π s = some ((stepT c π s).st, (stepT c π s).cost, lkBr (stepT c π s).lk)
+  ∧ uaddrs (n + 1) c π s = some (lkAddr (stepT c π s).lk) := by
+  cases c with
+  | seq | ite | loop => simp [atomic] at hc
+  | memop op x => cases op <;> agree_tac
+  | hop op x y => cases op <;> agree_tac
+  | sop op x e => cases op <;> agree_tac
+  | _ => agree_tac
+
+theorem TRun.seqT_done {a : TRun} {k : UState → TRun} (h : (a.seqT k).out = .done) :
+    a.out = .done ∧ (k a.st).out = .done ∧
+    a.seqT k = ⟨(k a.st).st, a.cost + (k a.st).cost, a.ev ++ (k a.st).ev,
+                a.lk ++ (k a.st).lk, (k a.st).out⟩ := by
+  unfold TRun.seqT at *
+  by_cases ha : a.out = .done
+  · simp only [ha, ↓reduceIte] at h ⊢; exact ⟨trivial, h, trivial⟩
+  · simp only [ha, ↓reduceIte] at h
+
+/-- **The bridge.** A `uexecT` run that finishes normally is a finished `uexec` run: same
+    final state, same cost, its branch bits, and its addresses. So every theorem about
+    finished `uexec` runs applies to it. -/
+theorem uexecT_done_agree : ∀ (n : Nat) (c : UCmd) (π : MedPolicy) (s : UState),
+    (uexecT n c π s).out = .done →
+      uexec n c π s = some ((uexecT n c π s).st, (uexecT n c π s).cost, lkBr (uexecT n c π s).lk)
+    ∧ uaddrs n c π s = some (lkAddr (uexecT n c π s).lk) := by
+  intro n
+  induction n with
+  | zero => intro c π s h; cases h
+  | succ m ih =>
+    intro c π s h
+    cases c with
+    | seq c₁ c₂ =>
+      simp only [uexecT] at h ⊢
+      split at h
+      · cases h
+      · rename_i hd
+        simp only [hd, Bool.false_eq_true, ↓reduceIte] at h ⊢
+        obtain ⟨ha, hb, he⟩ := TRun.seqT_done h
+        obtain ⟨u₁, a₁⟩ := ih c₁ π s ha
+        obtain ⟨u₂, a₂⟩ := ih c₂ π _ hb
+        rw [he]
+        refine ⟨?_, ?_⟩
+        · rw [uexec_seq_eq, u₁, Option.bind_some, u₂, Option.map_some]
+          simp [lkBr, List.filterMap_append]
+        · simp only [uaddrs, u₁, a₁, a₂, Option.bind_some, Option.map_some, lkAddr,
+            List.filterMap_append]
+    | ite e c₁ c₂ =>
+      simp only [uexecT] at h ⊢
+      split at h
+      · cases h
+      · rename_i hd
+        simp only [hd, Bool.false_eq_true, ↓reduceIte, TRun.tick] at h ⊢
+        by_cases hg : evalE e s.store ≠ 0
+        · rw [ite_eq_left hg] at h ⊢
+          obtain ⟨u, a⟩ := ih c₁ π s h
+          refine ⟨?_, ?_⟩
+          · rw [uexec_ite_eq, ite_eq_left hg, u, Option.map_some]
+            simp [lkBr, hg]
+          · simp only [uaddrs, ite_eq_left hg, a, lkAddr, List.filterMap_cons]
+        · rw [ite_eq_right hg] at h ⊢
+          obtain ⟨u, a⟩ := ih c₂ π s h
+          refine ⟨?_, ?_⟩
+          · rw [uexec_ite_eq, ite_eq_right hg, u, Option.map_some]
+            simp [lkBr, hg]
+          · simp only [uaddrs, ite_eq_right hg, a, lkAddr, List.filterMap_cons]
+    | loop e b =>
+      simp only [uexecT] at h ⊢
+      split at h
+      · cases h
+      · rename_i hd
+        simp only [hd, Bool.false_eq_true, ↓reduceIte] at h ⊢
+        by_cases hg : evalE e s.store ≠ 0
+        · rw [ite_eq_left hg] at h ⊢
+          simp only [TRun.tick] at h ⊢
+          obtain ⟨ha, hb, he⟩ := TRun.seqT_done h
+          obtain ⟨u₁, a₁⟩ := ih b π s ha
+          obtain ⟨u₂, a₂⟩ := ih _ π _ hb
+          rw [he]
+          refine ⟨?_, ?_⟩
+          · rw [uexec_loop_eq, ite_eq_left hg, u₁, Option.bind_some, u₂, Option.map_some]
+            simp [lkBr, List.filterMap_append, Nat.add_assoc]
+          · simp only [uaddrs, ite_eq_left hg, u₁, a₁, a₂, Option.bind_some, Option.map_some,
+              lkAddr, List.filterMap_cons, List.filterMap_append]
+        · rw [ite_eq_right hg] at h ⊢
+          refine ⟨?_, ?_⟩
+          · rw [uexec_loop_eq, ite_eq_right hg]; rfl
+          · simp only [uaddrs, ite_eq_right hg]; rfl
+    | _ =>
+      simp only [uexecT] at h ⊢
+      split at h
+      · cases h
+      · rename_i hd
+        simp only [hd, Bool.false_eq_true, ↓reduceIte] at h ⊢
+        exact stepT_done_agree _ rfl m π s h
+
 end ConfTyping
