@@ -67,14 +67,17 @@ def toyPad : Lang where
       cost := (toy.run n p i).cost + 1
       out  := (toy.run n p i).out }
 
+/-- The pad's transformers: one public branch in front, one unit of cost more. -/
+def padX : Xform where
+  lk l := .branch true :: l
+  cost c := c + 1
+  fuel m := m
+  costMono _ _ h := Nat.add_le_add_right h 1
+
 def padPass : PassCert toy toyPad where
-  comp p := .ok p
+  comp p := .ok (p, padX)
   enc i := i
-  lkT _ l := .branch true :: l
-  costT _ c := c + 1
-  fuelT _ m := m
-  costMono _ a b h := Nat.add_le_add_right h 1
-  sim p p' h m i := by cases h; rfl
+  sim p p' t h m i := by cases h; rfl
 
 /-- **The transfers, exercised.** `false`'s three certificates arrive on the padded program
     with no proof about the pad itself; the budget arrives transformed (3 + 1). -/
@@ -82,9 +85,9 @@ theorem padPass_carries :
     (∀ m i i', toy.lowIn i i' → toyPad.run m false (padPass.enc i) = toyPad.run m false (padPass.enc i'))
   ∧ (∀ m i, (toyPad.run m false (padPass.enc i)).cost ≤ 4)
   ∧ (∀ m i, ∀ e ∈ (toyPad.run m true (padPass.enc i)).ev, e = .read "r") :=
-  ⟨padPass.rel_transfer rfl toy_rel_holds,
-   padPass.bound_transfer rfl toy_bound_holds,
-   padPass.trace_transfer rfl toy_trace_holds⟩
+  ⟨padPass.rel_transfer (p' := false) (t := padX) rfl toy_rel_holds,
+   padPass.bound_transfer (p' := false) (t := padX) rfl toy_bound_holds,
+   padPass.trace_transfer (p' := true) (t := padX) rfl toy_trace_holds⟩
 
 /-- And the transfer is not vacuous: `true`, which is not `rel`, stays distinguishable after
     the pass. -/
@@ -94,18 +97,56 @@ theorem padPass_keeps_the_leak :
 
 /-- The identity pass on the padded language: composing with it must change nothing. -/
 def idPad : PassCert toyPad toyPad where
-  comp p := .ok p
+  comp p := .ok (p, Xform.id)
   enc i := i
-  lkT _ l := l
-  costT _ c := c
-  fuelT _ m := m
-  costMono _ _ _ h := h
-  sim p p' h m i := by cases h; rfl
+  sim p p' t h m i := by cases h; rfl
 
 /-- **Composition, exercised.** The two-pass pipeline is itself a `PassCert`, and the budget
     arrives through both cost transformers. -/
 theorem seq_carries_bound :
     ∀ m i, (toyPad.run m false ((padPass.seq idPad).enc i)).cost ≤ 4 :=
-  (padPass.seq idPad).bound_transfer rfl toy_bound_holds
+  (padPass.seq idPad).bound_transfer (p' := false) (t := padX.then Xform.id) rfl toy_bound_holds
+
+/-- Two pads in a row: the target language with two extra branches and two extra units. -/
+def toyPad2 : Lang where
+  Prog  := Bool
+  In    := Nat × Nat
+  lowIn i i' := i.1 = i'.1
+  run n p i :=
+    { ev   := (toyPad.run n p i).ev
+      lk   := .branch true :: (toyPad.run n p i).lk
+      cost := (toyPad.run n p i).cost + 1
+      out  := (toyPad.run n p i).out }
+
+def padPass2 : PassCert toyPad toyPad2 where
+  comp p := .ok (p, padX)
+  enc i := i
+  sim p p' t h m i := by cases h; rfl
+
+/-- **A three-pass pipeline's budget, computed by the kernel.** Compiling `false` through
+    pad, identity, pad yields the transformers in one pass over the stages, and its cost
+    transformer sends the source budget 3 to 5. -/
+theorem seq3_budget :
+    (((padPass.seq idPad).seq padPass2).comp false).map (fun r => r.2.cost 3) = .ok 5 := rfl
+
+/-- The same budget, carried by `bound_transfer` through all three passes. -/
+theorem seq3_carries_bound :
+    ∀ m i, (toyPad2.run m false (((padPass.seq idPad).seq padPass2).enc i)).cost ≤ 5 :=
+  ((padPass.seq idPad).seq padPass2).bound_transfer (p' := false)
+    (t := (padX.then Xform.id).then padX) rfl toy_bound_holds
+
+/-- A pass that refuses: `seq` propagates the refusal, so nothing is certified. -/
+def refuseTrue : PassCert toyPad toyPad where
+  comp
+    | true  => .error "refused"
+    | false => .ok (false, Xform.id)
+  enc i := i
+  sim p p' t h m i := by
+    cases p
+    · cases h; rfl
+    · cases h
+
+theorem seq_refusal_propagates :
+    ((padPass.seq refuseTrue).comp true).toOption = none := rfl
 
 end LCore.Witness
