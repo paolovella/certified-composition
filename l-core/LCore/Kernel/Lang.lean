@@ -18,4 +18,20 @@ structure Lang where
   /-- A run with `n` units of fuel. -/
   run   : Nat → Prog → In → Beh
 
+/-- **A lawful language** (F2). More fuel only extends a run: its events and leakage grow at
+    the end, its cost grows, and once it has finished it stays finished. And a run that has not
+    finished has paid for its fuel: up to a constant that depends only on the program, the fuel
+    spent is at most the cost, so a run that never finishes has unbounded cost. -/
+structure Lang.Lawful (L : Lang) : Prop where
+  ev_mono   : ∀ (p : L.Prog) (i : L.In) (n n' : Nat), n ≤ n' →
+    (L.run n p i).ev <+: (L.run n' p i).ev
+  lk_mono   : ∀ (p : L.Prog) (i : L.In) (n n' : Nat), n ≤ n' →
+    (L.run n p i).lk <+: (L.run n' p i).lk
+  cost_mono : ∀ (p : L.Prog) (i : L.In) (n n' : Nat), n ≤ n' →
+    (L.run n p i).cost ≤ (L.run n' p i).cost
+  stable    : ∀ (p : L.Prog) (i : L.In) (n n' : Nat), n ≤ n' →
+    (L.run n p i).out ≠ .fuel → L.run n' p i = L.run n p i
+  diverge   : ∀ (p : L.Prog), ∃ d : Nat, ∀ (n : Nat) (i : L.In),
+    (L.run n p i).out = .fuel → n ≤ (L.run n p i).cost + d
+
 end LCore

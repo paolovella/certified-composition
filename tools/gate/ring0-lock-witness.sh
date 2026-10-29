@@ -42,6 +42,10 @@ refuses() {  # refuses NAME DIR
 }
 
 echo "ring0.lock witnesses"
+# The three scenarios use separate copies, so they run side by side (F1): each rebuilds what
+# depends on its edit, and that grows with every module downstream of the checkers. Each writes
+# its lines to its own file; they are printed in scenario order and counted from the lines.
+scen_d() {
 copy "$tmp/d"
 python3 -I - "$tmp/d/conf-typing/ConfTyping/CostBound.lean" <<'EOF'
 import re, sys
@@ -62,9 +66,13 @@ else
   fail=$((fail+1))
 fi
 refuses definition "$tmp/d"
+}
+scen_c() {
 copy "$tmp/c"
 sed -i '0,/frozen statements (P0-03/s//frozen statements  (P0-03/' "$tmp/c/workspace/Statements.lean"
 refuses challenge "$tmp/c"
+}
+scen_k() {
 copy "$tmp/k"
 python3 -I - "$tmp/k/conf-typing/ConfTyping/CostBound.lean" <<'EOF2'
 import sys
@@ -87,5 +95,14 @@ if ( cd "$tmp/k" && bash tools/ring0-lock.sh --checkers && bash tools/ring0-lock
 else
   printf '  FAIL  %-12s not accepted: %s\n' checker "$(tail -1 "$tmp/k2.log")"; fail=$((fail+1))
 fi
+}
+scen_d > "$tmp/out.d" 2>&1 &
+scen_c > "$tmp/out.c" 2>&1 &
+scen_k > "$tmp/out.k" 2>&1 &
+wait
+cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k"
+pass=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" | grep -c '^  ok ')
+fail=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" | grep -c '^  FAIL ')
+[ "$((pass + fail))" -ge 5 ] || { echo "  FAIL  a scenario printed no verdict"; fail=$((fail+1)); }
 echo "ring0.lock witnesses: $pass passed, $fail failed"
 [ "$fail" = 0 ]

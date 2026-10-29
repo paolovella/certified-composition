@@ -8,7 +8,11 @@
     observable (events, leakage, cost, outcome), this is fuel-indexed termination-sensitive
     noninterference with leakage and cost included, in one equation.
   - `bound k`: every run costs at most `k`.
-  "Every run" means every fuel and every input.
+  "Every run" means every fuel and every input. On a lawful language (`Lang.Lawful`, F2) the run
+  at fuel `n` is a prefix of every run with more fuel, so "every fuel" covers every prefix of
+  the run, and `bound` forces the run to finish (`Lang.Lawful.bound_finishes`). Not every
+  `Lang` is lawful: `ucmdLang` is not yet (F2 step 2), so on it these shapes can still hold
+  vacuously (`ConfTyping.Vacuity.vacProg_vacuous`).
 
   Correction of record (2026-10-29, F0). From 30f0720 to now this docstring said:
   ~~a fuelled run that stops early is a prefix, and each shape must hold of it too~~.
@@ -34,5 +38,16 @@ def bound (L : Lang) (k : Nat) (p : L.Prog) : Prop :=
   ∀ (n : Nat) (i : L.In), (L.run n p i).cost ≤ k
 
 end Cert
+
+/-- **A budget forces termination** on a lawful language: `bound k` is not satisfied by a
+    program that never finishes. -/
+theorem Lang.Lawful.bound_finishes {L : Lang} (hL : L.Lawful) {k : Nat} {p : L.Prog}
+    (h : Cert.bound L k p) (i : L.In) : ∃ n, (L.run n p i).out ≠ .fuel := by
+  obtain ⟨d, hd⟩ := hL.diverge p
+  refine ⟨k + d + 1, fun hf => ?_⟩
+  have h1 := hd (k + d + 1) i hf
+  have h2 := h (k + d + 1) i
+  exact Nat.lt_irrefl (k + d)
+    (Nat.lt_of_lt_of_le (Nat.lt_succ_self _) (Nat.le_trans h1 (Nat.add_le_add_right h2 d)))
 
 end LCore

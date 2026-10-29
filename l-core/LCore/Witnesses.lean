@@ -149,4 +149,47 @@ def refuseTrue : PassCert toyPad toyPad where
 theorem seq_refusal_propagates :
     ((padPass.seq refuseTrue).comp true).toOption = none := rfl
 
+/-! ## Lawful languages (F2) -/
+
+/-- Lawful: the toy runs to completion at every fuel. -/
+def toyL : Lang where
+  Prog := Bool
+  In := Nat
+  lowIn _ _ := True
+  run _ p i := { ev := [.read "r"], lk := [.branch p], cost := i, out := .done }
+
+theorem toyL_lawful : toyL.Lawful where
+  ev_mono _ _ _ _ _ := List.prefix_refl _
+  lk_mono _ _ _ _ _ := List.prefix_refl _
+  cost_mono _ _ _ _ _ := Nat.le_refl _
+  stable _ _ _ _ _ _ := rfl
+  diverge _ := ⟨0, fun _ _ h => by cases h⟩
+
+/-- The empty language: every run is the empty, out-of-fuel record (what `ucmdLang` reports
+    for a run that never returns). Not lawful: it never pays for its fuel. -/
+def emptyL : Lang where
+  Prog := Unit
+  In := Unit
+  lowIn _ _ := True
+  run _ _ _ := { ev := [], lk := [], cost := 0, out := .fuel }
+
+theorem emptyL_unlawful : ¬ emptyL.Lawful := by
+  intro h
+  obtain ⟨d, hd⟩ := h.diverge ()
+  have := hd (d + 1) () rfl
+  simp [emptyL] at this; omega
+
+/-- A language whose events grow in the middle (all reads, then all emits): not lawful. -/
+def middleL : Lang where
+  Prog := Unit
+  In := Unit
+  lowIn _ _ := True
+  run n _ _ := { ev := List.replicate n (.read "r") ++ [.emit "out" []], lk := [], cost := n,
+                 out := .fuel }
+
+theorem middleL_unlawful : ¬ middleL.Lawful := by
+  intro h
+  have := h.ev_mono () () 0 1 (Nat.zero_le 1)
+  simp [middleL] at this
+
 end LCore.Witness

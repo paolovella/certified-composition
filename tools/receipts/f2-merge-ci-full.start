@@ -1,0 +1,4 @@
+started: 2026-10-29T14:45:34+01:00
+head: af8392c
+command: bash tools/ci.sh
+log: tools/receipts/f2-merge-ci-full.log

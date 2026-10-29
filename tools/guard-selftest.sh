@@ -16,23 +16,35 @@ set -u
 cd "$(dirname "$0")/.." || exit 1
 REPO=$(pwd)
 pass=0; fail=0
+# Cases are independent (each exports its own copy), so they run GUARD_JOBS at a time (F1). Each
+# case writes its line to $res/<number>; the lines are printed in case order once all finish,
+# and the counts are taken from them.
+GUARD_JOBS="${GUARD_JOBS:-8}"
+res=$(mktemp -d)
+trap 'rm -rf "$res"' EXIT
+ncase=0
 
 run_case() {                      # run_case <name> <expect: pass|drift> <mutation...>
-  local name="$1" expect="$2"; shift 2
+  ncase=$((ncase+1))
+  while [ "$(jobs -rp | wc -l)" -ge "$GUARD_JOBS" ]; do wait -n; done
+  one_case "$res/$(printf '%04d' "$ncase")" "$@" &
+}
+one_case() {                      # one_case <result file> <name> <expect> <mutation...>
+  local out_f="$1" name="$2" expect="$3"; shift 3
   local tmp; tmp=$(mktemp -d)
   ( cd "$REPO" && git ls-files -co --exclude-standard -z \
       | tar --null -T - -cf - ) 2>/dev/null | tar -x -C "$tmp" 2>/dev/null
   # A mutation that fails (for instance one that checks its own anchor matched) is reported: a
   # case whose mutation did not apply passes vacuously (P0-03 found one).
   if ! ( cd "$tmp" && "$@" ) >/dev/null 2>&1; then
-    printf '  FAIL  %-38s the mutation did not apply\n' "$name"; fail=$((fail+1)); rm -rf "$tmp"; return
+    printf '  FAIL  %-38s the mutation did not apply\n' "$name" > "$out_f"; rm -rf "$tmp"; return
   fi
   local out; out=$(cd "$tmp" && bash tools/check-claims.sh 2>&1)
   local got="pass"; echo "$out" | grep -q "^DRIFT" && got="drift"
   if [ "$got" = "$expect" ]; then
-    printf '  ok    %-38s (%s)\n' "$name" "$got"; pass=$((pass+1))
+    printf '  ok    %-38s (%s)\n' "$name" "$got" > "$out_f"
   else
-    printf '  FAIL  %-38s expected %s, got %s\n' "$name" "$expect" "$got"; fail=$((fail+1))
+    printf '  FAIL  %-38s expected %s, got %s\n' "$name" "$expect" "$got" > "$out_f"
   fi
   rm -rf "$tmp"
 }
@@ -349,10 +361,16 @@ run_case "ucmd_p1_carries proves through a certificate" drift \
 
 # (n) the kernel claims prefixes with no fuel law: refused; with a Lawful structure: accepted
 run_case "kernel claims prefixes without a fuel law" drift \
-  bash -c 'printf "/- a fuelled run that stops early is a prefix -/\n" >> l-core/LCore/Kernel/Cert.lean'
+  bash -c 'printf "/- a fuelled run that stops early is a prefix -/\n" >> l-core/LCore/Kernel/Cert.lean && sed -i "s/^structure Lang\.Lawful /structure Lang.Unruled /" l-core/LCore/Kernel/Lang.lean && ! grep -q "^structure Lang.Lawful" l-core/LCore/Kernel/Lang.lean'
 run_case "kernel claims prefixes with a fuel law" pass \
   bash -c 'printf "/- a fuelled run that stops early is a prefix -/\nstructure Lang.Lawful where\n" >> l-core/LCore/Kernel/Cert.lean'
 
+wait
+for r in "$res"/*; do cat "$r"; done
+pass=$(cat "$res"/* | grep -c '^  ok ')
+fail=$(cat "$res"/* | grep -c '^  FAIL ')
+# A case that wrote no line is a failure too, not a silent skip.
+[ "$(ls "$res" | wc -l)" -eq "$ncase" ] || { echo "  FAIL  $((ncase - $(ls "$res" | wc -l))) case(s) wrote no result"; fail=$((fail+1)); }
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

@@ -1381,6 +1381,14 @@ ConfTyping.UStr	ConfTyping.Unified
 ConfTyping.Unsafe	ConfTyping.QueryProgram	
 ConfTyping.Untrusted	ConfTyping.Integrity	
 ConfTyping.UseFreeLoop	ConfTyping.FreeLoop	
+ConfTyping.Vacuity.body_kills	ConfTyping.Vacuity	propext
+ConfTyping.Vacuity.loop_diverges	ConfTyping.Vacuity	propext
+ConfTyping.Vacuity.refuseAll	ConfTyping.Vacuity	
+ConfTyping.Vacuity.vacProg	ConfTyping.Vacuity	
+ConfTyping.Vacuity.vacProg_checks	ConfTyping.Vacuity	propext
+ConfTyping.Vacuity.vacProg_diverges	ConfTyping.Vacuity	propext
+ConfTyping.Vacuity.vacProg_emits_first	ConfTyping.Vacuity	
+ConfTyping.Vacuity.vacProg_vacuous	ConfTyping.Vacuity	propext
 ConfTyping.Val.below	ConfTyping.Obs	
 ConfTyping.Val.bits.elim	ConfTyping.Obs	
 ConfTyping.Val.bits.noConfusion	ConfTyping.Obs	
@@ -3271,6 +3279,14 @@ LCore.Ev.recOn	LCore.Kernel.Obs
 LCore.Ev.release.elim	LCore.Kernel.Obs	
 LCore.Ev.release.noConfusion	LCore.Kernel.Obs	
 LCore.Lang.In	LCore.Kernel.Lang	
+LCore.Lang.Lawful.bound_finishes	LCore.Kernel.Cert	
+LCore.Lang.Lawful.casesOn	LCore.Kernel.Lang	
+LCore.Lang.Lawful.cost_mono	LCore.Kernel.Lang	
+LCore.Lang.Lawful.diverge	LCore.Kernel.Lang	
+LCore.Lang.Lawful.ev_mono	LCore.Kernel.Lang	
+LCore.Lang.Lawful.lk_mono	LCore.Kernel.Lang	
+LCore.Lang.Lawful.recOn	LCore.Kernel.Lang	
+LCore.Lang.Lawful.stable	LCore.Kernel.Lang	
 LCore.Lang.Prog	LCore.Kernel.Lang	
 LCore.Lang.casesOn	LCore.Kernel.Lang	
 LCore.Lang.ctorIdx	LCore.Kernel.Lang	
@@ -3321,7 +3337,11 @@ LCore.PassCert.rel_transfer	LCore.Kernel.Pass
 LCore.PassCert.seq	LCore.Kernel.Pass	
 LCore.PassCert.sim	LCore.Kernel.Pass	
 LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
+LCore.Witness.emptyL	LCore.Witnesses	
+LCore.Witness.emptyL_unlawful	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.idPad	LCore.Witnesses	
+LCore.Witness.middleL	LCore.Witnesses	
+LCore.Witness.middleL_unlawful	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padPass	LCore.Witnesses	
 LCore.Witness.padPass2	LCore.Witnesses	
 LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
@@ -3333,6 +3353,8 @@ LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_refusal_propagates	LCore.Witnesses	
 LCore.Witness.toy	LCore.Witnesses	
+LCore.Witness.toyL	LCore.Witnesses	
+LCore.Witness.toyL_lawful	LCore.Witnesses	propext
 LCore.Witness.toyPad	LCore.Witnesses	
 LCore.Witness.toyPad2	LCore.Witnesses	
 LCore.Witness.toy_bound_fails	LCore.Witnesses	propext

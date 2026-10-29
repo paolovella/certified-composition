@@ -2,7 +2,7 @@ ConfTyping.acheck	1	1	ConfTyping.alias_ok_accepted	ConfTyping.alias_uaf_rejected
 ConfTyping.alcheck	1	3	ConfTyping.aliasfree_checks	ConfTyping.alias_uaf_loop_rejected
 ConfTyping.alcheck2	4	1	ConfTyping.nested_checks	ConfTyping.alcheck2_refuses_uaf_loop
 ConfTyping.allcheck	9	6	ConfTyping.bigHandler_allcheck	ConfTyping.allcheck_refuses_loopHandler
-ConfTyping.bcheck	2	2	ConfTyping.bcheck_accepts_nested_loops	ConfTyping.bcheck_refuses_nested_double_free
+ConfTyping.bcheck	3	2	ConfTyping.Vacuity.vacProg_checks	ConfTyping.bcheck_refuses_nested_double_free
 ConfTyping.bcheckF	1	1	ConfTyping.bcheckF_accepts_skip	ConfTyping.bcheckF_refuses_wild_deref
 ConfTyping.costCheck	1	1	ConfTyping.costCheck_accepts_skip	ConfTyping.costCheck_refuses_unbounded_loop
 ConfTyping.dbcheck	1	1	ConfTyping.dbcheck_accepts_input	ConfTyping.sound_rejects_stored
