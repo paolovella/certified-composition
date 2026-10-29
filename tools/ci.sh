@@ -5,21 +5,27 @@
 #   tools/ci.sh                  full run (includes the mathlib package; slow)
 #   tools/ci.sh --fast           skip transport-kernel (mathlib), for the inner loop
 #   tools/ci.sh --require-heavy  full run on the heavy runner: an absent tool is a failure
+#   tools/ci.sh --quick          the inner loop (F1): --fast, and the slow witnesses deferred.
+#                                Every deferred step is printed; it is never merge evidence.
 #
 # A step that does not run is never silent (P0-06): it prints DEFERRED or ABSENT with the
 # reason, and the last line lists every step not run.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-FAST=0; HEAVY=0
+FAST=0; HEAVY=0; QUICK=0
 for a in "$@"; do
   case "$a" in
     --fast) FAST=1 ;;
+    --quick) QUICK=1; FAST=1 ;;
     --require-heavy) HEAVY=1 ;;
     *) echo "ci.sh: unknown option $a"; exit 2 ;;
   esac
 done
-[ "$FAST" = 1 ] && [ "$HEAVY" = 1 ] && { echo "ci.sh: --fast and --require-heavy contradict"; exit 2; }
+[ "$FAST" = 1 ] && [ "$HEAVY" = 1 ] && { echo "ci.sh: --fast or --quick and --require-heavy contradict"; exit 2; }
+# The steps --quick defers: the slow witnesses and the external kernels (F1 baseline, 2026-10-29:
+# together ~390 s of the ~614 s full run). The full run and the gate still run all of them.
+QUICK_DEFER=$'lake check from the root workspace (route 1)\nring0.lock catches what the comparator cannot (witness)\nexport accepted by all six kernels (route 2)\nboth kernel gates refuse a planted axiom (witness)\nwalk-check (numeric claims in the notes)'
 
 fail=0
 notrun=()
@@ -27,12 +33,23 @@ notrun=()
 # and written to $RUNJOB_STEPS when tools/run-job.sh runs this, so the receipt says where the
 # time went.
 times=()
+nobudget=0
 step() {
   local name="$1" st t0; shift
+  if [ "$QUICK" = 1 ] && grep -qxF "$name" <<< "$QUICK_DEFER"; then
+    not_run "$name" DEFERRED "--quick; the full run and the gate run it"; return
+  fi
   printf '\n=== %s\n' "$name"
   t0=$(date +%s)
   if "$@"; then st=ok; else st=FAILED; fail=1; fi
-  local dt=$(( $(date +%s) - t0 ))
+  local dt=$(( $(date +%s) - t0 )) bmsg brc
+  # The time ratchet (tools/ci-budget.sh): on a machine with budgets, a step over its budget,
+  # or with none, fails; a machine without budgets is reported at the end.
+  if [ "$st" = ok ]; then
+    bmsg=$(bash tools/ci-budget.sh check "$name" "$dt"); brc=$?
+    if [ "$brc" = 1 ]; then st="FAILED ($bmsg)"; fail=1
+    elif [ "$brc" = 3 ]; then nobudget=1; fi
+  fi
   printf '    %s (%d s)\n' "$st" "$dt"
   times+=("$dt"$'\t'"$st"$'\t'"$name")
 }
@@ -188,6 +205,16 @@ if [ "$FAST" = 0 ]; then
 else
   not_run "rule mutants: every one killed, table current" DEFERRED "--fast; the full run and the heavy runner run them"
 fi
+budget_witness() (  # accepted and refused cases of the time ratchet, on a planted budget file
+  t=$(mktemp -d); trap 'rm -rf "$t"' EXIT
+  printf 'budget\tstep\n10\tplanted step\n' > "$t/b.tsv"
+  c() { CI_BUDGET_FILE="$1" bash tools/ci-budget.sh check "$2" "$3" >/dev/null; echo $?; }
+  [ "$(c "$t/b.tsv" "planted step" 10)" = 0 ] &&      # at the budget: accepted
+  [ "$(c "$t/b.tsv" "planted step" 11)" = 1 ] &&      # over it: refused
+  [ "$(c "$t/b.tsv" "unbudgeted step" 1)" = 1 ] &&    # a step with no budget: refused
+  [ "$(c "$t/none.tsv" "planted step" 1)" = 3 ]       # a machine with none: reported
+)
+step "time budgets accept and refuse (witness)" budget_witness
 step "check-claims (drift guards)" bash -c 'bash tools/check-claims.sh | tail -1 | grep -q "^check-claims: clean$"'
 step "guard-selftest (the guards actually fire)" \
      bash -c 'bash tools/guard-selftest.sh | tail -1 | grep -qE "^guard self-test: [0-9]+ passed, 0 failed$"'
@@ -201,8 +228,11 @@ if [ -n "${RUNJOB_STEPS:-}" ]; then
   { printf 'seconds\tstatus\tstep\n'; printf '%s\n' "$table"; } > "$RUNJOB_STEPS"
 fi
 
+[ "$nobudget" = 1 ] && printf '\nTIME BUDGET: none for host %s; step times were not checked\n' "$(bash tools/ci-budget.sh host)"
+
 printf '\n'
 nr=""
 [ "${#notrun[@]}" -gt 0 ] && nr="; ${#notrun[@]} not run: $(IFS=';'; echo "${notrun[*]}" | sed 's/;/; /g')"
+[ "$QUICK" = 1 ] && printf 'CI: quick tier, not merge evidence\n'
 if [ "$fail" = 0 ]; then printf 'CI: all steps that ran passed%s\n' "$nr"; else printf 'CI: FAILURES ABOVE%s\n' "$nr"; fi
 exit "$fail"

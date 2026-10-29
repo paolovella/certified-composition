@@ -1,0 +1,4 @@
+started: 2026-10-29T14:16:43+01:00
+head: 7550c5e
+command: bash tools/ci.sh
+log: tools/receipts/f1-parallel-1.log
