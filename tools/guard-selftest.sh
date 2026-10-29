@@ -347,6 +347,12 @@ run_case "P1 gains a certificate-specific pass lemma" drift \
 run_case "ucmd_p1_carries proves through a certificate" drift \
   bash -c 'python3 -c "p=\"conf-typing/ConfTyping/P1.lean\";s=open(p).read();a=\"  obtain ⟨hb, ht, hr⟩ := bcheck_lcore h π\n\";assert a in s;open(p,\"w\").write(s.replace(a,a+\"  have _x := @jsecTy_sound\n\"))"'
 
+# (n) the kernel claims prefixes with no fuel law: refused; with a Lawful structure: accepted
+run_case "kernel claims prefixes without a fuel law" drift \
+  bash -c 'printf "/- a fuelled run that stops early is a prefix -/\n" >> l-core/LCore/Kernel/Cert.lean'
+run_case "kernel claims prefixes with a fuel law" pass \
+  bash -c 'printf "/- a fuelled run that stops early is a prefix -/\nstructure Lang.Lawful where\n" >> l-core/LCore/Kernel/Cert.lean'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
