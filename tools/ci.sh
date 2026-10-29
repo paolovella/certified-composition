@@ -23,15 +23,25 @@ done
 
 fail=0
 notrun=()
+# Per-step seconds (F1): every step's time, status and name, printed slowest first at the end
+# and written to $RUNJOB_STEPS when tools/run-job.sh runs this, so the receipt says where the
+# time went.
+times=()
 step() {
-  printf '\n=== %s\n' "$1"; shift
-  if "$@"; then printf '    ok\n'; else printf '    FAILED\n'; fail=1; fi
+  local name="$1" st t0; shift
+  printf '\n=== %s\n' "$name"
+  t0=$(date +%s)
+  if "$@"; then st=ok; else st=FAILED; fail=1; fi
+  local dt=$(( $(date +%s) - t0 ))
+  printf '    %s (%d s)\n' "$st" "$dt"
+  times+=("$dt"$'\t'"$st"$'\t'"$name")
 }
 # not_run <step> <DEFERRED|ABSENT> <reason>: an ABSENT tool fails under --require-heavy.
 not_run() {
   printf '\n=== %s\n    %s: %s\n' "$1" "$2" "$3"
   if [ "$2" = ABSENT ] && [ "$HEAVY" = 1 ]; then printf '    FAILED\n'; fail=1; fi
   notrun+=("$1")
+  times+=("0"$'\t'"$2"$'\t'"$1")
 }
 
 build() {  # build a lake package, succeed only on a clean build
@@ -183,6 +193,13 @@ step "guard-selftest (the guards actually fire)" \
      bash -c 'bash tools/guard-selftest.sh | tail -1 | grep -qE "^guard self-test: [0-9]+ passed, 0 failed$"'
 step "walk-check (numeric claims in the notes)" \
      bash -c 'python3 tools/walk-check.py | tail -1 | grep -q "^all checks PASS$"'
+
+printf '\n--- seconds per step, slowest first\n'
+table=$(printf '%s\n' "${times[@]}" | sort -t$'\t' -k1,1nr)
+printf '%s\n' "$table" | awk -F'\t' '{ printf "  %6s s  %-8s %s\n", $1, $2, $3 }'
+if [ -n "${RUNJOB_STEPS:-}" ]; then
+  { printf 'seconds\tstatus\tstep\n'; printf '%s\n' "$table"; } > "$RUNJOB_STEPS"
+fi
 
 printf '\n'
 nr=""
