@@ -14,7 +14,7 @@ W=ConfTyping/Witnesses.lean
 case_() {  # case_ NAME EXPECTED_SUMMARY MUTATION...
   local name=$1 want=$2; shift 2
   local d="$tmp/$name"
-  mkdir -p "$d" && cp -a "$REPO/conf-typing" "$d/" && cp -a "$REPO/transport-calculus" "$d/"
+  mkdir -p "$d" && cp -a "$REPO/conf-typing" "$d/" && cp -a "$REPO/transport-calculus" "$d/" && cp -a "$REPO/l-core" "$d/"
   ( cd "$d/conf-typing" && "$@" ) >/dev/null 2>&1
   local got
   got=$(cd "$d/conf-typing" && lake build >/dev/null 2>&1 && lake env lean WitnessRegistry.lean 2>&1 | tail -1)

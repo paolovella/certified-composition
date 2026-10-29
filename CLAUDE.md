@@ -22,7 +22,7 @@ claim here is absolute, and each one carries its versions.
 | 2 | proof-carrying programs (corpus, libraries) | agents, auto-merge on green |
 | 3 | untrusted tooling: inference, renderers, generators, schedulers | anyone; nothing it outputs is believed until a Ring 0/1 check passes |
 
-Until `l-core/` exists, Ring 0 means: `tools/`, `.github/`, `CLAUDE.md`, `.claude/`,
+Ring 0 means: L's trusted core `l-core/LCore/Kernel/` (PH1), `tools/`, `.github/`, `CLAUDE.md`, `.claude/`,
 `*/lean-toolchain`, `*/lakefile*`, `*/lake-manifest.json`, the root workspace (`lean-toolchain`,
 `lakefile.toml`, `lake-manifest.json`, `workspace/`), `comparator.json`, and any
 frozen statement file.

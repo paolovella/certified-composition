@@ -22,7 +22,7 @@ mkpr() {  # mkpr DIR: a PR tree identical to this working tree, with its .git an
   ( cd "$REPO" && git ls-files -co --exclude-standard -z | tar --null -T - -cf - ) | tar -x -C "$1"
   cp -a "$REPO/.git" "$1/.git"
   local c
-  for c in .lake conf-typing/.lake transport-calculus/.lake; do
+  for c in .lake conf-typing/.lake transport-calculus/.lake l-core/.lake; do
     [ -d "$REPO/$c" ] && mkdir -p "$1/$(dirname "$c")" && cp -a "$REPO/$c" "$1/$c"
   done
   return 0
@@ -52,6 +52,10 @@ case_ pr-touches-claude-md "ring0" 1 "^gate: ring0 TOUCHED" \
   bash -c 'echo "an agent edit" >> CLAUDE.md'
 case_ pr-touches-toolchain "ring0" 1 "^  conf-typing/lean-toolchain$" \
   bash -c 'echo leanprover/lean4:v4.34.0 > conf-typing/lean-toolchain'
+case_ pr-touches-the-l-core-kernel "ring0" 1 "^  l-core/LCore/Kernel/Obs.lean$" \
+  bash -c 'echo "-- an agent edit" >> l-core/LCore/Kernel/Obs.lean'
+case_ pr-touches-l-core-outside-the-kernel "ring0" 0 "^gate: ring0 untouched$" \
+  bash -c 'echo "-- an agent edit" >> l-core/LCore/Witnesses.lean'
 case_ pr-touches-only-receipts "ring0" 0 "^gate: ring0 untouched$" \
   bash -c 'echo x > tools/receipts/witness-only.end'
 case_ pr-drops-manifest-line "manifest" 1 "^gate: manifest lines REMOVED or CHANGED (1)" \

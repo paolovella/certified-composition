@@ -1502,7 +1502,7 @@ done
 #     workspace and all three packages share one version: transport-kernel builds the
 #     transport-calculus sources itself, so two toolchains forced names valid in both (P0-09).
 tc=$(sed 's/.*://' conf-typing/lean-toolchain 2>/dev/null)
-for f in lean-toolchain transport-calculus/lean-toolchain transport-kernel/lean-toolchain; do
+for f in lean-toolchain transport-calculus/lean-toolchain transport-kernel/lean-toolchain l-core/lean-toolchain; do
   if [ "$(sed 's/.*://' "$f" 2>/dev/null)" != "$tc" ]; then
     echo "DRIFT: $f does not pin $tc like conf-typing/lean-toolchain"; fail=1
   fi
@@ -1589,6 +1589,17 @@ if [ -f tools/checkers.lock ]; then
   fi
   if [ "$meaning" != "$rmeaning" ]; then
     echo "DRIFT: README says ring0.lock locks ${rmeaning:-no} definitions; it holds $meaning"; fail=1
+  fi
+fi
+
+# (n) The kernel may say a fuelled run "is a prefix" only once it has a fuel law (F0, F2). From
+# 30f0720 to 2026-10-29 Cert.lean said so with nothing behind it, which made every trace and
+# bound certificate vacuous on runs that never finish. Struck text (~~...~~) is a correction of
+# record and is skipped. The law counts when the kernel defines `Lawful`.
+if [ -d l-core/LCore/Kernel ]; then
+  pref=$(sed 's/~~[^~]*~~//g' l-core/LCore/Kernel/*.lean | grep -ciE 'is a prefix|are prefixes' || true)
+  if [ "$pref" -gt 0 ] && ! grep -qE '^(structure|class|def) Lang\.?Lawful|^(structure|class) Lawful' l-core/LCore/Kernel/*.lean; then
+    echo "DRIFT: l-core/LCore/Kernel says a run is a prefix, but the kernel has no fuel law (Lawful); F2"; fail=1
   fi
 fi
 

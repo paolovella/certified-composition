@@ -3129,6 +3129,134 @@ ConfTyping.τ1	ConfTyping.Pipeline
 ConfTyping.φ_bit	ConfTyping.Pleak	
 ConfTyping.χ0	ConfTyping.WhileLedger	
 ConfTyping.χ1	ConfTyping.WhileLedger	
+LCore.Beh.casesOn	LCore.Kernel.Obs	
+LCore.Beh.cost	LCore.Kernel.Obs	
+LCore.Beh.ctorIdx	LCore.Kernel.Obs	
+LCore.Beh.ev	LCore.Kernel.Obs	
+LCore.Beh.lk	LCore.Kernel.Obs	
+LCore.Beh.mk.noConfusion	LCore.Kernel.Obs	
+LCore.Beh.noConfusion	LCore.Kernel.Obs	
+LCore.Beh.noConfusionType	LCore.Kernel.Obs	
+LCore.Beh.out	LCore.Kernel.Obs	
+LCore.Beh.recOn	LCore.Kernel.Obs	
+LCore.Cert.bound	LCore.Kernel.Cert	
+LCore.Cert.rel	LCore.Kernel.Cert	
+LCore.Cert.trace	LCore.Kernel.Cert	
+LCore.Ev.casesOn	LCore.Kernel.Obs	
+LCore.Ev.check.elim	LCore.Kernel.Obs	
+LCore.Ev.check.noConfusion	LCore.Kernel.Obs	
+LCore.Ev.ctorElim	LCore.Kernel.Obs	
+LCore.Ev.ctorElimType	LCore.Kernel.Obs	
+LCore.Ev.ctorIdx	LCore.Kernel.Obs	
+LCore.Ev.emit.elim	LCore.Kernel.Obs	
+LCore.Ev.emit.noConfusion	LCore.Kernel.Obs	
+LCore.Ev.ext.elim	LCore.Kernel.Obs	
+LCore.Ev.ext.noConfusion	LCore.Kernel.Obs	
+LCore.Ev.noConfusion	LCore.Kernel.Obs	
+LCore.Ev.noConfusionType	LCore.Kernel.Obs	
+LCore.Ev.read.elim	LCore.Kernel.Obs	
+LCore.Ev.read.noConfusion	LCore.Kernel.Obs	
+LCore.Ev.recOn	LCore.Kernel.Obs	
+LCore.Ev.release.elim	LCore.Kernel.Obs	
+LCore.Ev.release.noConfusion	LCore.Kernel.Obs	
+LCore.Lang.In	LCore.Kernel.Lang	
+LCore.Lang.Prog	LCore.Kernel.Lang	
+LCore.Lang.casesOn	LCore.Kernel.Lang	
+LCore.Lang.ctorIdx	LCore.Kernel.Lang	
+LCore.Lang.lowIn	LCore.Kernel.Lang	
+LCore.Lang.mk.noConfusion	LCore.Kernel.Lang	
+LCore.Lang.noConfusion	LCore.Kernel.Lang	
+LCore.Lang.noConfusionType	LCore.Kernel.Lang	
+LCore.Lang.recOn	LCore.Kernel.Lang	
+LCore.Lang.run	LCore.Kernel.Lang	
+LCore.Lk.addr.elim	LCore.Kernel.Obs	
+LCore.Lk.addr.noConfusion	LCore.Kernel.Obs	
+LCore.Lk.branch.elim	LCore.Kernel.Obs	
+LCore.Lk.branch.noConfusion	LCore.Kernel.Obs	
+LCore.Lk.casesOn	LCore.Kernel.Obs	
+LCore.Lk.ctorElim	LCore.Kernel.Obs	
+LCore.Lk.ctorElimType	LCore.Kernel.Obs	
+LCore.Lk.ctorIdx	LCore.Kernel.Obs	
+LCore.Lk.ext.elim	LCore.Kernel.Obs	
+LCore.Lk.ext.noConfusion	LCore.Kernel.Obs	
+LCore.Lk.noConfusion	LCore.Kernel.Obs	
+LCore.Lk.noConfusionType	LCore.Kernel.Obs	
+LCore.Lk.recOn	LCore.Kernel.Obs	
+LCore.Lk.vtime.elim	LCore.Kernel.Obs	
+LCore.Lk.vtime.noConfusion	LCore.Kernel.Obs	
+LCore.Outcome.abort.elim	LCore.Kernel.Obs	
+LCore.Outcome.casesOn	LCore.Kernel.Obs	
+LCore.Outcome.ctorElim	LCore.Kernel.Obs	
+LCore.Outcome.ctorElimType	LCore.Kernel.Obs	
+LCore.Outcome.ctorIdx	LCore.Kernel.Obs	
+LCore.Outcome.done.elim	LCore.Kernel.Obs	
+LCore.Outcome.fuel.elim	LCore.Kernel.Obs	
+LCore.Outcome.noConfusion	LCore.Kernel.Obs	
+LCore.Outcome.noConfusionType	LCore.Kernel.Obs	
+LCore.Outcome.ofNat	LCore.Kernel.Obs	
+LCore.Outcome.ofNat_ctorIdx	LCore.Kernel.Obs	
+LCore.Outcome.recOn	LCore.Kernel.Obs	
+LCore.PassCert.bound_transfer	LCore.Kernel.Pass	
+LCore.PassCert.casesOn	LCore.Kernel.Pass	
+LCore.PassCert.comp	LCore.Kernel.Pass	
+LCore.PassCert.ctorIdx	LCore.Kernel.Pass	
+LCore.PassCert.enc	LCore.Kernel.Pass	
+LCore.PassCert.mk.congr_simp	LCore.Witnesses	
+LCore.PassCert.mk.noConfusion	LCore.Kernel.Pass	
+LCore.PassCert.noConfusion	LCore.Kernel.Pass	
+LCore.PassCert.noConfusionType	LCore.Kernel.Pass	
+LCore.PassCert.recOn	LCore.Kernel.Pass	
+LCore.PassCert.rel_transfer	LCore.Kernel.Pass	
+LCore.PassCert.seq	LCore.Kernel.Pass	
+LCore.PassCert.sim	LCore.Kernel.Pass	
+LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
+LCore.Witness.idPad	LCore.Witnesses	
+LCore.Witness.padPass	LCore.Witnesses	
+LCore.Witness.padPass2	LCore.Witnesses	
+LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.padPass_keeps_the_leak	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.padX	LCore.Witnesses	
+LCore.Witness.refuseTrue	LCore.Witnesses	
+LCore.Witness.seq3_budget	LCore.Witnesses	
+LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.seq_refusal_propagates	LCore.Witnesses	
+LCore.Witness.toy	LCore.Witnesses	
+LCore.Witness.toyPad	LCore.Witnesses	
+LCore.Witness.toyPad2	LCore.Witnesses	
+LCore.Witness.toy_bound_fails	LCore.Witnesses	propext
+LCore.Witness.toy_bound_holds	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.toy_rel_fails	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.toy_rel_holds	LCore.Witnesses	propext
+LCore.Witness.toy_trace_fails	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.toy_trace_holds	LCore.Witnesses	propext
+LCore.Xform.casesOn	LCore.Kernel.Pass	
+LCore.Xform.cost	LCore.Kernel.Pass	
+LCore.Xform.costMono	LCore.Kernel.Pass	
+LCore.Xform.ctorIdx	LCore.Kernel.Pass	
+LCore.Xform.fuel	LCore.Kernel.Pass	
+LCore.Xform.id	LCore.Kernel.Pass	
+LCore.Xform.lk	LCore.Kernel.Pass	
+LCore.Xform.mk.noConfusion	LCore.Kernel.Pass	
+LCore.Xform.noConfusion	LCore.Kernel.Pass	
+LCore.Xform.noConfusionType	LCore.Kernel.Pass	
+LCore.Xform.recOn	LCore.Kernel.Pass	
+LCore.Xform.then	LCore.Kernel.Pass	
+LCore.instDecidableEqBeh	LCore.Kernel.Obs	
+LCore.instDecidableEqBeh.decEq	LCore.Kernel.Obs	
+LCore.instDecidableEqEv	LCore.Kernel.Obs	
+LCore.instDecidableEqEv.decEq	LCore.Kernel.Obs	
+LCore.instDecidableEqLk	LCore.Kernel.Obs	
+LCore.instDecidableEqLk.decEq	LCore.Kernel.Obs	
+LCore.instDecidableEqOutcome	LCore.Kernel.Obs	
+LCore.instReprBeh	LCore.Kernel.Obs	propext
+LCore.instReprBeh.repr	LCore.Kernel.Obs	propext
+LCore.instReprEv	LCore.Kernel.Obs	propext
+LCore.instReprEv.repr	LCore.Kernel.Obs	propext
+LCore.instReprLk	LCore.Kernel.Obs	propext
+LCore.instReprLk.repr	LCore.Kernel.Obs	propext
+LCore.instReprOutcome	LCore.Kernel.Obs	
+LCore.instReprOutcome.repr	LCore.Kernel.Obs	
 TransportCalculus.Bridge.casesOn	TransportCalculus	
 TransportCalculus.Bridge.cert	TransportCalculus	
 TransportCalculus.Bridge.comp	TransportCalculus	

@@ -13,10 +13,11 @@ pass=0; fail=0
 
 copy() {  # a git checkout-like copy with the two packages and tools, so ROOT resolves to it
   mkdir -p "$1"
-  ( cd "$REPO" && git ls-files -co --exclude-standard -z conf-typing transport-calculus tools \
+  ( cd "$REPO" && git ls-files -co --exclude-standard -z conf-typing transport-calculus l-core tools \
       | tar --null -T - -cf - ) | tar -x -C "$1"
   cp -a "$REPO/conf-typing/.lake" "$1/conf-typing/.lake" 2>/dev/null
   cp -a "$REPO/transport-calculus/.lake" "$1/transport-calculus/.lake" 2>/dev/null
+  cp -a "$REPO/l-core/.lake" "$1/l-core/.lake" 2>/dev/null
   ( cd "$1" && git init -q && git add -A >/dev/null 2>&1 )
 }
 

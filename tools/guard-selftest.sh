@@ -341,6 +341,12 @@ run_case "the README raises the checker limit" drift \
 run_case "ring0.lock loses a definition the README counts" drift \
   bash -c 'sed -i "\$d" tools/ring0.lock'
 
+# (n) the kernel claims prefixes with no fuel law: refused; with a Lawful structure: accepted
+run_case "kernel claims prefixes without a fuel law" drift \
+  bash -c 'printf "/- a fuelled run that stops early is a prefix -/\n" >> l-core/LCore/Kernel/Cert.lean'
+run_case "kernel claims prefixes with a fuel law" pass \
+  bash -c 'printf "/- a fuelled run that stops early is a prefix -/\nstructure Lang.Lawful where\n" >> l-core/LCore/Kernel/Cert.lean'
+
 echo
 echo "guard self-test: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

@@ -24,7 +24,7 @@ copy() {
   ( cd "$REPO" && git ls-files -co --exclude-standard -z | tar --null -T - -cf - ) | tar -x -C "$1"
   cp -a "$REPO/.git" "$1/.git"
   local c
-  for c in .lake conf-typing/.lake transport-calculus/.lake; do
+  for c in .lake conf-typing/.lake transport-calculus/.lake l-core/.lake; do
     [ -d "$REPO/$c" ] && mkdir -p "$1/$(dirname "$c")" && cp -a "$REPO/$c" "$1/$c"
   done
   return 0
