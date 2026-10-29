@@ -13,7 +13,7 @@
   the first step, and its cost grows without bound. When F2 lands, this file's statement is
   inverted, and the two theorems become the before and after of the fix.
 -/
-import ConfTyping.BudgetT
+import ConfTyping.MedT
 
 namespace ConfTyping.Vacuity
 
@@ -142,5 +142,19 @@ theorem vacProg_budgetT :
 /-- The repo's loop handler keeps its budget of 40 on every run of the lawful language. -/
 theorem loopHandler_boundT (π : MedPolicy) : LCore.Cert.bound (ucmdLangT Psec π) 40 loopHandler :=
   bcheck_boundT loopHandler_checks π
+
+/-- The loop handler's reads are mediated on every run of the lawful language. -/
+theorem loopHandler_mediatedT (π : MedPolicy) :
+    LCore.Cert.trace (ucmdLangT Psec π) (mediated π) loopHandler :=
+  bcheck_mediatedT loopHandler_checks π
+
+/-- **Mediation is not trivial on `ucmdLangT`.** An unguarded read of `db` is refused by
+    `bcheck`, and under `refuseAll` its run reads `db`, which the policy forbids. -/
+theorem unguarded_read_not_mediated :
+    bcheck Psec [] [] (.access "db") = none
+  ∧ ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (mediated refuseAll) (.access "db") := by
+  refine ⟨by decide, fun h => ?_⟩
+  have := h 1 (fun _ => 0) "db" (by decide)
+  cases this
 
 end ConfTyping.Vacuity

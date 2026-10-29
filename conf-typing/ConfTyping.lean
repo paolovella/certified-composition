@@ -99,4 +99,5 @@ import ConfTyping.LAdapter
 import ConfTyping.P1
 import ConfTyping.UTrace
 import ConfTyping.BudgetT
+import ConfTyping.MedT
 import ConfTyping.Vacuity

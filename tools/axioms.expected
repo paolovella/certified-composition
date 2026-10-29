@@ -1242,6 +1242,7 @@ ConfTyping.TRun.recOn	ConfTyping.UTrace
 ConfTyping.TRun.seqT	ConfTyping.UTrace	
 ConfTyping.TRun.seqT_cost_le	ConfTyping.BudgetT	
 ConfTyping.TRun.seqT_done	ConfTyping.UTrace	propext
+ConfTyping.TRun.seqT_ev_mem	ConfTyping.MedT	propext
 ConfTyping.TRun.seqT_ext	ConfTyping.UTrace	propext
 ConfTyping.TRun.seqT_fuel	ConfTyping.UTrace	propext
 ConfTyping.TRun.seqT_grows	ConfTyping.UTrace	propext
@@ -1404,8 +1405,10 @@ ConfTyping.Untrusted	ConfTyping.Integrity
 ConfTyping.UseFreeLoop	ConfTyping.FreeLoop	
 ConfTyping.Vacuity.body_kills	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.loopHandler_boundT	ConfTyping.Vacuity	Quot.sound,propext
+ConfTyping.Vacuity.loopHandler_mediatedT	ConfTyping.Vacuity	Quot.sound,propext
 ConfTyping.Vacuity.loop_diverges	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.refuseAll	ConfTyping.Vacuity	
+ConfTyping.Vacuity.unguarded_read_not_mediated	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.vacProg	ConfTyping.Vacuity	
 ConfTyping.Vacuity.vacProg_budgetT	ConfTyping.Vacuity	Quot.sound,propext
 ConfTyping.Vacuity.vacProg_checks	ConfTyping.Vacuity	propext
@@ -1584,6 +1587,7 @@ ConfTyping.atomT	ConfTyping.Race
 ConfTyping.atomic	ConfTyping.UTrace	propext
 ConfTyping.atomic_accepted	ConfTyping.Race	propext
 ConfTyping.atomic_all_schedules_safe	ConfTyping.Race	Quot.sound,propext
+ConfTyping.atomic_read	ConfTyping.MedT	propext
 ConfTyping.attackState	ConfTyping.TaintCert	
 ConfTyping.attack_access_without_check	ConfTyping.Attack	propext
 ConfTyping.attack_branch_on_a_secret	ConfTyping.Attack	propext
@@ -1634,12 +1638,14 @@ ConfTyping.bcheckF	ConfTyping.CountedLoop	propext
 ConfTyping.bcheckF_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.bcheckF_budgetT	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.bcheckF_enough	ConfTyping.CountedLoop	Quot.sound,propext
+ConfTyping.bcheckF_medT	ConfTyping.MedT	Quot.sound,propext
 ConfTyping.bcheckF_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheckF_sound	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheckF_succ	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheck_accepts_nested_loops	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_boundT	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.bcheck_lcore	ConfTyping.LAdapter	Classical.choice,Quot.sound,propext
+ConfTyping.bcheck_mediatedT	ConfTyping.MedT	Quot.sound,propext
 ConfTyping.bcheck_refuses_nested_double_free	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_sound	ConfTyping.CountedLoop	Quot.sound,propext
@@ -1823,6 +1829,7 @@ ConfTyping.countU	ConfTyping.CountedLoop
 ConfTyping.countU_auth	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.countU_cost	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.countU_costT	ConfTyping.BudgetT	Quot.sound,propext
+ConfTyping.countU_medT	ConfTyping.MedT	Quot.sound,propext
 ConfTyping.countU_turn	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.countdown	ConfTyping.CostBound	
 ConfTyping.countdown_cost	ConfTyping.CostBound	Quot.sound,propext
@@ -2418,6 +2425,7 @@ ConfTyping.medBase	ConfTyping.Mediation
 ConfTyping.medCheck	ConfTyping.Mediation	propext
 ConfTyping.medCheck_sound	ConfTyping.Mediation	Quot.sound,propext
 ConfTyping.medGoal_of_no_access	ConfTyping.LoadBearing	propext
+ConfTyping.medInv_done	ConfTyping.MedT	Quot.sound,propext
 ConfTyping.medRun	ConfTyping.Mediation	
 ConfTyping.medRunBody	ConfTyping.Mediation	
 ConfTyping.medRunBody_inv	ConfTyping.Mediation	propext
@@ -2981,6 +2989,7 @@ ConfTyping.stepT_cost	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.stepT_cost_le_of	ConfTyping.BudgetT	propext
 ConfTyping.stepT_done_agree	ConfTyping.UTrace	propext
 ConfTyping.stepT_ne	ConfTyping.UTrace	propext
+ConfTyping.stepT_read	ConfTyping.MedT	propext
 ConfTyping.step_eval	ConfTyping.Imp	propext
 ConfTyping.storeRel_upd	ConfTyping.P1	Classical.choice,Quot.sound,propext
 ConfTyping.stored_injection_leaks	ConfTyping.DbInjection	
@@ -3132,6 +3141,7 @@ ConfTyping.uexecS_uexec	ConfTyping.SpecFused	propext
 ConfTyping.uexecT	ConfTyping.UTrace	propext
 ConfTyping.uexecT_atomic_cost	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.uexecT_dead_cost	ConfTyping.BudgetT	propext
+ConfTyping.uexecT_dead_ev	ConfTyping.MedT	propext
 ConfTyping.uexecT_diverge	ConfTyping.UTrace	Quot.sound,propext
 ConfTyping.uexecT_done_agree	ConfTyping.UTrace	Quot.sound,propext
 ConfTyping.uexecT_ext	ConfTyping.UTrace	Quot.sound,propext
