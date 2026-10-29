@@ -535,13 +535,9 @@ def p1Table (c : UCmd) : List String := dedup (cvars c)
 /-- **P1, names to slots, certified.** Identity leakage and cost transformers: the compiled
     program's observation is the source's, exactly. -/
 def p1Pass (P : Partition) (π : MedPolicy) : LCore.PassCert (ucmdLang P π) (slotLang P π) where
-  comp c := .ok (p1Table c, compile (p1Table c) c)
+  comp c := .ok ((p1Table c, compile (p1Table c) c), LCore.Xform.id)
   enc σ := σ
-  lkT _ l := l
-  costT _ k := k
-  fuelT _ m := m
-  costMono _ _ _ h := h
-  sim c p' h m σ := by
+  sim c p' t h m σ := by
     cases h
     have hnd := nodup_dedup (cvars c)
     have hv : ∀ x ∈ cvars c, x ∈ p1Table c := fun x hx => mem_dedup.mpr hx

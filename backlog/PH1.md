@@ -126,3 +126,20 @@ toy `Lang`. Then 6, 5, 7. Each step builds and runs CI before the next.
   pass proofs). PH1 stays in progress until the kernel (PR #14, Ring 0) and this branch merge
   with the user's key.
   - Full CI green (`ph1-p1-ci-full`, 954 s).
+- 2026-10-29, branch `ph1/spine`: **plan, `seq` compiles once.** The user's review: later
+  passes get slower. In 30f0720, `PassCert.seq` computes `lkT`, `costT` and `fuelT` by
+  running the earlier stages' compiler again, so evaluating one transformer of an n-pass
+  left-nested pipeline compiles about n²/2 times. PH5 evaluates the pipeline in the kernel.
+  Fix: `comp` returns the compiled program *with* its transformers (`Xform`: `lk`, `cost`,
+  `fuel`, `costMono`), and `seq` composes the two `Xform`s it already has (`Xform.then`), so
+  each stage compiles once. The transformers still never see the input: they are produced by
+  compiling the program. Witnesses move to the new shape; a three-pass pipeline's budget is
+  computed by `decide` (`seq3_budget`).
+  - Done. `PassCert.comp` returns `(T.Prog × Xform)`; `PassCert.seq` composes the `Xform`s it
+    already holds (`Xform.then`), so each stage compiles once. `seq` and the three transfer
+    theorems still use no axioms (`tools/axioms.expected`). Witnesses: `seq3_budget` (the
+    kernel computes a three-pass pipeline's budget, 3 → 5, by `rfl`), `seq3_carries_bound`
+    (the same budget through `bound_transfer`), and `seq_refusal_propagates` (a refusing
+    stage refuses the pipeline). A first proof of `seq` used `simp`'s injectivity lemmas and
+    picked up `propext`; the axiom manifest showed it, and the proof was rewritten with
+    `rw`/`cases`. Full CI green (`ph1-seq-ci-full`, 962 s).

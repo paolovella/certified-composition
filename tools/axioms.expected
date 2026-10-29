@@ -3310,12 +3310,8 @@ LCore.Outcome.recOn	LCore.Kernel.Obs
 LCore.PassCert.bound_transfer	LCore.Kernel.Pass	
 LCore.PassCert.casesOn	LCore.Kernel.Pass	
 LCore.PassCert.comp	LCore.Kernel.Pass	
-LCore.PassCert.costMono	LCore.Kernel.Pass	
-LCore.PassCert.costT	LCore.Kernel.Pass	
 LCore.PassCert.ctorIdx	LCore.Kernel.Pass	
 LCore.PassCert.enc	LCore.Kernel.Pass	
-LCore.PassCert.fuelT	LCore.Kernel.Pass	
-LCore.PassCert.lkT	LCore.Kernel.Pass	
 LCore.PassCert.mk.congr_simp	LCore.Witnesses	
 LCore.PassCert.mk.noConfusion	LCore.Kernel.Pass	
 LCore.PassCert.noConfusion	LCore.Kernel.Pass	
@@ -3327,17 +3323,36 @@ LCore.PassCert.sim	LCore.Kernel.Pass
 LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
 LCore.Witness.idPad	LCore.Witnesses	
 LCore.Witness.padPass	LCore.Witnesses	
+LCore.Witness.padPass2	LCore.Witnesses	
 LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padPass_keeps_the_leak	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.padX	LCore.Witnesses	
+LCore.Witness.refuseTrue	LCore.Witnesses	
+LCore.Witness.seq3_budget	LCore.Witnesses	
+LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.seq_refusal_propagates	LCore.Witnesses	
 LCore.Witness.toy	LCore.Witnesses	
 LCore.Witness.toyPad	LCore.Witnesses	
+LCore.Witness.toyPad2	LCore.Witnesses	
 LCore.Witness.toy_bound_fails	LCore.Witnesses	propext
 LCore.Witness.toy_bound_holds	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.toy_rel_fails	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.toy_rel_holds	LCore.Witnesses	propext
 LCore.Witness.toy_trace_fails	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.toy_trace_holds	LCore.Witnesses	propext
+LCore.Xform.casesOn	LCore.Kernel.Pass	
+LCore.Xform.cost	LCore.Kernel.Pass	
+LCore.Xform.costMono	LCore.Kernel.Pass	
+LCore.Xform.ctorIdx	LCore.Kernel.Pass	
+LCore.Xform.fuel	LCore.Kernel.Pass	
+LCore.Xform.id	LCore.Kernel.Pass	
+LCore.Xform.lk	LCore.Kernel.Pass	
+LCore.Xform.mk.noConfusion	LCore.Kernel.Pass	
+LCore.Xform.noConfusion	LCore.Kernel.Pass	
+LCore.Xform.noConfusionType	LCore.Kernel.Pass	
+LCore.Xform.recOn	LCore.Kernel.Pass	
+LCore.Xform.then	LCore.Kernel.Pass	
 LCore.instDecidableEqBeh	LCore.Kernel.Obs	
 LCore.instDecidableEqBeh.decEq	LCore.Kernel.Obs	
 LCore.instDecidableEqEv	LCore.Kernel.Obs	
