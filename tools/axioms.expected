@@ -1078,6 +1078,25 @@ ConfTyping.SepInv.initU	ConfTyping.MemLinear	propext
 ConfTyping.SepInv.mono	ConfTyping.MemLinear	
 ConfTyping.SepInv.toMemInv	ConfTyping.MemLinear	
 ConfTyping.SimA3	ConfTyping.TwoSafety	
+ConfTyping.SlotState.auth	ConfTyping.P1	
+ConfTyping.SlotState.casesOn	ConfTyping.P1	
+ConfTyping.SlotState.ctorIdx	ConfTyping.P1	
+ConfTyping.SlotState.dead	ConfTyping.P1	
+ConfTyping.SlotState.err	ConfTyping.P1	
+ConfTyping.SlotState.freed	ConfTyping.P1	
+ConfTyping.SlotState.fresh	ConfTyping.P1	
+ConfTyping.SlotState.heap	ConfTyping.P1	
+ConfTyping.SlotState.hlab	ConfTyping.P1	
+ConfTyping.SlotState.live	ConfTyping.P1	
+ConfTyping.SlotState.mk.noConfusion	ConfTyping.P1	
+ConfTyping.SlotState.noConfusion	ConfTyping.P1	
+ConfTyping.SlotState.noConfusionType	ConfTyping.P1	
+ConfTyping.SlotState.reads	ConfTyping.P1	
+ConfTyping.SlotState.recOn	ConfTyping.P1	
+ConfTyping.SlotState.sink	ConfTyping.P1	
+ConfTyping.SlotState.sstore	ConfTyping.P1	
+ConfTyping.SlotState.store	ConfTyping.P1	
+ConfTyping.SlotState.withStore	ConfTyping.P1	
 ConfTyping.SpecArtifact	ConfTyping.HeteroCompose	
 ConfTyping.SpecRun.casesOn	ConfTyping.HeteroCompose	
 ConfTyping.SpecRun.ctorIdx	ConfTyping.HeteroCompose	
@@ -1138,6 +1157,7 @@ ConfTyping.Step.brecOn	ConfTyping.Imp
 ConfTyping.Step.casesOn	ConfTyping.Imp	
 ConfTyping.Step.recOn	ConfTyping.Imp	
 ConfTyping.Store	ConfTyping.Imp	
+ConfTyping.StoreRel	ConfTyping.P1	
 ConfTyping.Stored	ConfTyping.DbInjection	
 ConfTyping.Str	ConfTyping.InjectionReal	
 ConfTyping.Stratum.casesOn	ConfTyping.Typing	
@@ -1159,6 +1179,54 @@ ConfTyping.StringInert.check	ConfTyping.TaintCert	propext
 ConfTyping.StringInert.hop	ConfTyping.TaintCert	propext
 ConfTyping.StringInert.memop	ConfTyping.TaintCert	propext
 ConfTyping.StringInert.skip	ConfTyping.TaintCert	propext
+ConfTyping.TCmd.access.elim	ConfTyping.P1	
+ConfTyping.TCmd.access.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.assign.elim	ConfTyping.P1	
+ConfTyping.TCmd.assign.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.below	ConfTyping.P1	
+ConfTyping.TCmd.brecOn	ConfTyping.P1	
+ConfTyping.TCmd.brecOn.eq	ConfTyping.P1	
+ConfTyping.TCmd.brecOn.go	ConfTyping.P1	
+ConfTyping.TCmd.casesOn	ConfTyping.P1	
+ConfTyping.TCmd.check.elim	ConfTyping.P1	
+ConfTyping.TCmd.check.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.ctorElim	ConfTyping.P1	
+ConfTyping.TCmd.ctorElimType	ConfTyping.P1	
+ConfTyping.TCmd.ctorIdx	ConfTyping.P1	
+ConfTyping.TCmd.hop.elim	ConfTyping.P1	
+ConfTyping.TCmd.hop.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.ite.elim	ConfTyping.P1	
+ConfTyping.TCmd.ite.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.loop.elim	ConfTyping.P1	
+ConfTyping.TCmd.loop.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.memop.elim	ConfTyping.P1	
+ConfTyping.TCmd.memop.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.noConfusionType	ConfTyping.P1	
+ConfTyping.TCmd.recOn	ConfTyping.P1	
+ConfTyping.TCmd.seq.elim	ConfTyping.P1	
+ConfTyping.TCmd.seq.noConfusion	ConfTyping.P1	
+ConfTyping.TCmd.skip.elim	ConfTyping.P1	
+ConfTyping.TCmd.sop.elim	ConfTyping.P1	
+ConfTyping.TCmd.sop.noConfusion	ConfTyping.P1	
+ConfTyping.TExpr.add.elim	ConfTyping.P1	
+ConfTyping.TExpr.add.noConfusion	ConfTyping.P1	
+ConfTyping.TExpr.below	ConfTyping.P1	
+ConfTyping.TExpr.brecOn	ConfTyping.P1	
+ConfTyping.TExpr.brecOn.eq	ConfTyping.P1	
+ConfTyping.TExpr.brecOn.go	ConfTyping.P1	
+ConfTyping.TExpr.casesOn	ConfTyping.P1	
+ConfTyping.TExpr.ctorElim	ConfTyping.P1	
+ConfTyping.TExpr.ctorElimType	ConfTyping.P1	
+ConfTyping.TExpr.ctorIdx	ConfTyping.P1	
+ConfTyping.TExpr.noConfusion	ConfTyping.P1	
+ConfTyping.TExpr.noConfusionType	ConfTyping.P1	
+ConfTyping.TExpr.num.elim	ConfTyping.P1	
+ConfTyping.TExpr.num.noConfusion	ConfTyping.P1	
+ConfTyping.TExpr.recOn	ConfTyping.P1	
+ConfTyping.TExpr.slot.elim	ConfTyping.P1	
+ConfTyping.TExpr.slot.noConfusion	ConfTyping.P1	
+ConfTyping.TRel	ConfTyping.P1	propext
 ConfTyping.TState.casesOn	ConfTyping.QueryEscape	
 ConfTyping.TState.ctorElim	ConfTyping.QueryEscape	
 ConfTyping.TState.ctorElimType	ConfTyping.QueryEscape	
@@ -1535,6 +1603,7 @@ ConfTyping.bcheckF_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheckF_sound	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheckF_succ	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.bcheck_accepts_nested_loops	ConfTyping.Witnesses	propext
+ConfTyping.bcheck_lcore	ConfTyping.LAdapter	Classical.choice,Quot.sound,propext
 ConfTyping.bcheck_refuses_nested_double_free	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_refuses_wild_deref	ConfTyping.Witnesses	propext
 ConfTyping.bcheck_sound	ConfTyping.CountedLoop	Quot.sound,propext
@@ -1668,8 +1737,11 @@ ConfTyping.coarsen_loop_of_fix	ConfTyping.AliasFix	Classical.choice,Quot.sound,p
 ConfTyping.coarsen_loop_safe	ConfTyping.AliasFix	Classical.choice,Quot.sound,propext
 ConfTyping.coarsen_loop_safe_gen	ConfTyping.AliasFix	Quot.sound,propext
 ConfTyping.collapse	ConfTyping.AliasFix	
+ConfTyping.collide_breaks_simulation	ConfTyping.P1	propext
 ConfTyping.comp_map_is_seq	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
 ConfTyping.comp_reconstructs_seq_release	ConfTyping.FlowBridge	Classical.choice,Quot.sound,propext
+ConfTyping.compile	ConfTyping.P1	
+ConfTyping.compileE	ConfTyping.P1	
 ConfTyping.completeness_rel_O	ConfTyping.Joint	
 ConfTyping.completeness_thm2	ConfTyping.Joint	
 ConfTyping.compose	ConfTyping.JasminCert	propext
@@ -1727,6 +1799,7 @@ ConfTyping.cross_tool_composition_is_the_independent_case	ConfTyping.CrossToolIn
 ConfTyping.crosscompartment_leaks	ConfTyping.LatticeFlow	propext
 ConfTyping.crosscompartment_untypable	ConfTyping.LatticeFlow	propext
 ConfTyping.ctrStore	ConfTyping.CostBound	
+ConfTyping.cvars	ConfTyping.P1	propext
 ConfTyping.cx_cond	ConfTyping.Ledger	propext
 ConfTyping.cx_not_unconditional	ConfTyping.Ledger	Classical.choice,Quot.sound,propext
 ConfTyping.cx_ξ0	ConfTyping.Ledger	propext
@@ -1746,6 +1819,7 @@ ConfTyping.deadS_is_certified	ConfTyping.SpecTrace	propext
 ConfTyping.dec1	ConfTyping.CostBound	
 ConfTyping.decOne	ConfTyping.CountedLoop	
 ConfTyping.decimal_source_injection_free	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.dedup	ConfTyping.P1	propext
 ConfTyping.dedup_repairs_the_composite	ConfTyping.IndexedBases	Quot.sound,propext
 ConfTyping.demo_pipeline	ConfTyping.Pipeline	Quot.sound,propext
 ConfTyping.demo_pipeline_bridge	ConfTyping.Pipeline	Classical.choice,Quot.sound,propext
@@ -1831,6 +1905,7 @@ ConfTyping.eval_seq	ConfTyping.Compose
 ConfTyping.eval_step	ConfTyping.Imp	propext
 ConfTyping.eval_σ0_l	ConfTyping.Pleak	propext
 ConfTyping.eval_σ1_l	ConfTyping.Pleak	propext
+ConfTyping.evars	ConfTyping.P1	
 ConfTyping.evens	ConfTyping.InjectionReal	
 ConfTyping.evens_segsN	ConfTyping.QueryGrammar	Quot.sound,propext
 ConfTyping.evidenceFor	ConfTyping.Typing	
@@ -2007,6 +2082,9 @@ ConfTyping.incrAt	ConfTyping.CNReceive
 ConfTyping.incrAt_modifies	ConfTyping.CNReceive	propext
 ConfTyping.indexed_beats_the_conjunction	ConfTyping.HeapJoint	propext
 ConfTyping.initMed	ConfTyping.Mediation	
+ConfTyping.initT	ConfTyping.P1	
+ConfTyping.initT_rel	ConfTyping.P1	propext
+ConfTyping.initT_withStore	ConfTyping.P1	
 ConfTyping.initU	ConfTyping.Unified	
 ConfTyping.initU_hides_string_inputs	ConfTyping.Attack	
 ConfTyping.injection_free_of_check	ConfTyping.QueryProgram	Quot.sound,propext
@@ -2262,6 +2340,7 @@ ConfTyping.loopFix_terminates	ConfTyping.AliasFix	Quot.sound,propext
 ConfTyping.loopHandler	ConfTyping.CountedLoop	
 ConfTyping.loopHandler_checks	ConfTyping.CountedLoop	propext
 ConfTyping.loopHandler_five	ConfTyping.CountedLoop	Classical.choice,Quot.sound,propext
+ConfTyping.loopHandler_lcore	ConfTyping.LAdapter	Classical.choice,Quot.sound,propext
 ConfTyping.loopHandler_strings	ConfTyping.CountedLoop	propext
 ConfTyping.loopHandler_trace_is_low	ConfTyping.CountedLoop	Classical.choice,Quot.sound,propext
 ConfTyping.loopQuery	ConfTyping.StringLoop	
@@ -2309,6 +2388,7 @@ ConfTyping.medStep_inv	ConfTyping.Mediation	propext
 ConfTyping.med_fixed_accepted	ConfTyping.Mediation	propext
 ConfTyping.med_victim_bypasses	ConfTyping.Mediation	propext
 ConfTyping.med_victim_rejected	ConfTyping.Mediation	propext
+ConfTyping.mediated	ConfTyping.LAdapter	
 ConfTyping.mediation_generated_policy_carried	ConfTyping.Mediation	Quot.sound,propext
 ConfTyping.memA	ConfTyping.Speculate	
 ConfTyping.memB	ConfTyping.Speculate	
@@ -2326,6 +2406,7 @@ ConfTyping.memStr_cons	ConfTyping.LeakCert	propext
 ConfTyping.memStr_dropStr_of_ne	ConfTyping.LeakCert	Classical.choice,Quot.sound,propext
 ConfTyping.memStr_mem	ConfTyping.Mediation	propext
 ConfTyping.memStr_of_subStr	ConfTyping.LeakCert	Quot.sound,propext
+ConfTyping.mem_dedup	ConfTyping.P1	propext
 ConfTyping.mem_filter_ne	ConfTyping.AliasLoop	Quot.sound,propext
 ConfTyping.mem_is_postproc	ConfTyping.Joint	Quot.sound,propext
 ConfTyping.mem_lrem	ConfTyping.DbInjection	propext
@@ -2396,6 +2477,7 @@ ConfTyping.no_entry_bears_of_unconditional	ConfTyping.LoadBearing
 ConfTyping.no_irreducible_admissible	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
 ConfTyping.no_pointer_arithmetic_here	ConfTyping.SpecUnified	
 ConfTyping.no_relabelling_operation_exists	ConfTyping.HeapSecret	propext
+ConfTyping.nodup_dedup	ConfTyping.P1	propext
 ConfTyping.notAllDistinct	ConfTyping.TwoSafety	
 ConfTyping.notAllDistinct_postclosed	ConfTyping.TwoSafety	
 ConfTyping.not_loadBearingAt_of_suffices	ConfTyping.LoadBearing	
@@ -2433,6 +2515,11 @@ ConfTyping.outO	ConfTyping.Compose
 ConfTyping.outReleases_to_releasesAtMost	ConfTyping.SecTyTD	Quot.sound,propext
 ConfTyping.overwrite_rejected	ConfTyping.LeakCert	
 ConfTyping.ownership_is_the_missing_hypothesis	ConfTyping.Ownership	propext
+ConfTyping.p1Collide	ConfTyping.P1	
+ConfTyping.p1Demo	ConfTyping.P1	
+ConfTyping.p1Demo_runs	ConfTyping.P1	propext
+ConfTyping.p1Pass	ConfTyping.P1	Classical.choice,Quot.sound,propext
+ConfTyping.p1Table	ConfTyping.P1	propext
 ConfTyping.paddedBase	ConfTyping.LoadBearing	propext
 ConfTyping.padded_base_not_load_bearing	ConfTyping.LoadBearing	Classical.choice,Quot.sound,propext
 ConfTyping.pairBase	ConfTyping.MinimalCompose	
@@ -2718,6 +2805,8 @@ ConfTyping.secretAddr	ConfTyping.Speculate
 ConfTyping.secretAddrProg	ConfTyping.AddrLeak	
 ConfTyping.secretAddrProg_refused	ConfTyping.AddrLeak	propext
 ConfTyping.secretAddrProg_trace_differs	ConfTyping.AddrLeak	propext
+ConfTyping.secretBranch	ConfTyping.LAdapter	
+ConfTyping.secretBranch_not_rel	ConfTyping.LAdapter	propext
 ConfTyping.secretCell	ConfTyping.SpecFactor	
 ConfTyping.secretCellProg	ConfTyping.AddrLeak	
 ConfTyping.secretCellProg_checks	ConfTyping.AddrLeak	propext
@@ -2802,6 +2891,11 @@ ConfTyping.slcheck	ConfTyping.MemLinear	propext
 ConfTyping.slcheck_extends_umcheck	ConfTyping.MemLinear	propext
 ConfTyping.slcheck_no_fault	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
 ConfTyping.slcheck_sound	ConfTyping.MemLinear	Classical.choice,Quot.sound,propext
+ConfTyping.slotLang	ConfTyping.P1	propext
+ConfTyping.slotOf	ConfTyping.P1	
+ConfTyping.slotOf_inj	ConfTyping.P1	Classical.choice,Quot.sound,propext
+ConfTyping.slotOf_lt	ConfTyping.P1	propext
+ConfTyping.slotOf_mem	ConfTyping.P1	propext
 ConfTyping.slvl_transient_ne_public	ConfTyping.JasminSCT	
 ConfTyping.slvl_transient_ne_secret	ConfTyping.JasminSCT	
 ConfTyping.sndV	ConfTyping.Joint	propext
@@ -2842,6 +2936,7 @@ ConfTyping.startsFenced	ConfTyping.Speculate	propext
 ConfTyping.startsWithL	ConfTyping.JasminCert	
 ConfTyping.stepRel	ConfTyping.PathTraversal	
 ConfTyping.step_eval	ConfTyping.Imp	propext
+ConfTyping.storeRel_upd	ConfTyping.P1	Classical.choice,Quot.sound,propext
 ConfTyping.stored_injection_leaks	ConfTyping.DbInjection	
 ConfTyping.storing_a_public_value_is_fine	ConfTyping.HeapValue	propext
 ConfTyping.storing_a_secret_is_refused	ConfTyping.HeapValue	propext
@@ -2853,10 +2948,13 @@ ConfTyping.subStr_mem	ConfTyping.CountedLoop	Quot.sound,propext
 ConfTyping.supd	ConfTyping.ParseSource	
 ConfTyping.supply_chain_discharged	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
 ConfTyping.supply_chain_ledger	ConfTyping.SupplyChain	Classical.choice,Quot.sound,propext
+ConfTyping.tBeh	ConfTyping.P1	propext
 ConfTyping.tPre	ConfTyping.InjectionReal	
 ConfTyping.tPre_qfree	ConfTyping.QueryEscape	
 ConfTyping.tSuf	ConfTyping.InjectionReal	
 ConfTyping.tSuf_qfree	ConfTyping.QueryEscape	
+ConfTyping.taddrs	ConfTyping.P1	propext
+ConfTyping.taddrs_compile	ConfTyping.P1	Classical.choice,Quot.sound,propext
 ConfTyping.taint_is_JNI	ConfTyping.Integrity	
 ConfTyping.taint_result_seq	ConfTyping.Compose	
 ConfTyping.tcheck	ConfTyping.TaintCert	propext
@@ -2868,6 +2966,11 @@ ConfTyping.tcheckW_sound	ConfTyping.StringLoop	Classical.choice,Quot.sound,prope
 ConfTyping.tcheck_no_injection	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_no_injection_from	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_sound	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.tevalE	ConfTyping.P1	
+ConfTyping.tevalE_compile	ConfTyping.P1	propext
+ConfTyping.texec	ConfTyping.P1	
+ConfTyping.texec_compile	ConfTyping.P1	Classical.choice,Quot.sound,propext
+ConfTyping.texec_frame	ConfTyping.P1	Quot.sound,propext
 ConfTyping.the_allocator_reuses	ConfTyping.Reuse	
 ConfTyping.the_bound_is_not_vacuous	ConfTyping.SpecBudget	propext
 ConfTyping.the_extra_command_touches_memory	ConfTyping.SpecUnified	propext
@@ -2924,13 +3027,17 @@ ConfTyping.trem	ConfTyping.ParseSource
 ConfTyping.trimL	ConfTyping.JasminCert	
 ConfTyping.trustEq	ConfTyping.Integrity	
 ConfTyping.tup	ConfTyping.Obs	
+ConfTyping.tupd	ConfTyping.P1	
 ConfTyping.twelve_attacks_refused	ConfTyping.Attack	propext
 ConfTyping.twoCells	ConfTyping.HeapLabel	
 ConfTyping.twoCells_checks	ConfTyping.HeapLabel	propext
 ConfTyping.twoCells_labels	ConfTyping.HeapLabel	
 ConfTyping.twoLive	ConfTyping.SpecUnified	
 ConfTyping.typed_but_wall_leaks	ConfTyping.SecTy	Classical.choice,Quot.sound,propext
+ConfTyping.uBeh	ConfTyping.LAdapter	propext
+ConfTyping.uBeh_withStore	ConfTyping.P1	propext
 ConfTyping.uCtr	ConfTyping.CostBound	
+ConfTyping.uEvents	ConfTyping.LAdapter	
 ConfTyping.uFixed	ConfTyping.Unified	
 ConfTyping.uFixed_permitted_reads	ConfTyping.Unified	
 ConfTyping.uFixed_refused_reads_nothing	ConfTyping.Unified	
@@ -2955,11 +3062,14 @@ ConfTyping.uVictim_not_mediated	ConfTyping.Unified	propext
 ConfTyping.uaddrs	ConfTyping.AddrLeak	propext
 ConfTyping.uaf_errors	ConfTyping.MemFree	propext
 ConfTyping.uaf_rejected	ConfTyping.MemFree	propext
+ConfTyping.uchCode	ConfTyping.LAdapter	
 ConfTyping.ucheck	ConfTyping.Bundle	propext
 ConfTyping.ucheckNI	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheckNI_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.ucheckNI_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheck_sound	ConfTyping.Bundle	Quot.sound,propext
+ConfTyping.ucmdLang	ConfTyping.LAdapter	propext
+ConfTyping.ucmd_p1_carries	ConfTyping.P1	Classical.choice,Quot.sound,propext
 ConfTyping.ucost_of_cost	ConfTyping.Unified	Quot.sound,propext
 ConfTyping.uembed	ConfTyping.Unified	
 ConfTyping.uembed_mediated	ConfTyping.Unified	Quot.sound,propext
@@ -3117,6 +3227,7 @@ ConfTyping.ξ0	ConfTyping.Ledger
 ConfTyping.ξ1	ConfTyping.Ledger	
 ConfTyping.σ0	ConfTyping.Pleak	
 ConfTyping.σ1	ConfTyping.Pleak	
+ConfTyping.σSecret0	ConfTyping.LAdapter	
 ConfTyping.σSecret5	ConfTyping.AddrLeak	
 ConfTyping.σSecret7	ConfTyping.AddrLeak	
 ConfTyping.σ_b1	ConfTyping.Pleak	

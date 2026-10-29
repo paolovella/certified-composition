@@ -1,0 +1,4 @@
+started: 2026-10-28T12:39:35+01:00
+head: 30f0720
+command: bash tools/ci.sh
+log: tools/receipts/ph1-ucmd-ci-full.log

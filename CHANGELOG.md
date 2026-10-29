@@ -6,6 +6,23 @@ landed.
 
 ## Repository verification
 
+- **Correction of record (2026-10-29, F0)** on the entry below. From 2026-10-28 it was headed
+  ~~Phase 1's exit: certificates survive the first compiler pass by the kernel alone~~. That
+  is met in the letter only. The certificates it carries hold vacuously on runs that never
+  finish, since the kernel has no fuel laws and `ucmdLang` reports an out-of-fuel run as an
+  empty record (F2). They also reach only target inputs that encode a source input (F3). And
+  P1 is a renaming that mirrors the source machine step for step (F4). PH1's exit is now the
+  foundation's S1–S3 (`research/2026-10/FOUNDATION-2026-10-29.md`).
+
+- **UCmd is L's first `Lang`, and P1 is a `PassCert` whose certificates arrive by transfer**
+  (2026-10-28, PH1; `LAdapter.lean`, `P1.lean`). UCmd is L's first `Lang`, and a `bcheck`-
+  accepted program carries the kernel's `bound`, `trace` and `rel` shapes (`bcheck_lcore`). P1
+  compiles names to slots, and its simulation makes it a `PassCert` with identity transformers.
+  `ucmd_p1_carries` shows budget, mediation and noninterference (addresses included) surviving
+  P1 through the three transfer theorems, with no certificate-specific pass proof. A
+  check-claims guard keeps it that way. The original P1 sketch had been lost from a scratchpad
+  (I-0003) and was rebuilt.
+
 - **L's trusted core begins: `Beh`, `Lang`, three certificate shapes, `PassCert`** (2026-10-28,
   PH1 steps 1–4; `l-core/LCore/Kernel/`, Ring 0). One observation for every language. Every
   certificate is a `trace`, `rel` or `bound` instance. A certified pass carries all three
