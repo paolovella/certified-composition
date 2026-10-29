@@ -1227,6 +1227,25 @@ ConfTyping.TExpr.recOn	ConfTyping.P1
 ConfTyping.TExpr.slot.elim	ConfTyping.P1	
 ConfTyping.TExpr.slot.noConfusion	ConfTyping.P1	
 ConfTyping.TRel	ConfTyping.P1	propext
+ConfTyping.TRun.Ext	ConfTyping.UTrace	
+ConfTyping.TRun.Ext.refl	ConfTyping.UTrace	propext
+ConfTyping.TRun.casesOn	ConfTyping.UTrace	
+ConfTyping.TRun.cost	ConfTyping.UTrace	
+ConfTyping.TRun.ctorIdx	ConfTyping.UTrace	
+ConfTyping.TRun.ev	ConfTyping.UTrace	
+ConfTyping.TRun.lk	ConfTyping.UTrace	
+ConfTyping.TRun.mk.noConfusion	ConfTyping.UTrace	
+ConfTyping.TRun.noConfusion	ConfTyping.UTrace	
+ConfTyping.TRun.noConfusionType	ConfTyping.UTrace	
+ConfTyping.TRun.out	ConfTyping.UTrace	
+ConfTyping.TRun.recOn	ConfTyping.UTrace	
+ConfTyping.TRun.seqT	ConfTyping.UTrace	
+ConfTyping.TRun.seqT_ext	ConfTyping.UTrace	propext
+ConfTyping.TRun.seqT_fuel	ConfTyping.UTrace	propext
+ConfTyping.TRun.seqT_grows	ConfTyping.UTrace	propext
+ConfTyping.TRun.st	ConfTyping.UTrace	
+ConfTyping.TRun.tick	ConfTyping.UTrace	
+ConfTyping.TRun.tick_ext	ConfTyping.UTrace	propext
 ConfTyping.TState.casesOn	ConfTyping.QueryEscape	
 ConfTyping.TState.ctorElim	ConfTyping.QueryEscape	
 ConfTyping.TState.ctorElimType	ConfTyping.QueryEscape	
@@ -1388,6 +1407,8 @@ ConfTyping.Vacuity.vacProg	ConfTyping.Vacuity
 ConfTyping.Vacuity.vacProg_checks	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.vacProg_diverges	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.vacProg_emits_first	ConfTyping.Vacuity	
+ConfTyping.Vacuity.vacProg_halts	ConfTyping.Vacuity	propext
+ConfTyping.Vacuity.vacProg_not_vacuous	ConfTyping.Vacuity	propext
 ConfTyping.Vacuity.vacProg_vacuous	ConfTyping.Vacuity	propext
 ConfTyping.Val.below	ConfTyping.Obs	
 ConfTyping.Val.bits.elim	ConfTyping.Obs	
@@ -2599,6 +2620,7 @@ ConfTyping.policy_entry_not_duplicated	ConfTyping.LedgerDedup	propext
 ConfTyping.poolPreserves_step	ConfTyping.Race	propext
 ConfTyping.post	ConfTyping.Obs	
 ConfTyping.postclosed_collapse	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
+ConfTyping.prefix_append_both	ConfTyping.UTrace	propext
 ConfTyping.prependHead	ConfTyping.QueryEscape	
 ConfTyping.prependHead_cons	ConfTyping.QueryEscape	propext
 ConfTyping.preservation_inert_for_source	ConfTyping.JasminLedger	
@@ -2942,7 +2964,10 @@ ConfTyping.splitOnChar	ConfTyping.JasminCert
 ConfTyping.stale_pointer_refused_after_reuse	ConfTyping.Reuse	propext
 ConfTyping.startsFenced	ConfTyping.Speculate	propext
 ConfTyping.startsWithL	ConfTyping.JasminCert	
+ConfTyping.stepEv	ConfTyping.UTrace	propext
 ConfTyping.stepRel	ConfTyping.PathTraversal	
+ConfTyping.stepT	ConfTyping.UTrace	propext
+ConfTyping.stepT_ne	ConfTyping.UTrace	propext
 ConfTyping.step_eval	ConfTyping.Imp	propext
 ConfTyping.storeRel_upd	ConfTyping.P1	Classical.choice,Quot.sound,propext
 ConfTyping.stored_injection_leaks	ConfTyping.DbInjection	
@@ -3034,6 +3059,7 @@ ConfTyping.traversal_escapes	ConfTyping.PathTraversal	propext
 ConfTyping.trem	ConfTyping.ParseSource	
 ConfTyping.trimL	ConfTyping.JasminCert	
 ConfTyping.trustEq	ConfTyping.Integrity	
+ConfTyping.tsize	ConfTyping.UTrace	propext
 ConfTyping.tup	ConfTyping.Obs	
 ConfTyping.tupd	ConfTyping.P1	
 ConfTyping.twelve_attacks_refused	ConfTyping.Attack	propext
@@ -3077,6 +3103,8 @@ ConfTyping.ucheckNI_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.ucheckNI_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheck_sound	ConfTyping.Bundle	Quot.sound,propext
 ConfTyping.ucmdLang	ConfTyping.LAdapter	propext
+ConfTyping.ucmdLangT	ConfTyping.UTrace	propext
+ConfTyping.ucmdLangT_lawful	ConfTyping.UTrace	Quot.sound,propext
 ConfTyping.ucmd_p1_carries	ConfTyping.P1	Classical.choice,Quot.sound,propext
 ConfTyping.ucost_of_cost	ConfTyping.Unified	Quot.sound,propext
 ConfTyping.uembed	ConfTyping.Unified	
@@ -3087,6 +3115,9 @@ ConfTyping.uexecS	ConfTyping.SpecUnified	propext
 ConfTyping.uexecS_ite_eq	ConfTyping.SpecUnified	propext
 ConfTyping.uexecS_loop_eq	ConfTyping.SpecUnified	propext
 ConfTyping.uexecS_uexec	ConfTyping.SpecFused	propext
+ConfTyping.uexecT	ConfTyping.UTrace	propext
+ConfTyping.uexecT_diverge	ConfTyping.UTrace	Quot.sound,propext
+ConfTyping.uexecT_ext	ConfTyping.UTrace	Quot.sound,propext
 ConfTyping.uexec_atomic	ConfTyping.SpecFused	propext
 ConfTyping.uexec_dead	ConfTyping.LeakCert	propext
 ConfTyping.uexec_dead_cost	ConfTyping.BundleLoop	Quot.sound,propext

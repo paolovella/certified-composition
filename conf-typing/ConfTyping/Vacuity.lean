@@ -13,7 +13,7 @@
   the first step, and its cost grows without bound. When F2 lands, this file's statement is
   inverted, and the two theorems become the before and after of the fix.
 -/
-import ConfTyping.LAdapter
+import ConfTyping.UTrace
 
 namespace ConfTyping.Vacuity
 
@@ -110,5 +110,23 @@ theorem vacProg_vacuous :
     rw [vacProg_diverges]; rfl
   · show (uBeh _ _).cost ≤ 0
     rw [vacProg_diverges]; exact Nat.le_refl 0
+
+/-! ## After F2: on the lawful `ucmdLangT` (halting abort, one trace) -/
+
+/-- On `ucmdLangT` the same run shows what happened: the emit, then the refused check, and
+    then it halts with `abort`. -/
+theorem vacProg_halts :
+    (ucmdLangT Psec refuseAll).run 10 vacProg (fun _ => 0)
+      = { ev := [.emit "out" [0], .check "db"], lk := [.branch true], cost := 4,
+          out := .abort } := by decide
+
+/-- **The finding, inverted.** Neither "emits nothing" nor "costs 0" holds of `vacProg` on
+    `ucmdLangT`. -/
+theorem vacProg_not_vacuous :
+    ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (fun evs => evs = []) vacProg
+  ∧ ¬ LCore.Cert.bound (ucmdLangT Psec refuseAll) 0 vacProg := by
+  refine ⟨fun h => ?_, fun h => ?_⟩
+  · have := h 10 (fun _ => 0); rw [vacProg_halts] at this; cases this
+  · have := h 10 (fun _ => 0); rw [vacProg_halts] at this; cases this
 
 end ConfTyping.Vacuity
