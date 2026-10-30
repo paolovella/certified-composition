@@ -13,7 +13,7 @@
   the first step, and its cost grows without bound. When F2 lands, this file's statement is
   inverted, and the two theorems become the before and after of the fix.
 -/
-import ConfTyping.NiT
+import ConfTyping.UStep
 
 namespace ConfTyping.Vacuity
 
@@ -179,6 +179,34 @@ theorem secretBranch_not_relT :
     bcheck Psec [] [] secretBranch = none
   ∧ ¬ LCore.Cert.rel (ucmdLangT Psec (fun _ => true)) secretBranch := by
   refine ⟨by decide, fun h => ?_⟩
+  have hlow : lowEq Psec σSecret5 σSecret0 := by
+    intro x hx
+    simp only [σSecret5, σSecret0]
+    have : (x == "secret") = false := hx
+    simp [this]
+  have := h 2 σSecret5 σSecret0 trivial trivial hlow
+  revert this
+  decide
+
+/-! ## On step fuel (F4) -/
+
+/-- On `ucmdLangS` too, `vacProg` shows its emit and then the refused check, and halts with
+    `abort`. -/
+theorem vacProg_haltsS :
+    ((ucmdLangS Psec refuseAll).run 10 vacProg (fun _ => 0)).ev = [.emit "out" [0], .check "db"]
+  ∧ ((ucmdLangS Psec refuseAll).run 10 vacProg (fun _ => 0)).out = .abort := by decide
+
+/-- The loop handler's four guarantees on step fuel. -/
+theorem loopHandler_lcoreS (π : MedPolicy) :
+    LCore.Cert.bound (ucmdLangS Psec π) 40 loopHandler
+  ∧ LCore.Cert.trace (ucmdLangS Psec π) (mediated π) loopHandler
+  ∧ LCore.Cert.trace (ucmdLangS Psec π) (fun evs => faultEv ∉ evs) loopHandler
+  ∧ LCore.Cert.rel (ucmdLangS Psec π) loopHandler :=
+  bcheck_lcoreS loopHandler_checks π
+
+/-- **Not trivial on step fuel**: a secret branch is refused by `bcheck` and told apart. -/
+theorem secretBranch_not_relS : ¬ LCore.Cert.rel (ucmdLangS Psec (fun _ => true)) secretBranch := by
+  intro h
   have hlow : lowEq Psec σSecret5 σSecret0 := by
     intro x hx
     simp only [σSecret5, σSecret0]

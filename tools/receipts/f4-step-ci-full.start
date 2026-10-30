@@ -1,0 +1,4 @@
+started: 2026-10-30T10:42:24+01:00
+head: 8d33875
+command: bash tools/ci.sh
+log: tools/receipts/f4-step-ci-full.log
