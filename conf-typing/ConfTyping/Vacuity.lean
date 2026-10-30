@@ -13,7 +13,7 @@
   the first step, and its cost grows without bound. When F2 lands, this file's statement is
   inverted, and the two theorems become the before and after of the fix.
 -/
-import ConfTyping.MemT
+import ConfTyping.NiT
 
 namespace ConfTyping.Vacuity
 
@@ -168,5 +168,24 @@ theorem wild_deref_faults :
     bcheck Psec [] [] (.memop .deref "q") = none
   ∧ ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (fun evs => faultEv ∉ evs) (.memop .deref "q") := by
   refine ⟨by decide, fun h => h 1 (fun _ => 0) (by decide)⟩
+
+/-- The loop handler is noninterferent on every run of the lawful language. -/
+theorem loopHandler_relT (π : MedPolicy) : LCore.Cert.rel (ucmdLangT Psec π) loopHandler :=
+  bcheck_relT loopHandler_checks π
+
+/-- **Noninterference is not trivial on `ucmdLangT`.** A branch on the secret is refused by
+    `bcheck`, and two runs differing only in the secret are told apart by the branch bit. -/
+theorem secretBranch_not_relT :
+    bcheck Psec [] [] secretBranch = none
+  ∧ ¬ LCore.Cert.rel (ucmdLangT Psec (fun _ => true)) secretBranch := by
+  refine ⟨by decide, fun h => ?_⟩
+  have hlow : lowEq Psec σSecret5 σSecret0 := by
+    intro x hx
+    simp only [σSecret5, σSecret0]
+    have : (x == "secret") = false := hx
+    simp [this]
+  have := h 2 σSecret5 σSecret0 hlow
+  revert this
+  decide
 
 end ConfTyping.Vacuity

@@ -365,6 +365,10 @@ run_case "kernel claims prefixes without a fuel law" drift \
 run_case "kernel claims prefixes with a fuel law" pass \
   bash -c 'printf "/- a fuelled run that stops early is a prefix -/\nstructure Lang.Lawful where\n" >> l-core/LCore/Kernel/Cert.lean'
 
+# (o) F2's pair: dropping the 'after' half fires
+run_case "F2 loses vacProg_not_vacuous" drift \
+  bash -c 'grep -q "^ConfTyping.Vacuity.vacProg_not_vacuous	" tools/axioms.expected && sed -i "/^ConfTyping.Vacuity.vacProg_not_vacuous	/d" tools/axioms.expected'
+
 wait
 for r in "$res"/*; do cat "$r"; done
 pass=$(cat "$res"/* | grep -c '^  ok ')

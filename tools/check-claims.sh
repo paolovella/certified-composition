@@ -1638,5 +1638,16 @@ if [ -d l-core/LCore/Kernel ]; then
   fi
 fi
 
+# (o) F2's before-and-after pair stays, with the adequacy it buys (F2 step 4). On `ucmdLang` a
+# certified program that never finishes carries vacuous certificates (`vacProg_vacuous`); on the
+# lawful `ucmdLangT` they fail (`vacProg_not_vacuous`), and `bcheck`'s four guarantees hold on
+# every run (`bcheck_lcoreT`). Losing one would hide whether the hole is still open. Checked
+# against the axiom manifest, so the names are built declarations, not words in a file.
+if [ -f conf-typing/ConfTyping/Vacuity.lean ]; then
+  for d in ConfTyping.Vacuity.vacProg_vacuous ConfTyping.Vacuity.vacProg_not_vacuous ConfTyping.bcheck_lcoreT LCore.Lang.Lawful.bound_finishes ConfTyping.ucmdLangT_lawful; do
+    grep -q "^$d	" tools/axioms.expected || { echo "DRIFT: F2 declaration $d is not in tools/axioms.expected"; fail=1; }
+  done
+fi
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

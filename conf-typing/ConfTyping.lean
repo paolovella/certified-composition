@@ -101,4 +101,5 @@ import ConfTyping.UTrace
 import ConfTyping.BudgetT
 import ConfTyping.MedT
 import ConfTyping.MemT
+import ConfTyping.NiT
 import ConfTyping.Vacuity
