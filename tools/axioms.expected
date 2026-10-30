@@ -3422,18 +3422,18 @@ LCore.PassCert.mk.congr_simp	LCore.Witnesses
 LCore.PassCert.mk.noConfusion	LCore.Kernel.Pass	
 LCore.PassCert.noConfusion	LCore.Kernel.Pass	
 LCore.PassCert.noConfusionType	LCore.Kernel.Pass	
-LCore.PassCert.ofSim	LCore.Kernel.Pass	propext
+LCore.PassCert.ofSim	LCore.Kernel.Pass	
 LCore.PassCert.progress	LCore.Kernel.Pass	
 LCore.PassCert.recOn	LCore.Kernel.Pass	
 LCore.PassCert.rel_transfer	LCore.Kernel.Pass	
-LCore.PassCert.seq	LCore.Kernel.Pass	propext
+LCore.PassCert.seq	LCore.Kernel.Pass	
 LCore.PassCert.seq_comp_ok	LCore.Kernel.Pass	
 LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
 LCore.PrefixClosed	LCore.Kernel.Pass	
 LCore.Witness.chained_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.emptyL	LCore.Witnesses	
 LCore.Witness.emptyL_unlawful	LCore.Witnesses	Quot.sound,propext
-LCore.Witness.idPad	LCore.Witnesses	propext
+LCore.Witness.idPad	LCore.Witnesses	
 LCore.Witness.idleL	LCore.Witnesses	
 LCore.Witness.idle_safe	LCore.Witnesses	
 LCore.Witness.leakyEnc	LCore.Witnesses	
@@ -3445,14 +3445,14 @@ LCore.Witness.middleL	LCore.Witnesses
 LCore.Witness.middleL_unlawful	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_idle_pass	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_leaky_pass	LCore.Witnesses	propext
-LCore.Witness.padPass	LCore.Witnesses	propext
-LCore.Witness.padPass2	LCore.Witnesses	propext
+LCore.Witness.padPass	LCore.Witnesses	
+LCore.Witness.padPass2	LCore.Witnesses	
 LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padPass_keeps_the_leak	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padX	LCore.Witnesses	
 LCore.Witness.refuseComp	LCore.Witnesses	
 LCore.Witness.refuseTrue	LCore.Witnesses	propext
-LCore.Witness.seq3_budget	LCore.Witnesses	propext
+LCore.Witness.seq3_budget	LCore.Witnesses	
 LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_refusal_propagates	LCore.Witnesses	propext
@@ -3479,6 +3479,8 @@ LCore.Xform.noConfusion	LCore.Kernel.Pass
 LCore.Xform.noConfusionType	LCore.Kernel.Pass	
 LCore.Xform.recOn	LCore.Kernel.Pass	
 LCore.Xform.then	LCore.Kernel.Pass	
+LCore.append_assoc'	LCore.Kernel.Pass	
+LCore.append_nil'	LCore.Kernel.Pass	
 LCore.instDecidableEqBeh	LCore.Kernel.Obs	
 LCore.instDecidableEqBeh.decEq	LCore.Kernel.Obs	
 LCore.instDecidableEqEv	LCore.Kernel.Obs	
@@ -3494,6 +3496,8 @@ LCore.instReprLk	LCore.Kernel.Obs	propext
 LCore.instReprLk.repr	LCore.Kernel.Obs	propext
 LCore.instReprOutcome	LCore.Kernel.Obs	
 LCore.instReprOutcome.repr	LCore.Kernel.Obs	
+LCore.prefix_refl'	LCore.Kernel.Pass	
+LCore.prefix_trans'	LCore.Kernel.Pass	
 TransportCalculus.Bridge.casesOn	TransportCalculus	
 TransportCalculus.Bridge.cert	TransportCalculus	
 TransportCalculus.Bridge.comp	TransportCalculus	

@@ -87,6 +87,22 @@ structure PassCert (S T : Lang) where
       ∃ m, (T.run m p' (enc i)).out = (S.run n p i).out ∧
            (T.run m p' (enc i)).ev = (S.run n p i).ev
 
+/-- Prefix facts proved by induction, because the core library's (`List.prefix_refl`,
+    `List.IsPrefix.trans`, `List.append_nil`) use `propext`, and the kernel's composition uses
+    no axioms. -/
+theorem append_nil' {α} : ∀ l : List α, l ++ [] = l
+  | [] => rfl
+  | x :: xs => congrArg (x :: ·) (append_nil' xs)
+
+theorem append_assoc' {α} : ∀ a b c : List α, a ++ (b ++ c) = a ++ b ++ c
+  | [], _, _ => rfl
+  | x :: xs, b, c => congrArg (x :: ·) (append_assoc' xs b c)
+
+theorem prefix_refl' {α} (l : List α) : l <+: l := ⟨[], append_nil' l⟩
+
+theorem prefix_trans' {α} {a b c : List α} (h₁ : a <+: b) (h₂ : b <+: c) : a <+: c := by
+  obtain ⟨t₁, rfl⟩ := h₁; obtain ⟨t₂, rfl⟩ := h₂; exact ⟨t₁ ++ t₂, append_assoc' _ _ _⟩
+
 /-- A property of event traces that holds of every prefix of a trace it holds of. On a lawful
     language every fuel reports a prefix, so these are the properties a `trace` certificate can
     meaningfully state. -/
@@ -162,7 +178,7 @@ def PassCert.seq {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) : PassCe
     exact ⟨i, i', hi, hi', hii, rfl, rfl⟩
   ev_sim p _ _ h m i hi := by
     obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
-    exact (qc.ev_sim p' _ u hq m (pc.enc i) (pc.enc_adm i hi)).trans
+    exact prefix_trans' (qc.ev_sim p' _ u hq m (pc.enc i) (pc.enc_adm i hi))
       (pc.ev_sim p p' t hp (u.fuel m) i hi)
   cost_sim p _ _ h m i hi := by
     obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
@@ -201,7 +217,7 @@ def PassCert.ofSim {S T : Lang} (comp : S.Prog → Except String (T.Prog × Xfor
   enc_adm := enc_adm
   cover := cover
   low_cover := low_cover
-  ev_sim p p' t h m i _ := by rw [sim p p' t h m i]; exact List.prefix_refl _
+  ev_sim p p' t h m i _ := by rw [sim p p' t h m i]; exact prefix_refl' _
   cost_sim p p' t h m i _ := by rw [sim p p' t h m i]; exact Nat.le_refl _
   det p p' t h m i i' _ _ he := by rw [sim p p' t h m i, sim p p' t h m i', he]
   progress p p' t h n i _ _ := by

@@ -6,6 +6,26 @@ landed.
 
 ## Repository verification
 
+- **The kernel's passes: four obligations, and certificates that land on the target**
+  (2026-10-30, F3 and F4; `l-core/LCore/Kernel/Pass.lean`, Ring 0). A `PassCert` now proves
+  four facts about the pass: target events are a prefix of the source's, target cost is
+  bounded by a monotone transformer, the target observation is fixed by the source
+  observation, and what the source finishes the target finishes. With coverage of each
+  language's admissible inputs, the transfers conclude certificates of the compiled program in
+  its own language, on every admissible input. `LCore.PassCert.trace_transfer`,
+  `LCore.PassCert.rel_transfer` and `LCore.PassCert.bound_transfer` are axiom-free, and so is
+  `LCore.PassCert.seq` (axiom-free). Refused witnesses: an encoder that misses an input on
+  which the target leaks (`no_leaky_pass`), and a pass into a language where nothing runs
+  (`no_idle_pass`).
+
+- **UCmd on L, with halting abort: certificates over every run** (2026-10-29/30, F2;
+  `conf-typing/ConfTyping/{UTrace,BudgetT,MedT,MemT,NiT,Vacuity}.lean`). The kernel's
+  `Lang.Lawful` makes a run with more fuel only extend; `LCore.Lang.Lawful.bound_finishes` is
+  axiom-free. `ucmdLangT` is lawful, and `bcheck`'s budget, mediation, memory safety and
+  noninterference hold on every run of it, finished, aborted or out of fuel
+  (`bcheck_lcoreT`). Before: a `bcheck`-certified program that never finishes carried
+  vacuous certificates (`vacProg_vacuous`); after: they fail (`vacProg_not_vacuous`).
+
 - **Correction of record (2026-10-29, F0)** on the entry below. From 2026-10-28 it was headed
   ~~Phase 1's exit: certificates survive the first compiler pass by the kernel alone~~. That
   is met in the letter only. The certificates it carries hold vacuously on runs that never
