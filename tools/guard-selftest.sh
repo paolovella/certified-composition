@@ -369,6 +369,10 @@ run_case "kernel claims prefixes with a fuel law" pass \
 run_case "F2 loses vacProg_not_vacuous" drift \
   bash -c 'grep -q "^ConfTyping.Vacuity.vacProg_not_vacuous	" tools/axioms.expected && sed -i "/^ConfTyping.Vacuity.vacProg_not_vacuous	/d" tools/axioms.expected'
 
+# (m) a prefix-closure lemma written inside P1.lean is a pass-side certificate fact: fires
+run_case "P1 proves prefix closure itself" drift \
+  bash -c 'printf "\ntheorem p1_prefix (π : MedPolicy) : LCore.PrefixClosed (mediated π) := mediated_prefixClosed π\n" >> conf-typing/ConfTyping/P1.lean'
+
 wait
 for r in "$res"/*; do cat "$r"; done
 pass=$(cat "$res"/* | grep -c '^  ok ')

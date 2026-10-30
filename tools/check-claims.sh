@@ -1613,7 +1613,11 @@ for d in decls:
         found = True
         body = d.split(":= by", 1)[-1]
         used = set(re.findall(r"[A-Za-z_][\w.]*", body))
+        # F4: `trace_transfer` takes the certificate's prefix closure. That is a fact about
+        # mediation alone, proved once in LAdapter.lean and shared by every pass, so it is not a
+        # pass lemma; a prefix-closure lemma written in P1.lean still fires (it names `mediated`).
         allowed = {"bound_transfer", "trace_transfer", "rel_transfer", "bcheck_lcore",
+                   "mediated_prefixClosed",
                    "obtain", "exact", "rfl", "p1Pass", "P", "π", "h", "hb", "ht", "hr"}
         extra = sorted(u for u in used if u.split(".")[-1] not in allowed and not u.startswith("("))
         if extra: errs.append("ucmd_p1_carries uses " + ", ".join(extra))

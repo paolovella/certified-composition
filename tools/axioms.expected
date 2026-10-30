@@ -2454,6 +2454,7 @@ ConfTyping.med_fixed_accepted	ConfTyping.Mediation	propext
 ConfTyping.med_victim_bypasses	ConfTyping.Mediation	propext
 ConfTyping.med_victim_rejected	ConfTyping.Mediation	propext
 ConfTyping.mediated	ConfTyping.LAdapter	
+ConfTyping.mediated_prefixClosed	ConfTyping.LAdapter	
 ConfTyping.mediation_generated_policy_carried	ConfTyping.Mediation	Quot.sound,propext
 ConfTyping.memA	ConfTyping.Speculate	
 ConfTyping.memB	ConfTyping.Speculate	
@@ -3409,24 +3410,32 @@ LCore.Outcome.recOn	LCore.Kernel.Obs
 LCore.PassCert.bound_transfer	LCore.Kernel.Pass	
 LCore.PassCert.casesOn	LCore.Kernel.Pass	
 LCore.PassCert.comp	LCore.Kernel.Pass	
+LCore.PassCert.cost_sim	LCore.Kernel.Pass	
 LCore.PassCert.cover	LCore.Kernel.Pass	
 LCore.PassCert.ctorIdx	LCore.Kernel.Pass	
+LCore.PassCert.det	LCore.Kernel.Pass	
 LCore.PassCert.enc	LCore.Kernel.Pass	
 LCore.PassCert.enc_adm	LCore.Kernel.Pass	
+LCore.PassCert.ev_sim	LCore.Kernel.Pass	
 LCore.PassCert.low_cover	LCore.Kernel.Pass	
 LCore.PassCert.mk.congr_simp	LCore.Witnesses	
 LCore.PassCert.mk.noConfusion	LCore.Kernel.Pass	
 LCore.PassCert.noConfusion	LCore.Kernel.Pass	
 LCore.PassCert.noConfusionType	LCore.Kernel.Pass	
+LCore.PassCert.ofSim	LCore.Kernel.Pass	propext
+LCore.PassCert.progress	LCore.Kernel.Pass	
 LCore.PassCert.recOn	LCore.Kernel.Pass	
 LCore.PassCert.rel_transfer	LCore.Kernel.Pass	
-LCore.PassCert.seq	LCore.Kernel.Pass	
-LCore.PassCert.sim	LCore.Kernel.Pass	
+LCore.PassCert.seq	LCore.Kernel.Pass	propext
+LCore.PassCert.seq_comp_ok	LCore.Kernel.Pass	
 LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
+LCore.PrefixClosed	LCore.Kernel.Pass	
 LCore.Witness.chained_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.emptyL	LCore.Witnesses	
 LCore.Witness.emptyL_unlawful	LCore.Witnesses	Quot.sound,propext
-LCore.Witness.idPad	LCore.Witnesses	
+LCore.Witness.idPad	LCore.Witnesses	propext
+LCore.Witness.idleL	LCore.Witnesses	
+LCore.Witness.idle_safe	LCore.Witnesses	
 LCore.Witness.leakyEnc	LCore.Witnesses	
 LCore.Witness.leakyT	LCore.Witnesses	
 LCore.Witness.leaky_misses	LCore.Witnesses	propext
@@ -3434,17 +3443,19 @@ LCore.Witness.leaky_not_rel	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.leaky_rel_on_encodings	LCore.Witnesses	propext
 LCore.Witness.middleL	LCore.Witnesses	
 LCore.Witness.middleL_unlawful	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.no_idle_pass	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_leaky_pass	LCore.Witnesses	propext
-LCore.Witness.padPass	LCore.Witnesses	
-LCore.Witness.padPass2	LCore.Witnesses	
+LCore.Witness.padPass	LCore.Witnesses	propext
+LCore.Witness.padPass2	LCore.Witnesses	propext
 LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padPass_keeps_the_leak	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padX	LCore.Witnesses	
-LCore.Witness.refuseTrue	LCore.Witnesses	
-LCore.Witness.seq3_budget	LCore.Witnesses	
+LCore.Witness.refuseComp	LCore.Witnesses	
+LCore.Witness.refuseTrue	LCore.Witnesses	propext
+LCore.Witness.seq3_budget	LCore.Witnesses	propext
 LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
-LCore.Witness.seq_refusal_propagates	LCore.Witnesses	
+LCore.Witness.seq_refusal_propagates	LCore.Witnesses	propext
 LCore.Witness.toy	LCore.Witnesses	
 LCore.Witness.toyL	LCore.Witnesses	
 LCore.Witness.toyL_lawful	LCore.Witnesses	propext

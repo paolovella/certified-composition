@@ -49,6 +49,11 @@ def ucmdLang (P : Partition) (π : MedPolicy) : LCore.Lang where
 def mediated (π : MedPolicy) (evs : List LCore.Ev) : Prop :=
   ∀ r, LCore.Ev.read r ∈ evs → π r = true
 
+/-- Mediation holds of every prefix of a mediated trace. A fact about the certificate alone,
+    proved once and used by every pass's `trace_transfer` (F4). -/
+theorem mediated_prefixClosed (π : MedPolicy) : LCore.PrefixClosed (mediated π) :=
+  fun _ _ hab hb r hr => hb r (hab.subset hr)
+
 /-- **Adequacy.** A program `bcheck` accepts carries the kernel's three certificate shapes on
     `ucmdLang`: its budget is a `bound`, its mediation is a `trace`, and its noninterference,
     with addresses in the leakage, is a `rel`. These are the existing theorems (`bcheck_sound`,

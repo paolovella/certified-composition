@@ -74,13 +74,11 @@ def padX : Xform where
   fuel m := m
   costMono _ _ h := Nat.add_le_add_right h 1
 
-def padPass : PassCert toy toyPad where
-  comp p := .ok (p, padX)
-  enc i := i
-  enc_adm _ _ := trivial
-  cover u _ := ⟨u, trivial, rfl⟩
-  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
-  sim p p' t h m i := by cases h; rfl
+def padPass : PassCert toy toyPad :=
+  PassCert.ofSim (fun p => .ok (p, padX)) (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun _ _ _ h _ _ => by cases h; rfl)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
 
 /-- **The transfers, exercised.** `false`'s three certificates arrive on the padded program
     as certificates of `toyPad` itself, on every admissible input (F3), with no proof about
@@ -91,22 +89,21 @@ theorem padPass_carries :
   ∧ Cert.trace toyPad (fun evs => ∀ e ∈ evs, e = .read "r") true :=
   ⟨padPass.rel_transfer (p' := false) (t := padX) rfl toy_rel_holds,
    padPass.bound_transfer (p' := false) (t := padX) rfl toy_bound_holds,
-   padPass.trace_transfer (p' := true) (t := padX) rfl toy_trace_holds⟩
+   padPass.trace_transfer (p' := true) (t := padX) rfl
+     (fun _ _ hab hb e he => hb e (hab.subset he)) toy_trace_holds⟩
 
 /-- And the transfer is not vacuous: `true`, which is not `rel`, stays distinguishable after
     the pass. -/
 theorem padPass_keeps_the_leak :
     toyPad.run 0 true (padPass.enc (0, 0)) ≠ toyPad.run 0 true (padPass.enc (0, 1)) := by
-  simp [toyPad, toy, padPass]
+  simp [toyPad, toy, padPass, PassCert.ofSim]
 
 /-- The identity pass on the padded language: composing with it must change nothing. -/
-def idPad : PassCert toyPad toyPad where
-  comp p := .ok (p, Xform.id)
-  enc i := i
-  enc_adm _ _ := trivial
-  cover u _ := ⟨u, trivial, rfl⟩
-  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
-  sim p p' t h m i := by cases h; rfl
+def idPad : PassCert toyPad toyPad :=
+  PassCert.ofSim (fun p => .ok (p, Xform.id)) (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun _ _ _ h _ _ => by cases h; rfl)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
 
 /-- **Composition, exercised.** The two-pass pipeline is itself a `PassCert`, and the budget
     arrives through both cost transformers. -/
@@ -131,13 +128,11 @@ def toyPad2 : Lang where
       cost := (toyPad.run n p i).cost + 1
       out  := (toyPad.run n p i).out }
 
-def padPass2 : PassCert toyPad toyPad2 where
-  comp p := .ok (p, padX)
-  enc i := i
-  enc_adm _ _ := trivial
-  cover u _ := ⟨u, trivial, rfl⟩
-  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
-  sim p p' t h m i := by cases h; rfl
+def padPass2 : PassCert toyPad toyPad2 :=
+  PassCert.ofSim (fun p => .ok (p, padX)) (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun _ _ _ h _ _ => by cases h; rfl)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
 
 /-- **A three-pass pipeline's budget, computed by the kernel.** Compiling `false` through
     pad, identity, pad yields the transformers in one pass over the stages, and its cost
@@ -151,21 +146,40 @@ theorem seq3_carries_bound : Cert.bound toyPad2 5 false :=
     (t := (padX.then Xform.id).then padX) rfl toy_bound_holds
 
 /-- A pass that refuses: `seq` propagates the refusal, so nothing is certified. -/
-def refuseTrue : PassCert toyPad toyPad where
-  comp
-    | true  => .error "refused"
-    | false => .ok (false, Xform.id)
-  enc i := i
-  enc_adm _ _ := trivial
-  cover u _ := ⟨u, trivial, rfl⟩
-  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
-  sim p p' t h m i := by
-    cases p
-    · cases h; rfl
-    · cases h
+def refuseComp : Bool → Except String (Bool × Xform)
+  | true  => .error "refused"
+  | false => .ok (false, Xform.id)
+
+def refuseTrue : PassCert toyPad toyPad :=
+  PassCert.ofSim refuseComp (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun p _ _ h _ _ => by cases p <;> simp [refuseComp] at h; obtain ⟨rfl, rfl⟩ := h; rfl)
+    (fun p _ _ h n => by cases p <;> simp [refuseComp] at h; obtain ⟨rfl, rfl⟩ := h; exact ⟨n, rfl⟩)
 
 theorem seq_refusal_propagates :
     ((padPass.seq refuseTrue).comp true).toOption = none := rfl
+
+/-! ## Progress (F4): a pass must finish what its source finishes -/
+
+/-- A target language in which nothing ever runs: every run is the empty, out-of-fuel record.
+    Every prefix-closed safety certificate holds of its programs vacuously. -/
+def idleL : Lang where
+  Prog  := Unit
+  In    := Nat × Nat
+  lowIn i i' := i.1 = i'.1
+  run _ _ _ := { ev := [], lk := [], cost := 0, out := .fuel }
+
+/-- Its programs satisfy any safety property the empty trace satisfies, and every budget. -/
+theorem idle_safe (Φ : List Ev → Prop) (h : Φ []) : Cert.trace idleL Φ () ∧ Cert.bound idleL 0 () :=
+  ⟨fun _ _ _ => h, fun _ _ _ => Nat.le_refl 0⟩
+
+/-- **But no pass into it is certified**: `toy`'s programs finish, the idle target never does,
+    so `progress` fails for any program the pass compiles. A compiler emitting a loop that does
+    nothing cannot inherit certificates. -/
+theorem no_idle_pass (pc : PassCert toy idleL) {p' : Unit} {t : Xform}
+    (h : pc.comp false = .ok (p', t)) : False := by
+  obtain ⟨m, ho, _⟩ := pc.progress false p' t h 0 (0, 0) trivial (by simp [toy])
+  simp [idleL, toy] at ho
 
 /-! ## Coverage (F3): a pass must reach every admissible target input -/
 

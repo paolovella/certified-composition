@@ -534,38 +534,37 @@ def p1Table (c : UCmd) : List String := dedup (cvars c)
 
 /-- **P1, names to slots, certified.** Identity leakage and cost transformers: the compiled
     program's observation is the source's, exactly. -/
-def p1Pass (P : Partition) (π : MedPolicy) : LCore.PassCert (ucmdLang P π) (slotLang P π) where
-  comp c := .ok ((p1Table c, compile (p1Table c) c), LCore.Xform.id)
-  enc σ := σ
-  enc_adm _ _ := trivial
-  cover u _ := ⟨u, trivial, rfl⟩
-  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
-  sim c p' t h m σ := by
-    cases h
-    have hnd := nodup_dedup (cvars c)
-    have hv : ∀ x ∈ cvars c, x ∈ p1Table c := fun x hx => mem_dedup.mpr hx
-    have hsim : TRel (p1Table c) (texec m (compile (p1Table c) c) π (initT (p1Table c) σ))
-        (uexec m c π (initU σ)) := texec_compile hnd π m c (initT (p1Table c) σ) σ hv initT_rel
-    have haddr : taddrs m (compile (p1Table c) c) π (initT (p1Table c) σ) = uaddrs m c π (initU σ) :=
-      taddrs_compile hnd π m c (initT (p1Table c) σ) σ hv initT_rel
-    show tBeh (texec m (compile (p1Table c) c) π (initT (p1Table c) σ))
-        (taddrs m (compile (p1Table c) c) π (initT (p1Table c) σ))
-      = uBeh (uexec m c π (initU σ)) (uaddrs m c π (initU σ))
-    simp only [tBeh]
-    rw [haddr]
-    rcases e₁ : texec m (compile (p1Table c) c) π (initT (p1Table c) σ) with _ | ⟨r₁, k, b⟩ <;>
-      rcases e₂ : uexec m c π (initU σ) with _ | ⟨s₁, k', b'⟩
-    · rfl
-    · rw [e₁, e₂] at hsim; exact hsim.elim
-    · rw [e₁, e₂] at hsim; exact hsim.elim
-    rw [e₁, e₂] at hsim
-    obtain ⟨hc, hs, _⟩ := hsim
-    simp only [Prod.mk.injEq] at hc
-    obtain ⟨rfl, rfl⟩ := hc
-    simp only [Option.map_some]
-    have hs' : s₁ = r₁.withStore s₁.store := hs
-    rw [hs']
-    exact uBeh_withStore r₁ _ _ _ _ _
+def p1Pass (P : Partition) (π : MedPolicy) : LCore.PassCert (ucmdLang P π) (slotLang P π) :=
+  LCore.PassCert.ofSim (fun c => .ok ((p1Table c, compile (p1Table c) c), LCore.Xform.id))
+    (fun σ => σ) (fun _ _ => trivial) (fun u _ => ⟨u, trivial, rfl⟩)
+    (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun c p' t h m σ => by
+      cases h
+      have hnd := nodup_dedup (cvars c)
+      have hv : ∀ x ∈ cvars c, x ∈ p1Table c := fun x hx => mem_dedup.mpr hx
+      have hsim : TRel (p1Table c) (texec m (compile (p1Table c) c) π (initT (p1Table c) σ))
+          (uexec m c π (initU σ)) := texec_compile hnd π m c (initT (p1Table c) σ) σ hv initT_rel
+      have haddr : taddrs m (compile (p1Table c) c) π (initT (p1Table c) σ) = uaddrs m c π (initU σ) :=
+        taddrs_compile hnd π m c (initT (p1Table c) σ) σ hv initT_rel
+      show tBeh (texec m (compile (p1Table c) c) π (initT (p1Table c) σ))
+          (taddrs m (compile (p1Table c) c) π (initT (p1Table c) σ))
+        = uBeh (uexec m c π (initU σ)) (uaddrs m c π (initU σ))
+      simp only [tBeh]
+      rw [haddr]
+      rcases e₁ : texec m (compile (p1Table c) c) π (initT (p1Table c) σ) with _ | ⟨r₁, k, b⟩ <;>
+        rcases e₂ : uexec m c π (initU σ) with _ | ⟨s₁, k', b'⟩
+      · rfl
+      · rw [e₁, e₂] at hsim; exact hsim.elim
+      · rw [e₁, e₂] at hsim; exact hsim.elim
+      rw [e₁, e₂] at hsim
+      obtain ⟨hc, hs, _⟩ := hsim
+      simp only [Prod.mk.injEq] at hc
+      obtain ⟨rfl, rfl⟩ := hc
+      simp only [Option.map_some]
+      have hs' : s₁ = r₁.withStore s₁.store := hs
+      rw [hs']
+      exact uBeh_withStore r₁ _ _ _ _ _)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
 
 /-- **The Phase 1 exit (PLAN-2026-10 §12): `ucmd_p1_carries`.** A program `bcheck` accepts
     keeps its budget, its mediation and its noninterference (addresses in the leakage) after
@@ -580,7 +579,7 @@ theorem ucmd_p1_carries {P : Partition} {c : UCmd} {A' V' : List String} {k : Na
   ∧ LCore.Cert.rel (slotLang P π) p' := by
   obtain ⟨hb, ht, hr⟩ := bcheck_lcore h π
   exact ⟨(p1Pass P π).bound_transfer rfl hb,
-         (p1Pass P π).trace_transfer rfl ht,
+         (p1Pass P π).trace_transfer rfl (mediated_prefixClosed π) ht,
          (p1Pass P π).rel_transfer rfl hr⟩
 
 
