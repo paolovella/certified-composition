@@ -23,34 +23,34 @@ def toy : Lang where
 /-! ## `rel` -/
 
 theorem toy_rel_holds : Cert.rel toy false := by
-  intro n i i' h
+  intro n i i' _ _ h
   show (⟨_, _, _, _⟩ : Beh) = ⟨_, _, _, _⟩
   simp only [toy] at h ⊢
   simp [h]
 
 theorem toy_rel_fails : ¬ Cert.rel toy true := by
   intro h
-  have := h 0 (0, 0) (0, 1) rfl
+  have := h 0 (0, 0) (0, 1) trivial trivial rfl
   simp [toy] at this
 
 /-! ## `bound` -/
 
 theorem toy_bound_holds : Cert.bound toy 3 false := by
-  intro n i; simp [toy]
+  intro n i _; simp [toy]
 
 theorem toy_bound_fails : ¬ Cert.bound toy 3 true := by
   intro h
-  have := h 0 (0, 4)
+  have := h 0 (0, 4) trivial
   simp [toy] at this
 
 /-! ## `trace` -/
 
 theorem toy_trace_holds : Cert.trace toy (fun evs => ∀ e ∈ evs, e = .read "r") true := by
-  intro n i e he; simpa [toy] using he
+  intro n i _ e he; simpa [toy] using he
 
 theorem toy_trace_fails : ¬ Cert.trace toy (fun evs => evs = []) true := by
   intro h
-  have := h 0 (0, 0)
+  have := h 0 (0, 0) trivial
   simp [toy] at this
 
 /-! ## A pass that changes leakage and cost -/
@@ -77,14 +77,18 @@ def padX : Xform where
 def padPass : PassCert toy toyPad where
   comp p := .ok (p, padX)
   enc i := i
+  enc_adm _ _ := trivial
+  cover u _ := ⟨u, trivial, rfl⟩
+  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
   sim p p' t h m i := by cases h; rfl
 
 /-- **The transfers, exercised.** `false`'s three certificates arrive on the padded program
-    with no proof about the pad itself; the budget arrives transformed (3 + 1). -/
+    as certificates of `toyPad` itself, on every admissible input (F3), with no proof about
+    the pad; the budget arrives transformed (3 + 1). -/
 theorem padPass_carries :
-    (∀ m i i', toy.lowIn i i' → toyPad.run m false (padPass.enc i) = toyPad.run m false (padPass.enc i'))
-  ∧ (∀ m i, (toyPad.run m false (padPass.enc i)).cost ≤ 4)
-  ∧ (∀ m i, ∀ e ∈ (toyPad.run m true (padPass.enc i)).ev, e = .read "r") :=
+    Cert.rel toyPad false
+  ∧ Cert.bound toyPad 4 false
+  ∧ Cert.trace toyPad (fun evs => ∀ e ∈ evs, e = .read "r") true :=
   ⟨padPass.rel_transfer (p' := false) (t := padX) rfl toy_rel_holds,
    padPass.bound_transfer (p' := false) (t := padX) rfl toy_bound_holds,
    padPass.trace_transfer (p' := true) (t := padX) rfl toy_trace_holds⟩
@@ -99,13 +103,22 @@ theorem padPass_keeps_the_leak :
 def idPad : PassCert toyPad toyPad where
   comp p := .ok (p, Xform.id)
   enc i := i
+  enc_adm _ _ := trivial
+  cover u _ := ⟨u, trivial, rfl⟩
+  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
   sim p p' t h m i := by cases h; rfl
 
 /-- **Composition, exercised.** The two-pass pipeline is itself a `PassCert`, and the budget
     arrives through both cost transformers. -/
-theorem seq_carries_bound :
-    ∀ m i, (toyPad.run m false ((padPass.seq idPad).enc i)).cost ≤ 4 :=
+theorem seq_carries_bound : Cert.bound toyPad 4 false :=
   (padPass.seq idPad).bound_transfer (p' := false) (t := padX.then Xform.id) rfl toy_bound_holds
+
+/-- **Composition at the certificate level** (F3). The padded program's certificate, which
+    `padPass` produced, is an ordinary certificate of `toyPad`, so the next pass takes it as
+    its source certificate directly, with no `seq`. -/
+theorem chained_carries_bound : Cert.bound toyPad 4 false :=
+  idPad.bound_transfer (p := false) (p' := false) (t := Xform.id) rfl
+    (padPass.bound_transfer (p' := false) (t := padX) rfl toy_bound_holds)
 
 /-- Two pads in a row: the target language with two extra branches and two extra units. -/
 def toyPad2 : Lang where
@@ -121,6 +134,9 @@ def toyPad2 : Lang where
 def padPass2 : PassCert toyPad toyPad2 where
   comp p := .ok (p, padX)
   enc i := i
+  enc_adm _ _ := trivial
+  cover u _ := ⟨u, trivial, rfl⟩
+  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
   sim p p' t h m i := by cases h; rfl
 
 /-- **A three-pass pipeline's budget, computed by the kernel.** Compiling `false` through
@@ -130,8 +146,7 @@ theorem seq3_budget :
     (((padPass.seq idPad).seq padPass2).comp false).map (fun r => r.2.cost 3) = .ok 5 := rfl
 
 /-- The same budget, carried by `bound_transfer` through all three passes. -/
-theorem seq3_carries_bound :
-    ∀ m i, (toyPad2.run m false (((padPass.seq idPad).seq padPass2).enc i)).cost ≤ 5 :=
+theorem seq3_carries_bound : Cert.bound toyPad2 5 false :=
   ((padPass.seq idPad).seq padPass2).bound_transfer (p' := false)
     (t := (padX.then Xform.id).then padX) rfl toy_bound_holds
 
@@ -141,6 +156,9 @@ def refuseTrue : PassCert toyPad toyPad where
     | true  => .error "refused"
     | false => .ok (false, Xform.id)
   enc i := i
+  enc_adm _ _ := trivial
+  cover u _ := ⟨u, trivial, rfl⟩
+  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
   sim p p' t h m i := by
     cases p
     · cases h; rfl
@@ -148,6 +166,49 @@ def refuseTrue : PassCert toyPad toyPad where
 
 theorem seq_refusal_propagates :
     ((padPass.seq refuseTrue).comp true).toOption = none := rfl
+
+/-! ## Coverage (F3): a pass must reach every admissible target input -/
+
+/-- A target with an extra flag. With the flag off it runs as `toy`; with the flag on,
+    program `false` branches on the secret. -/
+def leakyT : Lang where
+  Prog  := Bool
+  In    := Nat × Nat × Bool
+  lowIn i i' := i.1 = i'.1 ∧ i.2.2 = i'.2.2
+  run _ p i :=
+    { ev   := [.read "r"]
+      lk   := [.branch (if p || i.2.2 then i.2.1 != 0 else i.1 != 0)]
+      cost := if p then i.2.1 else 3
+      out  := .done }
+
+/-- An encoder that never sets the flag. -/
+def leakyEnc (i : Nat × Nat) : Nat × Nat × Bool := (i.1, i.2, false)
+
+/-- **The old transfer's conclusion holds, and says nothing.** On the encodings, `false`'s
+    runs are indistinguishable, exactly what `rel_transfer` concluded before F3. -/
+theorem leaky_rel_on_encodings : ∀ m i i', toy.lowIn i i' →
+    leakyT.run m false (leakyEnc i) = leakyT.run m false (leakyEnc i') := by
+  intro m i i' h
+  show (⟨_, _, _, _⟩ : Beh) = ⟨_, _, _, _⟩
+  simp only [leakyEnc, toy] at h ⊢
+  simp [h]
+
+/-- **But the compiled program leaks** on an admissible target input no source input encodes
+    to: flag on, secrets 0 and 1. -/
+theorem leaky_not_rel : ¬ Cert.rel leakyT false := by
+  intro h
+  have := h 0 (0, 0, true) (0, 1, true) trivial trivial ⟨rfl, rfl⟩
+  simp [leakyT] at this
+
+/-- **And the pass cannot be certified**: the encoder misses the flagged inputs, so `cover`
+    fails, and no `PassCert toy leakyT` with this encoder exists. -/
+theorem leaky_misses : ¬ ∀ u, leakyT.Adm u → ∃ i, toy.Adm i ∧ leakyEnc i = u := by
+  intro h
+  obtain ⟨i, _, hi⟩ := h (0, 0, true) trivial
+  simp [leakyEnc] at hi
+
+theorem no_leaky_pass (pc : PassCert toy leakyT) (he : pc.enc = leakyEnc) : False :=
+  leaky_misses (fun u hu => by obtain ⟨i, hi, h⟩ := pc.cover u hu; exact ⟨i, hi, he ▸ h⟩)
 
 /-! ## Lawful languages (F2) -/
 

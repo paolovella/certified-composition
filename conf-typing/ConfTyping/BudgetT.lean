@@ -264,6 +264,6 @@ theorem bcheckF_budgetT {P : Partition} : ∀ (f : Nat) (c : UCmd) (A V A' V' : 
 theorem bcheck_boundT {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
     (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
     LCore.Cert.bound (ucmdLangT P π) k c :=
-  fun n σ => bcheckF_budgetT (usize c) c [] [] A' V' k h n π (initU σ)
+  fun n σ _ => bcheckF_budgetT (usize c) c [] [] A' V' k h n π (initU σ)
 
 end ConfTyping

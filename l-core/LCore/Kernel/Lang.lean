@@ -17,6 +17,11 @@ structure Lang where
   lowIn : In → In → Prop
   /-- A run with `n` units of fuel. -/
   run   : Nat → Prog → In → Beh
+  /-- The inputs the certificates speak about (F3): well-formed ones, such as a machine state
+      with a valid layout. By default every input. A certificate is a claim about every
+      admissible input, so a compiler must reach every admissible target input from an
+      admissible source input (`PassCert.cover`). -/
+  Adm   : In → Prop := fun _ => True
 
 /-- **A lawful language** (F2). More fuel only extends a run: its events and leakage grow at
     the end, its cost grows, and once it has finished it stays finished. And a run that has not

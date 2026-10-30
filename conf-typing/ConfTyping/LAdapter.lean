@@ -60,14 +60,14 @@ theorem bcheck_lcore {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
   ∧ LCore.Cert.rel (ucmdLang P π) c := by
   have hf := bcheck_sound c [] [] A' V' k h
   refine ⟨?_, ?_, ?_⟩
-  · intro n σ
+  · intro n σ _
     show (uBeh _ _).cost ≤ k
     unfold uBeh
     split
     · rename_i r a hr _
       exact hf.bundle.budget n π (initU σ) r hr
     · exact Nat.zero_le k
-  · intro n σ q hq
+  · intro n σ _ q hq
     have hq' : LCore.Ev.read q ∈ (uBeh (uexec n c π (initU σ)) (uaddrs n c π (initU σ))).ev := hq
     unfold uBeh at hq'
     split at hq'
@@ -79,7 +79,7 @@ theorem bcheck_lcore {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
       · injection hq'e with hqq; subst hqq; exact hm _ hq'm
       · cases ht
     · cases hq'
-  · intro n σ σ' hσ
+  · intro n σ σ' _ _ hσ
     have hlow := jsecTy_sound n c [] V' hf.joint π (initU σ) (initU σ')
       SepInv.initU SepInv.initU LabInv.initU LabInv.initU
       ⟨hσ, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl, rfl, fun _ _ => rfl⟩
@@ -121,7 +121,7 @@ theorem secretBranch_not_rel : ¬ LCore.Cert.rel (ucmdLang Psec (fun _ => true))
     simp only [σSecret5, σSecret0]
     have : (x == "secret") = false := hx
     simp [this]
-  have := h 2 σSecret5 σSecret0 hlow
+  have := h 2 σSecret5 σSecret0 trivial trivial hlow
   revert this
   decide
 

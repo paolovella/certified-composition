@@ -105,7 +105,7 @@ theorem vacProg_diverges (n : Nat) (σ : Store) : uexec n vacProg refuseAll (ini
 theorem vacProg_vacuous :
     LCore.Cert.trace (ucmdLang Psec refuseAll) (fun evs => evs = []) vacProg
   ∧ LCore.Cert.bound (ucmdLang Psec refuseAll) 0 vacProg := by
-  refine ⟨fun n (σ : Store) => ?_, fun n (σ : Store) => ?_⟩
+  refine ⟨fun n (σ : Store) _ => ?_, fun n (σ : Store) _ => ?_⟩
   · show (uBeh _ _).ev = []
     rw [vacProg_diverges]; rfl
   · show (uBeh _ _).cost ≤ 0
@@ -126,8 +126,8 @@ theorem vacProg_not_vacuous :
     ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (fun evs => evs = []) vacProg
   ∧ ¬ LCore.Cert.bound (ucmdLangT Psec refuseAll) 0 vacProg := by
   refine ⟨fun h => ?_, fun h => ?_⟩
-  · have := h 10 (fun _ => 0); rw [vacProg_halts] at this; cases this
-  · have := h 10 (fun _ => 0); rw [vacProg_halts] at this; cases this
+  · have := h 10 (fun _ => 0) trivial; rw [vacProg_halts] at this; cases this
+  · have := h 10 (fun _ => 0) trivial; rw [vacProg_halts] at this; cases this
 
 /-- **The budget is carried, and it is not trivial.** On `ucmdLangT`, `bcheck`'s budget 12
     holds of `vacProg` on every run (`bcheck_boundT`), and a budget of 3 does not: the run
@@ -136,7 +136,7 @@ theorem vacProg_budgetT :
     LCore.Cert.bound (ucmdLangT Psec refuseAll) 12 vacProg
   ∧ ¬ LCore.Cert.bound (ucmdLangT Psec refuseAll) 3 vacProg := by
   refine ⟨bcheck_boundT vacProg_checks refuseAll, fun h => ?_⟩
-  have := h 10 (fun _ => 0); rw [vacProg_halts] at this
+  have := h 10 (fun _ => 0) trivial; rw [vacProg_halts] at this
   exact absurd this (by decide)
 
 /-- The repo's loop handler keeps its budget of 40 on every run of the lawful language. -/
@@ -154,7 +154,7 @@ theorem unguarded_read_not_mediated :
     bcheck Psec [] [] (.access "db") = none
   ∧ ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (mediated refuseAll) (.access "db") := by
   refine ⟨by decide, fun h => ?_⟩
-  have := h 1 (fun _ => 0) "db" (by decide)
+  have := h 1 (fun _ => 0) trivial "db" (by decide)
   cases this
 
 /-- The loop handler never faults, on any run of the lawful language. -/
@@ -167,7 +167,7 @@ theorem loopHandler_memsafeT (π : MedPolicy) :
 theorem wild_deref_faults :
     bcheck Psec [] [] (.memop .deref "q") = none
   ∧ ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (fun evs => faultEv ∉ evs) (.memop .deref "q") := by
-  refine ⟨by decide, fun h => h 1 (fun _ => 0) (by decide)⟩
+  refine ⟨by decide, fun h => h 1 (fun _ => 0) trivial (by decide)⟩
 
 /-- The loop handler is noninterferent on every run of the lawful language. -/
 theorem loopHandler_relT (π : MedPolicy) : LCore.Cert.rel (ucmdLangT Psec π) loopHandler :=
@@ -184,7 +184,7 @@ theorem secretBranch_not_relT :
     simp only [σSecret5, σSecret0]
     have : (x == "secret") = false := hx
     simp [this]
-  have := h 2 σSecret5 σSecret0 hlow
+  have := h 2 σSecret5 σSecret0 trivial trivial hlow
   revert this
   decide
 

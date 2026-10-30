@@ -177,7 +177,7 @@ theorem bcheckF_medT {P : Partition} : ∀ (f : Nat) (c : UCmd) (A V A' V' : Lis
 theorem bcheck_mediatedT {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
     (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
     LCore.Cert.trace (ucmdLangT P π) (mediated π) c := by
-  intro n σ r hr
+  intro n σ _ r hr
   have hinv : UMedInv π [] (initU σ) := ⟨by simp [initU], by simp [initU], by simp⟩
   exact bcheckF_medT (usize c) c [] [] A' V' k h n π (initU σ) hinv r hr
 

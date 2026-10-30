@@ -177,6 +177,6 @@ theorem bcheckF_memT {P : Partition} : ∀ (f : Nat) (c : UCmd) (A V A' V' : Lis
 theorem bcheck_memsafeT {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
     (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
     LCore.Cert.trace (ucmdLangT P π) (fun evs => faultEv ∉ evs) c :=
-  fun n σ => bcheckF_memT (usize c) c [] [] A' V' k h n π (initU σ) SepInv.initU
+  fun n σ _ => bcheckF_memT (usize c) c [] [] A' V' k h n π (initU σ) SepInv.initU
 
 end ConfTyping

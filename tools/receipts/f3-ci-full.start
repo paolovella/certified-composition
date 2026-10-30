@@ -1,0 +1,4 @@
+started: 2026-10-30T09:25:14+01:00
+head: 9d2a4b8
+command: bash tools/ci.sh
+log: tools/receipts/f3-ci-full.log

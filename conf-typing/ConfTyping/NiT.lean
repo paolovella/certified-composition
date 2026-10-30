@@ -148,7 +148,7 @@ theorem jsecTy_sameT {P : Partition} (π : MedPolicy) : ∀ (n : Nat) (c : UCmd)
 theorem bcheck_relT {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
     (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
     LCore.Cert.rel (ucmdLangT P π) c := by
-  intro n σ σ' hσ
+  intro n σ σ' _ _ hσ
   have hf := bcheck_sound c [] [] A' V' k h
   have hr : JRel P [] (initU σ) (initU σ') :=
     ⟨SepInv.initU, SepInv.initU, LabInv.initU, LabInv.initU,

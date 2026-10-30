@@ -537,6 +537,9 @@ def p1Table (c : UCmd) : List String := dedup (cvars c)
 def p1Pass (P : Partition) (π : MedPolicy) : LCore.PassCert (ucmdLang P π) (slotLang P π) where
   comp c := .ok ((p1Table c, compile (p1Table c) c), LCore.Xform.id)
   enc σ := σ
+  enc_adm _ _ := trivial
+  cover u _ := ⟨u, trivial, rfl⟩
+  low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
   sim c p' t h m σ := by
     cases h
     have hnd := nodup_dedup (cvars c)
@@ -566,14 +569,15 @@ def p1Pass (P : Partition) (π : MedPolicy) : LCore.PassCert (ucmdLang P π) (sl
 
 /-- **The Phase 1 exit (PLAN-2026-10 §12): `ucmd_p1_carries`.** A program `bcheck` accepts
     keeps its budget, its mediation and its noninterference (addresses in the leakage) after
-    P1, by the kernel's transfer theorems alone. There is no proof here about any certificate
+    P1, as certificates of the slot program in its own language (F3), by the kernel's transfer
+    theorems alone. There is no proof here about any certificate
     and P1 together. -/
 theorem ucmd_p1_carries {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
     (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
     let p' := (p1Table c, compile (p1Table c) c)
-    (∀ m σ, ((slotLang P π).run m p' σ).cost ≤ k)
-  ∧ (∀ m σ, mediated π ((slotLang P π).run m p' σ).ev)
-  ∧ (∀ m σ σ', lowEq P σ σ' → (slotLang P π).run m p' σ = (slotLang P π).run m p' σ') := by
+    LCore.Cert.bound (slotLang P π) k p'
+  ∧ LCore.Cert.trace (slotLang P π) (mediated π) p'
+  ∧ LCore.Cert.rel (slotLang P π) p' := by
   obtain ⟨hb, ht, hr⟩ := bcheck_lcore h π
   exact ⟨(p1Pass P π).bound_transfer rfl hb,
          (p1Pass P π).trace_transfer rfl ht,

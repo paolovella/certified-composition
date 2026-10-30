@@ -6,8 +6,9 @@
   program on an encoded input *is* a run of the source program, with only the leakage and the
   cost rewritten. The compiler returns, with each compiled program, the transformers (`Xform`)
   that rewrite them. The transformers are produced from the program alone, so they never see
-  the input. From that one fact every certificate shape transfers (`trace_transfer`,
-  `rel_transfer`, `bound_transfer`), and passes compose (`PassCert.seq`). So a new pass costs
+  the input. From that one fact, and coverage of the admissible inputs (F3), every certificate
+  shape transfers to a certificate of the compiled program in its own language
+  (`trace_transfer`, `rel_transfer`, `bound_transfer`), and passes compose (`PassCert.seq`). So a new pass costs
   one simulation proof and no certificate proofs, and a new certificate costs nothing per pass
   (PLAN-2026-10 §6).
 
@@ -55,6 +56,15 @@ structure PassCert (S T : Lang) where
   comp  : S.Prog → Except String (T.Prog × Xform)
   /-- How a source input is presented to the compiled program. -/
   enc   : S.In → T.In
+  /-- **Coverage** (F3). Admissible source inputs encode to admissible target inputs; every
+      admissible target input is the encoding of an admissible source input; and every Low-equal
+      pair of admissible target inputs is the encoding of a Low-equal source pair. Without it a
+      certificate would reach only the encodings, and an attacker picks an input that is not
+      one. -/
+  enc_adm   : ∀ i, S.Adm i → T.Adm (enc i)
+  cover     : ∀ u, T.Adm u → ∃ i, S.Adm i ∧ enc i = u
+  low_cover : ∀ u u', T.Adm u → T.Adm u' → T.lowIn u u' →
+    ∃ i i', S.Adm i ∧ S.Adm i' ∧ S.lowIn i i' ∧ enc i = u ∧ enc i' = u'
   /-- **The simulation.** The compiled run is the source run, with leakage and cost
       transformed. -/
   sim : ∀ (p : S.Prog) (p' : T.Prog) (t : Xform), comp p = .ok (p', t) →
@@ -68,27 +78,30 @@ namespace PassCert
 
 variable {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog} {t : Xform}
 
-/-- Events pass through unchanged, so every `trace` certificate transfers. -/
+/-- Events pass through unchanged, so every `trace` certificate transfers: the compiled program
+    carries it in its own language, on every admissible input. -/
 theorem trace_transfer (h : pc.comp p = .ok (p', t)) {Φ : List Ev → Prop}
-    (hc : Cert.trace S Φ p) : ∀ (m : Nat) (i : S.In), Φ (T.run m p' (pc.enc i)).ev := by
-  intro m i
+    (hc : Cert.trace S Φ p) : Cert.trace T Φ p' := by
+  intro m u hu
+  obtain ⟨i, hi, rfl⟩ := pc.cover u hu
   rw [pc.sim p p' t h m i]
-  exact hc (t.fuel m) i
+  exact hc (t.fuel m) i hi
 
-/-- The compiled observation is a function of the source observation and the program, so
-    indistinguishable source runs stay indistinguishable. -/
-theorem rel_transfer (h : pc.comp p = .ok (p', t)) (hc : Cert.rel S p) :
-    ∀ (m : Nat) (i i' : S.In), S.lowIn i i' →
-      T.run m p' (pc.enc i) = T.run m p' (pc.enc i') := by
-  intro m i i' hl
-  rw [pc.sim p p' t h m i, pc.sim p p' t h m i', hc (t.fuel m) i i' hl]
+/-- The compiled observation is a function of the source observation and the program, and
+    every Low-equal pair of admissible target inputs comes from a Low-equal source pair, so the
+    compiled program is noninterferent in its own language. -/
+theorem rel_transfer (h : pc.comp p = .ok (p', t)) (hc : Cert.rel S p) : Cert.rel T p' := by
+  intro m u u' hu hu' hl
+  obtain ⟨i, i', hi, hi', hii, rfl, rfl⟩ := pc.low_cover u u' hu hu' hl
+  rw [pc.sim p p' t h m i, pc.sim p p' t h m i', hc (t.fuel m) i i' hi hi' hii]
 
 /-- A budget transfers through the (monotone) cost transformer. -/
 theorem bound_transfer (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound S k p) :
-    ∀ (m : Nat) (i : S.In), (T.run m p' (pc.enc i)).cost ≤ t.cost k := by
-  intro m i
+    Cert.bound T (t.cost k) p' := by
+  intro m u hu
+  obtain ⟨i, hi, rfl⟩ := pc.cover u hu
   rw [pc.sim p p' t h m i]
-  exact t.costMono _ _ (hc (t.fuel m) i)
+  exact t.costMono _ _ (hc (t.fuel m) i hi)
 
 end PassCert
 
@@ -102,6 +115,15 @@ def PassCert.seq {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) : PassCe
       | .error e => .error e
       | .ok (p'', u) => .ok (p'', t.then u)
   enc i := qc.enc (pc.enc i)
+  enc_adm i hi := qc.enc_adm _ (pc.enc_adm i hi)
+  cover u hu := by
+    obtain ⟨j, hj, rfl⟩ := qc.cover u hu
+    obtain ⟨i, hi, rfl⟩ := pc.cover j hj
+    exact ⟨i, hi, rfl⟩
+  low_cover u u' hu hu' hl := by
+    obtain ⟨j, j', hj, hj', hjj, rfl, rfl⟩ := qc.low_cover u u' hu hu' hl
+    obtain ⟨i, i', hi, hi', hii, rfl, rfl⟩ := pc.low_cover j j' hj hj' hjj
+    exact ⟨i, i', hi, hi', hii, rfl, rfl⟩
   sim p p'' tu h m i := by
     cases hp : pc.comp p with
     | error e => rw [hp] at h; cases h
