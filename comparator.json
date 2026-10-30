@@ -26,7 +26,9 @@
     "ConfTyping.Frozen.wcheck_sound",
     "ConfTyping.Frozen.leakSafe_sound",
     "ConfTyping.Src.Frozen.source_certified",
-    "TransportCalculus.Frozen.Bridge.comp_cert"
+    "TransportCalculus.Frozen.Bridge.comp_cert",
+    "ConfTyping.Frozen.bcheck_lcoreT_meaning",
+    "ConfTyping.Frozen.ucmdLangT_lawful_meaning"
   ],
   "definition_names": [],
   "permitted_axioms": [

@@ -264,3 +264,28 @@ theorem Frozen.Bridge.comp_cert {X M D : Type} {GA : GradedAction M D} {dist : X
   | (apply TransportCalculus.Bridge.comp_cert <;> assumption)
 
 end TransportCalculus
+
+namespace ConfTyping
+
+/-- **L's meaning for UCmd** (`ConfTyping.bcheck_lcoreT`, `conf-typing/ConfTyping/NiT.lean`;
+    F2). A program `bcheck` accepts carries, on the lawful language `ucmdLangT`, its budget as a
+    `bound`, its mediation and its memory safety as `trace`s, and its noninterference as a
+    `rel`, over every run. Freezing it locks what "certified" means: the language, its run,
+    the events and leakage, `mediated`, `faultEv`, and the kernel's certificate shapes, all
+    through `ring0.lock`'s closure. `bcheck` is a checker, so it can still evolve. -/
+theorem Frozen.bcheck_lcoreT_meaning {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
+    (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
+    LCore.Cert.bound (ucmdLangT P π) k c
+  ∧ LCore.Cert.trace (ucmdLangT P π) (mediated π) c
+  ∧ LCore.Cert.trace (ucmdLangT P π) (fun evs => faultEv ∉ evs) c
+  ∧ LCore.Cert.rel (ucmdLangT P π) c := 
+  bcheck_lcoreT h π
+
+/-- **The language is lawful** (`ConfTyping.ucmdLangT_lawful`, `conf-typing/ConfTyping/UTrace.lean`;
+    F2): more fuel only extends a run, and a run that never finishes has unbounded cost, so
+    the certificates above cannot hold vacuously. -/
+theorem Frozen.ucmdLangT_lawful_meaning (P : Partition) (π : MedPolicy) :
+    (ucmdLangT P π).Lawful := 
+  ucmdLangT_lawful P π
+
+end ConfTyping

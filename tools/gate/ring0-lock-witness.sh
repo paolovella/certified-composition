@@ -96,13 +96,30 @@ else
   printf '  FAIL  %-12s not accepted: %s\n' checker "$(tail -1 "$tmp/k2.log")"; fail=$((fail+1))
 fi
 }
+# L's meaning (F2): `faultEv` is rebuilt as `.ext "fault" ([] ++ [])`, definitionally the same,
+# so every proof and every frozen statement's text survive; only the lock sees that what
+# "memory safe" means on `ucmdLangT` was edited.
+scen_l() {
+copy "$tmp/l"
+python3 -I - "$tmp/l/conf-typing/ConfTyping/UTrace.lean" <<'EOF3'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+old = 'def faultEv : LCore.Ev := .ext "fault" []\n'
+assert s.count(old) == 1, "faultEv not found"
+s = s.replace(old, 'def faultEv : LCore.Ev := .ext "fault" ([] ++ [])\n')
+open(p, "w").write(s)
+EOF3
+refuses lmeaning "$tmp/l"
+}
 scen_d > "$tmp/out.d" 2>&1 &
 scen_c > "$tmp/out.c" 2>&1 &
 scen_k > "$tmp/out.k" 2>&1 &
+scen_l > "$tmp/out.l" 2>&1 &
 wait
-cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k"
-pass=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" | grep -c '^  ok ')
-fail=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" | grep -c '^  FAIL ')
-[ "$((pass + fail))" -ge 5 ] || { echo "  FAIL  a scenario printed no verdict"; fail=$((fail+1)); }
+cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" "$tmp/out.l"
+pass=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" "$tmp/out.l" | grep -c '^  ok ')
+fail=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" "$tmp/out.l" | grep -c '^  FAIL ')
+[ "$((pass + fail))" -ge 6 ] || { echo "  FAIL  a scenario printed no verdict"; fail=$((fail+1)); }
 echo "ring0.lock witnesses: $pass passed, $fail failed"
 [ "$fail" = 0 ]

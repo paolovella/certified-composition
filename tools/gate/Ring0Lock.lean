@@ -2,7 +2,8 @@
   The definition half of `tools/ring0.lock` (P0-03) and all of `tools/checkers.lock` (P0-11).
   A frozen statement can be weakened without touching its text, by editing a definition it
   mentions: make `CostAtMost` always true and `costCheck_sound` still says the same words. So
-  this walks every frozen statement's dependency closure inside the two mathlib-free packages,
+  this walks every frozen statement's dependency closure inside the mathlib-free packages
+  (`LCore` included since F2: the kernel's shapes are what L's frozen statements mean),
   through definitions' values and inductives' constructors, and prints one structural hash per
   constant.
 
@@ -27,7 +28,7 @@ def inPackages (env : Environment) (n : Name) : Bool :=
   | none => false
   | some idx =>
     let m := env.header.moduleNames[idx.toNat]!
-    (`ConfTyping).isPrefixOf m || (`TransportCalculus).isPrefixOf m
+    (`ConfTyping).isPrefixOf m || (`TransportCalculus).isPrefixOf m || (`LCore).isPrefixOf m
 
 /-- The constants a declaration's meaning rests on: its type, a definition's value, an
     inductive's constructors. A theorem's proof is not followed: proofs are irrelevant. -/

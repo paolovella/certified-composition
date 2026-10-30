@@ -167,7 +167,7 @@ step "frozen statements: the comparator refuses a weakened solution (witness)" \
      bash -c 'bash tools/gate/comparator-witness.sh | tail -1 | grep -qx "comparator witnesses: 2 passed, 0 failed"'
 step "ring0.lock is current"       bash tools/ring0-lock.sh --check
 step "ring0.lock catches what the comparator cannot (witness)" \
-     bash -c 'bash tools/gate/ring0-lock-witness.sh | tail -1 | grep -qx "ring0.lock witnesses: 5 passed, 0 failed"'
+     bash -c 'bash tools/gate/ring0-lock-witness.sh | tail -1 | grep -qx "ring0.lock witnesses: 6 passed, 0 failed"'
 # P0-12: the boundary warden's mechanical half (verdict parser, drift report). The agent runs in
 # the gate workflow's warden job; its live witnesses are `warden-witness.sh --live`.
 step "checkers.baseline names a commit and the checkers ring0.lock lists" check_baseline

@@ -1,6 +1,6 @@
-file	workspace/Statements.lean	59fcd33e8af1315046d06ce6f657ccf9bedf70557ee8eea498616290ea93f574
-file	comparator.json	4112d2ab1c8df6223af575b304d25c0f77431233c5b201a65bb76fb5d62903bb
-frozen statements	25
+file	workspace/Statements.lean	03aa9d558f458087a7eab268a3ed93847618cd1231a4e03410791e8d017bda11
+file	comparator.json	a876d608c7621c9004c0ace429f6a8b04932747d3b29f0667f2c0aa8787d0249
+frozen statements	27
 checkers	23	ConfTyping.allcheck ConfTyping.bcheck ConfTyping.costCheck ConfTyping.hcheck ConfTyping.jcheck ConfTyping.jcheckW ConfTyping.leakSafe ConfTyping.medCheck ConfTyping.pathCheck ConfTyping.pcheck ConfTyping.pcheckW ConfTyping.secCheck ConfTyping.secCheckD ConfTyping.secCheckT ConfTyping.secCheckTD ConfTyping.slcheck ConfTyping.specCheck ConfTyping.tcheck ConfTyping.tcheckW ConfTyping.ucheck ConfTyping.ucheckNI ConfTyping.umcheck ConfTyping.wcheck
 ConfTyping.Addr	13285864654764339375
 ConfTyping.Cmd	3931117990
@@ -129,6 +129,7 @@ ConfTyping.SInstr.casesOn	4736987055289027778
 ConfTyping.SInstr.rec	308378196
 ConfTyping.SOp	3931117990
 ConfTyping.SOp.casesOn	6400073315862158329
+ConfTyping.SOp.ctorIdx	11042596463727948421
 ConfTyping.SOp.emit	435311240
 ConfTyping.SOp.rec	250793182
 ConfTyping.SOp.set	435311240
@@ -226,6 +227,15 @@ ConfTyping.Src.parseStmt.match_5	17621876737290693722
 ConfTyping.Src.parseStmt.match_7	8976440247168065043
 ConfTyping.Src.parseStmt.match_9	14327731902020339564
 ConfTyping.Store	15805404905283986265
+ConfTyping.TRun	3931117990
+ConfTyping.TRun.cost	5656524888183432852
+ConfTyping.TRun.ev	1270839448516612970
+ConfTyping.TRun.lk	7489938321802464831
+ConfTyping.TRun.mk	2064456848
+ConfTyping.TRun.out	8410283432881637848
+ConfTyping.TRun.seqT	13907469723525761485
+ConfTyping.TRun.st	14744667283136984802
+ConfTyping.TRun.tick	16750585128583370562
 ConfTyping.TaintCert	140667786
 ConfTyping.TaintCert.mk	2398836320
 ConfTyping.TaintEnv	16524446657590513975
@@ -243,6 +253,7 @@ ConfTyping.UCmd.access	2950786181
 ConfTyping.UCmd.assign	3642372025
 ConfTyping.UCmd.casesOn	2122307157564607620
 ConfTyping.UCmd.check	2950786181
+ConfTyping.UCmd.ctorIdx	14268488630121418610
 ConfTyping.UCmd.hop	2894457834
 ConfTyping.UCmd.ite	2305586980
 ConfTyping.UCmd.loop	2664255252
@@ -314,6 +325,7 @@ ConfTyping.evalS._f	2659483642136106611
 ConfTyping.exprLow	4049608670067559938
 ConfTyping.exprLow._f	13365948960548071859
 ConfTyping.exprLow.match_1	2274455497272424478
+ConfTyping.faultEv	5596306487917961941
 ConfTyping.forU	5132875529559929189
 ConfTyping.initMed	14381126611560282163
 ConfTyping.initU	11659459659056699520
@@ -334,6 +346,7 @@ ConfTyping.medRunBody	8320361482247940219
 ConfTyping.medRunBody._f	9003221297415800396
 ConfTyping.medRunBody.match_1	10715315372795530680
 ConfTyping.medStep	17625638638045495199
+ConfTyping.mediated	3083088331004194146
 ConfTyping.memInt	8503026959628194283
 ConfTyping.memInt._f	5298473052689521701
 ConfTyping.memInt.match_1	1995301809986274959
@@ -358,18 +371,38 @@ ConfTyping.specExec.match_1	1724462707813491578
 ConfTyping.specRun	16356518040096530860
 ConfTyping.specRun._f	2795940566825926452
 ConfTyping.specRun.match_1	1855305940045648578
+ConfTyping.stepEv	8123883938933468444
+ConfTyping.stepEv._sparseCasesOn_1	11200840597801037127
+ConfTyping.stepEv._sparseCasesOn_2	7867837808180836684
+ConfTyping.stepEv.match_1	2445889408724528265
 ConfTyping.stepRel	5256636843268744129
 ConfTyping.stepRel.match_1	6114354178706655859
 ConfTyping.stepRel.match_3	104115357356266839
+ConfTyping.stepT	16704610884916406156
+ConfTyping.stepT.match_1	5655769111387637691
 ConfTyping.toAddr	8473411720084756205
 ConfTyping.uLowEq	18108181965190166993
 ConfTyping.uOptLowEq	14763350073681292885
 ConfTyping.uOptLowEq._sparseCasesOn_1	18340205988076171428
 ConfTyping.uOptLowEq._sparseCasesOn_2	5523436881708479340
 ConfTyping.uOptLowEq.match_1	3091301525981115145
+ConfTyping.uaddrs	5956072210544847586
+ConfTyping.uaddrs._f	10650972395142642919
+ConfTyping.uaddrs._sparseCasesOn_5	13713675852637436168
+ConfTyping.uaddrs.match_1	14151557441749778282
+ConfTyping.uaddrs.match_3	17479408262771783519
+ConfTyping.uaddrs.match_5	17060811542026378197
+ConfTyping.uchCode	10927498559926626282
+ConfTyping.uchCode.match_1	525379387460727493
+ConfTyping.ucmdLangT	300332560281311533
 ConfTyping.uexec	8981127933832021871
 ConfTyping.uexec._f	3205482839628554740
 ConfTyping.uexec.match_1	17751106960464976961
+ConfTyping.uexecT	1129020541098833690
+ConfTyping.uexecT._f	11687003674160014436
+ConfTyping.uexecT._sparseCasesOn_1	7112528699472129390
+ConfTyping.uexecT.match_1	3198928139888620868
+ConfTyping.uexecT.match_4	2764596256399501502
 ConfTyping.upd	11642432546287623446
 ConfTyping.updBU	15676094271716416482
 ConfTyping.updHU	6619127622987166504
@@ -381,6 +414,45 @@ ConfTyping.walk.match_3	5027328189205000
 ConfTyping.wexec	12392850603007041714
 ConfTyping.wexec._f	10841612081430798810
 ConfTyping.wexec.match_1	16104865335847696459
+LCore.Beh	3931117990
+LCore.Beh.cost	6991957092382619295
+LCore.Beh.ev	16539655607411521739
+LCore.Beh.lk	4573415344376231868
+LCore.Beh.mk	3938620485
+LCore.Beh.out	14922758964269783117
+LCore.Cert.bound	12193867875832571831
+LCore.Cert.rel	17192613647496917356
+LCore.Cert.trace	13445278419080203711
+LCore.Ev	3931117990
+LCore.Ev.check	1374528839
+LCore.Ev.emit	4180475390
+LCore.Ev.ext	1459356491
+LCore.Ev.read	1374528839
+LCore.Ev.release	1374528839
+LCore.Lang	1772266319
+LCore.Lang.Adm	7816479531705584561
+LCore.Lang.In	13258634543407389944
+LCore.Lang.Lawful	612360291
+LCore.Lang.Lawful.mk	1806878745
+LCore.Lang.Prog	17758190055239810852
+LCore.Lang.lowIn	316078517221116920
+LCore.Lang.mk	1926544075
+LCore.Lang.run	5761093692814892775
+LCore.Lk	3931117990
+LCore.Lk.addr	3805333517
+LCore.Lk.branch	1633304581
+LCore.Lk.ext	1954398994
+LCore.Lk.vtime	3805333517
+LCore.Outcome	3931117990
+LCore.Outcome.abort	1249139017
+LCore.Outcome.casesOn	15528482689056001415
+LCore.Outcome.ctorIdx	12686991837478212154
+LCore.Outcome.done	1249139017
+LCore.Outcome.fuel	1249139017
+LCore.Outcome.rec	1760540576
+LCore.instDecidableEqOutcome	18105417926790293242
+LCore.instDecidableEqOutcome._proof_1	1330516955
+LCore.instDecidableEqOutcome._proof_2	3328705913
 TransportCalculus.Bridge	1248455741
 TransportCalculus.Bridge.cert	98754388039675929
 TransportCalculus.Bridge.comp	12723489086636728297

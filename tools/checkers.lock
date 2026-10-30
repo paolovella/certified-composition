@@ -10,7 +10,6 @@ checker	ConfTyping.bcheck	ConfTyping.Expr.ctorIdx	15512047581348863573
 checker	ConfTyping.bcheck	ConfTyping.UCmd.below	4297674963059254215
 checker	ConfTyping.bcheck	ConfTyping.UCmd.brecOn	17727348930629516125
 checker	ConfTyping.bcheck	ConfTyping.UCmd.brecOn.go	368922719316552048
-checker	ConfTyping.bcheck	ConfTyping.UCmd.ctorIdx	14268488630121418610
 checker	ConfTyping.bcheck	ConfTyping.allcheck	17018703456319502494
 checker	ConfTyping.bcheck	ConfTyping.allcheck._f	15130622688737206186
 checker	ConfTyping.bcheck	ConfTyping.allcheck._sparseCasesOn_1	5523436881708479340
