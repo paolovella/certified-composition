@@ -35,9 +35,9 @@ theorem stepT_read {c : UCmd} {π : MedPolicy} {s : UState} {r : String}
   unfold stepT at h
   split at h
   · cases c with
-    | access q => simp [stepEv] at h; rw [h]
-    | sop op x e => cases op <;> simp [stepEv] at h
-    | _ => simp [stepEv] at h
+    | access q => simp [stepEv, faultEv] at h; rw [h]
+    | sop op x e => cases op <;> simp [stepEv, faultEv] at h
+    | _ => simp [stepEv, faultEv] at h
   · simp at h
 
 /-- A finished run carries the invariant to its end, by the bridge and `UCert.auth`. -/

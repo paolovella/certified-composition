@@ -7,7 +7,7 @@
     memory fault, stops at once with outcome `abort`. `uexec` instead keeps executing no-ops,
     and inside a loop it never returns (`uexec_dead_loop_diverges`), which is what made
     `vacProg`'s certificates vacuous (`Vacuity.lean`).
-  - **One trace, in program order.** Events (checks, reads, emits) and leakage (branch bits,
+  - **One trace, in program order.** Events (checks, reads, emits, faults) and leakage (branch bits,
     addresses) are each one list in the order they happen, so a run with more fuel extends
     them at the end. `ucmdLang` listed every read before every emit, which no prefix law can
     hold of.
@@ -35,12 +35,16 @@ def stepEv : UCmd → UState → List LCore.Ev
   | .sop .emit x e,   s => [.emit x ((evalS s.sstore e).map uchCode)]
   | _,                _ => []
 
-/-- One atomic step, from a live state: `uexec`'s own step, with its events, its addresses,
-    and `abort` if the step killed the run. -/
+/-- The event a memory fault shows: a trap. Without it a fault and a refused check would end a
+    run the same way, and memory safety could not be stated about the observation. -/
+def faultEv : LCore.Ev := .ext "fault" []
+
+/-- One atomic step, from a live state: `uexec`'s own step, with its events (and `faultEv` if
+    this step faulted), its addresses, and `abort` if the step killed the run. -/
 def stepT (c : UCmd) (π : MedPolicy) (s : UState) : TRun :=
   match uexec 1 c π s with
-  | some r => ⟨r.1, r.2.1, stepEv c s, ((uaddrs 1 c π s).getD []).map .addr,
-               if r.1.dead then .abort else .done⟩
+  | some r => ⟨r.1, r.2.1, stepEv c s ++ (if r.1.err && !s.err then [faultEv] else []),
+               ((uaddrs 1 c π s).getD []).map .addr, if r.1.dead then .abort else .done⟩
   | none   => ⟨s, 0, [], [], .fuel⟩
 
 /-- Run `a`, then, if it finished, `k` from where it stopped; the record of both. -/

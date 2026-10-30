@@ -13,7 +13,7 @@
   the first step, and its cost grows without bound. When F2 lands, this file's statement is
   inverted, and the two theorems become the before and after of the fix.
 -/
-import ConfTyping.MedT
+import ConfTyping.MemT
 
 namespace ConfTyping.Vacuity
 
@@ -156,5 +156,17 @@ theorem unguarded_read_not_mediated :
   refine ⟨by decide, fun h => ?_⟩
   have := h 1 (fun _ => 0) "db" (by decide)
   cases this
+
+/-- The loop handler never faults, on any run of the lawful language. -/
+theorem loopHandler_memsafeT (π : MedPolicy) :
+    LCore.Cert.trace (ucmdLangT Psec π) (fun evs => faultEv ∉ evs) loopHandler :=
+  bcheck_memsafeT loopHandler_checks π
+
+/-- **Memory safety is not trivial on `ucmdLangT`.** Dereferencing a pointer that was never
+    allocated is refused by `bcheck`, and its run shows the fault. -/
+theorem wild_deref_faults :
+    bcheck Psec [] [] (.memop .deref "q") = none
+  ∧ ¬ LCore.Cert.trace (ucmdLangT Psec refuseAll) (fun evs => faultEv ∉ evs) (.memop .deref "q") := by
+  refine ⟨by decide, fun h => h 1 (fun _ => 0) (by decide)⟩
 
 end ConfTyping.Vacuity
