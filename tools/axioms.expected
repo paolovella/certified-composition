@@ -3396,8 +3396,11 @@ LCore.Beh.noConfusionType	LCore.Kernel.Obs
 LCore.Beh.out	LCore.Kernel.Obs	
 LCore.Beh.recOn	LCore.Kernel.Obs	
 LCore.Cert.bound	LCore.Kernel.Cert	
+LCore.Cert.live	LCore.Kernel.Cert	
 LCore.Cert.rel	LCore.Kernel.Cert	
 LCore.Cert.trace	LCore.Kernel.Cert	
+LCore.Chain	LCore.Kernel.Cert	
+LCore.Chain.Equiv	LCore.Kernel.Cert	
 LCore.Ev.casesOn	LCore.Kernel.Obs	
 LCore.Ev.check.elim	LCore.Kernel.Obs	
 LCore.Ev.check.noConfusion	LCore.Kernel.Obs	
@@ -3434,6 +3437,7 @@ LCore.Lang.noConfusion	LCore.Kernel.Lang
 LCore.Lang.noConfusionType	LCore.Kernel.Lang	
 LCore.Lang.recOn	LCore.Kernel.Lang	
 LCore.Lang.run	LCore.Kernel.Lang	
+LCore.LimitInv	LCore.Kernel.Cert	
 LCore.Lk.addr.elim	LCore.Kernel.Obs	
 LCore.Lk.addr.noConfusion	LCore.Kernel.Obs	
 LCore.Lk.branch.elim	LCore.Kernel.Obs	
@@ -3463,6 +3467,7 @@ LCore.Outcome.ofNat_ctorIdx	LCore.Kernel.Obs
 LCore.Outcome.recOn	LCore.Kernel.Obs	
 LCore.PassCert.bound_transfer	LCore.Kernel.Pass	
 LCore.PassCert.casesOn	LCore.Kernel.Pass	
+LCore.PassCert.catch_up	LCore.Kernel.Pass	
 LCore.PassCert.comp	LCore.Kernel.Pass	
 LCore.PassCert.cost_sim	LCore.Kernel.Pass	
 LCore.PassCert.cover	LCore.Kernel.Pass	
@@ -3471,6 +3476,7 @@ LCore.PassCert.det	LCore.Kernel.Pass
 LCore.PassCert.enc	LCore.Kernel.Pass	
 LCore.PassCert.enc_adm	LCore.Kernel.Pass	
 LCore.PassCert.ev_sim	LCore.Kernel.Pass	
+LCore.PassCert.live_transfer	LCore.Kernel.Pass	
 LCore.PassCert.low_cover	LCore.Kernel.Pass	
 LCore.PassCert.mk.congr_simp	LCore.Witnesses	
 LCore.PassCert.mk.noConfusion	LCore.Kernel.Pass	
@@ -3479,6 +3485,7 @@ LCore.PassCert.noConfusionType	LCore.Kernel.Pass
 LCore.PassCert.ofSim	LCore.Kernel.Pass	
 LCore.PassCert.progress	LCore.Kernel.Pass	
 LCore.PassCert.recOn	LCore.Kernel.Pass	
+LCore.PassCert.reflect	LCore.Kernel.Pass	
 LCore.PassCert.rel_transfer	LCore.Kernel.Pass	
 LCore.PassCert.seq	LCore.Kernel.Pass	
 LCore.PassCert.seq_comp_ok	LCore.Kernel.Pass	
@@ -3487,8 +3494,11 @@ LCore.PrefixClosed	LCore.Kernel.Pass
 LCore.Witness.chained_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.emptyL	LCore.Witnesses	
 LCore.Witness.emptyL_unlawful	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.eventually	LCore.Witnesses	
+LCore.Witness.eventually_inv	LCore.Witnesses	
 LCore.Witness.idPad	LCore.Witnesses	
 LCore.Witness.idleL	LCore.Witnesses	
+LCore.Witness.idle_not_live	LCore.Witnesses	propext
 LCore.Witness.idle_safe	LCore.Witnesses	
 LCore.Witness.leakyEnc	LCore.Witnesses	
 LCore.Witness.leakyT	LCore.Witnesses	
@@ -3499,9 +3509,11 @@ LCore.Witness.middleL	LCore.Witnesses
 LCore.Witness.middleL_unlawful	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_idle_pass	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_leaky_pass	LCore.Witnesses	propext
+LCore.Witness.no_stall_pass	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padPass	LCore.Witnesses	
 LCore.Witness.padPass2	LCore.Witnesses	
 LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.padPass_carries_live	LCore.Witnesses	propext
 LCore.Witness.padPass_keeps_the_leak	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padX	LCore.Witnesses	
 LCore.Witness.refuseComp	LCore.Witnesses	
@@ -3510,6 +3522,9 @@ LCore.Witness.seq3_budget	LCore.Witnesses
 LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_refusal_propagates	LCore.Witnesses	propext
+LCore.Witness.stallL	LCore.Witnesses	
+LCore.Witness.tickL	LCore.Witnesses	
+LCore.Witness.tick_unbounded	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.toy	LCore.Witnesses	
 LCore.Witness.toyL	LCore.Witnesses	
 LCore.Witness.toyL_lawful	LCore.Witnesses	propext
@@ -3517,10 +3532,13 @@ LCore.Witness.toyPad	LCore.Witnesses
 LCore.Witness.toyPad2	LCore.Witnesses	
 LCore.Witness.toy_bound_fails	LCore.Witnesses	propext
 LCore.Witness.toy_bound_holds	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.toy_live	LCore.Witnesses	propext
 LCore.Witness.toy_rel_fails	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.toy_rel_holds	LCore.Witnesses	propext
 LCore.Witness.toy_trace_fails	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.toy_trace_holds	LCore.Witnesses	propext
+LCore.Witness.unbounded	LCore.Witnesses	
+LCore.Witness.unbounded_inv	LCore.Witnesses	
 LCore.Xform.casesOn	LCore.Kernel.Pass	
 LCore.Xform.cost	LCore.Kernel.Pass	
 LCore.Xform.costMono	LCore.Kernel.Pass	

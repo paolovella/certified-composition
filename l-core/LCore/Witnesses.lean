@@ -181,6 +181,69 @@ theorem no_idle_pass (pc : PassCert toy idleL) {p' : Unit} {t : Xform}
   obtain ⟨m, ho, _⟩ := pc.progress false p' t h 0 (0, 0) trivial (by simp [toy])
   simp [idleL, toy] at ho
 
+/-! ## Liveness (`Cert.live`) -/
+
+/-- "The run eventually emits `x`", a property of the run's limit. -/
+def eventually (x : Ev) (r : Chain) : Prop := ∃ n, x ∈ (r n).ev
+
+theorem eventually_inv (x : Ev) : LimitInv (eventually x) := by
+  intro r r' h ⟨n, hn⟩
+  obtain ⟨m, hm⟩ := h.1 n
+  exact ⟨m, hm.subset hn⟩
+
+/-- "The run keeps producing events": a property only an infinite run can have when its
+    finished runs are bounded, and no `trace` certificate can state. -/
+def unbounded (r : Chain) : Prop := ∀ k, ∃ n, k ≤ (r n).ev.length
+
+theorem unbounded_inv : LimitInv unbounded := by
+  intro r r' h hu k
+  obtain ⟨n, hn⟩ := hu k
+  obtain ⟨m, hm⟩ := h.1 n
+  exact ⟨m, Nat.le_trans hn hm.length_le⟩
+
+/-- The toy's `true` eventually reads `r`. -/
+theorem toy_live : Cert.live toy (eventually (.read "r")) true :=
+  fun _ _ => ⟨0, by simp [toy]⟩
+
+/-- **Liveness, carried through a pass**: the padded program eventually reads `r` too. -/
+theorem padPass_carries_live : Cert.live toyPad (eventually (.read "r")) true :=
+  padPass.live_transfer (p' := true) (t := padX) rfl (eventually_inv _) toy_live
+
+/-- A program that never finishes and ticks once per unit of fuel. -/
+def tickL : Lang where
+  Prog  := Unit
+  In    := Unit
+  lowIn _ _ := True
+  run n _ _ := { ev := List.replicate n (.emit "tick" []), lk := [], cost := n, out := .fuel }
+
+/-- **An infinite run's liveness**: it keeps producing events. -/
+theorem tick_unbounded : Cert.live tickL unbounded () :=
+  fun _ _ k => ⟨k, by simp [tickL]⟩
+
+/-- **Liveness is not trivial**: nothing ever happens in the idle language. -/
+theorem idle_not_live : ¬ Cert.live idleL (eventually (.read "r")) () := by
+  intro h
+  obtain ⟨n, hn⟩ := h (0, 0) trivial
+  simp [idleL] at hn
+
+/-- A target that ticks once and then stalls forever. -/
+def stallL : Lang where
+  Prog  := Unit
+  In    := Unit
+  lowIn _ _ := True
+  run n _ _ := { ev := List.replicate (min n 1) (.emit "tick" []), lk := [], cost := n,
+                 out := .fuel }
+
+/-- **Catch-up refuses a stalling compiler.** Its events are prefixes of the source's, and
+    neither run ever finishes, so `ev_sim`, `progress` and `reflect` cannot object; only
+    catch-up does. Without it, "keeps producing events" would be lost in compilation. -/
+theorem no_stall_pass (pc : PassCert tickL stallL) {p' : Unit} {t : Xform}
+    (h : pc.comp () = .ok (p', t)) : False := by
+  obtain ⟨m, hm⟩ := pc.catch_up () p' t h 2 () trivial
+  have := hm.length_le
+  simp [tickL, stallL] at this
+  omega
+
 /-! ## Coverage (F3): a pass must reach every admissible target input -/
 
 /-- A target with an extra flag. With the flag off it runs as `toy`; with the flag on,

@@ -28,7 +28,9 @@
     "ConfTyping.Src.Frozen.source_certified",
     "TransportCalculus.Frozen.Bridge.comp_cert",
     "ConfTyping.Frozen.bcheck_lcoreT_meaning",
-    "ConfTyping.Frozen.ucmdLangT_lawful_meaning"
+    "ConfTyping.Frozen.ucmdLangT_lawful_meaning",
+    "ConfTyping.Frozen.bcheck_lcoreS_meaning",
+    "ConfTyping.Frozen.ucmdLangS_lawful_meaning"
   ],
   "definition_names": [],
   "permitted_axioms": [

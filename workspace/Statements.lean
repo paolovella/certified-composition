@@ -245,3 +245,22 @@ theorem Frozen.ucmdLangT_lawful_meaning (P : Partition) (π : MedPolicy) :
     (ucmdLangT P π).Lawful := sorry
 
 end ConfTyping
+
+namespace ConfTyping
+
+/-- **L's meaning for UCmd on step fuel** (`ConfTyping.bcheck_lcoreS`,
+    `conf-typing/ConfTyping/UStep.lean`; F4). The same four guarantees as on `ucmdLangT`, on the
+    step-indexed language whose observation marks every step. Freezing it locks `urunS`,
+    `push`, `stepMk` and `ucmdLangS` through `ring0.lock`'s closure. -/
+theorem Frozen.bcheck_lcoreS_meaning {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
+    (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
+    LCore.Cert.bound (ucmdLangS P π) k c
+  ∧ LCore.Cert.trace (ucmdLangS P π) (mediated π) c
+  ∧ LCore.Cert.trace (ucmdLangS P π) (fun evs => faultEv ∉ evs) c
+  ∧ LCore.Cert.rel (ucmdLangS P π) c := sorry
+
+/-- **The step-fuel language is lawful** (`ConfTyping.ucmdLangS_lawful`; F4). -/
+theorem Frozen.ucmdLangS_lawful_meaning (P : Partition) (π : MedPolicy) :
+    (ucmdLangS P π).Lawful := sorry
+
+end ConfTyping

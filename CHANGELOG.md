@@ -6,6 +6,16 @@ landed.
 
 ## Repository verification
 
+- **A fourth certificate shape: liveness** (2026-10-30, F4, the user's decision;
+  `l-core/LCore/Kernel/{Cert,Pass}.lean`, Ring 0). `Cert.live Ψ`: every run, taken whole as the
+  chain of its observations at every fuel, satisfies `Ψ`, a property of the run's limit:
+  "eventually emits X", "keeps producing events" for an infinite run. A pass carries it with two
+  more obligations, catch-up and reflection, and `LCore.PassCert.live_transfer` is axiom-free.
+  Witnesses: liveness carried through a pass (`padPass_carries_live`), an infinite run's
+  (`tick_unbounded`), the idle language refused, and a stalling compiler refused by catch-up
+  alone (`no_stall_pass`). Also: `ucmdLangS`, UCmd on step fuel, with `bcheck`'s four guarantees
+  (`bcheck_lcoreS`), and its meaning frozen.
+
 - **The kernel's passes: four obligations, and certificates that land on the target**
   (2026-10-30, F3 and F4; `l-core/LCore/Kernel/Pass.lean`, Ring 0). A `PassCert` now proves
   four facts about the pass: target events are a prefix of the source's, target cost is

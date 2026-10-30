@@ -2,8 +2,8 @@
   A certified pass, and why certificates never need per-pass proofs (PLAN-2026-10 §2,
   `Pass.lean`). Ring 0.
 
-  A `PassCert S T` is a compiler from `S` to `T` with four facts about the pass, none of them
-  about any certificate:
+  A `PassCert S T` is a compiler from `S` to `T` with facts about the pass, none of them about
+  any certificate. Four carry `trace`, `rel` and `bound`:
   - **events**: the compiled program's events at target fuel `m` are a prefix of the source's
     at `fuel m`;
   - **cost**: its cost at `m` is at most the (monotone) cost transformer of the source's;
@@ -12,10 +12,13 @@
   - **progress**: a source run that finishes has a target run that finishes, with the same
     events and outcome. No transfer uses it; without it a compiler emitting a loop that does
     nothing would inherit every safety certificate.
+  Two more carry `live` (the user's decision of 2026-10-30): **catch-up**, every event prefix
+  the source reaches the target reaches, and **reflection**, what the target finishes the source
+  finished, alike. With all four event facts the two runs have the same limit.
   With coverage of the admissible inputs (F3), every certificate shape transfers to a
   certificate of the compiled program in its own language (`trace_transfer` for prefix-closed
-  properties, `rel_transfer`, `bound_transfer`), and passes compose (`PassCert.seq`). So a new
-  pass costs these four facts and no certificate proofs, and a new certificate costs nothing
+  properties, `rel_transfer`, `bound_transfer`, `live_transfer` for limit properties), and passes
+  compose (`PassCert.seq`). So a new pass costs these facts and no certificate proofs, and a new certificate costs nothing
   per pass (PLAN-2026-10 §6).
 
   F4 replaced a single equation (target run = source run at `fuel m`, leakage and cost
@@ -86,6 +89,14 @@ structure PassCert (S T : Lang) where
     ∀ (n : Nat) (i : S.In), S.Adm i → (S.run n p i).out ≠ .fuel →
       ∃ m, (T.run m p' (enc i)).out = (S.run n p i).out ∧
            (T.run m p' (enc i)).ev = (S.run n p i).ev
+  /-- **Catch-up** (for `live`): every event prefix the source reaches, the target reaches. -/
+  catch_up : ∀ (p : S.Prog) (p' : T.Prog) (t : Xform), comp p = .ok (p', t) →
+    ∀ (n : Nat) (i : S.In), S.Adm i → ∃ m, (S.run n p i).ev <+: (T.run m p' (enc i)).ev
+  /-- **Reflection** (for `live`): what the target finishes, the source finished, alike. -/
+  reflect : ∀ (p : S.Prog) (p' : T.Prog) (t : Xform), comp p = .ok (p', t) →
+    ∀ (m : Nat) (i : S.In), S.Adm i → (T.run m p' (enc i)).out ≠ .fuel →
+      ∃ n, (S.run n p i).out = (T.run m p' (enc i)).out ∧
+           (S.run n p i).ev = (T.run m p' (enc i)).ev
 
 /-- Prefix facts proved by induction, because the core library's (`List.prefix_refl`,
     `List.IsPrefix.trans`, `List.append_nil`) use `propext`, and the kernel's composition uses
@@ -134,6 +145,20 @@ theorem bound_transfer (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound 
   intro m u hu
   obtain ⟨i, hi, rfl⟩ := pc.cover u hu
   exact Nat.le_trans (pc.cost_sim p p' t h m i hi) (t.costMono _ _ (hc (t.fuel m) i hi))
+
+/-- **Liveness transfers.** By the four event obligations the compiled run and the source run
+    have the same limit (`Chain.Equiv`), so any property of the limit carries over: what the
+    source must eventually do, the compiled program must too. -/
+theorem live_transfer (h : pc.comp p = .ok (p', t)) {Ψ : Chain → Prop} (hΨ : LimitInv Ψ)
+    (hc : Cert.live S Ψ p) : Cert.live T Ψ p' := by
+  intro u hu
+  obtain ⟨i, hi, rfl⟩ := pc.cover u hu
+  exact hΨ (fun n => S.run n p i) (fun m => T.run m p' (pc.enc i))
+    ⟨fun n => pc.catch_up p p' t h n i hi,
+     fun m => ⟨t.fuel m, pc.ev_sim p p' t h m i hi⟩,
+     fun n hf => pc.progress p p' t h n i hi hf,
+     fun m hf => pc.reflect p p' t h m i hi hf⟩
+    (hc i hi)
 
 end PassCert
 
@@ -194,6 +219,16 @@ def PassCert.seq {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) : PassCe
     obtain ⟨m₂, ho₂, he₂⟩ := qc.progress p' _ u hq m₁ (pc.enc i) (pc.enc_adm i hi)
       (by rw [ho₁]; exact hf)
     exact ⟨m₂, ho₂.trans ho₁, he₂.trans he₁⟩
+  catch_up p _ _ h n i hi := by
+    obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
+    obtain ⟨m₁, h₁⟩ := pc.catch_up p p' t hp n i hi
+    obtain ⟨m₂, h₂⟩ := qc.catch_up p' _ u hq m₁ (pc.enc i) (pc.enc_adm i hi)
+    exact ⟨m₂, prefix_trans' h₁ h₂⟩
+  reflect p _ _ h m i hi hf := by
+    obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
+    obtain ⟨n₁, ho₁, he₁⟩ := qc.reflect p' _ u hq m (pc.enc i) (pc.enc_adm i hi) hf
+    obtain ⟨n₂, ho₂, he₂⟩ := pc.reflect p p' t hp n₁ i hi (by rw [ho₁]; exact hf)
+    exact ⟨n₂, ho₂.trans ho₁, he₂.trans he₁⟩
 
 /-- **A lockstep pass from one equation.** If the compiled run *is* the source run at `fuel m`
     with leakage and cost rewritten, and every source fuel is some target fuel's image, the four
@@ -223,5 +258,9 @@ def PassCert.ofSim {S T : Lang} (comp : S.Prog → Except String (T.Prog × Xfor
   progress p p' t h n i _ _ := by
     obtain ⟨m, hm⟩ := fuel_onto p p' t h n
     exact ⟨m, by rw [sim p p' t h m i, hm], by rw [sim p p' t h m i, hm]⟩
+  catch_up p p' t h n i _ := by
+    obtain ⟨m, hm⟩ := fuel_onto p p' t h n
+    exact ⟨m, by rw [sim p p' t h m i, hm]; exact prefix_refl' _⟩
+  reflect p p' t h m i _ _ := ⟨t.fuel m, by rw [sim p p' t h m i], by rw [sim p p' t h m i]⟩
 
 end LCore

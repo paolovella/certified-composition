@@ -1,7 +1,8 @@
 /-
-  Three certificate shapes, their meaning defined once (PLAN-2026-10 §2, `Cert.lean`). Ring 0.
+  Four certificate shapes, their meaning defined once (PLAN-2026-10 §2, `Cert.lean`). Ring 0.
 
-  Every certificate L carries is an instance of one of these, over any `Lang`:
+  Every certificate L carries is an instance of one of these, over any `Lang` (a fourth,
+  `live`, for what must happen, is below):
   - `trace Φ`: every run's events satisfy `Φ`. Mediation, memory safety, taint and path
     properties, and the absence of leaks are all `trace` instances.
   - `rel`: inputs the attacker cannot tell apart give the same observation. Since `Beh` is all
@@ -39,6 +40,34 @@ def bound (L : Lang) (k : Nat) (p : L.Prog) : Prop :=
   ∀ (n : Nat) (i : L.In), L.Adm i → (L.run n p i).cost ≤ k
 
 end Cert
+
+/-- **A run as a whole**: the chain of its observations at every fuel. On a lawful language it
+    only grows, and its limit is the run's complete behaviour, finite or infinite. -/
+abbrev Chain := Nat → Beh
+
+/-- Two runs with the same limit: each reaches every event prefix the other reaches, and each
+    finishes exactly when the other does, with the same events and outcome. Leakage and cost are
+    not part of a run's limit: they are what `rel` and `bound` are about. -/
+def Chain.Equiv (r r' : Chain) : Prop :=
+  (∀ n, ∃ m, (r n).ev <+: (r' m).ev) ∧ (∀ m, ∃ n, (r' m).ev <+: (r n).ev) ∧
+  (∀ n, (r n).out ≠ .fuel → ∃ m, (r' m).out = (r n).out ∧ (r' m).ev = (r n).ev) ∧
+  (∀ m, (r' m).out ≠ .fuel → ∃ n, (r n).out = (r' m).out ∧ (r n).ev = (r' m).ev)
+
+/-- A property of a run's limit: runs with the same limit both have it or both lack it. -/
+def LimitInv (Ψ : Chain → Prop) : Prop := ∀ r r', Chain.Equiv r r' → Ψ r → Ψ r'
+
+namespace Cert
+
+/-- **The fourth shape: liveness** (the user's decision of 2026-10-30). Every admissible run, as a
+    whole, satisfies `Ψ`: "eventually emits X", "if it finishes, it ended with a reply", "emits
+    X infinitely often". `Ψ` must depend only on the run's limit (`LimitInv`) to transfer through
+    a pass. `trace` covers the properties every prefix keeps ("never X"); `live` the ones a
+    prefix may not have reached yet. -/
+def live (L : Lang) (Ψ : Chain → Prop) (p : L.Prog) : Prop :=
+  ∀ (i : L.In), L.Adm i → Ψ (fun n => L.run n p i)
+
+end Cert
+
 
 /-- **A budget forces termination** on a lawful language: `bound k` is not satisfied by a
     program that never finishes. -/

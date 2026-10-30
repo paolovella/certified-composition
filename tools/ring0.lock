@@ -1,6 +1,6 @@
-file	workspace/Statements.lean	03aa9d558f458087a7eab268a3ed93847618cd1231a4e03410791e8d017bda11
-file	comparator.json	a876d608c7621c9004c0ace429f6a8b04932747d3b29f0667f2c0aa8787d0249
-frozen statements	27
+file	workspace/Statements.lean	6ff499321d9f44b8320224b63873dfac80adb2f30d6070529e7b61fc2ffde9d3
+file	comparator.json	55ea4c843970fd9474e64f37e19e3c2d7d7f721caf02ceea2f894a29c4d370f8
+frozen statements	29
 checkers	23	ConfTyping.allcheck ConfTyping.bcheck ConfTyping.costCheck ConfTyping.hcheck ConfTyping.jcheck ConfTyping.jcheckW ConfTyping.leakSafe ConfTyping.medCheck ConfTyping.pathCheck ConfTyping.pcheck ConfTyping.pcheckW ConfTyping.secCheck ConfTyping.secCheckD ConfTyping.secCheckT ConfTyping.secCheckTD ConfTyping.slcheck ConfTyping.specCheck ConfTyping.tcheck ConfTyping.tcheckW ConfTyping.ucheck ConfTyping.ucheckNI ConfTyping.umcheck ConfTyping.wcheck
 ConfTyping.Addr	13285864654764339375
 ConfTyping.Cmd	3931117990
@@ -228,6 +228,7 @@ ConfTyping.Src.parseStmt.match_7	8976440247168065043
 ConfTyping.Src.parseStmt.match_9	14327731902020339564
 ConfTyping.Store	15805404905283986265
 ConfTyping.TRun	3931117990
+ConfTyping.TRun.atomS	13509768647903977216
 ConfTyping.TRun.cost	5656524888183432852
 ConfTyping.TRun.ev	1270839448516612970
 ConfTyping.TRun.lk	7489938321802464831
@@ -236,6 +237,7 @@ ConfTyping.TRun.out	8410283432881637848
 ConfTyping.TRun.seqT	13907469723525761485
 ConfTyping.TRun.st	14744667283136984802
 ConfTyping.TRun.tick	16750585128583370562
+ConfTyping.TRun.tickS	12215141599094429640
 ConfTyping.TaintCert	140667786
 ConfTyping.TaintCert.mk	2398836320
 ConfTyping.TaintEnv	16524446657590513975
@@ -251,6 +253,9 @@ ConfTyping.UCh.rec	246536136
 ConfTyping.UCmd	3931117990
 ConfTyping.UCmd.access	2950786181
 ConfTyping.UCmd.assign	3642372025
+ConfTyping.UCmd.below	4297674963059254215
+ConfTyping.UCmd.brecOn	17727348930629516125
+ConfTyping.UCmd.brecOn.go	368922719316552048
 ConfTyping.UCmd.casesOn	2122307157564607620
 ConfTyping.UCmd.check	2950786181
 ConfTyping.UCmd.ctorIdx	14268488630121418610
@@ -355,6 +360,10 @@ ConfTyping.memStr._f	13953899744159828884
 ConfTyping.memStr.match_1	12643910531083442031
 ConfTyping.pickAddr	17468977293630674353
 ConfTyping.pickAddr.match_1	7274296473686742323
+ConfTyping.push	669649165275206865
+ConfTyping.push._f	5870295837454512502
+ConfTyping.push._sparseCasesOn_1	3711495733487353903
+ConfTyping.push.match_1	11452232527693816845
 ConfTyping.qcount	1495906614981519231
 ConfTyping.qcount._f	18053503371564199083
 ConfTyping.qcount.match_1	16882662522572024841
@@ -375,6 +384,7 @@ ConfTyping.stepEv	8123883938933468444
 ConfTyping.stepEv._sparseCasesOn_1	11200840597801037127
 ConfTyping.stepEv._sparseCasesOn_2	7867837808180836684
 ConfTyping.stepEv.match_1	2445889408724528265
+ConfTyping.stepMk	864252557003573201
 ConfTyping.stepRel	5256636843268744129
 ConfTyping.stepRel.match_1	6114354178706655859
 ConfTyping.stepRel.match_3	104115357356266839
@@ -394,6 +404,7 @@ ConfTyping.uaddrs.match_3	17479408262771783519
 ConfTyping.uaddrs.match_5	17060811542026378197
 ConfTyping.uchCode	10927498559926626282
 ConfTyping.uchCode.match_1	525379387460727493
+ConfTyping.ucmdLangS	8988196660793776346
 ConfTyping.ucmdLangT	300332560281311533
 ConfTyping.uexec	8981127933832021871
 ConfTyping.uexec._f	3205482839628554740
@@ -407,6 +418,11 @@ ConfTyping.upd	11642432546287623446
 ConfTyping.updBU	15676094271716416482
 ConfTyping.updHU	6619127622987166504
 ConfTyping.updSU	7982628945434425168
+ConfTyping.urunS	10229773077856805681
+ConfTyping.urunS._f	14786483023031862878
+ConfTyping.urunS._sparseCasesOn_1	7112528699472129390
+ConfTyping.urunS.match_1	12934095701583392535
+ConfTyping.urunS.match_4	3249247214067577671
 ConfTyping.walk	3704474207785578377
 ConfTyping.walk._f	14335915928830150363
 ConfTyping.walk.match_1	17830781580792491215
