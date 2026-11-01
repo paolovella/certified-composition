@@ -73,7 +73,7 @@ ConfTyping.AcceptGoal	ConfTyping.LoadBearing
 ConfTyping.Addr	ConfTyping.Speculate	
 ConfTyping.AddrEq	ConfTyping.AddrLeak	
 ConfTyping.AddrEq.mono	ConfTyping.AddrLeak	
-ConfTyping.Agree	ConfTyping.UStep	
+ConfTyping.Agree	ConfTyping.UStep	propext
 ConfTyping.AliasFreeLoop	ConfTyping.AliasLoop	
 ConfTyping.AliasOK	ConfTyping.AliasSafe	
 ConfTyping.AliasUAF	ConfTyping.AliasSafe	
@@ -1262,7 +1262,7 @@ ConfTyping.TRun.seqT_same	ConfTyping.NiT	propext
 ConfTyping.TRun.st	ConfTyping.UTrace	
 ConfTyping.TRun.tick	ConfTyping.UTrace	
 ConfTyping.TRun.tickS	ConfTyping.UStep	
-ConfTyping.TRun.tickS_ext	ConfTyping.UStep	propext
+ConfTyping.TRun.tickS_ext	ConfTyping.UStep	
 ConfTyping.TRun.tickS_same	ConfTyping.UStep	propext
 ConfTyping.TRun.tick_ext	ConfTyping.UTrace	propext
 ConfTyping.TRun.tick_same	ConfTyping.NiT	propext
@@ -1391,6 +1391,7 @@ ConfTyping.UCmd.skip.elim	ConfTyping.Unified
 ConfTyping.UCmd.sop.elim	ConfTyping.Unified	
 ConfTyping.UCmd.sop.noConfusion	ConfTyping.Unified	
 ConfTyping.UCostAtMost	ConfTyping.Unified	
+ConfTyping.UFrame	ConfTyping.UStep	
 ConfTyping.UMedInv	ConfTyping.Bundle	
 ConfTyping.UMedInv.mono	ConfTyping.CountedLoop	
 ConfTyping.UMediated	ConfTyping.Unified	
@@ -2572,6 +2573,7 @@ ConfTyping.no_relabelling_operation_exists	ConfTyping.HeapSecret	propext
 ConfTyping.nodup_dedup	ConfTyping.P1	propext
 ConfTyping.notAllDistinct	ConfTyping.TwoSafety	
 ConfTyping.notAllDistinct_postclosed	ConfTyping.TwoSafety	
+ConfTyping.notStepL	ConfTyping.UStep	propext
 ConfTyping.not_loadBearingAt_of_suffices	ConfTyping.LoadBearing	
 ConfTyping.oLowEq	ConfTyping.WhileBridge	propext
 ConfTyping.obs	ConfTyping.Obs	
@@ -2684,6 +2686,7 @@ ConfTyping.poolPreserves_step	ConfTyping.Race	propext
 ConfTyping.post	ConfTyping.Obs	
 ConfTyping.postclosed_collapse	ConfTyping.TwoSafety	Classical.choice,Quot.sound,propext
 ConfTyping.prefix_append_both	ConfTyping.UTrace	propext
+ConfTyping.prefix_cons_both	ConfTyping.UStep	
 ConfTyping.prependHead	ConfTyping.QueryEscape	
 ConfTyping.prependHead_cons	ConfTyping.QueryEscape	propext
 ConfTyping.preservation_inert_for_source	ConfTyping.JasminLedger	
@@ -3059,12 +3062,12 @@ ConfTyping.stored_injection_leaks	ConfTyping.DbInjection
 ConfTyping.storing_a_public_value_is_fine	ConfTyping.HeapValue	propext
 ConfTyping.storing_a_secret_is_refused	ConfTyping.HeapValue	propext
 ConfTyping.straceU	ConfTyping.SpecUnified	propext
-ConfTyping.stripMk	ConfTyping.UStep	
-ConfTyping.stripMk_addrs	ConfTyping.UStep	Quot.sound,propext
+ConfTyping.stripMk	ConfTyping.UStep	propext
+ConfTyping.stripMk_addrs	ConfTyping.UStep	propext
 ConfTyping.stripMk_append	ConfTyping.UStep	propext
 ConfTyping.stripMk_cons_branch	ConfTyping.UStep	propext
 ConfTyping.stripMk_cons_mk	ConfTyping.UStep	propext
-ConfTyping.stripMk_stepT	ConfTyping.UStep	Quot.sound,propext
+ConfTyping.stripMk_stepT	ConfTyping.UStep	propext
 ConfTyping.subOf	ConfTyping.AliasFix	Quot.sound,propext
 ConfTyping.subOf_iff	ConfTyping.AliasFix	Quot.sound,propext
 ConfTyping.subStr	ConfTyping.CountedLoop	
@@ -3451,6 +3454,8 @@ LCore.Lk.ext.noConfusion	LCore.Kernel.Obs
 LCore.Lk.noConfusion	LCore.Kernel.Obs	
 LCore.Lk.noConfusionType	LCore.Kernel.Obs	
 LCore.Lk.recOn	LCore.Kernel.Obs	
+LCore.Lk.step.elim	LCore.Kernel.Obs	
+LCore.Lk.step.noConfusion	LCore.Kernel.Obs	
 LCore.Lk.vtime.elim	LCore.Kernel.Obs	
 LCore.Lk.vtime.noConfusion	LCore.Kernel.Obs	
 LCore.Outcome.abort.elim	LCore.Kernel.Obs	

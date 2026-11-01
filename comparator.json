@@ -30,7 +30,9 @@
     "ConfTyping.Frozen.bcheck_lcoreT_meaning",
     "ConfTyping.Frozen.ucmdLangT_lawful_meaning",
     "ConfTyping.Frozen.bcheck_lcoreS_meaning",
-    "ConfTyping.Frozen.ucmdLangS_lawful_meaning"
+    "ConfTyping.Frozen.ucmdLangS_lawful_meaning",
+    "ConfTyping.Frozen.ucmdLangT_admits_all",
+    "ConfTyping.Frozen.ucmdLangS_admits_all"
   ],
   "definition_names": [],
   "permitted_axioms": [

@@ -310,3 +310,17 @@ theorem Frozen.ucmdLangS_lawful_meaning (P : Partition) (π : MedPolicy) :
   ucmdLangS_lawful P π
 
 end ConfTyping
+
+namespace ConfTyping
+
+/-- **UCmd's certificates speak about every input** (F3's admissible inputs; a side note of
+    2026-11-01). A language that narrowed its admissible inputs would narrow every certificate
+    with it, and every check would still pass; these statements make narrowing UCmd's a change
+    to a frozen statement, which needs the user's key. -/
+theorem Frozen.ucmdLangT_admits_all (P : Partition) (π : MedPolicy) (σ : Store) :
+    (ucmdLangT P π).Adm σ := trivial
+
+theorem Frozen.ucmdLangS_admits_all (P : Partition) (π : MedPolicy) (σ : Store) :
+    (ucmdLangS P π).Adm σ := trivial
+
+end ConfTyping

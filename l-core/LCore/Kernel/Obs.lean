@@ -37,6 +37,11 @@ inductive Lk where
   | addr   (a : Int)
   | vtime  (v : Int)
   | ext    (name : String) (v : Int)
+  /-- A step boundary, with the program position of the instruction that ran (F4). Splits the
+      leakage into per-step segments and says which instruction each is, so a compiler pass's
+      target observation is a function of its source observation. For programs whose path is
+      public (branch bits Low), it reveals nothing the branch bits did not. -/
+  | step   (pc : List Nat)
   deriving DecidableEq, Repr
 
 /-- **The observation.** All of it is visible to the attacker the certificates are against. -/

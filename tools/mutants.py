@@ -95,8 +95,18 @@ def run(site, base):
         mp = os.path.join(work, "conf-typing", rel)
         lines = open(mp, encoding="utf-8").read().split("\n")
         open(mp, "w", encoding="utf-8").write("\n".join(mutate(lines, ln, col, tok)))
-        r = subprocess.run(["lake", "build"], cwd=os.path.join(work, "conf-typing"),
-                           capture_output=True, text=True)
+        # F1: build the mutated module first. Most mutants are killed there, by the checker's
+        # own soundness proof, and a failure there is a failure of the full build, so the
+        # verdict is the same. Every downstream module was otherwise rebuilt per mutant, and
+        # that grew with each pass (the time ratchet caught it: 168 s over a 164 s budget).
+        # Then the witness registry's module, which kills most of the rest and imports none of
+        # the L modules built on top of the checkers; only then everything.
+        mod = rel[:-len(".lean")].replace(os.sep, ".")
+        for target in ([mod], ["ConfTyping.Witnesses"], []):
+            r = subprocess.run(["lake", "build"] + target, cwd=os.path.join(work, "conf-typing"),
+                               capture_output=True, text=True)
+            if r.returncode != 0:
+                break
         if r.returncode == 0:
             return "survived", ""
         errs = re.findall(r"error: ([^\s:]+\.lean):(\d+):\d+", r.stdout + r.stderr)
