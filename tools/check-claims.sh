@@ -1631,6 +1631,43 @@ PYM
   fi
 fi
 
+# (p) The same rule for the one-to-many pass (F4): in Split.lean only `split_carries` may mention
+# a certificate, and its proof may use only the kernel's transfers, `bcheck_lcoreS`, and the
+# certificates' prefix closures (facts about the certificates, shared by every pass). A
+# declaration ending in `_checks` is a witness that the checker accepts an example program, not
+# a pass lemma.
+if [ -f conf-typing/ConfTyping/Split.lean ]; then
+  if ! out=$(python3 -I - conf-typing/ConfTyping/Split.lean <<'PYS'
+import re, sys
+src = open(sys.argv[1]).read()
+code = re.sub(r"/-.*?-/", "", src, flags=re.S)
+code = re.sub(r"--[^\n]*", "", code)
+decls = re.split(r"\n(?=(?:theorem|def|structure|inductive|abbrev|instance) )", code)
+cert = re.compile(r"\b(bcheck\w*|FullCert|UCert|jsecTy\w*|mediated)\b|\bCert\.")
+errs, found = [], False
+for d in decls:
+    m = re.match(r"(theorem|def|structure|inductive|abbrev|instance) (\S+)", d)
+    if not m: continue
+    name = m.group(2)
+    if name == "split_carries":
+        found = True
+        body = d.split(":= by", 1)[-1]
+        used = set(re.findall(r"[A-Za-z_][\w.]*", body))
+        allowed = {"bound_transfer", "trace_transfer", "rel_transfer", "bcheck_lcoreS",
+                   "mediated_prefixClosed", "faultFree_prefixClosed",
+                   "obtain", "exact", "rfl", "splitPass", "P", "π", "h", "hb", "hm", "hf", "hr"}
+        extra = sorted(u for u in used if u.split(".")[-1] not in allowed and not u.startswith("("))
+        if extra: errs.append("split_carries uses " + ", ".join(extra))
+    elif cert.search(d) and not name.endswith("_checks"):
+        errs.append(name + " mentions a certificate")
+if not found: errs.append("split_carries is missing")
+print("; ".join(errs)); sys.exit(1 if errs else 0)
+PYS
+  ); then
+    echo "DRIFT: Split.lean: $out (PLAN-2026-10 §6: no certificate-specific pass lemma)"; fail=1
+  fi
+fi
+
 # (n) The kernel may say a fuelled run "is a prefix" only once it has a fuel law (F0, F2). From
 # 30f0720 to 2026-10-29 Cert.lean said so with nothing behind it, which made every trace and
 # bound certificate vacuous on runs that never finish. Struck text (~~...~~) is a correction of

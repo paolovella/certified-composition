@@ -1,0 +1,4 @@
+started: 2026-11-01T18:57:01+01:00
+head: dffa2ec
+command: bash tools/ci.sh
+log: tools/receipts/f4-split-ci-full2.log

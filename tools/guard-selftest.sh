@@ -373,6 +373,10 @@ run_case "F2 loses vacProg_not_vacuous" drift \
 run_case "P1 proves prefix closure itself" drift \
   bash -c 'printf "\ntheorem p1_prefix (π : MedPolicy) : LCore.PrefixClosed (mediated π) := mediated_prefixClosed π\n" >> conf-typing/ConfTyping/P1.lean'
 
+# (p) the one-to-many pass gains a certificate-specific lemma: fires
+run_case "Split gains a certificate-specific pass lemma" drift \
+  bash -c 'printf "\ntheorem split_cheat : True := by have := @bcheck_lcoreS; trivial\n" >> conf-typing/ConfTyping/Split.lean'
+
 wait
 for r in "$res"/*; do cat "$r"; done
 pass=$(cat "$res"/* | grep -c '^  ok ')

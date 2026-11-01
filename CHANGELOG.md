@@ -6,6 +6,19 @@ landed.
 
 ## Repository verification
 
+- **Certificates through a one-to-many pass** (2026-11-01, F4; `conf-typing/ConfTyping/Split.lean`).
+  Expression splitting accumulates `x := (a + b) + c` in place as `x := a + b; x := x + c`, so
+  one source step becomes several target steps, cost grows with the expression, and a partial
+  run can stop mid-chain. It is a `PassCert` with the kernel's six obligations, and a
+  `bcheck`-accepted program's budget (scaled by the longest chain), mediation, memory safety and
+  noninterference reach its split version by the transfer theorems alone (`split_carries`,
+  enforced by check-claims guard (p)). Its determinacy rests on two facts about step-fuel UCmd
+  proved once, not per pass: a step splits off an observation, and equal observations stay
+  equal at less fuel. Each step's leakage marker now carries its program position (`Lk.step`).
+  Witnesses: the split program costs 4 where the source costs 2 (`exProg_expands`); a splitter
+  without the guard reads a different resource, so no certified pass compiles to it
+  (`no_naive_pass`).
+
 - **A fourth certificate shape: liveness** (2026-10-30, F4, the user's decision;
   `l-core/LCore/Kernel/{Cert,Pass}.lean`, Ring 0). `Cert.live Ψ`: every run, taken whole as the
   chain of its observations at every fuel, satisfies `Ψ`, a property of the run's limit:

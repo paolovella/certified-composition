@@ -1114,6 +1114,69 @@ ConfTyping.SpecRun.noConfusionType	ConfTyping.HeteroCompose
 ConfTyping.SpecRun.recOn	ConfTyping.HeteroCompose	
 ConfTyping.SpecRun.store	ConfTyping.HeteroCompose	
 ConfTyping.SpecRun.trace	ConfTyping.HeteroCompose	
+ConfTyping.Split.Ahead	ConfTyping.Split	
+ConfTyping.Split.Ahead.mono	ConfTyping.Split	
+ConfTyping.Split.Behind	ConfTyping.Split	
+ConfTyping.Split.Behind.atomS	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.Behind.tickS	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.FB	ConfTyping.Split	propext
+ConfTyping.Split.Lc	ConfTyping.Split	propext
+ConfTyping.Split.abort_lk	ConfTyping.Split	propext
+ConfTyping.Split.addrCount	ConfTyping.Split	propext
+ConfTyping.Split.ahead	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.append_split	ConfTyping.Split	propext
+ConfTyping.Split.assign_fuel0	ConfTyping.Split	propext
+ConfTyping.Split.assign_step	ConfTyping.Split	propext
+ConfTyping.Split.atomS_obs	ConfTyping.Split	propext
+ConfTyping.Split.atomS_split	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.badProg	ConfTyping.Split	
+ConfTyping.Split.badSplit	ConfTyping.Split	propext
+ConfTyping.Split.badSplit_diverges	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.behind	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.chain_full	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.chain_partial	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.dead_agree	ConfTyping.Split	propext
+ConfTyping.Split.det_split	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.evCount	ConfTyping.Split	propext
+ConfTyping.Split.evalE_upd_other	ConfTyping.Split	propext
+ConfTyping.Split.exProg	ConfTyping.Split	
+ConfTyping.Split.exProg_checks	ConfTyping.Split	propext
+ConfTyping.Split.exProg_expands	ConfTyping.Split	propext
+ConfTyping.Split.first_lk	ConfTyping.Split	propext
+ConfTyping.Split.len	ConfTyping.Split	propext
+ConfTyping.Split.len_pos	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.marks	ConfTyping.Split	propext
+ConfTyping.Split.mlen	ConfTyping.Split	propext
+ConfTyping.Split.naiveX	ConfTyping.Split	propext
+ConfTyping.Split.no_naive_pass	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.obs	ConfTyping.Split	
+ConfTyping.Split.obs_eq	ConfTyping.Split	propext
+ConfTyping.Split.push_fb	ConfTyping.Split	propext
+ConfTyping.Split.push_ne_nil	ConfTyping.Split	propext
+ConfTyping.Split.scale	ConfTyping.Split	
+ConfTyping.Split.split	ConfTyping.Split	propext
+ConfTyping.Split.splitPass	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.splitX	ConfTyping.Split	propext
+ConfTyping.Split.split_ahead	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.split_carries	ConfTyping.Split	Classical.choice,Quot.sound,propext
+ConfTyping.Split.split_cost	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.split_det	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.split_ev	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.split_reflect	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.start_ok	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.stepT_done_alive	ConfTyping.Split	propext
+ConfTyping.Split.stepT_ev_len	ConfTyping.Split	propext
+ConfTyping.Split.stepT_lk_len	ConfTyping.Split	propext
+ConfTyping.Split.stepT_out_cases	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.tF	ConfTyping.Split	propext
+ConfTyping.Split.tF_push	ConfTyping.Split	propext
+ConfTyping.Split.tF_start	ConfTyping.Split	propext
+ConfTyping.Split.tickS_obs	ConfTyping.Split	propext
+ConfTyping.Split.tickS_split	ConfTyping.Split	propext
+ConfTyping.Split.uexec1_some	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.upd_upd	ConfTyping.Split	Quot.sound
+ConfTyping.Split.urunS_nonempty_dead	ConfTyping.Split	propext
+ConfTyping.Split.urunS_nonempty_zero	ConfTyping.Split	propext
 ConfTyping.Src.Tok.casesOn	ConfTyping.Surface	
 ConfTyping.Src.Tok.ctorElim	ConfTyping.Surface	
 ConfTyping.Src.Tok.ctorElimType	ConfTyping.Surface	
@@ -3551,6 +3614,7 @@ LCore.Xform.ctorIdx	LCore.Kernel.Pass
 LCore.Xform.fuel	LCore.Kernel.Pass	
 LCore.Xform.id	LCore.Kernel.Pass	
 LCore.Xform.lk	LCore.Kernel.Pass	
+LCore.Xform.mk.congr_simp	ConfTyping.Split	
 LCore.Xform.mk.noConfusion	LCore.Kernel.Pass	
 LCore.Xform.noConfusion	LCore.Kernel.Pass	
 LCore.Xform.noConfusionType	LCore.Kernel.Pass	
