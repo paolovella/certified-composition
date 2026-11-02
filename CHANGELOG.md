@@ -6,6 +6,14 @@ landed.
 
 ## Repository verification
 
+- **Declassification on L, for whole input variables** (2026-11-02, F5 row 4;
+  `conf-typing/ConfTyping/ReleaseL.lean`). `ConfTyping.Release.bcheck_release`: what `bcheck` accepts
+  with variables `R` released shows the same on inputs that agree on public and released variables,
+  and `bcheck_release_carried` carries that through `splitPass`. No new checker or kernel change.
+  Refused with the leak shown: an undeclared release, a branch on an unreleased secret, and a secret
+  written into a released variable. Limit: a computed release cannot be stated (`revealR_coarser`);
+  that is the new item REL-01, which F6 must schedule or set aside before the lock.
+
 - **Tenant isolation on L, against an attacker who measures side channels** (2026-11-02, F5 row
   7b; `conf-typing/ConfTyping/TenantL.lean`). `ConfTyping.Tenant.tenantCheck_relView`: what `bcheck`
   and `tenantCheck` both accept shows tenant B the same events on its channels and the same leakage,

@@ -941,6 +941,29 @@ ConfTyping.Rbad_not_pairClosed	ConfTyping.TwoSafety	propext
 ConfTyping.Reconciles	ConfTyping.HeteroCompose	
 ConfTyping.Regs	ConfTyping.Race	
 ConfTyping.Release	ConfTyping.Obs	
+ConfTyping.Release.bcheck_release	ConfTyping.ReleaseL	Classical.choice,Quot.sound,propext
+ConfTyping.Release.bcheck_release_carried	ConfTyping.ReleaseL	Classical.choice,Quot.sound,propext
+ConfTyping.Release.launder	ConfTyping.ReleaseL	
+ConfTyping.Release.launder_leaks	ConfTyping.ReleaseL	propext
+ConfTyping.Release.launder_refused	ConfTyping.ReleaseL	propext
+ConfTyping.Release.overreach	ConfTyping.ReleaseL	
+ConfTyping.Release.overreach_leaks	ConfTyping.ReleaseL	propext
+ConfTyping.Release.overreach_refused	ConfTyping.ReleaseL	propext
+ConfTyping.Release.relNone	ConfTyping.ReleaseL	
+ConfTyping.Release.relR	ConfTyping.ReleaseL	
+ConfTyping.Release.released	ConfTyping.ReleaseL	
+ConfTyping.Release.released_lowEq	ConfTyping.ReleaseL	propext
+ConfTyping.Release.released_none	ConfTyping.ReleaseL	Quot.sound,propext
+ConfTyping.Release.revealR	ConfTyping.ReleaseL	
+ConfTyping.Release.revealR_certified	ConfTyping.ReleaseL	Classical.choice,Quot.sound,propext
+ConfTyping.Release.revealR_checks	ConfTyping.ReleaseL	propext
+ConfTyping.Release.revealR_coarser	ConfTyping.ReleaseL	propext
+ConfTyping.Release.revealR_leaks	ConfTyping.ReleaseL	Quot.sound,propext
+ConfTyping.Release.revealR_refused	ConfTyping.ReleaseL	propext
+ConfTyping.Release.secrets	ConfTyping.ReleaseL	
+ConfTyping.Release.store	ConfTyping.ReleaseL	
+ConfTyping.Release.store_agree_public	ConfTyping.ReleaseL	propext
+ConfTyping.Release.store_agree_r	ConfTyping.ReleaseL	propext
 ConfTyping.ReleasesAtMost	ConfTyping.Obs	
 ConfTyping.RespectsCoarsening	ConfTyping.TwoSafety	
 ConfTyping.SBase.casesOn	ConfTyping.Speculate	

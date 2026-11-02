@@ -182,7 +182,8 @@ does not fit L's certificate shapes (six since 2026-11-02; this said ~~four~~ wh
 | 12 | partly | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
 | 3 | loop-free, delimiter count | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |
 | 14 | loop-free, per sink | `ConfTyping.pcheck_traceI`, a `Cert.trace` on `ucmdLangI`. Attacker: controls every initial string. Observer: the sink `fs`; other sinks are not covered. The alphabet is a segment and `..`. A loop rule (`pcheckW`) is not on L; the depth method of `PathTraversal.lean` stays on its own language |
-| 4, 9 | no | toy semantics; F5 steps 2-3 |
+| 4 | whole input variables | `ConfTyping.Release.bcheck_release`, a `Cert.rel` on `ucmdLangS` at the secrets minus the released variables; carried by `ConfTyping.Release.bcheck_release_carried`. Attacker: sees every channel and all leakage, cost and outcome, and knows the public and released inputs. A computed release (§3.4's ledger) stays on toy `Cmd` until item REL-01; `ConfTyping.Release.revealR_coarser` shows the cost of the limit |
+| 9 | no | toy semantics; F5 step 3 |
 | 5, 8, 11 | misfit | quantitative, concurrent, assumption-shaped: outside the shapes as they stand |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
@@ -379,7 +380,8 @@ bound. `checker_rederives_pleak_bound` reproduces the hand-proved Paper-1 bound
 (`result_releases_at_most_bit`) from `decide` + soundness, choice-free — a *smaller*
 axiom footprint than the original. Declaration is disclosure, not bypass: an
 undeclared High flow is rejected (`pfull_rejected_undeclared`), and a declared one
-appears in the ledger as a visible line item (`pfull_ledger`).
+appears in the ledger as a visible line item (`pfull_ledger`). All of this paragraph is on
+toy `Cmd`; §3.0 says what holds on L, which is release of whole input variables only.
 
 ### 3.5 Privacy / DP — IN as the f-DP invariant [argued]; OUT-NONCOMPOSABLE as (ε,δ) [proved in miniature]
 
