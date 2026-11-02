@@ -379,3 +379,18 @@ theorem Frozen.hyper_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' 
   pc.hyper_transfer h hΘ hR hc
 
 end LCore
+
+namespace LCore
+
+/-- **One observer's view transfers** (`LCore.PassCert.relView_transfer`; the user's decision of
+    2026-11-02): given that related target inputs are encodings of related source inputs, what an
+    observer sees, side channels included, stays fixed through the pass. -/
+theorem Frozen.relView_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) {RS : S.In → S.In → Prop}
+    {RT : T.In → T.In → Prop} {f : Observer}
+    (hR : ∀ u u', T.Adm u → T.Adm u' → RT u u' →
+      ∃ i i', S.Adm i ∧ S.Adm i' ∧ RS i i' ∧ pc.enc i = u ∧ pc.enc i' = u')
+    (hc : Cert.relView S RS f p) : Cert.relView T RT f p' := 
+  pc.relView_transfer h hR hc
+
+end LCore

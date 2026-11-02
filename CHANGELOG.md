@@ -6,6 +6,19 @@ landed.
 
 ## Repository verification
 
+- **A sixth certificate shape: one observer's whole view, side channels included** (2026-11-02,
+  the user's decision; `l-core/LCore/Kernel/{Obs,Cert,Pass}.lean`, Ring 0;
+  `conf-typing/ConfTyping/Split.lean`). `hyper` compares only event limits, so a branch on tenant
+  A's data passes "tenant B sees the same". `Cert.relView R f`: for inputs related by `R`, observer
+  `f` sees the same events on its channels and the same leakage, cost and outcome, at every fuel.
+  An `Observer` chooses channels, never payloads, by its type. `PassCert.det` now holds for every
+  observer, so `LCore.PassCert.relView_transfer` needs no per-observer proof, and it is
+  axiom-free; `splitPass` proves it too (`stepT_view_len`: a finished step's channels are fixed by
+  its command). Witnesses: `timing_outputs_pass` and `timing_view_fails` show the same program
+  passing outputs-only and refused here; `clean_view_holds` and `clean_view_all_fails` show this
+  says what `rel` cannot. 39 frozen statements, and `ring0.lock` holds 522 definitions. This is
+  about the leakage `Beh` records, not hardware L does not model.
+
 - **A fifth certificate shape: one observer, a chosen input relation** (2026-11-02, F5's kill
   rule and the user's decision; `l-core/LCore/Kernel/{Cert,Pass}.lean`, Ring 0). Injection,
   declassification and tenant isolation are each noninterference for a particular observer under

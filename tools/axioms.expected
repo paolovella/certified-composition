@@ -1135,6 +1135,7 @@ ConfTyping.Split.badSplit_diverges	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.behind	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.chain_full	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.chain_partial	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.cmdChans	ConfTyping.Split	propext
 ConfTyping.Split.dead_agree	ConfTyping.Split	propext
 ConfTyping.Split.det_split	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.evCount	ConfTyping.Split	propext
@@ -1150,6 +1151,8 @@ ConfTyping.Split.mlen	ConfTyping.Split	propext
 ConfTyping.Split.naiveX	ConfTyping.Split	propext
 ConfTyping.Split.no_naive_pass	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.obs	ConfTyping.Split	
+ConfTyping.Split.obsV	ConfTyping.Split	
+ConfTyping.Split.obsV_of_obs	ConfTyping.Split	propext
 ConfTyping.Split.obs_eq	ConfTyping.Split	propext
 ConfTyping.Split.push_fb	ConfTyping.Split	propext
 ConfTyping.Split.push_ne_nil	ConfTyping.Split	propext
@@ -1159,6 +1162,8 @@ ConfTyping.Split.splitPass	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.splitX	ConfTyping.Split	propext
 ConfTyping.Split.split_ahead	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.split_carries	ConfTyping.Split	Classical.choice,Quot.sound,propext
+ConfTyping.Split.split_carries_every_view	ConfTyping.SplitView	Classical.choice,Quot.sound,propext
+ConfTyping.Split.split_carries_view	ConfTyping.SplitView	Quot.sound,propext
 ConfTyping.Split.split_cost	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.split_det	ConfTyping.Split	Quot.sound,propext
 ConfTyping.Split.split_ev	ConfTyping.Split	Quot.sound,propext
@@ -1168,6 +1173,7 @@ ConfTyping.Split.stepT_done_alive	ConfTyping.Split	propext
 ConfTyping.Split.stepT_ev_len	ConfTyping.Split	propext
 ConfTyping.Split.stepT_lk_len	ConfTyping.Split	propext
 ConfTyping.Split.stepT_out_cases	ConfTyping.Split	Quot.sound,propext
+ConfTyping.Split.stepT_view_len	ConfTyping.Split	propext
 ConfTyping.Split.tF	ConfTyping.Split	propext
 ConfTyping.Split.tF_push	ConfTyping.Split	propext
 ConfTyping.Split.tF_start	ConfTyping.Split	propext
@@ -3461,14 +3467,37 @@ LCore.Beh.noConfusion	LCore.Kernel.Obs
 LCore.Beh.noConfusionType	LCore.Kernel.Obs	
 LCore.Beh.out	LCore.Kernel.Obs	
 LCore.Beh.recOn	LCore.Kernel.Obs	
+LCore.Beh.view	LCore.Kernel.Obs	
+LCore.Beh.view_all	LCore.Kernel.Obs	
 LCore.Cert.bound	LCore.Kernel.Cert	
 LCore.Cert.hyper	LCore.Kernel.Cert	
 LCore.Cert.live	LCore.Kernel.Cert	
 LCore.Cert.rel	LCore.Kernel.Cert	
+LCore.Cert.relView	LCore.Kernel.Cert	
+LCore.Cert.rel_iff_relView	LCore.Kernel.Cert	
+LCore.Cert.rel_relView	LCore.Kernel.Cert	
 LCore.Cert.trace	LCore.Kernel.Cert	
 LCore.Chain	LCore.Kernel.Cert	
 LCore.Chain.Equiv	LCore.Kernel.Cert	
+LCore.Chan.casesOn	LCore.Kernel.Obs	
+LCore.Chan.check.elim	LCore.Kernel.Obs	
+LCore.Chan.check.noConfusion	LCore.Kernel.Obs	
+LCore.Chan.ctorElim	LCore.Kernel.Obs	
+LCore.Chan.ctorElimType	LCore.Kernel.Obs	
+LCore.Chan.ctorIdx	LCore.Kernel.Obs	
+LCore.Chan.emit.elim	LCore.Kernel.Obs	
+LCore.Chan.emit.noConfusion	LCore.Kernel.Obs	
+LCore.Chan.ext.elim	LCore.Kernel.Obs	
+LCore.Chan.ext.noConfusion	LCore.Kernel.Obs	
+LCore.Chan.noConfusion	LCore.Kernel.Obs	
+LCore.Chan.noConfusionType	LCore.Kernel.Obs	
+LCore.Chan.read.elim	LCore.Kernel.Obs	
+LCore.Chan.read.noConfusion	LCore.Kernel.Obs	
+LCore.Chan.recOn	LCore.Kernel.Obs	
+LCore.Chan.release.elim	LCore.Kernel.Obs	
+LCore.Chan.release.noConfusion	LCore.Kernel.Obs	
 LCore.Ev.casesOn	LCore.Kernel.Obs	
+LCore.Ev.chan	LCore.Kernel.Obs	
 LCore.Ev.check.elim	LCore.Kernel.Obs	
 LCore.Ev.check.noConfusion	LCore.Kernel.Obs	
 LCore.Ev.ctorElim	LCore.Kernel.Obs	
@@ -3523,6 +3552,8 @@ LCore.Lk.step.elim	LCore.Kernel.Obs
 LCore.Lk.step.noConfusion	LCore.Kernel.Obs	
 LCore.Lk.vtime.elim	LCore.Kernel.Obs	
 LCore.Lk.vtime.noConfusion	LCore.Kernel.Obs	
+LCore.Observer	LCore.Kernel.Obs	
+LCore.Observer.all	LCore.Kernel.Obs	
 LCore.Outcome.abort.elim	LCore.Kernel.Obs	
 LCore.Outcome.casesOn	LCore.Kernel.Obs	
 LCore.Outcome.ctorElim	LCore.Kernel.Obs	
@@ -3558,12 +3589,26 @@ LCore.PassCert.ofSim	LCore.Kernel.Pass
 LCore.PassCert.progress	LCore.Kernel.Pass	
 LCore.PassCert.recOn	LCore.Kernel.Pass	
 LCore.PassCert.reflect	LCore.Kernel.Pass	
+LCore.PassCert.relView_transfer	LCore.Kernel.Pass	
 LCore.PassCert.rel_transfer	LCore.Kernel.Pass	
 LCore.PassCert.seq	LCore.Kernel.Pass	
 LCore.PassCert.seq_comp_ok	LCore.Kernel.Pass	
 LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
 LCore.PrefixClosed	LCore.Kernel.Pass	
+LCore.Witness.TenantProg.casesOn	LCore.Witnesses	
+LCore.Witness.TenantProg.clean.elim	LCore.Witnesses	
+LCore.Witness.TenantProg.crossed.elim	LCore.Witnesses	
+LCore.Witness.TenantProg.ctorElim	LCore.Witnesses	
+LCore.Witness.TenantProg.ctorElimType	LCore.Witnesses	
+LCore.Witness.TenantProg.ctorIdx	LCore.Witnesses	
+LCore.Witness.TenantProg.noConfusion	LCore.Witnesses	
+LCore.Witness.TenantProg.noConfusionType	LCore.Witnesses	
+LCore.Witness.TenantProg.recOn	LCore.Witnesses	
+LCore.Witness.TenantProg.timing.elim	LCore.Witnesses	
 LCore.Witness.chained_carries_bound	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.clean_view_all_fails	LCore.Witnesses	propext
+LCore.Witness.clean_view_holds	LCore.Witnesses	propext
+LCore.Witness.crossed_view_fails	LCore.Witnesses	Classical.choice,Quot.sound,propext
 LCore.Witness.emit_hyper_fails	LCore.Witnesses	propext
 LCore.Witness.emit_hyper_holds	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.emptyL	LCore.Witnesses	
@@ -3573,6 +3618,8 @@ LCore.Witness.eventually_inv	LCore.Witnesses
 LCore.Witness.idEmit	LCore.Witnesses	
 LCore.Witness.idEmit_carries_hyper	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.idPad	LCore.Witnesses	
+LCore.Witness.idTenants	LCore.Witnesses	
+LCore.Witness.idTenants_carries_view	LCore.Witnesses	propext
 LCore.Witness.idleL	LCore.Witnesses	
 LCore.Witness.idle_not_live	LCore.Witnesses	propext
 LCore.Witness.idle_safe	LCore.Witnesses	
@@ -3586,6 +3633,8 @@ LCore.Witness.middleL_unlawful	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_idle_pass	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.no_leaky_pass	LCore.Witnesses	propext
 LCore.Witness.no_stall_pass	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.obsB	LCore.Witnesses	propext
+LCore.Witness.observer_blind_to_data	LCore.Witnesses	
 LCore.Witness.padPass	LCore.Witnesses	
 LCore.Witness.padPass2	LCore.Witnesses	
 LCore.Witness.padPass_carries	LCore.Witnesses	Quot.sound,propext
@@ -3594,6 +3643,8 @@ LCore.Witness.padPass_keeps_the_leak	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.padX	LCore.Witnesses	
 LCore.Witness.refuseComp	LCore.Witnesses	
 LCore.Witness.refuseTrue	LCore.Witnesses	propext
+LCore.Witness.sameB	LCore.Witnesses	
+LCore.Witness.sameBOutputs	LCore.Witnesses	propext
 LCore.Witness.sameEvents	LCore.Witnesses	
 LCore.Witness.sameEvents_inv	LCore.Witnesses	
 LCore.Witness.seq3_budget	LCore.Witnesses	
@@ -3601,8 +3652,11 @@ LCore.Witness.seq3_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_carries_bound	LCore.Witnesses	Quot.sound,propext
 LCore.Witness.seq_refusal_propagates	LCore.Witnesses	propext
 LCore.Witness.stallL	LCore.Witnesses	
+LCore.Witness.tenants	LCore.Witnesses	
 LCore.Witness.tickL	LCore.Witnesses	
 LCore.Witness.tick_unbounded	LCore.Witnesses	Quot.sound,propext
+LCore.Witness.timing_outputs_pass	LCore.Witnesses	propext
+LCore.Witness.timing_view_fails	LCore.Witnesses	Classical.choice,Quot.sound,propext
 LCore.Witness.toy	LCore.Witnesses	
 LCore.Witness.toyEmit	LCore.Witnesses	
 LCore.Witness.toyL	LCore.Witnesses	
@@ -3633,8 +3687,11 @@ LCore.Xform.recOn	LCore.Kernel.Pass
 LCore.Xform.then	LCore.Kernel.Pass	
 LCore.append_assoc'	LCore.Kernel.Pass	
 LCore.append_nil'	LCore.Kernel.Pass	
+LCore.filter_all	LCore.Kernel.Obs	
 LCore.instDecidableEqBeh	LCore.Kernel.Obs	
 LCore.instDecidableEqBeh.decEq	LCore.Kernel.Obs	
+LCore.instDecidableEqChan	LCore.Kernel.Obs	
+LCore.instDecidableEqChan.decEq	LCore.Kernel.Obs	
 LCore.instDecidableEqEv	LCore.Kernel.Obs	
 LCore.instDecidableEqEv.decEq	LCore.Kernel.Obs	
 LCore.instDecidableEqLk	LCore.Kernel.Obs	
@@ -3642,6 +3699,8 @@ LCore.instDecidableEqLk.decEq	LCore.Kernel.Obs
 LCore.instDecidableEqOutcome	LCore.Kernel.Obs	
 LCore.instReprBeh	LCore.Kernel.Obs	propext
 LCore.instReprBeh.repr	LCore.Kernel.Obs	propext
+LCore.instReprChan	LCore.Kernel.Obs	propext
+LCore.instReprChan.repr	LCore.Kernel.Obs	propext
 LCore.instReprEv	LCore.Kernel.Obs	propext
 LCore.instReprEv.repr	LCore.Kernel.Obs	propext
 LCore.instReprLk	LCore.Kernel.Obs	propext

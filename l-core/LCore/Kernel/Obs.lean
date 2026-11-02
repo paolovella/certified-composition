@@ -52,4 +52,44 @@ structure Beh where
   out  : Outcome
   deriving DecidableEq, Repr
 
+/-- Which channel an event is on: its kind and name, without its payload. -/
+inductive Chan where
+  | check   (r : String)
+  | read    (r : String)
+  | emit    (sink : String)
+  | release (tag : String)
+  | ext     (name : String)
+  deriving DecidableEq, Repr
+
+def Ev.chan : Ev → Chan
+  | .check r    => .check r
+  | .read r     => .read r
+  | .emit s _   => .emit s
+  | .release t  => .release t
+  | .ext n _    => .ext n
+
+/-- **An observer**: the channels it reads. It chooses channels, never payloads, by its type, so
+    two runs can disagree on which of a step's events it sees only if the step's channels differ. -/
+abbrev Observer := Chan → Bool
+
+/-- The observer that reads every channel. -/
+def Observer.all : Observer := fun _ => true
+
+/-- **What one observer sees of a run**: the events on its channels, and all of the leakage, cost
+    and outcome. Side channels are not partitioned: they are shared hardware, so every observer
+    sees them whole. -/
+def Beh.view (f : Observer) (b : Beh) : Beh :=
+  { b with ev := b.ev.filter (fun e => f e.chan) }
+
+/-- Proved by induction, because the core library's `List.filter_true` uses `propext`, and the
+    kernel uses no axioms. -/
+theorem filter_all {α} : ∀ l : List α, l.filter (fun _ => true) = l
+  | [] => rfl
+  | x :: xs => congrArg (x :: ·) (filter_all xs)
+
+/-- The observer that reads everything sees the whole observation. -/
+theorem Beh.view_all (b : Beh) : b.view Observer.all = b := by
+  cases b with
+  | mk ev lk cost out => exact congrArg (fun e => Beh.mk e lk cost out) (filter_all ev)
+
 end LCore
