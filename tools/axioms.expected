@@ -643,6 +643,36 @@ ConfTyping.LabInv	ConfTyping.HeapJoint
 ConfTyping.LabInv.initU	ConfTyping.HeapJoint	propext
 ConfTyping.LabInv.mono	ConfTyping.HeapJoint	
 ConfTyping.LabStable	ConfTyping.HeapJoint	
+ConfTyping.Leak.LF.below.casesOn	ConfTyping.LeakL	
+ConfTyping.Leak.LF.brecOn	ConfTyping.LeakL	
+ConfTyping.Leak.LF.casesOn	ConfTyping.LeakL	
+ConfTyping.Leak.LF.recOn	ConfTyping.LeakL	
+ConfTyping.Leak.Owned.mono	ConfTyping.LeakL	
+ConfTyping.Leak.allocThenCheck_abort_unreported	ConfTyping.LeakL	propext
+ConfTyping.Leak.b06_leaks	ConfTyping.LeakL	propext
+ConfTyping.Leak.b06fixed_finishes	ConfTyping.LeakL	propext
+ConfTyping.Leak.b06fixed_traceH	ConfTyping.LeakL	Classical.choice,Quot.sound,propext
+ConfTyping.Leak.eqStr_left	ConfTyping.LeakL	Quot.sound,propext
+ConfTyping.Leak.eqStr_right	ConfTyping.LeakL	Quot.sound,propext
+ConfTyping.Leak.exitReport	ConfTyping.LeakL	
+ConfTyping.Leak.exitReport_fuel	ConfTyping.LeakL	propext
+ConfTyping.Leak.leakEv	ConfTyping.LeakL	
+ConfTyping.Leak.leakSafe_traceH	ConfTyping.LeakL	Classical.choice,Quot.sound,propext
+ConfTyping.Leak.loopAlloc	ConfTyping.LeakL	
+ConfTyping.Leak.loopAlloc_leaks	ConfTyping.LeakL	propext
+ConfTyping.Leak.loopAlloc_refused	ConfTyping.LeakL	
+ConfTyping.Leak.loop_balanced_traceH	ConfTyping.LeakL	Classical.choice,Quot.sound,propext
+ConfTyping.Leak.overwrite	ConfTyping.LeakL	
+ConfTyping.Leak.overwrite_leaks	ConfTyping.LeakL	propext
+ConfTyping.Leak.push_lf	ConfTyping.LeakL	propext
+ConfTyping.Leak.runS_no_leak	ConfTyping.LeakL	Classical.choice,Quot.sound,propext
+ConfTyping.Leak.runS_owned	ConfTyping.LeakL	Classical.choice,Quot.sound,propext
+ConfTyping.Leak.stepT_done	ConfTyping.LeakL	propext
+ConfTyping.Leak.stepT_no_leak	ConfTyping.LeakL	Classical.choice,Quot.sound,propext
+ConfTyping.Leak.storeOf	ConfTyping.LeakL	
+ConfTyping.Leak.ucmdLangH	ConfTyping.LeakL	propext
+ConfTyping.Leak.ucmdLangH_lawful	ConfTyping.LeakL	Quot.sound,propext
+ConfTyping.Leak.ucmdLangH_strip	ConfTyping.LeakL	propext
 ConfTyping.LeakFree	ConfTyping.LeakCert	
 ConfTyping.Leaky	ConfTyping.Pipeline	
 ConfTyping.Ledger	ConfTyping.Ledger	

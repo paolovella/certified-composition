@@ -1,0 +1,4 @@
+started: 2026-11-02T15:10:46+01:00
+head: ce6ff7f
+command: bash tools/ci.sh
+log: tools/receipts/f5-row6-ci-full.log
