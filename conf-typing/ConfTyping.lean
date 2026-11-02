@@ -109,4 +109,5 @@ import ConfTyping.InjectionL
 import ConfTyping.PathL
 import ConfTyping.TenantL
 import ConfTyping.ReleaseL
+import ConfTyping.SpecL
 import ConfTyping.Vacuity

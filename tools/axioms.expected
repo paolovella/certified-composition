@@ -1128,6 +1128,43 @@ ConfTyping.SlotState.sink	ConfTyping.P1
 ConfTyping.SlotState.sstore	ConfTyping.P1	
 ConfTyping.SlotState.store	ConfTyping.P1	
 ConfTyping.SlotState.withStore	ConfTyping.P1	
+ConfTyping.Spec.JList.below.casesOn	ConfTyping.SpecL	
+ConfTyping.Spec.JList.brecOn	ConfTyping.SpecL	
+ConfTyping.Spec.JList.casesOn	ConfTyping.SpecL	
+ConfTyping.Spec.JList.recOn	ConfTyping.SpecL	
+ConfTyping.Spec.bcheck_relW	ConfTyping.SpecL	Classical.choice,Quot.sound,propext
+ConfTyping.Spec.brWitness_bcheck	ConfTyping.SpecL	propext
+ConfTyping.Spec.brWitness_relW	ConfTyping.SpecL	Classical.choice,Quot.sound,propext
+ConfTyping.Spec.brWitness_window_matters	ConfTyping.SpecL	propext
+ConfTyping.Spec.gadget	ConfTyping.SpecL	
+ConfTyping.Spec.gadgetWith	ConfTyping.SpecL	
+ConfTyping.Spec.gadget_first_load_checks	ConfTyping.SpecL	propext
+ConfTyping.Spec.gadget_leaks	ConfTyping.SpecL	propext
+ConfTyping.Spec.gadget_refused	ConfTyping.SpecL	propext
+ConfTyping.Spec.gadget_silent_at_one	ConfTyping.SpecL	propext
+ConfTyping.Spec.jlist_flatten	ConfTyping.SpecL	propext
+ConfTyping.Spec.jrel_uexec	ConfTyping.SpecL	Classical.choice,Quot.sound,propext
+ConfTyping.Spec.runW_diverge	ConfTyping.SpecL	Quot.sound,propext
+ConfTyping.Spec.runW_ext	ConfTyping.SpecL	Quot.sound,propext
+ConfTyping.Spec.runW_same	ConfTyping.SpecL	Classical.choice,Quot.sound,propext
+ConfTyping.Spec.runW_zero	ConfTyping.SpecL	Quot.sound,propext
+ConfTyping.Spec.secS	ConfTyping.SpecL	
+ConfTyping.Spec.specW	ConfTyping.SpecL	
+ConfTyping.Spec.specW_ext	ConfTyping.SpecL	propext
+ConfTyping.Spec.specW_same	ConfTyping.SpecL	propext
+ConfTyping.Spec.specW_zero	ConfTyping.SpecL	propext
+ConfTyping.Spec.storeS	ConfTyping.SpecL	
+ConfTyping.Spec.storeS_low	ConfTyping.SpecL	propext
+ConfTyping.Spec.touched_agreeJ	ConfTyping.SpecL	propext
+ConfTyping.Spec.transW_agree	ConfTyping.SpecL	Classical.choice,Quot.sound,propext
+ConfTyping.Spec.transientUse	ConfTyping.SpecL	
+ConfTyping.Spec.transientUse_leaks	ConfTyping.SpecL	propext
+ConfTyping.Spec.transientUse_refused	ConfTyping.SpecL	propext
+ConfTyping.Spec.transientUse_silent_at_zero	ConfTyping.SpecL	propext
+ConfTyping.Spec.ucmdLangW	ConfTyping.SpecL	propext
+ConfTyping.Spec.ucmdLangW_lawful	ConfTyping.SpecL	Quot.sound,propext
+ConfTyping.Spec.ucmdLangW_zero	ConfTyping.SpecL	Quot.sound,propext
+ConfTyping.Spec.urunW	ConfTyping.SpecL	propext
 ConfTyping.SpecArtifact	ConfTyping.HeteroCompose	
 ConfTyping.SpecRun.casesOn	ConfTyping.HeteroCompose	
 ConfTyping.SpecRun.ctorIdx	ConfTyping.HeteroCompose	

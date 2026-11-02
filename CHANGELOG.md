@@ -6,6 +6,15 @@ landed.
 
 ## Repository verification
 
+- **Speculative execution on L, for `ite` misprediction** (2026-11-02, F5 row 9;
+  `conf-typing/ConfTyping/SpecL.lean`). `ucmdLangW` is a lawful L language in which each `ite` first
+  runs the branch it will not take, for up to `w` commands, with its state discarded and its addresses
+  and commands observed. At window 0 it is `ucmdLangS`. `ConfTyping.Spec.bcheck_relW`: what `bcheck`
+  accepts shows the same on low-equivalent inputs at every window and fuel, counted loops included.
+  No new checker or kernel change. Refused with the leak shown: a secret address in a branch that never
+  runs, and a bounds-check-bypass gadget that needs a window of two. Limits: one global window, loop
+  guards predicted correctly, no nested speculation, no cache model, and not carried through a pass.
+
 - **Declassification on L, for whole input variables** (2026-11-02, F5 row 4;
   `conf-typing/ConfTyping/ReleaseL.lean`). `ConfTyping.Release.bcheck_release`: what `bcheck` accepts
   with variables `R` released shows the same on inputs that agree on public and released variables,
