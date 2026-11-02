@@ -324,3 +324,43 @@ theorem Frozen.ucmdLangS_admits_all (P : Partition) (π : MedPolicy) (σ : Store
     (ucmdLangS P π).Adm σ := trivial
 
 end ConfTyping
+
+namespace LCore
+
+/-- **The kernel's transfers** (`LCore.PassCert.trace_transfer` and siblings,
+    `l-core/LCore/Kernel/Pass.lean`; F6). What a certified pass guarantees: every certificate
+    shape of the source program is a certificate of the compiled program in its own language.
+    Freezing them locks `PassCert`'s obligations and the shapes' meaning through
+    `ring0.lock`'s closure. -/
+theorem Frozen.trace_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) {Φ : List Ev → Prop} (hΦ : PrefixClosed Φ)
+    (hc : Cert.trace S Φ p) : Cert.trace T Φ p' := 
+  pc.trace_transfer h hΦ hc
+
+theorem Frozen.rel_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) (hc : Cert.rel S p) : Cert.rel T p' := 
+  pc.rel_transfer h hc
+
+theorem Frozen.bound_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound S k p) :
+    Cert.bound T (t.cost k) p' := 
+  pc.bound_transfer h hc
+
+theorem Frozen.live_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) {Ψ : Chain → Prop} (hΨ : LimitInv Ψ)
+    (hc : Cert.live S Ψ p) : Cert.live T Ψ p' := 
+  pc.live_transfer h hΨ hc
+
+/-- **A budget forces termination** on a lawful language (`LCore.Lang.Lawful.bound_finishes`). -/
+theorem Frozen.bound_finishes {L : Lang} (hL : L.Lawful) {k : Nat} {p : L.Prog}
+    (h : Cert.bound L k p) (i : L.In) (hi : L.Adm i) : ∃ n, (L.run n p i).out ≠ .fuel := 
+  hL.bound_finishes h i hi
+
+/-- **Passes compose** (`LCore.PassCert.seq`): a pipeline of certified passes compiles each stage
+    once, and its compiled program is the second stage's output on the first stage's. -/
+theorem Frozen.seq_comp {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) {p : S.Prog}
+    {p' : T.Prog} {p'' : U.Prog} {t u : Xform} (hp : pc.comp p = .ok (p', t))
+    (hq : qc.comp p' = .ok (p'', u)) : (pc.seq qc).comp p = .ok (p'', t.then u) :=  by
+  simp only [PassCert.seq, hp, hq]
+
+end LCore
