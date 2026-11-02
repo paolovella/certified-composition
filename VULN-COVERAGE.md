@@ -177,7 +177,7 @@ does not fit L's certificate shapes (six since 2026-11-02; this said ~~four~~ wh
 | 2 | yes | `ConfTyping.bcheck_relS` (cost is in the observation) |
 | 13 | yes | `ConfTyping.bcheck_relS` (the outcome at every fuel is in it) |
 | 10 | yes | `ConfTyping.bcheck_boundS` |
-| 7 | mediation only | `ConfTyping.bcheck_mediatedS`; isolation is on toy `Cmd` |
+| 7 | yes, with limits | Mediation: `ConfTyping.bcheck_mediatedS`. Isolation: `ConfTyping.Tenant.tenantCheck_relView`, a `Cert.relView` on `ucmdLangI`. Attacker: tenant B, who reads its own channels and measures all leakage, cost and outcome. So A's code must be constant-time in A's integers (`bcheck`), and loops are bounded. Not yet carried through a pass on `ucmdLangI`. The other isolation claims in this map (§3.7) are on toy `Cmd` |
 | 6 | partly | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference; leaks are on toy heaps |
 | 12 | partly | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
 | 3 | loop-free, delimiter count | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |

@@ -283,6 +283,7 @@ tcheckW	conf-typing/ConfTyping/StringLoop.lean:208:45	refuse->accept	killed
 tcheckW	conf-typing/ConfTyping/StringLoop.lean:212:32	accept->refuse	killed
 tcheckW	conf-typing/ConfTyping/StringLoop.lean:213:32	refuse->accept	killed
 tcheckW	conf-typing/ConfTyping/StringLoop.lean:214:20	refuse->accept	killed
+tenantCheck	conf-typing/ConfTyping/TenantL.lean:33:10	accept->refuse	killed
 ucheck	conf-typing/ConfTyping/Bundle.lean:252:24	accept->refuse	killed
 ucheck	conf-typing/ConfTyping/Bundle.lean:253:24	accept->refuse	killed
 ucheck	conf-typing/ConfTyping/Bundle.lean:254:24	accept->refuse	killed
@@ -317,4 +318,4 @@ umcheck	conf-typing/ConfTyping/MemCert.lean:288:30	refuse->accept	killed
 wcheck	conf-typing/ConfTyping/WhileImp.lean:192:21	accept->refuse	killed
 xcheck	conf-typing/ConfTyping/AllFive.lean:57:40	accept->refuse	killed
 xcheck	conf-typing/ConfTyping/AllFive.lean:58:13	refuse->accept	killed
-mutants: 319 built, 319 killed, 0 stillborn, 0 survived, 0 unexplained
+mutants: 320 built, 320 killed, 0 stillborn, 0 survived, 0 unexplained

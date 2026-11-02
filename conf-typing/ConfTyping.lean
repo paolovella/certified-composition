@@ -107,4 +107,5 @@ import ConfTyping.Split
 import ConfTyping.SplitView
 import ConfTyping.InjectionL
 import ConfTyping.PathL
+import ConfTyping.TenantL
 import ConfTyping.Vacuity

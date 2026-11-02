@@ -1369,6 +1369,45 @@ ConfTyping.TaintCert.weakenPost	ConfTyping.StringLoop
 ConfTyping.TaintEnv	ConfTyping.TaintCert	
 ConfTyping.TaintInv	ConfTyping.TaintCert	
 ConfTyping.TaintInv.mono	ConfTyping.StringLoop	
+ConfTyping.Tenant.FramesOk	ConfTyping.TenantL	propext
+ConfTyping.Tenant.SRel	ConfTyping.TenantL	
+ConfTyping.Tenant.SepInv.initI	ConfTyping.TenantL	propext
+ConfTyping.Tenant.bcheck_relI	ConfTyping.TenantL	Classical.choice,Quot.sound,propext
+ConfTyping.Tenant.crossed	ConfTyping.TenantL	
+ConfTyping.Tenant.crossed_leaks	ConfTyping.TenantL	propext
+ConfTyping.Tenant.crossed_refused	ConfTyping.TenantL	propext
+ConfTyping.Tenant.evalS_agree	ConfTyping.TenantL	propext
+ConfTyping.Tenant.inA_related	ConfTyping.TenantL	propext
+ConfTyping.Tenant.inA₁	ConfTyping.TenantL	
+ConfTyping.Tenant.inA₂	ConfTyping.TenantL	
+ConfTyping.Tenant.intsA	ConfTyping.TenantL	
+ConfTyping.Tenant.laundered	ConfTyping.TenantL	
+ConfTyping.Tenant.laundered_leaks	ConfTyping.TenantL	propext
+ConfTyping.Tenant.laundered_refused	ConfTyping.TenantL	propext
+ConfTyping.Tenant.push_ok	ConfTyping.TenantL	propext
+ConfTyping.Tenant.runS_blind	ConfTyping.TenantL	Quot.sound,propext
+ConfTyping.Tenant.sameExceptA	ConfTyping.TenantL	
+ConfTyping.Tenant.sanitised	ConfTyping.TenantL	
+ConfTyping.Tenant.sanitised_leaks	ConfTyping.TenantL	propext
+ConfTyping.Tenant.sanitised_refused	ConfTyping.TenantL	propext
+ConfTyping.Tenant.seesA	ConfTyping.TenantL	propext
+ConfTyping.Tenant.seesB	ConfTyping.TenantL	propext
+ConfTyping.Tenant.step_blind	ConfTyping.TenantL	Quot.sound,propext
+ConfTyping.Tenant.strsA	ConfTyping.TenantL	
+ConfTyping.Tenant.strsB	ConfTyping.TenantL	
+ConfTyping.Tenant.tenantCheck_relView	ConfTyping.TenantL	Classical.choice,Quot.sound,propext
+ConfTyping.Tenant.timing	ConfTyping.TenantL	
+ConfTyping.Tenant.timing_checks	ConfTyping.TenantL	propext
+ConfTyping.Tenant.timing_leaks	ConfTyping.TenantL	propext
+ConfTyping.Tenant.timing_refused	ConfTyping.TenantL	propext
+ConfTyping.Tenant.twoTenants	ConfTyping.TenantL	
+ConfTyping.Tenant.twoTenants_all_fails	ConfTyping.TenantL	propext
+ConfTyping.Tenant.twoTenants_bcheck	ConfTyping.TenantL	propext
+ConfTyping.Tenant.twoTenants_bcheck'	ConfTyping.TenantL	propext
+ConfTyping.Tenant.twoTenants_checks_A	ConfTyping.TenantL	propext
+ConfTyping.Tenant.twoTenants_checks_B	ConfTyping.TenantL	propext
+ConfTyping.Tenant.twoTenants_isolates_A	ConfTyping.TenantL	Classical.choice,Quot.sound,propext
+ConfTyping.Tenant.twoTenants_isolates_B	ConfTyping.TenantL	Classical.choice,Quot.sound,propext
 ConfTyping.ThreeSafety	ConfTyping.TwoSafety	
 ConfTyping.Tok.casesOn	ConfTyping.ParseSource	
 ConfTyping.Tok.ctorElim	ConfTyping.ParseSource	
@@ -3192,6 +3231,7 @@ ConfTyping.tcheck_no_injection	ConfTyping.TaintCert	Classical.choice,Quot.sound,
 ConfTyping.tcheck_no_injection_from	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_sound	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_traceI	ConfTyping.InjectionL	Classical.choice,Quot.sound,propext
+ConfTyping.tenantCheck	ConfTyping.TenantL	propext
 ConfTyping.tevalE	ConfTyping.P1	
 ConfTyping.tevalE_compile	ConfTyping.P1	propext
 ConfTyping.texec	ConfTyping.P1	

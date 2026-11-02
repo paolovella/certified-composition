@@ -6,6 +6,16 @@ landed.
 
 ## Repository verification
 
+- **Tenant isolation on L, against an attacker who measures side channels** (2026-11-02, F5 row
+  7b; `conf-typing/ConfTyping/TenantL.lean`). `ConfTyping.Tenant.tenantCheck_relView`: what `bcheck`
+  and `tenantCheck` both accept shows tenant B the same events on its channels and the same leakage,
+  cost and outcome, at every fuel, on inputs that differ only in tenant A's data. A's own channels
+  may still depend on A's data (`twoTenants_all_fails`). A string cannot change timing, addresses,
+  cost or outcome in UCmd (`runS_blind`), so `bcheck` handles A's integers and `tenantCheck` A's
+  strings. Refused, each with a run showing the difference: A's data on B's channel, through an
+  assignment, through `san`, and a branch on A's integer. A's code must be constant-time in A's
+  integers, loops are bounded, and this is about the leakage `Beh` records.
+
 - **Path traversal on L, for loop-free programs, per sink** (2026-11-02, F5 row 14;
   `conf-typing/ConfTyping/PathL.lean`). `ConfTyping.pcheck_traceI`: what `pcheck fs` accepts sends
   only paths that stay inside their root to `fs`, on every input and at every fuel, as a
