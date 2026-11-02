@@ -1,0 +1,4 @@
+started: 2026-11-01T18:18:43+01:00
+head: 7af7637
+command: bash tools/ci.sh
+log: tools/receipts/f4-pc-ci-full.log

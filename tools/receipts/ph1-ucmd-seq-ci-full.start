@@ -1,0 +1,4 @@
+started: 2026-10-29T01:52:11+01:00
+head: 5282491
+command: bash tools/ci.sh
+log: tools/receipts/ph1-ucmd-seq-ci-full.log

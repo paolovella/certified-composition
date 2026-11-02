@@ -1,0 +1,4 @@
+started: 2026-10-29T16:55:59+01:00
+head: c8f0b11
+command: bash tools/ci.sh
+log: tools/receipts/f2-bridge-ci-full.log

@@ -1,0 +1,4 @@
+started: 2026-10-30T09:52:49+01:00
+head: 96138e7
+command: bash tools/ci.sh
+log: tools/receipts/f4-axfree-ci-full.log

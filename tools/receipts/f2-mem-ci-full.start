@@ -1,0 +1,4 @@
+started: 2026-10-30T08:58:42+01:00
+head: 5e00a8d
+command: bash tools/ci.sh
+log: tools/receipts/f2-mem-ci-full.log

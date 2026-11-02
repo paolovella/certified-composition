@@ -13,12 +13,13 @@
   Not part of the `ConfTyping` library; it only reads the environment.
 -/
 import ConfTyping
+import LCore
 import Lean
 
 open Lean Elab Command
 
-/-- The modules whose theorems are audited: both mathlib-free packages. -/
-def auditedRoots : List Name := [`ConfTyping, `TransportCalculus]
+/-- The modules whose theorems are audited: the three mathlib-free packages. -/
+def auditedRoots : List Name := [`ConfTyping, `TransportCalculus, `LCore]
 
 run_cmd do
   let env ← getEnv

@@ -6,6 +6,73 @@ landed.
 
 ## Repository verification
 
+- **Certificates through a one-to-many pass** (2026-11-01, F4; `conf-typing/ConfTyping/Split.lean`).
+  Expression splitting accumulates `x := (a + b) + c` in place as `x := a + b; x := x + c`, so
+  one source step becomes several target steps, cost grows with the expression, and a partial
+  run can stop mid-chain. It is a `PassCert` with the kernel's six obligations, and a
+  `bcheck`-accepted program's budget (scaled by the longest chain), mediation, memory safety and
+  noninterference reach its split version by the transfer theorems alone (`split_carries`,
+  enforced by check-claims guard (p)). Its determinacy rests on two facts about step-fuel UCmd
+  proved once, not per pass: a step splits off an observation, and equal observations stay
+  equal at less fuel. Each step's leakage marker now carries its program position (`Lk.step`).
+  Witnesses: the split program costs 4 where the source costs 2 (`exProg_expands`); a splitter
+  without the guard reads a different resource, so no certified pass compiles to it
+  (`no_naive_pass`).
+
+- **A fourth certificate shape: liveness** (2026-10-30, F4, the user's decision;
+  `l-core/LCore/Kernel/{Cert,Pass}.lean`, Ring 0). `Cert.live Ψ`: every run, taken whole as the
+  chain of its observations at every fuel, satisfies `Ψ`, a property of the run's limit:
+  "eventually emits X", "keeps producing events" for an infinite run. A pass carries it with two
+  more obligations, catch-up and reflection, and `LCore.PassCert.live_transfer` is axiom-free.
+  Witnesses: liveness carried through a pass (`padPass_carries_live`), an infinite run's
+  (`tick_unbounded`), the idle language refused, and a stalling compiler refused by catch-up
+  alone (`no_stall_pass`). Also: `ucmdLangS`, UCmd on step fuel, with `bcheck`'s four guarantees
+  (`bcheck_lcoreS`), and its meaning frozen.
+
+- **The kernel's passes: four obligations, and certificates that land on the target**
+  (2026-10-30, F3 and F4; `l-core/LCore/Kernel/Pass.lean`, Ring 0). A `PassCert` now proves
+  four facts about the pass: target events are a prefix of the source's, target cost is
+  bounded by a monotone transformer, the target observation is fixed by the source
+  observation, and what the source finishes the target finishes. With coverage of each
+  language's admissible inputs, the transfers conclude certificates of the compiled program in
+  its own language, on every admissible input. `LCore.PassCert.trace_transfer`,
+  `LCore.PassCert.rel_transfer` and `LCore.PassCert.bound_transfer` are axiom-free, and so is
+  `LCore.PassCert.seq` (axiom-free). Refused witnesses: an encoder that misses an input on
+  which the target leaks (`no_leaky_pass`), and a pass into a language where nothing runs
+  (`no_idle_pass`).
+
+- **UCmd on L, with halting abort: certificates over every run** (2026-10-29/30, F2;
+  `conf-typing/ConfTyping/{UTrace,BudgetT,MedT,MemT,NiT,Vacuity}.lean`). The kernel's
+  `Lang.Lawful` makes a run with more fuel only extend; `LCore.Lang.Lawful.bound_finishes` is
+  axiom-free. `ucmdLangT` is lawful, and `bcheck`'s budget, mediation, memory safety and
+  noninterference hold on every run of it, finished, aborted or out of fuel
+  (`bcheck_lcoreT`). Before: a `bcheck`-certified program that never finishes carried
+  vacuous certificates (`vacProg_vacuous`); after: they fail (`vacProg_not_vacuous`).
+
+- **Correction of record (2026-10-29, F0)** on the entry below. From 2026-10-28 it was headed
+  ~~Phase 1's exit: certificates survive the first compiler pass by the kernel alone~~. That
+  is met in the letter only. The certificates it carries hold vacuously on runs that never
+  finish, since the kernel has no fuel laws and `ucmdLang` reports an out-of-fuel run as an
+  empty record (F2). They also reach only target inputs that encode a source input (F3). And
+  P1 is a renaming that mirrors the source machine step for step (F4). PH1's exit is now the
+  foundation's S1–S3 (`research/2026-10/FOUNDATION-2026-10-29.md`).
+
+- **UCmd is L's first `Lang`, and P1 is a `PassCert` whose certificates arrive by transfer**
+  (2026-10-28, PH1; `LAdapter.lean`, `P1.lean`). UCmd is L's first `Lang`, and a `bcheck`-
+  accepted program carries the kernel's `bound`, `trace` and `rel` shapes (`bcheck_lcore`). P1
+  compiles names to slots, and its simulation makes it a `PassCert` with identity transformers.
+  `ucmd_p1_carries` shows budget, mediation and noninterference (addresses included) surviving
+  P1 through the three transfer theorems, with no certificate-specific pass proof. A
+  check-claims guard keeps it that way. The original P1 sketch had been lost from a scratchpad
+  (I-0003) and was rebuilt.
+
+- **L's trusted core begins: `Beh`, `Lang`, three certificate shapes, `PassCert`** (2026-10-28,
+  PH1 steps 1–4; `l-core/LCore/Kernel/`, Ring 0). One observation for every language. Every
+  certificate is a `trace`, `rel` or `bound` instance. A certified pass carries all three
+  shapes by `trace_transfer`, `rel_transfer` and `bound_transfer`, and passes compose
+  (`PassCert.seq`), all with no axioms. So no certificate is ever proved per pass. Each shape is
+  shown inhabited and refuted on a toy language.
+
 - **Addresses can join the observation: S-OBS goes through** (2026-10-28; `AddrLeak.lean`).
   PLAN-2026-10 flagged `JSecTy` as the riskiest certificate to move from state to observation.
   - `jsecTy_addrs`: two Low-equal runs of a typed program expose the same address trace,

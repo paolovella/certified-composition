@@ -1,0 +1,4 @@
+started: 2026-10-29T16:43:13+01:00
+head: 0f7a2dd
+command: bash tools/ci.sh
+log: tools/receipts/f2-step2-ci-full.log

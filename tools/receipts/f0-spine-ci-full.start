@@ -1,0 +1,4 @@
+started: 2026-10-29T12:59:46+01:00
+head: c6c3db2
+command: bash tools/ci.sh
+log: tools/receipts/f0-spine-ci-full.log

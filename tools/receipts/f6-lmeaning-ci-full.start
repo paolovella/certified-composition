@@ -1,0 +1,4 @@
+started: 2026-10-30T10:25:34+01:00
+head: e204525
+command: bash tools/ci.sh
+log: tools/receipts/f6-lmeaning-ci-full.log

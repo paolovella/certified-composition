@@ -26,7 +26,13 @@
     "ConfTyping.Frozen.wcheck_sound",
     "ConfTyping.Frozen.leakSafe_sound",
     "ConfTyping.Src.Frozen.source_certified",
-    "TransportCalculus.Frozen.Bridge.comp_cert"
+    "TransportCalculus.Frozen.Bridge.comp_cert",
+    "ConfTyping.Frozen.bcheck_lcoreT_meaning",
+    "ConfTyping.Frozen.ucmdLangT_lawful_meaning",
+    "ConfTyping.Frozen.bcheck_lcoreS_meaning",
+    "ConfTyping.Frozen.ucmdLangS_lawful_meaning",
+    "ConfTyping.Frozen.ucmdLangT_admits_all",
+    "ConfTyping.Frozen.ucmdLangS_admits_all"
   ],
   "definition_names": [],
   "permitted_axioms": [

@@ -6,7 +6,7 @@
 #   tools/run-job.sh NAME -- command args...
 #
 # Writes tools/receipts/NAME.start before running and tools/receipts/NAME.end (with exit code
-# and duration) after. render-state.sh reports any .start without an .end.
+# and duration) after. A job that times its steps (tools/ci.sh) also writes NAME.steps. render-state.sh reports any .start without an .end.
 #
 # A TERM, INT or HUP still writes the .end receipt (exit "signal NAME"), and the signal is passed
 # on to the job. I-0002: a `pkill -f` whose pattern matched this wrapper's own command line
@@ -27,6 +27,8 @@ finish() {
     > "tools/receipts/$name.end"
   echo "$name: exit $1 ($(( $(date +%s) - t0 )) s), log $log"
 }
+# A job that reports per-step times (tools/ci.sh) writes them beside the receipt (F1).
+export RUNJOB_STEPS="tools/receipts/$name.steps"
 "$@" > "$log" 2>&1 &
 child=$!
 for sig in TERM INT HUP; do

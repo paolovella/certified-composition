@@ -24,7 +24,7 @@ copy() {
   ( cd "$REPO" && git ls-files -co --exclude-standard -z | tar --null -T - -cf - ) | tar -x -C "$1"
   cp -a "$REPO/.git" "$1/.git"
   local c
-  for c in .lake conf-typing/.lake transport-calculus/.lake; do
+  for c in .lake conf-typing/.lake transport-calculus/.lake l-core/.lake; do
     [ -d "$REPO/$c" ] && mkdir -p "$1/$(dirname "$c")" && cp -a "$REPO/$c" "$1/$c"
   done
   return 0
@@ -42,6 +42,10 @@ refuses() {  # refuses NAME DIR
 }
 
 echo "ring0.lock witnesses"
+# The three scenarios use separate copies, so they run side by side (F1): each rebuilds what
+# depends on its edit, and that grows with every module downstream of the checkers. Each writes
+# its lines to its own file; they are printed in scenario order and counted from the lines.
+scen_d() {
 copy "$tmp/d"
 python3 -I - "$tmp/d/conf-typing/ConfTyping/CostBound.lean" <<'EOF'
 import re, sys
@@ -62,9 +66,13 @@ else
   fail=$((fail+1))
 fi
 refuses definition "$tmp/d"
+}
+scen_c() {
 copy "$tmp/c"
 sed -i '0,/frozen statements (P0-03/s//frozen statements  (P0-03/' "$tmp/c/workspace/Statements.lean"
 refuses challenge "$tmp/c"
+}
+scen_k() {
 copy "$tmp/k"
 python3 -I - "$tmp/k/conf-typing/ConfTyping/CostBound.lean" <<'EOF2'
 import sys
@@ -87,5 +95,31 @@ if ( cd "$tmp/k" && bash tools/ring0-lock.sh --checkers && bash tools/ring0-lock
 else
   printf '  FAIL  %-12s not accepted: %s\n' checker "$(tail -1 "$tmp/k2.log")"; fail=$((fail+1))
 fi
+}
+# L's meaning (F2): `faultEv` is rebuilt as `.ext "fault" ([] ++ [])`, definitionally the same,
+# so every proof and every frozen statement's text survive; only the lock sees that what
+# "memory safe" means on `ucmdLangT` was edited.
+scen_l() {
+copy "$tmp/l"
+python3 -I - "$tmp/l/conf-typing/ConfTyping/UTrace.lean" <<'EOF3'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+old = 'def faultEv : LCore.Ev := .ext "fault" []\n'
+assert s.count(old) == 1, "faultEv not found"
+s = s.replace(old, 'def faultEv : LCore.Ev := .ext "fault" ([] ++ [])\n')
+open(p, "w").write(s)
+EOF3
+refuses lmeaning "$tmp/l"
+}
+scen_d > "$tmp/out.d" 2>&1 &
+scen_c > "$tmp/out.c" 2>&1 &
+scen_k > "$tmp/out.k" 2>&1 &
+scen_l > "$tmp/out.l" 2>&1 &
+wait
+cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" "$tmp/out.l"
+pass=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" "$tmp/out.l" | grep -c '^  ok ')
+fail=$(cat "$tmp/out.d" "$tmp/out.c" "$tmp/out.k" "$tmp/out.l" | grep -c '^  FAIL ')
+[ "$((pass + fail))" -ge 6 ] || { echo "  FAIL  a scenario printed no verdict"; fail=$((fail+1)); }
 echo "ring0.lock witnesses: $pass passed, $fail failed"
 [ "$fail" = 0 ]

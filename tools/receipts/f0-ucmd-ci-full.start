@@ -1,0 +1,4 @@
+started: 2026-10-29T13:17:22+01:00
+head: 12fbe9c
+command: bash tools/ci.sh
+log: tools/receipts/f0-ucmd-ci-full.log

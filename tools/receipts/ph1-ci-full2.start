@@ -1,0 +1,4 @@
+started: 2026-10-28T12:04:05+01:00
+head: 486714d
+command: bash tools/ci.sh
+log: tools/receipts/ph1-ci-full2.log

@@ -36,6 +36,7 @@ jobs:
             .lake
             conf-typing/.lake
             transport-calculus/.lake
+            l-core/.lake
           key: core-${{ runner.os }}-${{ hashFiles('**/lean-toolchain', '**/lakefile.*') }}
       - name: tools/ci.sh --fast
         run: bash tools/ci.sh --fast

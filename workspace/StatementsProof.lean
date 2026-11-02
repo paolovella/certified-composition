@@ -264,3 +264,63 @@ theorem Frozen.Bridge.comp_cert {X M D : Type} {GA : GradedAction M D} {dist : X
   | (apply TransportCalculus.Bridge.comp_cert <;> assumption)
 
 end TransportCalculus
+
+namespace ConfTyping
+
+/-- **L's meaning for UCmd** (`ConfTyping.bcheck_lcoreT`, `conf-typing/ConfTyping/NiT.lean`;
+    F2). A program `bcheck` accepts carries, on the lawful language `ucmdLangT`, its budget as a
+    `bound`, its mediation and its memory safety as `trace`s, and its noninterference as a
+    `rel`, over every run. Freezing it locks what "certified" means: the language, its run,
+    the events and leakage, `mediated`, `faultEv`, and the kernel's certificate shapes, all
+    through `ring0.lock`'s closure. `bcheck` is a checker, so it can still evolve. -/
+theorem Frozen.bcheck_lcoreT_meaning {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
+    (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
+    LCore.Cert.bound (ucmdLangT P π) k c
+  ∧ LCore.Cert.trace (ucmdLangT P π) (mediated π) c
+  ∧ LCore.Cert.trace (ucmdLangT P π) (fun evs => faultEv ∉ evs) c
+  ∧ LCore.Cert.rel (ucmdLangT P π) c := 
+  bcheck_lcoreT h π
+
+/-- **The language is lawful** (`ConfTyping.ucmdLangT_lawful`, `conf-typing/ConfTyping/UTrace.lean`;
+    F2): more fuel only extends a run, and a run that never finishes has unbounded cost, so
+    the certificates above cannot hold vacuously. -/
+theorem Frozen.ucmdLangT_lawful_meaning (P : Partition) (π : MedPolicy) :
+    (ucmdLangT P π).Lawful := 
+  ucmdLangT_lawful P π
+
+end ConfTyping
+
+namespace ConfTyping
+
+/-- **L's meaning for UCmd on step fuel** (`ConfTyping.bcheck_lcoreS`,
+    `conf-typing/ConfTyping/UStep.lean`; F4). The same four guarantees as on `ucmdLangT`, on the
+    step-indexed language whose observation marks every step. Freezing it locks `urunS`,
+    `push`, `stepMk` and `ucmdLangS` through `ring0.lock`'s closure. -/
+theorem Frozen.bcheck_lcoreS_meaning {P : Partition} {c : UCmd} {A' V' : List String} {k : Nat}
+    (h : bcheck P [] [] c = some (A', V', k)) (π : MedPolicy) :
+    LCore.Cert.bound (ucmdLangS P π) k c
+  ∧ LCore.Cert.trace (ucmdLangS P π) (mediated π) c
+  ∧ LCore.Cert.trace (ucmdLangS P π) (fun evs => faultEv ∉ evs) c
+  ∧ LCore.Cert.rel (ucmdLangS P π) c := 
+  bcheck_lcoreS h π
+
+/-- **The step-fuel language is lawful** (`ConfTyping.ucmdLangS_lawful`; F4). -/
+theorem Frozen.ucmdLangS_lawful_meaning (P : Partition) (π : MedPolicy) :
+    (ucmdLangS P π).Lawful := 
+  ucmdLangS_lawful P π
+
+end ConfTyping
+
+namespace ConfTyping
+
+/-- **UCmd's certificates speak about every input** (F3's admissible inputs; a side note of
+    2026-11-01). A language that narrowed its admissible inputs would narrow every certificate
+    with it, and every check would still pass; these statements make narrowing UCmd's a change
+    to a frozen statement, which needs the user's key. -/
+theorem Frozen.ucmdLangT_admits_all (P : Partition) (π : MedPolicy) (σ : Store) :
+    (ucmdLangT P π).Adm σ := trivial
+
+theorem Frozen.ucmdLangS_admits_all (P : Partition) (π : MedPolicy) (σ : Store) :
+    (ucmdLangS P π).Adm σ := trivial
+
+end ConfTyping
