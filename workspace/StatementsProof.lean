@@ -364,3 +364,18 @@ theorem Frozen.seq_comp {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) {
   simp only [PassCert.seq, hp, hq]
 
 end LCore
+
+namespace LCore
+
+/-- **The relational shape transfers** (`LCore.PassCert.hyper_transfer`; the user's decision of
+    2026-11-02): given that related target inputs are encodings of related source inputs, a
+    property of two runs' limits carries from the source program to the compiled one. -/
+theorem Frozen.hyper_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) {RS : S.In → S.In → Prop}
+    {RT : T.In → T.In → Prop} {Θ : Chain → Chain → Prop} (hΘ : LimitInv2 Θ)
+    (hR : ∀ u u', T.Adm u → T.Adm u' → RT u u' →
+      ∃ i i', S.Adm i ∧ S.Adm i' ∧ RS i i' ∧ pc.enc i = u ∧ pc.enc i' = u')
+    (hc : Cert.hyper S RS Θ p) : Cert.hyper T RT Θ p' := 
+  pc.hyper_transfer h hΘ hR hc
+
+end LCore

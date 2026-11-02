@@ -17,7 +17,8 @@
   finished, alike. With all four event facts the two runs have the same limit.
   With coverage of the admissible inputs (F3), every certificate shape transfers to a
   certificate of the compiled program in its own language (`trace_transfer` for prefix-closed
-  properties, `rel_transfer`, `bound_transfer`, `live_transfer` for limit properties), and passes
+  properties, `rel_transfer`, `bound_transfer`, `live_transfer` for limit properties,
+  `hyper_transfer` for properties of two runs' limits), and passes
   compose (`PassCert.seq`). So a new pass costs these facts and no certificate proofs, and a new certificate costs nothing
   per pass (PLAN-2026-10 §6).
 
@@ -146,19 +147,37 @@ theorem bound_transfer (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound 
   obtain ⟨i, hi, rfl⟩ := pc.cover u hu
   exact Nat.le_trans (pc.cost_sim p p' t h m i hi) (t.costMono _ _ (hc (t.fuel m) i hi))
 
-/-- **Liveness transfers.** By the four event obligations the compiled run and the source run
-    have the same limit (`Chain.Equiv`), so any property of the limit carries over: what the
-    source must eventually do, the compiled program must too. -/
+/-- **A compiled run has its source run's limit** (`Chain.Equiv`), by the four event
+    obligations: events a prefix (`ev_sim`), caught up (`catch_up`), and finishing alike both
+    ways (`progress`, `reflect`). -/
+theorem chain_equiv (h : pc.comp p = .ok (p', t)) {i : S.In} (hi : S.Adm i) :
+    Chain.Equiv (fun n => S.run n p i) (fun m => T.run m p' (pc.enc i)) :=
+  ⟨fun n => pc.catch_up p p' t h n i hi,
+   fun m => ⟨t.fuel m, pc.ev_sim p p' t h m i hi⟩,
+   fun n hf => pc.progress p p' t h n i hi hf,
+   fun m hf => pc.reflect p p' t h m i hi hf⟩
+
+/-- **Liveness transfers.** The compiled run and the source run have the same limit, so any
+    property of the limit carries over: what the source must eventually do, the compiled program
+    must too. -/
 theorem live_transfer (h : pc.comp p = .ok (p', t)) {Ψ : Chain → Prop} (hΨ : LimitInv Ψ)
     (hc : Cert.live S Ψ p) : Cert.live T Ψ p' := by
   intro u hu
   obtain ⟨i, hi, rfl⟩ := pc.cover u hu
-  exact hΨ (fun n => S.run n p i) (fun m => T.run m p' (pc.enc i))
-    ⟨fun n => pc.catch_up p p' t h n i hi,
-     fun m => ⟨t.fuel m, pc.ev_sim p p' t h m i hi⟩,
-     fun n hf => pc.progress p p' t h n i hi hf,
-     fun m hf => pc.reflect p p' t h m i hi hf⟩
-    (hc i hi)
+  exact hΨ _ _ (pc.chain_equiv h hi) (hc i hi)
+
+/-- **The relational shape transfers**, given one fact about the pass's inputs: target inputs
+    related by `RT` are encodings of source inputs related by `RS` (as `low_cover` is for
+    `lowIn`). Each compiled run has its source run's limit, so any property of the two limits
+    carries over. -/
+theorem hyper_transfer (h : pc.comp p = .ok (p', t)) {RS : S.In → S.In → Prop}
+    {RT : T.In → T.In → Prop} {Θ : Chain → Chain → Prop} (hΘ : LimitInv2 Θ)
+    (hR : ∀ u u', T.Adm u → T.Adm u' → RT u u' →
+      ∃ i i', S.Adm i ∧ S.Adm i' ∧ RS i i' ∧ pc.enc i = u ∧ pc.enc i' = u')
+    (hc : Cert.hyper S RS Θ p) : Cert.hyper T RT Θ p' := by
+  intro u u' hu hu' hr
+  obtain ⟨i, i', hi, hi', hii, rfl, rfl⟩ := hR u u' hu hu' hr
+  exact hΘ _ _ _ _ (pc.chain_equiv h hi) (pc.chain_equiv h hi') (hc i i' hi hi' hii)
 
 end PassCert
 

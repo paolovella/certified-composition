@@ -38,7 +38,8 @@
     "LCore.Frozen.bound_transfer",
     "LCore.Frozen.live_transfer",
     "LCore.Frozen.bound_finishes",
-    "LCore.Frozen.seq_comp"
+    "LCore.Frozen.seq_comp",
+    "LCore.Frozen.hyper_transfer"
   ],
   "definition_names": [],
   "permitted_axioms": [

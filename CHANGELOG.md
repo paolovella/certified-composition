@@ -6,6 +6,16 @@ landed.
 
 ## Repository verification
 
+- **A fifth certificate shape: one observer, a chosen input relation** (2026-11-02, F5's kill
+  rule and the user's decision; `l-core/LCore/Kernel/{Cert,Pass}.lean`, Ring 0). Injection,
+  declassification and tenant isolation are each noninterference for a particular observer under
+  a particular input relation, which `rel` cannot state. `Cert.hyper R Θ`: for inputs related by
+  `R`, the two runs' limits satisfy `Θ`. Every pass already gives each compiled run its source
+  run's limit, so with one fact about the pass's inputs `LCore.PassCert.hyper_transfer` carries
+  it, and it is axiom-free. Witnesses: a property that holds, one that fails, and one carried
+  through a pass. Also frozen, with the kernel's other theorems (F6): 38 frozen statements, and
+  `ring0.lock` holds 509 definitions.
+
 - **Certificates through a one-to-many pass** (2026-11-01, F4; `conf-typing/ConfTyping/Split.lean`).
   Expression splitting accumulates `x := (a + b) + c` in place as `x := a + b; x := x + c`, so
   one source step becomes several target steps, cost grows with the expression, and a partial

@@ -558,11 +558,11 @@ master's `tools/` and `.github/` are laid over the PR tree before `ci.sh` runs. 
 touches a Ring 0 path fails the gate's `ring0` check and needs the user's key. A PR that
 removes or changes a line of `tools/axioms.expected` fails `manifest`.
 
-**Frozen statements** (Ring 0). `workspace/Statements.lean` states 37 results the repo rests on:
+**Frozen statements** (Ring 0). `workspace/Statements.lean` states 38 results the repo rests on:
 every checker's soundness theorem, `leakSafe_sound`, `source_certified`, `Bridge.comp_cert`, and
 L's meaning for UCmd: `bcheck`'s four guarantees on the lawful languages `ucmdLangT` (F2) and
 `ucmdLangS` (step fuel, F4), each language's lawfulness, and that each admits every input; and
-the kernel's own theorems: the four transfers, `bound_finishes`, and how `seq` composes (F6).
+the kernel's own theorems: the five transfers, `bound_finishes`, and how `seq` composes (F6).
 These lock what "certified" means on L: the language, its run, its events and leakage, the
 inputs its certificates cover, the kernel's certificate shapes, and what a certified pass must
 prove (`l-core`), so no agent can redefine them and re-prove a weaker guarantee under the same
@@ -571,7 +571,7 @@ name.
 those statements, with no axiom beyond the standard three. That file is the only one allowed
 `sorry`, as the challenge's bodies. A statement can also be weakened by editing a definition it
 mentions, which the comparator cannot see. So `tools/ring0.lock` hashes every definition in the
-frozen statements' dependency closure that does not pass through a checker, 507 of them, and CI
+frozen statements' dependency closure that does not pass through a checker, 509 of them, and CI
 fails on any change. The checkers the statements name are left out: an edit to one cannot weaken
 a statement, which must still be proved against the locked definitions. Their hashes are in
 `tools/checkers.lock`, which a change may rewrite (`tools/ring0-lock.sh --checkers`), and the base

@@ -1,6 +1,6 @@
-file	workspace/Statements.lean	086569cf477bc4b927d51937e01ea78809cb0d20c8c9cb97b6a08b5021b19c4a
-file	comparator.json	26cb944340dd85a99d92a0c6d4f96aec2a061980fdffc0b54798dfd88bf9e1be
-frozen statements	37
+file	workspace/Statements.lean	6857814caac363f1fc9c88895753ce53fe723b3dfa4c6b872f086ed74af03a52
+file	comparator.json	cf8af558e27955fcf384ffa4db06f07b8245362d7312cc0db1bdd6defdcbb2ec
+frozen statements	38
 checkers	23	ConfTyping.allcheck ConfTyping.bcheck ConfTyping.costCheck ConfTyping.hcheck ConfTyping.jcheck ConfTyping.jcheckW ConfTyping.leakSafe ConfTyping.medCheck ConfTyping.pathCheck ConfTyping.pcheck ConfTyping.pcheckW ConfTyping.secCheck ConfTyping.secCheckD ConfTyping.secCheckT ConfTyping.secCheckTD ConfTyping.slcheck ConfTyping.specCheck ConfTyping.tcheck ConfTyping.tcheckW ConfTyping.ucheck ConfTyping.ucheckNI ConfTyping.umcheck ConfTyping.wcheck
 ConfTyping.Addr	13285864654764339375
 ConfTyping.Cmd	3931117990
@@ -438,6 +438,7 @@ LCore.Beh.lk	4573415344376231868
 LCore.Beh.mk	3938620485
 LCore.Beh.out	14922758964269783117
 LCore.Cert.bound	12193867875832571831
+LCore.Cert.hyper	7579409909705046829
 LCore.Cert.live	13241332037465342036
 LCore.Cert.rel	17192613647496917356
 LCore.Cert.trace	13445278419080203711
@@ -459,6 +460,7 @@ LCore.Lang.lowIn	316078517221116920
 LCore.Lang.mk	1926544075
 LCore.Lang.run	5761093692814892775
 LCore.LimitInv	779152390061157289
+LCore.LimitInv2	14536882282419028770
 LCore.Lk	3931117990
 LCore.Lk.addr	3805333517
 LCore.Lk.branch	1633304581

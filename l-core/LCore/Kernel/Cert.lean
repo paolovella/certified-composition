@@ -1,8 +1,9 @@
 /-
-  Four certificate shapes, their meaning defined once (PLAN-2026-10 §2, `Cert.lean`). Ring 0.
+  Five certificate shapes, their meaning defined once (PLAN-2026-10 §2, `Cert.lean`). Ring 0.
 
   Every certificate L carries is an instance of one of these, over any `Lang` (a fourth,
-  `live`, for what must happen, is below):
+  `live`, for what must happen, and a fifth, `hyper`, for one observer under a chosen input
+  relation, are below):
   - `trace Φ`: every run's events satisfy `Φ`. Mediation, memory safety, taint and path
     properties, and the absence of leaks are all `trace` instances.
   - `rel`: inputs the attacker cannot tell apart give the same observation. Since `Beh` is all
@@ -56,7 +57,23 @@ def Chain.Equiv (r r' : Chain) : Prop :=
 /-- A property of a run's limit: runs with the same limit both have it or both lack it. -/
 def LimitInv (Ψ : Chain → Prop) : Prop := ∀ r r', Chain.Equiv r r' → Ψ r → Ψ r'
 
+/-- A property of two runs' limits: runs with the same limits both have it or both lack it. -/
+def LimitInv2 (Θ : Chain → Chain → Prop) : Prop :=
+  ∀ r₁ r₂ r₁' r₂', Chain.Equiv r₁ r₁' → Chain.Equiv r₂ r₂' → Θ r₁ r₂ → Θ r₁' r₂'
+
 namespace Cert
+
+/-- **The fifth shape: relational, for a chosen observer** (the user's decision of 2026-11-02,
+    after F5's kill rule fired on injection, declassification and isolation). For admissible
+    inputs related by `R`, the two runs, taken whole, satisfy `Θ`: "their events on sink `fs`
+    are the same" (injection, with `R` = agree on trusted data), "tenant B sees the same"
+    (isolation, with `R` = differ only in tenant A's data). `rel` fixes `R` to the language's
+    `lowIn` and compares the whole observation at every fuel; `hyper` lets the certificate
+    choose both, about what the runs eventually do. `Θ` must depend only on the two limits
+    (`LimitInv2`) to transfer through a pass. -/
+def hyper (L : Lang) (R : L.In → L.In → Prop) (Θ : Chain → Chain → Prop) (p : L.Prog) : Prop :=
+  ∀ (i i' : L.In), L.Adm i → L.Adm i' → R i i' →
+    Θ (fun n => L.run n p i) (fun n => L.run n p i')
 
 /-- **The fourth shape: liveness** (the user's decision of 2026-10-30). Every admissible run, as a
     whole, satisfies `Ψ`: "eventually emits X", "if it finishes, it ended with a reply", "emits

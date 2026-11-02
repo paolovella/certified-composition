@@ -244,6 +244,57 @@ theorem no_stall_pass (pc : PassCert tickL stallL) {p' : Unit} {t : Xform}
   simp [tickL, stallL] at this
   omega
 
+/-! ## The relational shape (`Cert.hyper`) -/
+
+/-- "Both runs eventually show the same events." -/
+def sameEvents (r r' : Chain) : Prop := ∀ l, (∃ n, l <+: (r n).ev) ↔ (∃ n, l <+: (r' n).ev)
+
+theorem sameEvents_inv : LimitInv2 sameEvents := by
+  intro r₁ r₂ r₁' r₂' h₁ h₂ h l
+  constructor
+  · intro ⟨n, hn⟩
+    obtain ⟨m, hm⟩ := h₁.2.1 n
+    obtain ⟨k, hk⟩ := (h l).mp ⟨m, prefix_trans' hn hm⟩
+    obtain ⟨j, hj⟩ := h₂.1 k
+    exact ⟨j, prefix_trans' hk hj⟩
+  · intro ⟨n, hn⟩
+    obtain ⟨m, hm⟩ := h₂.2.1 n
+    obtain ⟨k, hk⟩ := (h l).mpr ⟨m, prefix_trans' hn hm⟩
+    obtain ⟨j, hj⟩ := h₁.1 k
+    exact ⟨j, prefix_trans' hk hj⟩
+
+/-- A toy that emits: program `false` emits the public part, program `true` the secret. -/
+def toyEmit : Lang where
+  Prog  := Bool
+  In    := Nat × Nat
+  lowIn i i' := i.1 = i'.1
+  run _ p i := { ev := [.emit "out" [if p then i.2 else i.1]], lk := [], cost := 1, out := .done }
+
+/-- **Holds**: for publicly equal inputs, `false` shows the same events. -/
+theorem emit_hyper_holds : Cert.hyper toyEmit (fun i i' => i.1 = i'.1) sameEvents false := by
+  intro i i' _ _ h l
+  simp only [toyEmit, Bool.false_eq_true, ↓reduceIte, h]
+
+/-- **Fails**: `true` emits the secret, so publicly equal inputs can show different events. -/
+theorem emit_hyper_fails : ¬ Cert.hyper toyEmit (fun i i' => i.1 = i'.1) sameEvents true := by
+  intro h
+  obtain ⟨n, hn⟩ := (h (0, 0) (0, 1) trivial trivial rfl [.emit "out" [0]]).mp
+    ⟨0, prefix_refl' _⟩
+  have := hn.eq_of_length (by simp [toyEmit])
+  simp [toyEmit] at this
+
+/-- The identity pass on `toyEmit`. -/
+def idEmit : PassCert toyEmit toyEmit :=
+  PassCert.ofSim (fun p => .ok (p, Xform.id)) (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun _ _ _ h _ _ => by cases h; rfl)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
+
+/-- **The relational shape, carried through a pass.** -/
+theorem idEmit_carries_hyper : Cert.hyper toyEmit (fun i i' => i.1 = i'.1) sameEvents false :=
+  idEmit.hyper_transfer (p := false) (p' := false) (t := Xform.id) rfl sameEvents_inv
+    (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩) emit_hyper_holds
+
 /-! ## Coverage (F3): a pass must reach every admissible target input -/
 
 /-- A target with an extra flag. With the flag off it runs as `toy`; with the flag on,
