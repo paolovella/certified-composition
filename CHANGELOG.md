@@ -6,6 +6,13 @@ landed.
 
 ## Repository verification
 
+- **Component seams on L, in sequence** (2026-11-02, F5 row 12; `conf-typing/ConfTyping/SeamL.lean`).
+  `Cert.rel` does not compose, because `Beh` has no final store: `ConfTyping.Seam.bare_rel_breaks` gives
+  two programs that each satisfy it and whose sequence leaks. With `bcheck`'s threaded rights and
+  pointers as the interface, `ConfTyping.Seam.bcheck_seam` composes two components at the sum of their
+  costs, and `seam_carried` takes the composite's four guarantees through `splitPass`. No new checker or
+  kernel change. `Bridge.comp`'s reception and the trusted-base ledger stay on toy `Cmd`.
+
 - **Memory leaks on L, for runs that finish** (2026-11-02, F5 row 6;
   `conf-typing/ConfTyping/LeakL.lean`). `Beh` has no final heap, so a leak could not be stated on
   `ucmdLangS`. `ucmdLangH` is the same run plus an exit report, and `ConfTyping.Leak.leakSafe_traceH`

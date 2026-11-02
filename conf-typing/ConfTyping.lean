@@ -111,4 +111,5 @@ import ConfTyping.TenantL
 import ConfTyping.ReleaseL
 import ConfTyping.SpecL
 import ConfTyping.LeakL
+import ConfTyping.SeamL
 import ConfTyping.Vacuity

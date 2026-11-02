@@ -1084,6 +1084,30 @@ ConfTyping.SStore	ConfTyping.ParseSource
 ConfTyping.Safe	ConfTyping.QueryProgram	
 ConfTyping.Sat	ConfTyping.Ledger	
 ConfTyping.Sched	ConfTyping.HeteroCompose	
+ConfTyping.Seam.bare_rel_breaks	ConfTyping.SeamL	Classical.choice,Quot.sound,propext
+ConfTyping.Seam.bcheck_seam	ConfTyping.SeamL	Quot.sound,propext
+ConfTyping.Seam.branchY	ConfTyping.SeamL	
+ConfTyping.Seam.branchY_checks	ConfTyping.SeamL	propext
+ConfTyping.Seam.branchY_rel	ConfTyping.SeamL	Classical.choice,Quot.sound,propext
+ConfTyping.Seam.consumer	ConfTyping.SeamL	
+ConfTyping.Seam.consumer_checks	ConfTyping.SeamL	propext
+ConfTyping.Seam.noSec	ConfTyping.SeamL	
+ConfTyping.Seam.reader	ConfTyping.SeamL	
+ConfTyping.Seam.reader_checks	ConfTyping.SeamL	propext
+ConfTyping.Seam.seam_carried	ConfTyping.SeamL	Classical.choice,Quot.sound,propext
+ConfTyping.Seam.seam_certified	ConfTyping.SeamL	Classical.choice,Quot.sound,propext
+ConfTyping.Seam.secS	ConfTyping.SeamL	
+ConfTyping.Seam.storeS	ConfTyping.SeamL	
+ConfTyping.Seam.storeS_low	ConfTyping.SeamL	propext
+ConfTyping.Seam.supplier	ConfTyping.SeamL	
+ConfTyping.Seam.supplier_checks	ConfTyping.SeamL	propext
+ConfTyping.Seam.supplier_consumer_agrees	ConfTyping.SeamL	propext
+ConfTyping.Seam.supplier_consumer_certified	ConfTyping.SeamL	Classical.choice,Quot.sound,propext
+ConfTyping.Seam.unsupplied_refused	ConfTyping.SeamL	propext
+ConfTyping.Seam.unsupplied_unmediated	ConfTyping.SeamL	propext
+ConfTyping.Seam.writeY	ConfTyping.SeamL	
+ConfTyping.Seam.writeY_refused	ConfTyping.SeamL	propext
+ConfTyping.Seam.writeY_rel	ConfTyping.SeamL	propext
 ConfTyping.SecLat.casesOn	ConfTyping.LatticeFlow	
 ConfTyping.SecLat.ctorIdx	ConfTyping.LatticeFlow	
 ConfTyping.SecLat.join	ConfTyping.LatticeFlow	
