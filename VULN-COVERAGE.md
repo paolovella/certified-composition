@@ -171,20 +171,27 @@ below says which rows now hold on an L language, and by which theorem; a row not
 theorem is still a claim about its toy model only. Item F5 moves the rest, or records why a row
 does not fit L's certificate shapes (six since 2026-11-02; this said ~~four~~ when written).
 
-| # | on L | L theorem (`ucmdLangS`, step fuel; the same on `ucmdLangT`; row 3 on `ucmdLangI`) |
-|---|---|---|
-| 1 | yes | `ConfTyping.bcheck_relS` |
-| 2 | yes | `ConfTyping.bcheck_relS` (cost is in the observation) |
-| 13 | yes | `ConfTyping.bcheck_relS` (the outcome at every fuel is in it) |
-| 10 | yes | `ConfTyping.bcheck_boundS` |
-| 7 | yes, with limits | Mediation: `ConfTyping.bcheck_mediatedS`. Isolation: `ConfTyping.Tenant.tenantCheck_relView`, a `Cert.relView` on `ucmdLangI`. Attacker: tenant B, who reads its own channels and measures all leakage, cost and outcome. So A's code must be constant-time in A's integers (`bcheck`), and loops are bounded. Not yet carried through a pass on `ucmdLangI`. The other isolation claims in this map (§3.7) are on toy `Cmd` |
-| 6 | yes, leaks on finished runs | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference. `ConfTyping.Leak.leakSafe_traceH`, a `Cert.trace` on `ucmdLangH`, which is `ucmdLangS` plus an exit report: a run that finishes has freed everything it allocated, loops need not be bounded. A run that aborts is not covered (`ConfTyping.Leak.allocThenCheck_abort_unreported`). Not carried through a pass |
-| 12 | partly | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
-| 3 | loop-free, delimiter count | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |
-| 14 | loop-free, per sink | `ConfTyping.pcheck_traceI`, a `Cert.trace` on `ucmdLangI`. Attacker: controls every initial string. Observer: the sink `fs`; other sinks are not covered. The alphabet is a segment and `..`. A loop rule (`pcheckW`) is not on L; the depth method of `PathTraversal.lean` stays on its own language |
-| 4 | whole input variables | `ConfTyping.Release.bcheck_release`, a `Cert.rel` on `ucmdLangS` at the secrets minus the released variables; carried by `ConfTyping.Release.bcheck_release_carried`. Attacker: sees every channel and all leakage, cost and outcome, and knows the public and released inputs. A computed release (§3.4's ledger) stays on toy `Cmd` until item REL-01; `ConfTyping.Release.revealR_coarser` shows the cost of the limit |
-| 9 | yes, `ite` misprediction | `ConfTyping.Spec.bcheck_relW`, a `Cert.rel` on `ucmdLangW`, at every window; at window 0 it is `ucmdLangS` (`ConfTyping.Spec.ucmdLangW_zero`). Attacker: picks the window, sees every channel and all leakage including the addresses a mispredicted branch touches, and real cost including transient commands. Limits: one global window, correctly predicted loop guards, no nested speculation, addresses and step counts only (no cache model, v2 or v4). Not carried through a pass |
-| 5, 8, 11 | misfit | quantitative, concurrent, assumption-shaped: outside the shapes as they stand |
+*Correction of record.* From 2026-11-02 until this note, the third column's heading said its theorems
+were on ~~`ucmdLangS`, with row 3 on `ucmdLangI`~~. By then rows 14, 7, 9 and 6 used other languages, so
+the table read as one finished language. It is not. These rows hold on four separate languages, and
+nothing combines them: no theorem says one program has all these properties at once, and a compiler
+pass carries only what is on `ucmdLangS`. Item L-UNIFY holds that work. A "yes" below means "yes on the
+language named in its row".
+
+| # | on L | language | through `splitPass` | L theorem |
+|---|---|---|---|---|
+| 1 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` |
+| 2 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` (cost is in the observation) |
+| 13 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` (the outcome at every fuel is in it) |
+| 10 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_boundS` |
+| 7 | yes, with limits | `ucmdLangS`; isolation on `ucmdLangI` | mediation yes; isolation no | Mediation: `ConfTyping.bcheck_mediatedS`. Isolation: `ConfTyping.Tenant.tenantCheck_relView`, a `Cert.relView` on `ucmdLangI`. Attacker: tenant B, who reads its own channels and measures all leakage, cost and outcome. So A's code must be constant-time in A's integers (`bcheck`), and loops are bounded. Not yet carried through a pass on `ucmdLangI`. The other isolation claims in this map (§3.7) are on toy `Cmd` |
+| 6 | yes, leaks on finished runs | `ucmdLangS`; leaks on `ucmdLangH` | memory safety yes; leaks no | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference. `ConfTyping.Leak.leakSafe_traceH`, a `Cert.trace` on `ucmdLangH`, which is `ucmdLangS` plus an exit report: a run that finishes has freed everything it allocated, loops need not be bounded. A run that aborts is not covered (`ConfTyping.Leak.allocThenCheck_abort_unreported`). Not carried through a pass |
+| 12 | partly | any | it composes passes | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
+| 3 | loop-free, delimiter count | `ucmdLangI` | no | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |
+| 14 | loop-free, per sink | `ucmdLangI` | no | `ConfTyping.pcheck_traceI`, a `Cert.trace` on `ucmdLangI`. Attacker: controls every initial string. Observer: the sink `fs`; other sinks are not covered. The alphabet is a segment and `..`. A loop rule (`pcheckW`) is not on L; the depth method of `PathTraversal.lean` stays on its own language |
+| 4 | whole input variables | `ucmdLangS` at the reduced partition | yes | `ConfTyping.Release.bcheck_release`, a `Cert.rel` on `ucmdLangS` at the secrets minus the released variables; carried by `ConfTyping.Release.bcheck_release_carried`. Attacker: sees every channel and all leakage, cost and outcome, and knows the public and released inputs. A computed release (§3.4's ledger) stays on toy `Cmd` until item REL-01; `ConfTyping.Release.revealR_coarser` shows the cost of the limit |
+| 9 | yes, `ite` misprediction | `ucmdLangW` | no | `ConfTyping.Spec.bcheck_relW`, a `Cert.rel` on `ucmdLangW`, at every window; at window 0 it is `ucmdLangS` (`ConfTyping.Spec.ucmdLangW_zero`). Attacker: picks the window, sees every channel and all leakage including the addresses a mispredicted branch touches, and real cost including transient commands. Limits: one global window, correctly predicted loop guards, no nested speculation, addresses and step counts only (no cache model, v2 or v4). Not carried through a pass |
+| 5, 8, 11 | misfit | none | no | quantitative, concurrent, assumption-shaped: outside the shapes as they stand |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
 
