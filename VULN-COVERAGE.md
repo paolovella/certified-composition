@@ -169,9 +169,9 @@ and until F2 none of those models was an L language: they were toy semantics (`C
 `UCmd` on `uexec`, and per-row machines). A verdict ~~IN~~ meant "IN for that toy model". The table
 below says which rows now hold on an L language, and by which theorem; a row not listed with an L
 theorem is still a claim about its toy model only. Item F5 moves the rest, or records why a row
-does not fit L's four certificate shapes.
+does not fit L's certificate shapes (six since 2026-11-02; this said ~~four~~ when written).
 
-| # | on L | L theorem (`ucmdLangS`, step fuel; the same on `ucmdLangT`) |
+| # | on L | L theorem (`ucmdLangS`, step fuel; the same on `ucmdLangT`; row 3 on `ucmdLangI`) |
 |---|---|---|
 | 1 | yes | `ConfTyping.bcheck_relS` |
 | 2 | yes | `ConfTyping.bcheck_relS` (cost is in the observation) |
@@ -180,8 +180,9 @@ does not fit L's four certificate shapes.
 | 7 | mediation only | `ConfTyping.bcheck_mediatedS`; isolation is on toy `Cmd` |
 | 6 | partly | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference; leaks are on toy heaps |
 | 12 | partly | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
-| 3, 4, 9, 14 | no | toy semantics; F5 steps 2-3 |
-| 5, 8, 11 | misfit | quantitative, concurrent, assumption-shaped: outside the four shapes as they stand |
+| 3 | loop-free, delimiter count | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |
+| 4, 9, 14 | no | toy semantics; F5 steps 2-3 |
+| 5, 8, 11 | misfit | quantitative, concurrent, assumption-shaped: outside the shapes as they stand |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
 

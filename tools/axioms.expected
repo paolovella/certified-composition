@@ -1684,7 +1684,9 @@ ConfTyping.atomT	ConfTyping.Race
 ConfTyping.atomic	ConfTyping.UTrace	propext
 ConfTyping.atomic_accepted	ConfTyping.Race	propext
 ConfTyping.atomic_all_schedules_safe	ConfTyping.Race	Quot.sound,propext
+ConfTyping.atomic_emit	ConfTyping.InjectionL	propext
 ConfTyping.atomic_read	ConfTyping.MedT	propext
+ConfTyping.attackInput	ConfTyping.InjectionL	
 ConfTyping.attackState	ConfTyping.TaintCert	
 ConfTyping.attack_access_without_check	ConfTyping.Attack	propext
 ConfTyping.attack_branch_on_a_secret	ConfTyping.Attack	propext
@@ -1964,6 +1966,8 @@ ConfTyping.dbcheckNaive_accepts_emitP	ConfTyping.Witnesses	Quot.sound,propext
 ConfTyping.dbcheckNaive_refuses_tainted_emit	ConfTyping.Witnesses	Quot.sound,propext
 ConfTyping.dbcheck_accepts_input	ConfTyping.Witnesses	Quot.sound,propext
 ConfTyping.dbcheck_ni	ConfTyping.DbInjection	Quot.sound,propext
+ConfTyping.dcount	ConfTyping.InjectionL	
+ConfTyping.dcount_code	ConfTyping.InjectionL	propext
 ConfTyping.deadCost	ConfTyping.BundleLoop	
 ConfTyping.deadPrefix	ConfTyping.SpecTrace	
 ConfTyping.deadS	ConfTyping.SpecTrace	
@@ -2061,6 +2065,7 @@ ConfTyping.evars	ConfTyping.P1
 ConfTyping.evens	ConfTyping.InjectionReal	
 ConfTyping.evens_segsN	ConfTyping.QueryGrammar	Quot.sound,propext
 ConfTyping.evidenceFor	ConfTyping.Typing	
+ConfTyping.evs_tcheck	ConfTyping.InjectionL	Classical.choice,Quot.sound,propext
 ConfTyping.execA	ConfTyping.ParseSource	
 ConfTyping.exists_wlow_separator	ConfTyping.WhileBridge	Classical.choice,Quot.sound,propext
 ConfTyping.exprLevel	ConfTyping.LatticeFlow	
@@ -2235,12 +2240,15 @@ ConfTyping.iLowEq_trans	ConfTyping.HeapFlow
 ConfTyping.incrAt	ConfTyping.CNReceive	
 ConfTyping.incrAt_modifies	ConfTyping.CNReceive	propext
 ConfTyping.indexed_beats_the_conjunction	ConfTyping.HeapJoint	propext
+ConfTyping.initI	ConfTyping.InjectionL	
 ConfTyping.initMed	ConfTyping.Mediation	
 ConfTyping.initT	ConfTyping.P1	
 ConfTyping.initT_rel	ConfTyping.P1	propext
 ConfTyping.initT_withStore	ConfTyping.P1	
 ConfTyping.initU	ConfTyping.Unified	
 ConfTyping.initU_hides_string_inputs	ConfTyping.Attack	
+ConfTyping.injectionFree	ConfTyping.InjectionL	
+ConfTyping.injectionFree_prefixClosed	ConfTyping.InjectionL	
 ConfTyping.injection_free_of_check	ConfTyping.QueryProgram	Quot.sound,propext
 ConfTyping.injection_is_real	ConfTyping.TaintCert	
 ConfTyping.injection_rejected	ConfTyping.TaintCert	propext
@@ -2906,6 +2914,7 @@ ConfTyping.safeHeapProg_runs	ConfTyping.HeapJoint
 ConfTyping.safePath	ConfTyping.PathCert	
 ConfTyping.safePathProg	ConfTyping.PathCert	
 ConfTyping.safeQuery	ConfTyping.TaintCert	
+ConfTyping.safeQuery_traceI	ConfTyping.InjectionL	Classical.choice,Quot.sound,propext
 ConfTyping.safeRich	ConfTyping.LexReal	
 ConfTyping.safeSrc	ConfTyping.ParseSource	
 ConfTyping.safeToks	ConfTyping.LexReal	
@@ -3121,6 +3130,7 @@ ConfTyping.stepT_cost	ConfTyping.BudgetT	Quot.sound,propext
 ConfTyping.stepT_cost_le_of	ConfTyping.BudgetT	propext
 ConfTyping.stepT_cost_one	ConfTyping.UStep	propext
 ConfTyping.stepT_done_agree	ConfTyping.UTrace	propext
+ConfTyping.stepT_emit	ConfTyping.InjectionL	propext
 ConfTyping.stepT_ne	ConfTyping.UTrace	propext
 ConfTyping.stepT_no_fault	ConfTyping.MemT	propext
 ConfTyping.stepT_read	ConfTyping.MedT	propext
@@ -3161,9 +3171,12 @@ ConfTyping.tcheckW_no_injection	ConfTyping.StringLoop	Classical.choice,Quot.soun
 ConfTyping.tcheckW_out_of_fuel	ConfTyping.StringLoop	propext
 ConfTyping.tcheckW_refuses_injection	ConfTyping.Witnesses	propext
 ConfTyping.tcheckW_sound	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.tcheck_finishes	ConfTyping.InjectionL	Quot.sound,propext
+ConfTyping.tcheck_finishes.atomic_finishes	ConfTyping.InjectionL	Quot.sound,propext
 ConfTyping.tcheck_no_injection	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_no_injection_from	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_sound	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
+ConfTyping.tcheck_traceI	ConfTyping.InjectionL	Classical.choice,Quot.sound,propext
 ConfTyping.tevalE	ConfTyping.P1	
 ConfTyping.tevalE_compile	ConfTyping.P1	propext
 ConfTyping.texec	ConfTyping.P1	
@@ -3270,6 +3283,9 @@ ConfTyping.ucheckNI_accepts_skip	ConfTyping.Witnesses	propext
 ConfTyping.ucheckNI_sound	ConfTyping.UnifiedNI	propext
 ConfTyping.ucheck_sound	ConfTyping.Bundle	Quot.sound,propext
 ConfTyping.ucmdLang	ConfTyping.LAdapter	propext
+ConfTyping.ucmdLangI	ConfTyping.InjectionL	propext
+ConfTyping.ucmdLangI_empty	ConfTyping.InjectionL	propext
+ConfTyping.ucmdLangI_lawful	ConfTyping.InjectionL	Quot.sound,propext
 ConfTyping.ucmdLangS	ConfTyping.UStep	propext
 ConfTyping.ucmdLangS_lawful	ConfTyping.UStep	Quot.sound,propext
 ConfTyping.ucmdLangT	ConfTyping.UTrace	propext
@@ -3366,6 +3382,8 @@ ConfTyping.victim_rejected	ConfTyping.Speculate	propext
 ConfTyping.vremove	ConfTyping.QueryProgram	
 ConfTyping.vulnPath	ConfTyping.PathCert	
 ConfTyping.vulnQuery	ConfTyping.TaintCert	
+ConfTyping.vulnQuery_empty_shows_two	ConfTyping.InjectionL	propext
+ConfTyping.vulnQuery_traceI_fails	ConfTyping.InjectionL	Quot.sound,propext
 ConfTyping.wNIBound	ConfTyping.WhileBridge	propext
 ConfTyping.wOutNI_contracts	ConfTyping.WhileBridge	Classical.choice,Quot.sound,propext
 ConfTyping.walk	ConfTyping.PathCert	

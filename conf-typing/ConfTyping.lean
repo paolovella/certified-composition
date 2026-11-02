@@ -105,4 +105,5 @@ import ConfTyping.NiT
 import ConfTyping.UStep
 import ConfTyping.Split
 import ConfTyping.SplitView
+import ConfTyping.InjectionL
 import ConfTyping.Vacuity

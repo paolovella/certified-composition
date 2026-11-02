@@ -6,6 +6,16 @@ landed.
 
 ## Repository verification
 
+- **Injection on L, for loop-free programs** (2026-11-02, F5 row 3;
+  `conf-typing/ConfTyping/InjectionL.lean`). L had no entry point for untrusted strings:
+  `ucmdLangS` starts the string store empty, so the vulnerable query is safe on it
+  (`vulnQuery_empty_shows_two`). `ucmdLangI` adds the initial strings to the input and is equal to
+  `ucmdLangS` on empty strings. `ConfTyping.tcheck_traceI`: what `tcheck` accepts emits only
+  predicted delimiter counts, on every input and at every fuel, as a `Cert.trace`; the vulnerable
+  query is refused on the attacker's input (`vulnQuery_traceI_fails`). Injection here means the
+  delimiter count over a two-symbol alphabet. Correction of record: F5's table said this row
+  needed a different `lowIn`; it is a trace property.
+
 - **A sixth certificate shape: one observer's whole view, side channels included** (2026-11-02,
   the user's decision; `l-core/LCore/Kernel/{Obs,Cert,Pass}.lean`, Ring 0;
   `conf-typing/ConfTyping/Split.lean`). `hyper` compares only event limits, so a branch on tenant
