@@ -181,7 +181,8 @@ does not fit L's certificate shapes (six since 2026-11-02; this said ~~four~~ wh
 | 6 | partly | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference; leaks are on toy heaps |
 | 12 | partly | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
 | 3 | loop-free, delimiter count | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |
-| 4, 9, 14 | no | toy semantics; F5 steps 2-3 |
+| 14 | loop-free, per sink | `ConfTyping.pcheck_traceI`, a `Cert.trace` on `ucmdLangI`. Attacker: controls every initial string. Observer: the sink `fs`; other sinks are not covered. The alphabet is a segment and `..`. A loop rule (`pcheckW`) is not on L; the depth method of `PathTraversal.lean` stays on its own language |
+| 4, 9 | no | toy semantics; F5 steps 2-3 |
 | 5, 8, 11 | misfit | quantitative, concurrent, assumption-shaped: outside the shapes as they stand |
 
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]

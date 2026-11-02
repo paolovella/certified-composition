@@ -1685,6 +1685,7 @@ ConfTyping.atomic	ConfTyping.UTrace	propext
 ConfTyping.atomic_accepted	ConfTyping.Race	propext
 ConfTyping.atomic_all_schedules_safe	ConfTyping.Race	Quot.sound,propext
 ConfTyping.atomic_emit	ConfTyping.InjectionL	propext
+ConfTyping.atomic_finishes	ConfTyping.InjectionL	Quot.sound,propext
 ConfTyping.atomic_read	ConfTyping.MedT	propext
 ConfTyping.attackInput	ConfTyping.InjectionL	
 ConfTyping.attackState	ConfTyping.TaintCert	
@@ -1959,6 +1960,9 @@ ConfTyping.cx_not_unconditional	ConfTyping.Ledger	Classical.choice,Quot.sound,pr
 ConfTyping.cx_ξ0	ConfTyping.Ledger	propext
 ConfTyping.cx_ξ1	ConfTyping.Ledger	propext
 ConfTyping.dataSegs	ConfTyping.QueryEscape	
+ConfTyping.dbProg	ConfTyping.PathL	
+ConfTyping.dbProg_db_fails	ConfTyping.PathL	propext
+ConfTyping.dbProg_fs_holds	ConfTyping.PathL	Classical.choice,Quot.sound,propext
 ConfTyping.db_injection_free_of_check	ConfTyping.DbInjection	Quot.sound,propext
 ConfTyping.dbcheck	ConfTyping.DbInjection	Quot.sound,propext
 ConfTyping.dbcheckNaive	ConfTyping.DbInjection	Quot.sound,propext
@@ -1975,6 +1979,8 @@ ConfTyping.deadS_is_certified	ConfTyping.SpecTrace	propext
 ConfTyping.dec1	ConfTyping.CostBound	
 ConfTyping.decOne	ConfTyping.CountedLoop	
 ConfTyping.decimal_source_injection_free	ConfTyping.DecimalId	Quot.sound,propext
+ConfTyping.decodeCh	ConfTyping.PathL	
+ConfTyping.decode_code	ConfTyping.PathL	
 ConfTyping.dedup	ConfTyping.P1	propext
 ConfTyping.dedup_repairs_the_composite	ConfTyping.IndexedBases	Quot.sound,propext
 ConfTyping.demo_pipeline	ConfTyping.Pipeline	Quot.sound,propext
@@ -2044,6 +2050,7 @@ ConfTyping.esc_immune	ConfTyping.QueryEscape	Quot.sound,propext
 ConfTyping.esc_mismatch_injectable	ConfTyping.QueryEscape	
 ConfTyping.esc_not_unconditional	ConfTyping.QueryEscape	
 ConfTyping.esc_skeleton	ConfTyping.QueryEscape	Quot.sound,propext
+ConfTyping.escapeInput	ConfTyping.PathL	
 ConfTyping.escapeState	ConfTyping.PathCert	
 ConfTyping.escaping_is_convention_relative	ConfTyping.QueryEscape	Quot.sound,propext
 ConfTyping.escaping_no_silent_discharge	ConfTyping.QueryEscape	Quot.sound,propext
@@ -2065,6 +2072,7 @@ ConfTyping.evars	ConfTyping.P1
 ConfTyping.evens	ConfTyping.InjectionReal	
 ConfTyping.evens_segsN	ConfTyping.QueryGrammar	Quot.sound,propext
 ConfTyping.evidenceFor	ConfTyping.Typing	
+ConfTyping.evs_pcheck	ConfTyping.PathL	Classical.choice,Quot.sound,propext
 ConfTyping.evs_tcheck	ConfTyping.InjectionL	Classical.choice,Quot.sound,propext
 ConfTyping.execA	ConfTyping.ParseSource	
 ConfTyping.exists_wlow_separator	ConfTyping.WhileBridge	Classical.choice,Quot.sound,propext
@@ -2636,6 +2644,8 @@ ConfTyping.noAlloc_lowEq	ConfTyping.HeapNI
 ConfTyping.noAssign	ConfTyping.CostBound	
 ConfTyping.noAssign_preserves	ConfTyping.CostBound	propext
 ConfTyping.noBS	ConfTyping.QueryEscape	
+ConfTyping.noLoop	ConfTyping.InjectionL	propext
+ConfTyping.noLoop_finishes	ConfTyping.InjectionL	Quot.sound,propext
 ConfTyping.noPolicy	ConfTyping.Typing	
 ConfTyping.noQ	ConfTyping.QueryGrammar	
 ConfTyping.noQ_head	ConfTyping.QueryGrammar	propext
@@ -2721,6 +2731,8 @@ ConfTyping.pathCheck	ConfTyping.PathTraversal
 ConfTyping.pathCheck_accepts_down	ConfTyping.Witnesses	
 ConfTyping.pathCheck_rejects	ConfTyping.PathTraversal	
 ConfTyping.pathCheck_sound	ConfTyping.PathTraversal	Quot.sound,propext
+ConfTyping.pathSafe	ConfTyping.PathL	
+ConfTyping.pathSafe_prefixClosed	ConfTyping.PathL	
 ConfTyping.path_escape_is_real	ConfTyping.PathCert	
 ConfTyping.path_escape_rejected	ConfTyping.PathCert	propext
 ConfTyping.path_needs_the_taint_environment	ConfTyping.PathCert	propext
@@ -2732,8 +2744,10 @@ ConfTyping.pcheckW	ConfTyping.StringLoop	propext
 ConfTyping.pcheckW_no_escape	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
 ConfTyping.pcheckW_refuses_escaping_literal	ConfTyping.Witnesses	propext
 ConfTyping.pcheckW_sound	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
+ConfTyping.pcheck_noLoop	ConfTyping.PathL	propext
 ConfTyping.pcheck_no_escape	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
 ConfTyping.pcheck_sound	ConfTyping.PathCert	Classical.choice,Quot.sound,propext
+ConfTyping.pcheck_traceI	ConfTyping.PathL	Classical.choice,Quot.sound,propext
 ConfTyping.perchannel_covered	ConfTyping.Joint	Quot.sound,propext
 ConfTyping.perchannel_to_joint	ConfTyping.Joint	propext
 ConfTyping.permissivePolicy	ConfTyping.LoadBearing	
@@ -2913,6 +2927,7 @@ ConfTyping.safeHeapProg_both	ConfTyping.HeapJoint	Classical.choice,Quot.sound,pr
 ConfTyping.safeHeapProg_runs	ConfTyping.HeapJoint	
 ConfTyping.safePath	ConfTyping.PathCert	
 ConfTyping.safePathProg	ConfTyping.PathCert	
+ConfTyping.safePathProg_traceI	ConfTyping.PathL	Classical.choice,Quot.sound,propext
 ConfTyping.safeQuery	ConfTyping.TaintCert	
 ConfTyping.safeQuery_traceI	ConfTyping.InjectionL	Classical.choice,Quot.sound,propext
 ConfTyping.safeRich	ConfTyping.LexReal	
@@ -3172,7 +3187,7 @@ ConfTyping.tcheckW_out_of_fuel	ConfTyping.StringLoop	propext
 ConfTyping.tcheckW_refuses_injection	ConfTyping.Witnesses	propext
 ConfTyping.tcheckW_sound	ConfTyping.StringLoop	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_finishes	ConfTyping.InjectionL	Quot.sound,propext
-ConfTyping.tcheck_finishes.atomic_finishes	ConfTyping.InjectionL	Quot.sound,propext
+ConfTyping.tcheck_noLoop	ConfTyping.InjectionL	propext
 ConfTyping.tcheck_no_injection	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_no_injection_from	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
 ConfTyping.tcheck_sound	ConfTyping.TaintCert	Classical.choice,Quot.sound,propext
@@ -3381,6 +3396,8 @@ ConfTyping.victim_not_mediated	ConfTyping.Mediation	propext
 ConfTyping.victim_rejected	ConfTyping.Speculate	propext
 ConfTyping.vremove	ConfTyping.QueryProgram	
 ConfTyping.vulnPath	ConfTyping.PathCert	
+ConfTyping.vulnPath_empty_is_safe	ConfTyping.PathL	propext
+ConfTyping.vulnPath_traceI_fails	ConfTyping.PathL	propext
 ConfTyping.vulnQuery	ConfTyping.TaintCert	
 ConfTyping.vulnQuery_empty_shows_two	ConfTyping.InjectionL	propext
 ConfTyping.vulnQuery_traceI_fails	ConfTyping.InjectionL	Quot.sound,propext

@@ -6,6 +6,12 @@ landed.
 
 ## Repository verification
 
+- **Path traversal on L, for loop-free programs, per sink** (2026-11-02, F5 row 14;
+  `conf-typing/ConfTyping/PathL.lean`). `ConfTyping.pcheck_traceI`: what `pcheck fs` accepts sends
+  only paths that stay inside their root to `fs`, on every input and at every fuel, as a
+  `Cert.trace` on `ucmdLangI`. The vulnerable program is refused on the `../..` input
+  (`vulnPath_traceI_fails`). Other sinks are not covered (`dbProg_db_fails`).
+
 - **Injection on L, for loop-free programs** (2026-11-02, F5 row 3;
   `conf-typing/ConfTyping/InjectionL.lean`). L had no entry point for untrusted strings:
   `ucmdLangS` starts the string store empty, so the vulnerable query is safe on it

@@ -175,68 +175,100 @@ theorem evs_tcheck : ∀ (c : UCmd) (C C' : TaintEnv) (Ks : List Nat), tcheck C 
   | .hop _ _ _, _, _, _, _, _, _, _, _ => fun _ _ hm => by
     obtain ⟨_, _, he, _⟩ := atomic_emit rfl hm; cases he
 
-/-- `tcheck` accepts only loop-free programs, and those finish from every state. -/
-theorem tcheck_finishes : ∀ (c : UCmd) (C C' : TaintEnv) (Ks : List Nat),
-    tcheck C c = some (C', Ks) → ∀ (π : MedPolicy) (s : UState), ∃ f, (uexecT f c π s).out ≠ .fuel
-  | .seq a b, C, C', Ks, h, π, s => by
+/-- A program with no loop. -/
+def noLoop : UCmd → Bool
+  | .seq a b => noLoop a && noLoop b
+  | .ite _ a b => noLoop a && noLoop b
+  | .loop _ _ => false
+  | _ => true
+
+theorem atomic_finishes {c : UCmd} (hc : atomic c = true) (π : MedPolicy) (s : UState) :
+    ∃ f, (uexecT f c π s).out ≠ .fuel := by
+  refine ⟨1, ?_⟩
+  by_cases hd : s.dead = true
+  · simp [uexecT, hd]
+  have : (uexecT 1 c π s).out = (stepT c π s).out := by
+    cases c with
+    | seq | ite | loop => simp [atomic] at hc
+    | _ => simp [uexecT, hd]
+  rw [this]
+  rcases Split.stepT_out_cases hc π s with h | h <;> simp [h]
+
+/-- **A loop-free program finishes from every state**, given enough fuel. -/
+theorem noLoop_finishes : ∀ (c : UCmd), noLoop c = true →
+    ∀ (π : MedPolicy) (s : UState), ∃ f, (uexecT f c π s).out ≠ .fuel
+  | .seq a b, h, π, s => by
+    simp only [noLoop, Bool.and_eq_true] at h
+    by_cases hd : s.dead = true
+    · exact ⟨1, by simp [uexecT, hd]⟩
+    obtain ⟨fa, hfa⟩ := noLoop_finishes a h.1 π s
+    by_cases ha : (uexecT fa a π s).out = .done
+    · obtain ⟨fb, hfb⟩ := noLoop_finishes b h.2 π (uexecT fa a π s).st
+      refine ⟨max fa fb + 1, ?_⟩
+      have ea := (uexecT_ext fa (max fa fb) a π s (Nat.le_max_left _ _)).1 hfa
+      have eb := (uexecT_ext fb (max fa fb) b π _ (Nat.le_max_right _ _)).1 hfb
+      simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.seqT, ← ea, ha, ← eb]
+      exact hfb
+    · refine ⟨fa + 1, ?_⟩
+      simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.seqT, ha]
+      exact hfa
+  | .ite e a b, h, π, s => by
+    simp only [noLoop, Bool.and_eq_true] at h
+    by_cases hd : s.dead = true
+    · exact ⟨1, by simp [uexecT, hd]⟩
+    by_cases hg : evalE e s.store ≠ 0
+    · obtain ⟨f, hf⟩ := noLoop_finishes a h.1 π s
+      refine ⟨f + 1, ?_⟩
+      simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.tick, hg, ne_eq,
+        not_false_eq_true]
+      exact hf
+    · obtain ⟨f, hf⟩ := noLoop_finishes b h.2 π s
+      refine ⟨f + 1, ?_⟩
+      simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.tick, hg]
+      exact hf
+  | .loop _ _, h, _, _ => by simp [noLoop] at h
+  | .sop _ _ _, _, π, s => atomic_finishes rfl π s
+  | .skip, _, π, s => atomic_finishes rfl π s
+  | .assign _ _, _, π, s => atomic_finishes rfl π s
+  | .check _, _, π, s => atomic_finishes rfl π s
+  | .access _, _, π, s => atomic_finishes rfl π s
+  | .memop _ _, _, π, s => atomic_finishes rfl π s
+  | .hop _ _ _, _, π, s => atomic_finishes rfl π s
+
+/-- `tcheck` accepts only loop-free programs. -/
+theorem tcheck_noLoop : ∀ (c : UCmd) (C C' : TaintEnv) (Ks : List Nat),
+    tcheck C c = some (C', Ks) → noLoop c = true
+  | .seq a b, C, C', Ks, h => by
     cases h1 : tcheck C a with
     | none => simp [tcheck, h1] at h
     | some p1 =>
       cases h2 : tcheck p1.1 b with
       | none => simp [tcheck, h1, h2] at h
       | some p2 =>
-        by_cases hd : s.dead = true
-        · exact ⟨1, by simp [uexecT, hd]⟩
-        obtain ⟨fa, hfa⟩ := tcheck_finishes a C p1.1 p1.2 h1 π s
-        by_cases ha : (uexecT fa a π s).out = .done
-        · obtain ⟨fb, hfb⟩ := tcheck_finishes b p1.1 p2.1 p2.2 h2 π (uexecT fa a π s).st
-          refine ⟨max fa fb + 1, ?_⟩
-          have ea := (uexecT_ext fa (max fa fb) a π s (Nat.le_max_left _ _)).1 hfa
-          have eb := (uexecT_ext fb (max fa fb) b π _ (Nat.le_max_right _ _)).1 hfb
-          simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.seqT, ← ea, ha, ← eb]
-          exact hfb
-        · refine ⟨fa + 1, ?_⟩
-          simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.seqT, ha]
-          exact hfa
-  | .ite e a b, C, C', Ks, h, π, s => by
+        simp only [noLoop, Bool.and_eq_true]
+        exact ⟨tcheck_noLoop a C p1.1 p1.2 h1, tcheck_noLoop b p1.1 p2.1 p2.2 h2⟩
+  | .ite e a b, C, C', Ks, h => by
     cases h1 : tcheck C a with
     | none => simp [tcheck, h1] at h
     | some p1 =>
       cases h2 : tcheck C b with
       | none => simp [tcheck, h1, h2] at h
       | some p2 =>
-        by_cases hd : s.dead = true
-        · exact ⟨1, by simp [uexecT, hd]⟩
-        by_cases hg : evalE e s.store ≠ 0
-        · obtain ⟨f, hf⟩ := tcheck_finishes a C p1.1 p1.2 h1 π s
-          refine ⟨f + 1, ?_⟩
-          simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.tick, hg, ne_eq,
-            not_false_eq_true]
-          exact hf
-        · obtain ⟨f, hf⟩ := tcheck_finishes b C p2.1 p2.2 h2 π s
-          refine ⟨f + 1, ?_⟩
-          simp only [uexecT, hd, Bool.false_eq_true, ↓reduceIte, TRun.tick, hg]
-          exact hf
-  | .loop _ _, _, _, _, h, _, _ => by simp [tcheck] at h
-  | .sop op x e, _, _, _, _, π, s => atomic_finishes rfl π s
-  | .skip, _, _, _, _, π, s => atomic_finishes rfl π s
-  | .assign _ _, _, _, _, _, π, s => atomic_finishes rfl π s
-  | .check _, _, _, _, _, π, s => atomic_finishes rfl π s
-  | .access _, _, _, _, _, π, s => atomic_finishes rfl π s
-  | .memop _ _, _, _, _, _, π, s => atomic_finishes rfl π s
-  | .hop _ _ _, _, _, _, _, π, s => atomic_finishes rfl π s
-where
-  atomic_finishes {c : UCmd} (hc : atomic c = true) (π : MedPolicy) (s : UState) :
-      ∃ f, (uexecT f c π s).out ≠ .fuel := by
-    refine ⟨1, ?_⟩
-    by_cases hd : s.dead = true
-    · simp [uexecT, hd]
-    have : (uexecT 1 c π s).out = (stepT c π s).out := by
-      cases c with
-      | seq | ite | loop => simp [atomic] at hc
-      | _ => simp [uexecT, hd]
-    rw [this]
-    rcases Split.stepT_out_cases hc π s with h | h <;> simp [h]
+        simp only [noLoop, Bool.and_eq_true]
+        exact ⟨tcheck_noLoop a C p1.1 p1.2 h1, tcheck_noLoop b C p2.1 p2.2 h2⟩
+  | .loop _ _, _, _, _, h => by simp [tcheck] at h
+  | .sop _ _ _, _, _, _, _ => rfl
+  | .skip, _, _, _, _ => rfl
+  | .assign _ _, _, _, _, _ => rfl
+  | .check _, _, _, _, _ => rfl
+  | .access _, _, _, _, _ => rfl
+  | .memop _ _, _, _, _, _ => rfl
+  | .hop _ _ _, _, _, _, _ => rfl
+
+theorem tcheck_finishes {c : UCmd} {C C' : TaintEnv} {Ks : List Nat}
+    (h : tcheck C c = some (C', Ks)) (π : MedPolicy) (s : UState) :
+    ∃ f, (uexecT f c π s).out ≠ .fuel :=
+  noLoop_finishes c (tcheck_noLoop c C C' Ks h) π s
 
 /-! ## The certificate -/
 
@@ -246,7 +278,7 @@ theorem tcheck_traceI {P : Partition} {c : UCmd} {C' : TaintEnv} {Ks : List Nat}
     (h : tcheck [] c = some (C', Ks)) (π : MedPolicy) :
     LCore.Cert.trace (ucmdLangI P π) (injectionFree Ks) c := by
   intro n i _
-  obtain ⟨f, hf⟩ := tcheck_finishes c [] C' Ks h π (initI i.1 i.2)
+  obtain ⟨f, hf⟩ := tcheck_finishes h π (initI i.1 i.2)
   have hrun := evs_tcheck c [] C' Ks h f π (initI i.1 i.2) (by intro _ p hp; simp at hp)
   exact injectionFree_prefixClosed Ks _ _ (runS_within (s := initI i.1 i.2) rfl hf n).1 hrun
 
