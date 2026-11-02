@@ -377,6 +377,10 @@ run_case "P1 proves prefix closure itself" drift \
 run_case "Split gains a certificate-specific pass lemma" drift \
   bash -c 'printf "\ntheorem split_cheat : True := by have := @bcheck_lcoreS; trivial\n" >> conf-typing/ConfTyping/Split.lean'
 
+# (q) the map's "on L" table names a theorem that does not exist: fires
+run_case "the map claims a missing L theorem" drift \
+  bash -c 'sed -i "s/\`ConfTyping.bcheck_boundS\`/\`ConfTyping.bcheck_boundZ\`/" VULN-COVERAGE.md && grep -q bcheck_boundZ VULN-COVERAGE.md'
+
 wait
 for r in "$res"/*; do cat "$r"; done
 pass=$(cat "$res"/* | grep -c '^  ok ')

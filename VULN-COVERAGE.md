@@ -161,6 +161,28 @@ the one claim it could not independently verify. Restored to sixteen.)*
 | 13 | termination / progress leaks (CWE-385-adjacent) | 2-safety over a fuel-indexed semantics with loops | 1 | IN-WITH-MODEL (generated) | [proved] |
 | 14 | path traversal (CWE-22) | untrusted structure in a filesystem-path sink | 1* | IN (real; safe-by-construction) | [proved] |
 
+### 3.0 Which verdicts hold on L (F5, 2026-11-02)
+
+*Correction of record.* From 2026-07-18 to 2026-11-02 this map's verdicts were read as claims
+about the framework, and since 2026-10-23 about L. Every verdict is proved over a semantic model,
+and until F2 none of those models was an L language: they were toy semantics (`Cmd`, `WCmd`,
+`UCmd` on `uexec`, and per-row machines). A verdict ~~IN~~ meant "IN for that toy model". The table
+below says which rows now hold on an L language, and by which theorem; a row not listed with an L
+theorem is still a claim about its toy model only. Item F5 moves the rest, or records why a row
+does not fit L's four certificate shapes.
+
+| # | on L | L theorem (`ucmdLangS`, step fuel; the same on `ucmdLangT`) |
+|---|---|---|
+| 1 | yes | `ConfTyping.bcheck_relS` |
+| 2 | yes | `ConfTyping.bcheck_relS` (cost is in the observation) |
+| 13 | yes | `ConfTyping.bcheck_relS` (the outcome at every fuel is in it) |
+| 10 | yes | `ConfTyping.bcheck_boundS` |
+| 7 | mediation only | `ConfTyping.bcheck_mediatedS`; isolation is on toy `Cmd` |
+| 6 | partly | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference; leaks are on toy heaps |
+| 12 | partly | `LCore.PassCert.seq` composes certified passes; component seams are on toy `Cmd` |
+| 3, 4, 9, 14 | no | toy semantics; F5 steps 2-3 |
+| 5, 8, 11 | misfit | quantitative, concurrent, assumption-shaped: outside the four shapes as they stand |
+
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
 
 Home turf. `J_NI` at partition `P` and adversary capability set; per-channel reasoning

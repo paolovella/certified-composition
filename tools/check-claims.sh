@@ -1690,5 +1690,15 @@ if [ -f conf-typing/ConfTyping/Vacuity.lean ]; then
   done
 fi
 
+# (q) The map's "on L" table (VULN-COVERAGE 3.0, F5) names built declarations: every backticked
+# `ConfTyping.`/`LCore.` name in it is in the axiom manifest, so a row cannot claim an L theorem
+# that does not exist or was renamed away.
+if grep -q "^### 3.0 Which verdicts hold on L" VULN-COVERAGE.md; then
+  for d in $(sed -n '/^### 3.0 Which verdicts hold on L/,/^### 3.1 /p' VULN-COVERAGE.md \
+             | grep -oE '`(ConfTyping|LCore)\.[A-Za-z0-9_.]+`' | tr -d '`' | sort -u); do
+    grep -q "^$d	" tools/axioms.expected || { echo "DRIFT: VULN-COVERAGE 3.0 names $d, which is not in tools/axioms.expected"; fail=1; }
+  done
+fi
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail
