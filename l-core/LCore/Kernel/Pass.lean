@@ -7,8 +7,9 @@
   - **events**: the compiled program's events at target fuel `m` are a prefix of the source's
     at `fuel m`;
   - **cost**: its cost at `m` is at most the (monotone) cost transformer of the source's;
-  - **determinacy**: admissible inputs whose source observations agree at `fuel m` give equal
-    target observations at `m`;
+  - **determinacy**: for every observer, admissible inputs whose source views agree at `fuel m`
+    give equal target views at `m` (the observer that reads every channel is the whole
+    observation);
   - **progress**: a source run that finishes has a target run that finishes, with the same
     events and outcome. No transfer uses it; without it a compiler emitting a loop that does
     nothing would inherit every safety certificate.
@@ -17,7 +18,9 @@
   finished, alike. With all four event facts the two runs have the same limit.
   With coverage of the admissible inputs (F3), every certificate shape transfers to a
   certificate of the compiled program in its own language (`trace_transfer` for prefix-closed
-  properties, `rel_transfer`, `bound_transfer`, `live_transfer` for limit properties), and passes
+  properties, `rel_transfer`, `bound_transfer`, `live_transfer` for limit properties,
+  `hyper_transfer` for properties of two runs' limits, `relView_transfer` for one observer's
+  view), and passes
   compose (`PassCert.seq`). So a new pass costs these facts and no certificate proofs, and a new certificate costs nothing
   per pass (PLAN-2026-10 §6).
 
@@ -80,10 +83,12 @@ structure PassCert (S T : Lang) where
   cost_sim : ∀ (p : S.Prog) (p' : T.Prog) (t : Xform), comp p = .ok (p', t) →
     ∀ (m : Nat) (i : S.In), S.Adm i →
       (T.run m p' (enc i)).cost ≤ t.cost (S.run (t.fuel m) p i).cost
-  /-- **Determinacy**: the target observation is fixed by the source observation. -/
+  /-- **Determinacy**: what an observer sees of the target is fixed by what it sees of the source,
+      for every observer. -/
   det : ∀ (p : S.Prog) (p' : T.Prog) (t : Xform), comp p = .ok (p', t) →
-    ∀ (m : Nat) (i i' : S.In), S.Adm i → S.Adm i' →
-      S.run (t.fuel m) p i = S.run (t.fuel m) p i' → T.run m p' (enc i) = T.run m p' (enc i')
+    ∀ (f : Observer) (m : Nat) (i i' : S.In), S.Adm i → S.Adm i' →
+      (S.run (t.fuel m) p i).view f = (S.run (t.fuel m) p i').view f →
+      (T.run m p' (enc i)).view f = (T.run m p' (enc i')).view f
   /-- **Progress**: what the source finishes, the target finishes, alike. -/
   progress : ∀ (p : S.Prog) (p' : T.Prog) (t : Xform), comp p = .ok (p', t) →
     ∀ (n : Nat) (i : S.In), S.Adm i → (S.run n p i).out ≠ .fuel →
@@ -137,7 +142,21 @@ theorem trace_transfer (h : pc.comp p = .ok (p', t)) {Φ : List Ev → Prop} (h�
 theorem rel_transfer (h : pc.comp p = .ok (p', t)) (hc : Cert.rel S p) : Cert.rel T p' := by
   intro m u u' hu hu' hl
   obtain ⟨i, i', hi, hi', hii, rfl, rfl⟩ := pc.low_cover u u' hu hu' hl
-  exact pc.det p p' t h m i i' hi hi' (hc (t.fuel m) i i' hi hi' hii)
+  have := pc.det p p' t h Observer.all m i i' hi hi'
+    (congrArg (Beh.view Observer.all) (hc (t.fuel m) i i' hi hi' hii))
+  rwa [Beh.view_all, Beh.view_all] at this
+
+/-- **One observer's view transfers**, given the same fact about the pass's inputs as
+    `hyper_transfer`: target inputs related by `RT` are encodings of source inputs related by
+    `RS`. Determinacy holds for every observer, so a new observer costs nothing per pass. -/
+theorem relView_transfer (h : pc.comp p = .ok (p', t)) {RS : S.In → S.In → Prop}
+    {RT : T.In → T.In → Prop} {f : Observer}
+    (hR : ∀ u u', T.Adm u → T.Adm u' → RT u u' →
+      ∃ i i', S.Adm i ∧ S.Adm i' ∧ RS i i' ∧ pc.enc i = u ∧ pc.enc i' = u')
+    (hc : Cert.relView S RS f p) : Cert.relView T RT f p' := by
+  intro m u u' hu hu' hr
+  obtain ⟨i, i', hi, hi', hii, rfl, rfl⟩ := hR u u' hu hu' hr
+  exact pc.det p p' t h f m i i' hi hi' (hc (t.fuel m) i i' hi hi' hii)
 
 /-- A budget transfers through the (monotone) cost transformer. -/
 theorem bound_transfer (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound S k p) :
@@ -146,19 +165,37 @@ theorem bound_transfer (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound 
   obtain ⟨i, hi, rfl⟩ := pc.cover u hu
   exact Nat.le_trans (pc.cost_sim p p' t h m i hi) (t.costMono _ _ (hc (t.fuel m) i hi))
 
-/-- **Liveness transfers.** By the four event obligations the compiled run and the source run
-    have the same limit (`Chain.Equiv`), so any property of the limit carries over: what the
-    source must eventually do, the compiled program must too. -/
+/-- **A compiled run has its source run's limit** (`Chain.Equiv`), by the four event
+    obligations: events a prefix (`ev_sim`), caught up (`catch_up`), and finishing alike both
+    ways (`progress`, `reflect`). -/
+theorem chain_equiv (h : pc.comp p = .ok (p', t)) {i : S.In} (hi : S.Adm i) :
+    Chain.Equiv (fun n => S.run n p i) (fun m => T.run m p' (pc.enc i)) :=
+  ⟨fun n => pc.catch_up p p' t h n i hi,
+   fun m => ⟨t.fuel m, pc.ev_sim p p' t h m i hi⟩,
+   fun n hf => pc.progress p p' t h n i hi hf,
+   fun m hf => pc.reflect p p' t h m i hi hf⟩
+
+/-- **Liveness transfers.** The compiled run and the source run have the same limit, so any
+    property of the limit carries over: what the source must eventually do, the compiled program
+    must too. -/
 theorem live_transfer (h : pc.comp p = .ok (p', t)) {Ψ : Chain → Prop} (hΨ : LimitInv Ψ)
     (hc : Cert.live S Ψ p) : Cert.live T Ψ p' := by
   intro u hu
   obtain ⟨i, hi, rfl⟩ := pc.cover u hu
-  exact hΨ (fun n => S.run n p i) (fun m => T.run m p' (pc.enc i))
-    ⟨fun n => pc.catch_up p p' t h n i hi,
-     fun m => ⟨t.fuel m, pc.ev_sim p p' t h m i hi⟩,
-     fun n hf => pc.progress p p' t h n i hi hf,
-     fun m hf => pc.reflect p p' t h m i hi hf⟩
-    (hc i hi)
+  exact hΨ _ _ (pc.chain_equiv h hi) (hc i hi)
+
+/-- **The relational shape transfers**, given one fact about the pass's inputs: target inputs
+    related by `RT` are encodings of source inputs related by `RS` (as `low_cover` is for
+    `lowIn`). Each compiled run has its source run's limit, so any property of the two limits
+    carries over. -/
+theorem hyper_transfer (h : pc.comp p = .ok (p', t)) {RS : S.In → S.In → Prop}
+    {RT : T.In → T.In → Prop} {Θ : Chain → Chain → Prop} (hΘ : LimitInv2 Θ)
+    (hR : ∀ u u', T.Adm u → T.Adm u' → RT u u' →
+      ∃ i i', S.Adm i ∧ S.Adm i' ∧ RS i i' ∧ pc.enc i = u ∧ pc.enc i' = u')
+    (hc : Cert.hyper S RS Θ p) : Cert.hyper T RT Θ p' := by
+  intro u u' hu hu' hr
+  obtain ⟨i, i', hi, hi', hii, rfl, rfl⟩ := hR u u' hu hu' hr
+  exact hΘ _ _ _ _ (pc.chain_equiv h hi) (pc.chain_equiv h hi') (hc i i' hi hi' hii)
 
 end PassCert
 
@@ -209,10 +246,10 @@ def PassCert.seq {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) : PassCe
     obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
     exact Nat.le_trans (qc.cost_sim p' _ u hq m (pc.enc i) (pc.enc_adm i hi))
       (u.costMono _ _ (pc.cost_sim p p' t hp (u.fuel m) i hi))
-  det p _ _ h m i i' hi hi' he := by
+  det p _ _ h f m i i' hi hi' he := by
     obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
-    exact qc.det p' _ u hq m _ _ (pc.enc_adm i hi) (pc.enc_adm i' hi')
-      (pc.det p p' t hp (u.fuel m) i i' hi hi' he)
+    exact qc.det p' _ u hq f m _ _ (pc.enc_adm i hi) (pc.enc_adm i' hi')
+      (pc.det p p' t hp f (u.fuel m) i i' hi hi' he)
   progress p _ _ h n i hi hf := by
     obtain ⟨p', t, u, hp, hq, rfl⟩ := PassCert.seq_comp_ok h
     obtain ⟨m₁, ho₁, he₁⟩ := pc.progress p p' t hp n i hi hf
@@ -254,7 +291,23 @@ def PassCert.ofSim {S T : Lang} (comp : S.Prog → Except String (T.Prog × Xfor
   low_cover := low_cover
   ev_sim p p' t h m i _ := by rw [sim p p' t h m i]; exact prefix_refl' _
   cost_sim p p' t h m i _ := by rw [sim p p' t h m i]; exact Nat.le_refl _
-  det p p' t h m i i' _ _ he := by rw [sim p p' t h m i, sim p p' t h m i', he]
+  det p p' t h f m i i' _ _ he := by
+    rw [sim p p' t h m i, sim p p' t h m i']
+    have h1 : (S.run (t.fuel m) p i).ev.filter (fun e => f e.chan) =
+        (S.run (t.fuel m) p i').ev.filter (fun e => f e.chan) := congrArg Beh.ev he
+    have h2 : (S.run (t.fuel m) p i).lk = (S.run (t.fuel m) p i').lk :=
+      (congrArg Beh.lk he : (Beh.view f _).lk = (Beh.view f _).lk)
+    have h3 : (S.run (t.fuel m) p i).cost = (S.run (t.fuel m) p i').cost :=
+      (congrArg Beh.cost he : (Beh.view f _).cost = (Beh.view f _).cost)
+    have h4 : (S.run (t.fuel m) p i).out = (S.run (t.fuel m) p i').out :=
+      (congrArg Beh.out he : (Beh.view f _).out = (Beh.view f _).out)
+    show Beh.mk ((S.run (t.fuel m) p i).ev.filter (fun e => f e.chan))
+        (t.lk (S.run (t.fuel m) p i).lk) (t.cost (S.run (t.fuel m) p i).cost)
+        (S.run (t.fuel m) p i).out =
+      Beh.mk ((S.run (t.fuel m) p i').ev.filter (fun e => f e.chan))
+        (t.lk (S.run (t.fuel m) p i').lk) (t.cost (S.run (t.fuel m) p i').cost)
+        (S.run (t.fuel m) p i').out
+    rw [h1, h2, h3, h4]
   progress p p' t h n i _ _ := by
     obtain ⟨m, hm⟩ := fuel_onto p p' t h n
     exact ⟨m, by rw [sim p p' t h m i, hm], by rw [sim p p' t h m i, hm]⟩

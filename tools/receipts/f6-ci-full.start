@@ -1,0 +1,4 @@
+started: 2026-11-02T03:15:16+01:00
+head: 69eed65
+command: bash tools/ci.sh
+log: tools/receipts/f6-ci-full.log

@@ -1,0 +1,4 @@
+started: 2026-11-02T09:42:54+01:00
+head: 02cb445
+command: bash tools/ci.sh
+log: tools/receipts/f6-relview-ci-full.log

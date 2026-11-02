@@ -104,4 +104,5 @@ import ConfTyping.MemT
 import ConfTyping.NiT
 import ConfTyping.UStep
 import ConfTyping.Split
+import ConfTyping.SplitView
 import ConfTyping.Vacuity

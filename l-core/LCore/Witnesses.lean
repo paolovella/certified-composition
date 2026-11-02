@@ -244,6 +244,135 @@ theorem no_stall_pass (pc : PassCert tickL stallL) {p' : Unit} {t : Xform}
   simp [tickL, stallL] at this
   omega
 
+/-! ## The relational shape (`Cert.hyper`) -/
+
+/-- "Both runs eventually show the same events." -/
+def sameEvents (r r' : Chain) : Prop := ∀ l, (∃ n, l <+: (r n).ev) ↔ (∃ n, l <+: (r' n).ev)
+
+theorem sameEvents_inv : LimitInv2 sameEvents := by
+  intro r₁ r₂ r₁' r₂' h₁ h₂ h l
+  constructor
+  · intro ⟨n, hn⟩
+    obtain ⟨m, hm⟩ := h₁.2.1 n
+    obtain ⟨k, hk⟩ := (h l).mp ⟨m, prefix_trans' hn hm⟩
+    obtain ⟨j, hj⟩ := h₂.1 k
+    exact ⟨j, prefix_trans' hk hj⟩
+  · intro ⟨n, hn⟩
+    obtain ⟨m, hm⟩ := h₂.2.1 n
+    obtain ⟨k, hk⟩ := (h l).mpr ⟨m, prefix_trans' hn hm⟩
+    obtain ⟨j, hj⟩ := h₁.1 k
+    exact ⟨j, prefix_trans' hk hj⟩
+
+/-- A toy that emits: program `false` emits the public part, program `true` the secret. -/
+def toyEmit : Lang where
+  Prog  := Bool
+  In    := Nat × Nat
+  lowIn i i' := i.1 = i'.1
+  run _ p i := { ev := [.emit "out" [if p then i.2 else i.1]], lk := [], cost := 1, out := .done }
+
+/-- **Holds**: for publicly equal inputs, `false` shows the same events. -/
+theorem emit_hyper_holds : Cert.hyper toyEmit (fun i i' => i.1 = i'.1) sameEvents false := by
+  intro i i' _ _ h l
+  simp only [toyEmit, Bool.false_eq_true, ↓reduceIte, h]
+
+/-- **Fails**: `true` emits the secret, so publicly equal inputs can show different events. -/
+theorem emit_hyper_fails : ¬ Cert.hyper toyEmit (fun i i' => i.1 = i'.1) sameEvents true := by
+  intro h
+  obtain ⟨n, hn⟩ := (h (0, 0) (0, 1) trivial trivial rfl [.emit "out" [0]]).mp
+    ⟨0, prefix_refl' _⟩
+  have := hn.eq_of_length (by simp [toyEmit])
+  simp [toyEmit] at this
+
+/-- The identity pass on `toyEmit`. -/
+def idEmit : PassCert toyEmit toyEmit :=
+  PassCert.ofSim (fun p => .ok (p, Xform.id)) (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun _ _ _ h _ _ => by cases h; rfl)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
+
+/-- **The relational shape, carried through a pass.** -/
+theorem idEmit_carries_hyper : Cert.hyper toyEmit (fun i i' => i.1 = i'.1) sameEvents false :=
+  idEmit.hyper_transfer (p := false) (p' := false) (t := Xform.id) rfl sameEvents_inv
+    (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩) emit_hyper_holds
+
+/-! ## One observer's view (`Cert.relView`): two tenants, side channels included -/
+
+/-- An observer cannot tell payloads apart: its choice depends only on the channel. -/
+theorem observer_blind_to_data (f : Observer) (s : String) (d d' : List Nat) :
+    f (Ev.emit s d).chan = f (Ev.emit s d').chan := rfl
+
+/-- Three programs over A's data (`i.1`) and B's data (`i.2`). `clean` writes each tenant's data to
+    its own channel. `timing` does too, and also branches on A's data. `crossed` writes A's data
+    to B's channel. -/
+inductive TenantProg where
+  | clean | timing | crossed
+
+/-- Two tenants, each with a channel. -/
+def tenants : Lang where
+  Prog  := TenantProg
+  In    := Nat × Nat
+  lowIn i i' := i = i'
+  run _ p i :=
+    match p with
+    | .clean   => { ev := [.emit "a" [i.1], .emit "b" [i.2]], lk := [], cost := 2, out := .done }
+    | .timing  => { ev := [.emit "a" [i.1], .emit "b" [i.2]], lk := [.branch (i.1 == 0)],
+                    cost := 2, out := .done }
+    | .crossed => { ev := [.emit "a" [i.1], .emit "b" [i.1]], lk := [], cost := 2, out := .done }
+
+/-- Inputs that differ at most in A's data. -/
+def sameB (i i' : Nat × Nat) : Prop := i.2 = i'.2
+
+/-- B's observer: its own channel. -/
+def obsB : Observer
+  | .emit "b" => true
+  | _ => false
+
+/-- **Holds**: `clean` shows B nothing of A. -/
+theorem clean_view_holds : Cert.relView tenants sameB obsB .clean := by
+  intro _ i i' _ _ h
+  cases i; cases i'; cases h; rfl
+
+/-- **The all-channels observer fails on the same program**: A's own output depends on A's data,
+    so isolation is not the whole-observation comparison `rel` makes. -/
+theorem clean_view_all_fails : ¬ Cert.relView tenants sameB Observer.all .clean := by
+  intro h
+  have := congrArg Beh.ev (h 0 (0, 0) (1, 0) trivial trivial rfl)
+  simp [tenants, Beh.view_all] at this
+
+/-- "B's outputs are the same", at every fuel, with nothing about leakage or cost. -/
+def sameBOutputs (r r' : Chain) : Prop :=
+  ∀ n, ((r n).view obsB).ev = ((r' n).view obsB).ev
+
+/-- **The outputs-only comparison passes `timing`**: B's outputs never depend on A's data. -/
+theorem timing_outputs_pass : Cert.hyper tenants sameB sameBOutputs .timing := by
+  intro i i' _ _ h _
+  cases i; cases i'; cases h; rfl
+
+/-- **B's view refuses it**: the branch on A's data shows, which is the side channel this shape
+    adds. -/
+theorem timing_view_fails : ¬ Cert.relView tenants sameB obsB .timing := by
+  intro h
+  have := congrArg Beh.lk (h 0 (0, 0) (1, 0) trivial trivial rfl)
+  simp [tenants, Beh.view] at this
+
+/-- **B's view refuses a plain leak too**: A's data on B's channel. -/
+theorem crossed_view_fails : ¬ Cert.relView tenants sameB obsB .crossed := by
+  intro h
+  have := congrArg Beh.ev (h 0 (0, 0) (1, 0) trivial trivial rfl)
+  simp [tenants, Beh.view, obsB, Ev.chan] at this
+
+/-- The identity pass on `tenants`. -/
+def idTenants : PassCert tenants tenants :=
+  PassCert.ofSim (fun p => .ok (p, Xform.id)) (fun i => i) (fun _ _ => trivial)
+    (fun u _ => ⟨u, trivial, rfl⟩) (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩)
+    (fun _ _ _ h _ _ => by cases h; rfl)
+    (fun _ _ _ h n => by cases h; exact ⟨n, rfl⟩)
+
+/-- **The view, carried through a pass.** -/
+theorem idTenants_carries_view : Cert.relView tenants sameB obsB .clean :=
+  idTenants.relView_transfer (p := .clean) (p' := .clean) (t := Xform.id) rfl
+    (fun u u' _ _ h => ⟨u, u', trivial, trivial, h, rfl, rfl⟩) clean_view_holds
+
 /-! ## Coverage (F3): a pass must reach every admissible target input -/
 
 /-- A target with an extra flag. With the flag off it runs as `toy`; with the flag on,
