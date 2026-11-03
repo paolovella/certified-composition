@@ -7,7 +7,7 @@ deps: [F2, F4]
 closes: ['F3 kill rule: a lowering whose target input differs', 'nothing certified reaches anything that runs']
 acceptance: for one program, a theorem that its literal RV64 image carries rel and bound on an RV Lang by transfer alone; the image runs under an emulator and its observed result, cost and PC trace match the prediction; a refused program whose binary is observed to leak; the trust base listed; the kernel changes it forced listed for the user's review
 kill: if no lowering with a different target input can meet cover and low_cover, stop and write up the obstruction, which amends PLAN-2026-10 section 2. If certificate-specific pass proofs are needed, the central claim of section 6 fails, so stop and report
-status: planned
+status: in-progress
 ---
 
 ## Plan
@@ -60,3 +60,21 @@ under an emulator says nothing about a real core's timing.
 a compiler function, with the bytes produced by running it outside the kernel, does not.
 
 ## Log
+- 2026-11-03, branch `vs/slice`, **step 1 done: the walking skeleton runs.** `l-core/LCore/Slice/Skeleton.lean`
+  writes static RV64 ELFs from Lean. No proofs, and not imported by `LCore`, so CI does not build it yet.
+  - `objdump` decodes the encoder's `addi`, `add`, `ld`, `sd`, `beq` and `ecall` as written, and `readelf` accepts
+    the header. Under QEMU 8.2.2 user mode, `ret42` exits 42, `viamem 7` exits 42 and `viamem 0` exits 0.
+  - **The trace question is answered: QEMU is enough for now, and Spike is not needed yet.**
+    `-one-insn-per-tb -d exec,nochain,cpu` logs each instruction's PC and all registers before it. So cost is the
+    count of lines (9 and 8 on the two runs), and an address is a register plus an immediate. No plugins ship
+    with the package. Spike remains the later check on QEMU.
+  - **The trace shows the leak.** `viamem 7` and `viamem 0` differ in exactly one PC, `0x1008c`, the skipped
+    instruction. This is the channel `rel` must speak about, seen on a real binary.
+  - **Finding for step 2: the stack pointer is an input, chosen from outside.** It repeats across identical runs,
+    and changes with the environment and with `argv` (`0x2aaaab2aa890`, `...abe10`, `...a870`). So the RV `Lang`'s
+    input must contain it, and it is attacker-influenced. The source language has no stack pointer, so `cover`
+    needs every value to be the encoding of some source input. This is F3's kill rule in concrete form.
+  - **Finding for step 2: the exit status is not the result.** `a0 = 300` exits 44: the status keeps 8 bits. The
+    log shows the full `a0`. So `ret` is `a0` at the exit `ecall`, and the differential reads it from the log.
+  - **Finding for step 2: a fault has an outcome.** A load from address 0 exits 139 with no exit `ecall`. The RV
+    `Lang` must call this an abort that the OS reports, and the trust base must say so.
