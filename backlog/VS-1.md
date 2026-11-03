@@ -89,3 +89,15 @@ a compiler function, with the bytes produced by running it outside the kernel, d
     `reflect` give result correctness; `W64` in the slice. PLAN-2026-10 §2's `ret` field is not needed here.
   - **F3's kill rule is still unjudged.** Step 5 judges it. Constant addresses make `det` at its easiest here, so a
     later slice must try input-dependent addresses.
+- 2026-11-03, **step 3 done: the source language, its checker, and `rel` and `bound` on it**, in
+  `l-core/LCore/Slice/Word.lean` and `Source.lean`, on the design in step 2. No kernel change.
+  - `sliceLang E P` is lawful. Its input is positional words and a passive `E`; its words wrap (`wraps_in_source`); its
+    result is the event `Ev.ext "ret"`. `sliceCheck_rel` and `sliceCheck_bound`: what `sliceCheck` accepts shows the
+    same at every fuel on inputs agreeing at public positions, whatever the environment, within the checker's budget.
+  - Accepted: `clean`, where `clean_runs` shows it finishes with the right result and depends on its public input.
+    Refused, each with its leak proved: `secretBranch`, `secretRet`, `laundered`, `oneArm`, `shadowed`.
+  - **Rule mutants by hand:** 11 mutants of the checker and the budget, all killed (`research/2026-11/slice_mut.py`,
+    run from `l-core/` with a scratch directory as argument).
+  - **Tooling gap, for the user:** `tools/mutants.py` and the witness registry scan only `conf-typing`, so `sliceCheck`
+    is outside both. So is everything in `LCore.Slice`. They are Ring 0, so this is a proposal: extend both to `l-core`
+    before F6. Nothing checks these 11 stay killed until then.

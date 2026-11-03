@@ -3,3 +3,5 @@ import LCore.Kernel.Lang
 import LCore.Kernel.Cert
 import LCore.Kernel.Pass
 import LCore.Witnesses
+import LCore.Slice.Word
+import LCore.Slice.Source

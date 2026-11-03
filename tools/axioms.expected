@@ -3784,6 +3784,133 @@ LCore.PassCert.seq	LCore.Kernel.Pass
 LCore.PassCert.seq_comp_ok	LCore.Kernel.Pass	
 LCore.PassCert.trace_transfer	LCore.Kernel.Pass	
 LCore.PrefixClosed	LCore.Kernel.Pass	
+LCore.Slice.Cmd.assign.elim	LCore.Slice.Source	
+LCore.Slice.Cmd.assign.noConfusion	LCore.Slice.Source	
+LCore.Slice.Cmd.below	LCore.Slice.Source	
+LCore.Slice.Cmd.brecOn	LCore.Slice.Source	
+LCore.Slice.Cmd.brecOn.eq	LCore.Slice.Source	
+LCore.Slice.Cmd.brecOn.go	LCore.Slice.Source	
+LCore.Slice.Cmd.casesOn	LCore.Slice.Source	
+LCore.Slice.Cmd.ctorElim	LCore.Slice.Source	
+LCore.Slice.Cmd.ctorElimType	LCore.Slice.Source	
+LCore.Slice.Cmd.ctorIdx	LCore.Slice.Source	
+LCore.Slice.Cmd.ite.elim	LCore.Slice.Source	
+LCore.Slice.Cmd.ite.noConfusion	LCore.Slice.Source	
+LCore.Slice.Cmd.noConfusion	LCore.Slice.Source	
+LCore.Slice.Cmd.noConfusionType	LCore.Slice.Source	
+LCore.Slice.Cmd.recOn	LCore.Slice.Source	
+LCore.Slice.Cmd.seq.elim	LCore.Slice.Source	
+LCore.Slice.Cmd.seq.noConfusion	LCore.Slice.Source	
+LCore.Slice.Cmd.skip.elim	LCore.Slice.Source	
+LCore.Slice.Expr.add.elim	LCore.Slice.Source	
+LCore.Slice.Expr.add.noConfusion	LCore.Slice.Source	
+LCore.Slice.Expr.below	LCore.Slice.Source	
+LCore.Slice.Expr.brecOn	LCore.Slice.Source	
+LCore.Slice.Expr.brecOn.eq	LCore.Slice.Source	
+LCore.Slice.Expr.brecOn.go	LCore.Slice.Source	
+LCore.Slice.Expr.casesOn	LCore.Slice.Source	
+LCore.Slice.Expr.ctorElim	LCore.Slice.Source	
+LCore.Slice.Expr.ctorElimType	LCore.Slice.Source	
+LCore.Slice.Expr.ctorIdx	LCore.Slice.Source	
+LCore.Slice.Expr.lit.elim	LCore.Slice.Source	
+LCore.Slice.Expr.lit.noConfusion	LCore.Slice.Source	
+LCore.Slice.Expr.noConfusion	LCore.Slice.Source	
+LCore.Slice.Expr.noConfusionType	LCore.Slice.Source	
+LCore.Slice.Expr.recOn	LCore.Slice.Source	
+LCore.Slice.Expr.var.elim	LCore.Slice.Source	
+LCore.Slice.Expr.var.noConfusion	LCore.Slice.Source	
+LCore.Slice.Ext	LCore.Slice.Source	
+LCore.Slice.Ext.refl	LCore.Slice.Source	propext
+LCore.Slice.FT.below.casesOn	LCore.Slice.Source	propext
+LCore.Slice.FT.brecOn	LCore.Slice.Source	propext
+LCore.Slice.FT.casesOn	LCore.Slice.Source	propext
+LCore.Slice.FT.recOn	LCore.Slice.Source	propext
+LCore.Slice.Frame	LCore.Slice.Source	
+LCore.Slice.Low	LCore.Slice.Source	
+LCore.Slice.Low.mono	LCore.Slice.Source	
+LCore.Slice.NoSeq	LCore.Slice.Source	
+LCore.Slice.Prog.body	LCore.Slice.Source	
+LCore.Slice.Prog.casesOn	LCore.Slice.Source	
+LCore.Slice.Prog.ctorIdx	LCore.Slice.Source	
+LCore.Slice.Prog.inputs	LCore.Slice.Source	
+LCore.Slice.Prog.mk.noConfusion	LCore.Slice.Source	
+LCore.Slice.Prog.noConfusion	LCore.Slice.Source	
+LCore.Slice.Prog.noConfusionType	LCore.Slice.Source	
+LCore.Slice.Prog.recOn	LCore.Slice.Source	
+LCore.Slice.Prog.ret	LCore.Slice.Source	
+LCore.Slice.Store	LCore.Slice.Source	
+LCore.Slice.W64	LCore.Slice.Word	
+LCore.Slice.W64.add	LCore.Slice.Word	
+LCore.Slice.W64.add_wraps	LCore.Slice.Word	
+LCore.Slice.W64.ofNat	LCore.Slice.Word	
+LCore.Slice.cap	LCore.Slice.Source	
+LCore.Slice.clean	LCore.Slice.Source	
+LCore.Slice.clean_bound	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.clean_checks	LCore.Slice.Source	propext
+LCore.Slice.clean_rel	LCore.Slice.Source	propext
+LCore.Slice.clean_runs	LCore.Slice.Source	propext
+LCore.Slice.costK	LCore.Slice.Source	
+LCore.Slice.costK_push	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.costOf	LCore.Slice.Source	
+LCore.Slice.env_passive	LCore.Slice.Source	propext
+LCore.Slice.eval	LCore.Slice.Source	
+LCore.Slice.eval_low	LCore.Slice.Source	propext
+LCore.Slice.highC	LCore.Slice.Source	propext
+LCore.Slice.highE	LCore.Slice.Source	propext
+LCore.Slice.highInit	LCore.Slice.Source	
+LCore.Slice.initFrom	LCore.Slice.Source	
+LCore.Slice.initFrom_low	LCore.Slice.Source	propext
+LCore.Slice.inp	LCore.Slice.Source	
+LCore.Slice.inp_adm	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.inp_low	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.instDecidableEqCmd	LCore.Slice.Source	
+LCore.Slice.instDecidableEqCmd.decEq	LCore.Slice.Source	
+LCore.Slice.instDecidableEqExpr	LCore.Slice.Source	
+LCore.Slice.instDecidableEqExpr.decEq	LCore.Slice.Source	
+LCore.Slice.instDecidableEqProg	LCore.Slice.Source	
+LCore.Slice.instDecidableEqProg.decEq	LCore.Slice.Source	
+LCore.Slice.instReprCmd	LCore.Slice.Source	propext
+LCore.Slice.instReprCmd.repr	LCore.Slice.Source	propext
+LCore.Slice.instReprExpr	LCore.Slice.Source	propext
+LCore.Slice.instReprExpr.repr	LCore.Slice.Source	propext
+LCore.Slice.instReprProg	LCore.Slice.Source	propext
+LCore.Slice.instReprProg.repr	LCore.Slice.Source	propext
+LCore.Slice.laundered	LCore.Slice.Source	
+LCore.Slice.laundered_leaks	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.laundered_refused	LCore.Slice.Source	propext
+LCore.Slice.leak_of_ne	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.oneArm	LCore.Slice.Source	
+LCore.Slice.oneArm_leaks	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.oneArm_refused	LCore.Slice.Source	propext
+LCore.Slice.push	LCore.Slice.Source	propext
+LCore.Slice.push_ft	LCore.Slice.Source	propext
+LCore.Slice.push_noSeq	LCore.Slice.Source	propext
+LCore.Slice.retEv	LCore.Slice.Source	
+LCore.Slice.run	LCore.Slice.Source	propext
+LCore.Slice.run_cost	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.run_diverge	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.run_ext	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.run_same	LCore.Slice.Source	propext
+LCore.Slice.sec0	LCore.Slice.Source	
+LCore.Slice.secretBranch	LCore.Slice.Source	
+LCore.Slice.secretBranch_leaks	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.secretBranch_refused	LCore.Slice.Source	propext
+LCore.Slice.secretRet	LCore.Slice.Source	
+LCore.Slice.secretRet_leaks	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.secretRet_refused	LCore.Slice.Source	propext
+LCore.Slice.shadowed	LCore.Slice.Source	
+LCore.Slice.shadowed_leaks	LCore.Slice.Source	Classical.choice,Quot.sound,propext
+LCore.Slice.shadowed_refused	LCore.Slice.Source	propext
+LCore.Slice.sliceCheck	LCore.Slice.Source	propext
+LCore.Slice.sliceCheck_bound	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.sliceCheck_rel	LCore.Slice.Source	propext
+LCore.Slice.sliceLang	LCore.Slice.Source	propext
+LCore.Slice.sliceLang_lawful	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.slice_bound	LCore.Slice.Source	Quot.sound,propext
+LCore.Slice.tick	LCore.Slice.Source	
+LCore.Slice.tick_ext	LCore.Slice.Source	propext
+LCore.Slice.upd	LCore.Slice.Source	
+LCore.Slice.wraps_in_source	LCore.Slice.Source	propext
 LCore.Witness.TenantProg.casesOn	LCore.Witnesses	
 LCore.Witness.TenantProg.clean.elim	LCore.Witnesses	
 LCore.Witness.TenantProg.crossed.elim	LCore.Witnesses	
