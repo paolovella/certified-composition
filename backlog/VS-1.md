@@ -200,3 +200,17 @@ a compiler function, with the bytes produced by running it outside the kernel, d
   - `image_decodes`, `image_not_compressed`, `image_one_exit`: the model's two tested deviations cannot apply to these bytes.
   - **The theorem depends on the bytes:** `tampered_leaks`. Change byte 30, so the branch reads the secret word and not the public
     one, and `rel` is false.
+- 2026-11-03, **step 8 done: the literal, run under QEMU and compared.** `l-core/test/image_diff.py` and `test/ImagePred.lean`,
+  receipt `vs1-step8-imagediff`. The plan was written first, but the command writing it into this item was refused by the hook with
+  a commit attached, so it arrives with the result.
+  - **Independent where it can be:** the script reads the bytes from `Image.lean`'s source text, writes its own ELF, which equals
+    the Lean `elf`'s byte for byte, and decodes loads and stores itself.
+  - **Against the model:** 204 inputs, 3,604 instructions, 1,785 addresses: result, cost, outcome and the whole leakage all equal.
+  - **Step 4's blind spot, closed for this image only:** each address is derived from QEMU's registers and the script's decoding. A
+    prediction missing them, or with one shifted by 8, would fail. There are only 3 distinct addresses, all constants, which is
+    this slice's limit. `rv_diff.py` is still blind to them for other programs.
+  - **Security, on real runs:** 192 comparisons of inputs differing only in the secret word, including words near the wrap and in
+    three environments and `argv`s: PC and address traces, cost and result identical.
+  - **Vacuity:** on the tampered image, the secret shows on 12 of 12 public words. Changing the public word changes the observation.
+  - **Limits.** One program, on chosen inputs, under QEMU's user mode. Nothing about hardware, timing or caches. Not in CI: the
+    runners have no QEMU. Library code is unchanged, so full CI was not rerun for this step.
