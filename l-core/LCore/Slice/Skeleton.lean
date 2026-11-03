@@ -82,6 +82,45 @@ def write (dir name : String) (p : List Insn) : IO Unit := do
   IO.FS.writeBinFile path (ByteArray.mk (elf p).toArray)
   IO.setAccessRights path { user := { read := true, write := true, execution := true } }
 
+/-! ## Step 2's probe: the program sets its own stack, and its input sits in a data segment -/
+
+/-- `lui rd, imm`. Kept out of `Insn`, since only this probe's entry stub uses it. -/
+def lui (rd imm : Nat) : List UInt8 := le 4 (imm * 2 ^ 12 + rd * 2 ^ 7 + 0x37)
+
+/-- Two segments: code (read, execute) at `0x10000`, and data (read, write) at `0x20000`, whose first
+    bytes are `data` and the rest of its 4096 bytes the loader must zero. -/
+def elf2 (body data : List UInt8) : List UInt8 :=
+  let cbase := 0x10000
+  let dbase := 0x20000
+  let hdr := 64 + 2 * 56
+  let csize := hdr + body.length
+  let ident : List UInt8 := [0x7f, 0x45, 0x4c, 0x46, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  let head := ident ++ le 2 2 ++ le 2 243 ++ le 4 1 ++ le 8 (cbase + hdr) ++ le 8 64 ++ le 8 0 ++ le 4 0
+    ++ le 2 64 ++ le 2 56 ++ le 2 2 ++ le 2 64 ++ le 2 0 ++ le 2 0
+    ++ le 4 1 ++ le 4 5 ++ le 8 0 ++ le 8 cbase ++ le 8 cbase ++ le 8 csize ++ le 8 csize ++ le 8 0x1000
+    ++ le 4 1 ++ le 4 6 ++ le 8 0x1000 ++ le 8 dbase ++ le 8 dbase ++ le 8 data.length ++ le 8 0x1000
+    ++ le 8 0x1000
+    ++ body
+  head ++ List.replicate (0x1000 - head.length) 0 ++ data
+
+abbrev t2 := 7
+
+/-- Set `sp` and the input base, read two input words and one zeroed word, and use a stack slot. -/
+def selfStack : List UInt8 :=
+  lui sp 0x21 ++ lui t2 0x20 ++ code
+    [ .ld t0 t2 0, .ld t1 t2 8, .sd t0 sp (-8), .ld a0 sp (-8), .add a0 a0 t1, .ld t1 t2 256,
+      .add a0 a0 t1, .addi a7 x0 93, .ecall ]
+
+/-- The same, with a branch on the first input: it skips one instruction when that is zero. -/
+def selfBranch : List UInt8 :=
+  lui sp 0x21 ++ lui t2 0x20 ++ code
+    [ .ld t0 t2 0, .beq t0 x0 8, .addi t0 t0 1, .add a0 t0 x0, .addi a7 x0 93, .ecall ]
+
+def writeBytes (dir name : String) (b : List UInt8) : IO Unit := do
+  let path := s!"{dir}/{name}"
+  IO.FS.writeBinFile path (ByteArray.mk b.toArray)
+  IO.setAccessRights path { user := { read := true, write := true, execution := true } }
+
 end LCore.Slice.Skeleton
 
 open LCore.Slice.Skeleton in
@@ -90,3 +129,7 @@ def main (args : List String) : IO Unit := do
   write dir "ret42" ret42
   write dir "viamem7" (viaMem 7)
   write dir "viamem0" (viaMem 0)
+  writeBytes dir "self_40_2" (elf2 selfStack (le 8 40 ++ le 8 2))
+  writeBytes dir "self_300_0" (elf2 selfStack (le 8 300 ++ le 8 0))
+  writeBytes dir "branch_0" (elf2 selfBranch (le 8 0))
+  writeBytes dir "branch_5" (elf2 selfBranch (le 8 5))

@@ -78,3 +78,14 @@ a compiler function, with the bytes produced by running it outside the kernel, d
     log shows the full `a0`. So `ret` is `a0` at the exit `ecall`, and the differential reads it from the log.
   - **Finding for step 2: a fault has an outcome.** A load from address 0 exits 139 with no exit `ecall`. The RV
     `Lang` must call this an abort that the OS reports, and the trust base must say so.
+- 2026-11-03, **step 2 done, on paper: the slice forces no kernel change**
+  ([`VS-1-KERNEL`](../research/2026-11/VS-1-KERNEL.md)). Tested by one probe binary, and proved by nothing yet.
+  - **Correction to step 1's finding.** It said the RV `Lang`'s input must contain the loader's `sp` as something
+    the program uses. An unused `sp` in the source input makes `det` false if addresses depend on it, since `det`
+    covers any two inputs. So the entry stub sets `sp` itself, and from the second instruction on, the probe's trace
+    is identical across environments and `argv`.
+  - The design: a passive environment `E` in every language's input, whose independence is `det`'s real content;
+    positional inputs in a data segment, so `enc` needs no program; the result as `Ev.ext "ret"`, so `progress` and
+    `reflect` give result correctness; `W64` in the slice. PLAN-2026-10 §2's `ret` field is not needed here.
+  - **F3's kill rule is still unjudged.** Step 5 judges it. Constant addresses make `det` at its easiest here, so a
+    later slice must try input-dependent addresses.
