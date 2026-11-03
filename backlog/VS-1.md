@@ -127,3 +127,24 @@ a compiler function, with the bytes produced by running it outside the kernel, d
     unknown syscall. So `rvLang` says nothing about a program using them, and step 7 must show the image uses neither.
   - **Not in CI.** QEMU is on this box and not on the GitHub runners, and `tools/ci.sh` is Ring 0. Proposal for the user:
     run it on the heavy runner, once P0-06 provides one. Until then a model change is not re-tested automatically.
+- 2026-11-03, **step 5 plan: variables to slots, where the input changes.**
+  - **Target:** `slotLang E P`: numbered slots in place of names, and an input of the data segment's **bytes** and `E`.
+    The source's input is words by position, so this is a real change of representation. `cover` and `low_cover` have
+    to be proved by decoding bytes, including inputs that differ inside one word.
+  - **Layout:** input `k` lives at slot `k`, in place, and locals from slot 64. So `enc` needs no program, and no table
+    is hidden in the target. `comp` refuses what does not fit: over 64 inputs, or over 512 slots.
+  - **No stack.** With no calls, every slot is a constant in the data segment. Step 2's self-set stack is not needed:
+    the compiled program never reads `sp`, set or not. Step 6 will show that on the machine.
+  - **Not `PassCert.ofSim`:** its equation holds for every input, and locals start at zero only on admissible inputs.
+    So the obligations are proved from an equation that assumes `Adm`.
+  - **What this judges:** the half of F3's kill rule about a changed input. `E` stays passive here, since this language
+    does not read it. Step 6 judges the other half, on the machine, where `E` is real.
+  - **Done as planned**, in `l-core/LCore/Slice/Slots.lean`. No kernel change, and `PassCert` needed nothing new.
+  - **F3's kill rule, first half: it holds.** A pass whose target input really differs meets `cover` and `low_cover`.
+    `enc_wordAt` is what makes that true: encoding a decoding gives back every byte pattern. `carried_inside_a_word` uses
+    it: two inputs differing in one byte inside a secret word are covered by the certificate.
+  - **Carried by transfer alone:** `clean_carried` takes `rel` and `bound` through the kernel's transfers, with no proof
+    about either certificate in this file. `compile_sim` is the pass's one equation; every obligation comes from it.
+  - **Why this half is the easier one.** It is lockstep, and its target language does not read `E`. So the second half
+    of the kill rule, that a compiled program's view does not depend on the machine's environment, is untested. So is one
+    step becoming many. Step 6 has both.

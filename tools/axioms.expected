@@ -3946,6 +3946,113 @@ LCore.Slice.Rv.t0	LCore.Slice.Rv
 LCore.Slice.Rv.t2	LCore.Slice.Rv	
 LCore.Slice.Rv.word0	LCore.Slice.Rv	
 LCore.Slice.Rv.wordOfInt	LCore.Slice.Rv	
+LCore.Slice.Slots.Cov	LCore.Slice.Slots	
+LCore.Slice.Slots.NoSeqS	LCore.Slice.Slots	
+LCore.Slice.Slots.Rel	LCore.Slice.Slots	propext
+LCore.Slice.Slots.SCmd.below	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.brecOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.brecOn.eq	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.brecOn.go	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.casesOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.ctorElim	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.ctorElimType	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.ctorIdx	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.ite.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.ite.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.noConfusionType	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.recOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.seq.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.seq.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.set.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.set.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SCmd.skip.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.add.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.add.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.below	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.brecOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.brecOn.eq	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.brecOn.go	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.casesOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.ctorElim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.ctorElimType	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.ctorIdx	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.lit.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.lit.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.noConfusionType	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.recOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.slot.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.slot.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SFrame	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.body	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.casesOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.ctorIdx	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.mk.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.noConfusion	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.noConfusionType	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.recOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SProg.ret	LCore.Slice.Slots	
+LCore.Slice.Slots.Slots	LCore.Slice.Slots	
+LCore.Slice.Slots.allVars	LCore.Slice.Slots	
+LCore.Slice.Slots.bytesWith	LCore.Slice.Slots	
+LCore.Slice.Slots.bytesWith_adm	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.bytes_sum	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.cC	LCore.Slice.Slots	propext
+LCore.Slice.Slots.cE	LCore.Slice.Slots	propext
+LCore.Slice.Slots.cF	LCore.Slice.Slots	propext
+LCore.Slice.Slots.carried_inside_a_word	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.clean_carried	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.clean_comp	LCore.Slice.Slots	propext
+LCore.Slice.Slots.comp	LCore.Slice.Slots	propext
+LCore.Slice.Slots.comp_ok	LCore.Slice.Slots	propext
+LCore.Slice.Slots.comp_refuses_too_many_inputs	LCore.Slice.Slots	propext
+LCore.Slice.Slots.compile	LCore.Slice.Slots	propext
+LCore.Slice.Slots.compile_sim	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.cvars	LCore.Slice.Slots	
+LCore.Slice.Slots.encBytes	LCore.Slice.Slots	
+LCore.Slice.Slots.enc_wordAt	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.evalS	LCore.Slice.Slots	
+LCore.Slice.Slots.evalS_cE	LCore.Slice.Slots	propext
+LCore.Slice.Slots.evars	LCore.Slice.Slots	
+LCore.Slice.Slots.fits	LCore.Slice.Slots	
+LCore.Slice.Slots.idx	LCore.Slice.Slots	
+LCore.Slice.Slots.idx_inj	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.idx_lt	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.initFrom_mem	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.initFrom_not_mem	LCore.Slice.Slots	propext
+LCore.Slice.Slots.init_rel	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.instDecidableEqSCmd	LCore.Slice.Slots	
+LCore.Slice.Slots.instDecidableEqSCmd.decEq	LCore.Slice.Slots	
+LCore.Slice.Slots.instDecidableEqSExpr	LCore.Slice.Slots	
+LCore.Slice.Slots.instDecidableEqSExpr.decEq	LCore.Slice.Slots	
+LCore.Slice.Slots.instDecidableEqSProg	LCore.Slice.Slots	
+LCore.Slice.Slots.instDecidableEqSProg.decEq	LCore.Slice.Slots	
+LCore.Slice.Slots.instReprSCmd	LCore.Slice.Slots	
+LCore.Slice.Slots.instReprSCmd.repr	LCore.Slice.Slots	
+LCore.Slice.Slots.instReprSExpr	LCore.Slice.Slots	
+LCore.Slice.Slots.instReprSExpr.repr	LCore.Slice.Slots	
+LCore.Slice.Slots.instReprSProg	LCore.Slice.Slots	
+LCore.Slice.Slots.instReprSProg.repr	LCore.Slice.Slots	
+LCore.Slice.Slots.pushS	LCore.Slice.Slots	propext
+LCore.Slice.Slots.pushS_cC	LCore.Slice.Slots	propext
+LCore.Slice.Slots.pushS_noSeq	LCore.Slice.Slots	propext
+LCore.Slice.Slots.push_cov	LCore.Slice.Slots	propext
+LCore.Slice.Slots.runS	LCore.Slice.Slots	propext
+LCore.Slice.Slots.runS_diverge	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.runS_ext	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.runS_sim	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.secretRet_target_leaks	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.slotLang	LCore.Slice.Slots	propext
+LCore.Slice.Slots.slotLang_lawful	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.slotOf	LCore.Slice.Slots	propext
+LCore.Slice.Slots.slotOf_inj	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.slotPass	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
+LCore.Slice.Slots.sum_lt	LCore.Slice.Slots	Quot.sound,propext
+LCore.Slice.Slots.target_reads_bytes	LCore.Slice.Slots	propext
+LCore.Slice.Slots.updS	LCore.Slice.Slots	
+LCore.Slice.Slots.wordAt	LCore.Slice.Slots	
+LCore.Slice.Slots.wordAt_enc	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice.Store	LCore.Slice.Source	
 LCore.Slice.W64	LCore.Slice.Word	
 LCore.Slice.W64.add	LCore.Slice.Word	
