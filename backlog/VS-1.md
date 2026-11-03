@@ -148,3 +148,38 @@ a compiler function, with the bytes produced by running it outside the kernel, d
   - **Why this half is the easier one.** It is lockstep, and its target language does not read `E`. So the second half
     of the kill rule, that a compiled program's view does not depend on the machine's environment, is untested. So is one
     step becoming many. Step 6 has both.
+- 2026-11-03, **step 6 plan: slots to machine bytes, where one step becomes many and `E` is real.**
+  - **The pass:** `rvPass`, `slotLang Env P` to `rvLang P`, in `l-core/LCore/Slice/Lower.lean`, chained to `slotPass` by
+    `seq`. Input is unchanged here (`enc` is the identity), since `slotLang` already takes the data segment's bytes.
+  - **Code:** the base in `x7`; an expression on registers from `x8` up; `ld` and `sd` at constant offsets; `beq` over the
+    arms, with a jump at the end of the first; a no-op for `skip`; at the end, the result in `a0` and the exit `ecall`.
+  - **`comp` refuses** literals of 2048 or more, slots of 256 or more, expressions needing over 24 registers, and code over
+    3 KB. The first is a real limit: there is no shift instruction to build a large constant.
+  - **The proof:** one equation for a run: at every fuel, the machine shows a list of micro-steps, each a PC and its
+    addresses, played up to that fuel, then the exit. That list is computed from the slots alone, so the environment
+    cannot appear in it, which is `det`'s real content. Two runs with equal source leakage have equal lists.
+  - **A simplification to record:** `t.fuel` is a constant, the fuel at which the source has finished. That is sound for
+    these obligations because the slice has no loops, and it avoids aligning fuel inside a statement. **A language with
+    loops cannot do this**, so this step does not test that alignment. F4's `splitPass` does, in a lockstep setting.
+  - **Budget:** `t.cost c = L * c + L`, with `L` the code's instruction count. So the budget is really transformed.
+  - **Done as planned**, in `l-core/LCore/Slice/Lower.lean`, about 1,500 lines, and no kernel change.
+  - **F3's kill rule, second half: it holds, for this slice.** `run_eq` is the plan's one equation. `compiled_ignores_env`
+    follows from it: on the machine model, a compiled program's whole observation is the same in every environment.
+  - **`PassCert.seq` chains the two passes** (`pipeline`). `slice_carries`: what `sliceCheck` accepts, compiled, has `rel` and a
+    transformed budget on `rvLang`, through the kernel's transfers. `grep` finds no `Cert.` in `slotPass` or `rvPass`, so
+    PLAN-2026-10 §6's claim holds on this path. Guard (m) does not cover these files, so nothing keeps that true yet.
+  - **Run for real:** `test/CleanRun.lean` writes the compiled `clean` as ELFs. Under QEMU, on five inputs, exit status and
+    instruction count match the model's prediction (18, 18, 18, 14, 18). PC traces are identical across secrets 5, 6 and 250,
+    and across a changed environment and `argv`, and differ on the public input, as they should. Five runs by hand. The
+    systematic version is step 8.
+  - **Accepted and refused:** `clean_on_machine`, `clean_runs_on_machine`, `clean_ignores_busy_env`; `large_literal_refused`,
+    `high_slot_refused`; `secretRet_machine_leaks` shows `rel` on the machine is not vacuous.
+  - **Still only for this slice, as the plan said.** The constant `t.fuel` cannot work for loops, and every address is a
+    constant. F6 records the proposed condition. `clean_on_machine` is about the term `code (genP (compile clean))`; a literal
+    image is step 7.
+  - **The kernels found a real cost.** `vs1-step6-ci-full` failed (exit 1): `lean4lean` hit a deterministic timeout on `run_eq`,
+    while the five others and the axiom check accepted (`vs1-step6-export`). It is a resource limit, not a rejection, and it
+    still fails the gate, so the gate was left alone and `run_eq` was split into `entry_exec`, `exit_exec`, `laid` and
+    `run_eq_laid`. All six then accept (`vs1-step6-export2`). **`lean4lean`'s per-theorem limit is now a design constraint**, and
+    step 7's compile by kernel evaluation will press on it. CI's step also hides which kernel failed: a proposal for the user,
+    since `tools/ci.sh` is Ring 0.

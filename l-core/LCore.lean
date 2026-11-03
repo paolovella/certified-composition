@@ -7,3 +7,4 @@ import LCore.Slice.Word
 import LCore.Slice.Source
 import LCore.Slice.Rv
 import LCore.Slice.Slots
+import LCore.Slice.Lower

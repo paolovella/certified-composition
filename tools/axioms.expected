@@ -3828,6 +3828,164 @@ LCore.Slice.FT.recOn	LCore.Slice.Source	propext
 LCore.Slice.Frame	LCore.Slice.Source	
 LCore.Slice.Low	LCore.Slice.Source	
 LCore.Slice.Low.mono	LCore.Slice.Source	
+LCore.Slice.Lower.At	LCore.Slice.Lower	propext
+LCore.Slice.Lower.At.head	LCore.Slice.Lower	propext
+LCore.Slice.Lower.At.left	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.At.right	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.Chain	LCore.Slice.Lower	
+LCore.Slice.Lower.Corr.below.casesOn	LCore.Slice.Lower	
+LCore.Slice.Lower.Corr.brecOn	LCore.Slice.Lower	
+LCore.Slice.Lower.Corr.casesOn	LCore.Slice.Lower	
+LCore.Slice.Lower.Corr.push	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Corr.recOn	LCore.Slice.Lower	
+LCore.Slice.Lower.Exec	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Exec.nil	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Exec.step	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Exec.stepAt	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Exec.trans	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.FOk	LCore.Slice.Lower	propext
+LCore.Slice.Lower.FS	LCore.Slice.Lower	
+LCore.Slice.Lower.Good	LCore.Slice.Lower	
+LCore.Slice.Lower.Inv	LCore.Slice.Lower	
+LCore.Slice.Lower.Inv.mono_mem	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.Laid.body	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.casesOn	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.lui	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.recOn	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.res	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.size	LCore.Slice.Lower	
+LCore.Slice.Lower.Laid.x0	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.x1	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Laid.x2	LCore.Slice.Lower	propext
+LCore.Slice.Lower.Micro	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.casesOn	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.cmd.elim	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.cmd.noConfusion	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.ctorElim	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.ctorElimType	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.ctorIdx	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.jmp.elim	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.jmp.noConfusion	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.noConfusion	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.noConfusionType	LCore.Slice.Lower	
+LCore.Slice.Lower.TF.recOn	LCore.Slice.Lower	
+LCore.Slice.Lower.addImm_val	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.add_zero_w	LCore.Slice.Lower	propext
+LCore.Slice.Lower.addrs8_slot	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.allM	LCore.Slice.Lower	propext
+LCore.Slice.Lower.allM_len	LCore.Slice.Lower	propext
+LCore.Slice.Lower.beq_fields	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.bits_ofNat	LCore.Slice.Lower	propext
+LCore.Slice.Lower.clean_fits	LCore.Slice.Lower	
+LCore.Slice.Lower.clean_ignores_busy_env	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.clean_ok	LCore.Slice.Lower	propext
+LCore.Slice.Lower.clean_on_machine	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.clean_pipeline	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.clean_runs_on_machine	LCore.Slice.Lower	propext
+LCore.Slice.Lower.codeLen	LCore.Slice.Lower	
+LCore.Slice.Lower.code_getD	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.code_length	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.compR	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.compR_ok	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.compiled_ignores_env	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.div_field	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.entry_exec	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.envBusy	LCore.Slice.Lower	
+LCore.Slice.Lower.exitF	LCore.Slice.Lower	
+LCore.Slice.Lower.exit_exec	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.fetchI	LCore.Slice.Lower	propext
+LCore.Slice.Lower.fetchI_bound	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.fetchI_code	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.fetchI_parts	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.fuelB	LCore.Slice.Lower	
+LCore.Slice.Lower.gD_left	LCore.Slice.Lower	propext
+LCore.Slice.Lower.gD_mem	LCore.Slice.Lower	propext
+LCore.Slice.Lower.gD_right	LCore.Slice.Lower	propext
+LCore.Slice.Lower.genC	LCore.Slice.Lower	
+LCore.Slice.Lower.genC_good	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.genC_length	LCore.Slice.Lower	propext
+LCore.Slice.Lower.genE	LCore.Slice.Lower	
+LCore.Slice.Lower.genE_exec	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.genE_good	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.genE_length	LCore.Slice.Lower	propext
+LCore.Slice.Lower.genP	LCore.Slice.Lower	
+LCore.Slice.Lower.genP_good	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.genP_length	LCore.Slice.Lower	propext
+LCore.Slice.Lower.get_set	LCore.Slice.Lower	propext
+LCore.Slice.Lower.get_zero	LCore.Slice.Lower	
+LCore.Slice.Lower.good_add	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_addi	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_beq	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.good_ecall	LCore.Slice.Lower	
+LCore.Slice.Lower.good_ld	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_lui	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_sd	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.high_slot_refused	LCore.Slice.Lower	
+LCore.Slice.Lower.inData_slot	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.init_inv	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.jc	LCore.Slice.Lower	
+LCore.Slice.Lower.jc_push	LCore.Slice.Lower	propext
+LCore.Slice.Lower.k0	LCore.Slice.Lower	propext
+LCore.Slice.Lower.k0_bound	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.k0_bound'	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.k0_corr	LCore.Slice.Lower	propext
+LCore.Slice.Lower.k0_fs	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.laid	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.large_literal_refused	LCore.Slice.Lower	
+LCore.Slice.Lower.load8_store_other	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.load8_store_same	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.load8_val	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.lui_value	LCore.Slice.Lower	
+LCore.Slice.Lower.mC	LCore.Slice.Lower	
+LCore.Slice.Lower.mC_pos	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.mE	LCore.Slice.Lower	
+LCore.Slice.Lower.mE_length	LCore.Slice.Lower	propext
+LCore.Slice.Lower.mK	LCore.Slice.Lower	
+LCore.Slice.Lower.mK_push	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.okC	LCore.Slice.Lower	
+LCore.Slice.Lower.okE	LCore.Slice.Lower	
+LCore.Slice.Lower.okP	LCore.Slice.Lower	
+LCore.Slice.Lower.pcE	LCore.Slice.Lower	
+LCore.Slice.Lower.pipeline	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.playApp	LCore.Slice.Lower	
+LCore.Slice.Lower.playApp_append	LCore.Slice.Lower	
+LCore.Slice.Lower.play_cost	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.play_ev	LCore.Slice.Lower	
+LCore.Slice.Lower.play_fin	LCore.Slice.Lower	propext
+LCore.Slice.Lower.play_out	LCore.Slice.Lower	
+LCore.Slice.Lower.play_view	LCore.Slice.Lower	propext
+LCore.Slice.Lower.pushT	LCore.Slice.Lower	propext
+LCore.Slice.Lower.push_chain	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.push_fok	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.push_fs	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.range8	LCore.Slice.Lower	
+LCore.Slice.Lower.retPc	LCore.Slice.Lower	
+LCore.Slice.Lower.retW	LCore.Slice.Lower	propext
+LCore.Slice.Lower.run_eq	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.run_eq_laid	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.rvPass	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.sC	LCore.Slice.Lower	
+LCore.Slice.Lower.sE	LCore.Slice.Lower	
+LCore.Slice.Lower.secretRet_machine_leaks	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.sext_small	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.slice_carries	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.slotAddr	LCore.Slice.Lower	
+LCore.Slice.Lower.srcRun	LCore.Slice.Lower	propext
+LCore.Slice.Lower.src_any	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.src_done	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.startPc	LCore.Slice.Lower	
+LCore.Slice.Lower.store8_in	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.store8_out	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.tickM	LCore.Slice.Lower	
+LCore.Slice.Lower.walk	LCore.Slice.Lower	propext
+LCore.Slice.Lower.walk_exec	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice.Lower.walk_len	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.walk_same	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.walk_src	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.wordOfInt_val	LCore.Slice.Lower	propext
+LCore.Slice.Lower.word_of_bytes	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.wordsMax	LCore.Slice.Lower	
+LCore.Slice.Lower.xf	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.NoSeq	LCore.Slice.Source	
 LCore.Slice.Prog.body	LCore.Slice.Source	
 LCore.Slice.Prog.casesOn	LCore.Slice.Source	
