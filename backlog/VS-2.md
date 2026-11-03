@@ -63,3 +63,4 @@ back-edges exist. Those three theorems are this plan's template.
 - Heap addresses, which are what real input-dependent addresses mostly are. A masked index into one fixed array is the smallest form of the question.
 
 ## Log
+- 2026-11-03, the user said to start, and that F6 waits for this item. Step 1 next.

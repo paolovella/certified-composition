@@ -178,6 +178,10 @@ nothing combines them: no theorem says one program has all these properties at o
 pass carries only what is on `ucmdLangS`. Item L-UNIFY holds that work. A "yes" below means "yes on the
 language named in its row".
 
+**No row reaches machine code.** `splitPass` rewrites `UCmd` into `UCmd`, so "yes" in its column means a source-to-source pass, not
+a compiled program. The one path to bytes is `research/2026-11/VS-1-ACCOUNT.md`'s, for a separate small language with no theorem linking
+it to `UCmd`. Item L-BYTES holds that gap.
+
 | # | on L | language | through `splitPass` | L theorem |
 |---|---|---|---|---|
 | 1 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` |
