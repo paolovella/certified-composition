@@ -7,7 +7,7 @@ deps: [F2, F4]
 closes: ['F3 kill rule: a lowering whose target input differs', 'nothing certified reaches anything that runs']
 acceptance: for one program, a theorem that its literal RV64 image carries rel and bound on an RV Lang by transfer alone; the image runs under an emulator and its observed result, cost and PC trace match the prediction; a refused program whose binary is observed to leak; the trust base listed; the kernel changes it forced listed for the user's review
 kill: if no lowering with a different target input can meet cover and low_cover, stop and write up the obstruction, which amends PLAN-2026-10 section 2. If certificate-specific pass proofs are needed, the central claim of section 6 fails, so stop and report
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -214,3 +214,21 @@ a compiler function, with the bytes produced by running it outside the kernel, d
   - **Vacuity:** on the tampered image, the secret shows on 12 of 12 public words. Changing the public word changes the observation.
   - **Limits.** One program, on chosen inputs, under QEMU's user mode. Nothing about hardware, timing or caches. Not in CI: the
     runners have no QEMU. Library code is unchanged, so full CI was not rerun for this step.
+- 2026-11-03, **steps 9 and 10 plan.**
+  - **Step 9, teeth,** in `l-core/LCore/Slice/Teeth.lean` and `test/refused_diff.py`. The pipeline compiles what the checker refuses,
+    since compiling is not certifying. Each refused program's compiled form provably leaks on the model, and its binary is seen to
+    leak under QEMU, with `clean` as the control. In Lean: no certified pass can pin the environment, which is step 1's rejected option,
+    and no certified pass can compile `clean` to the tampered bytes.
+  - **Step 10, the account,** in `research/2026-11/VS-1-ACCOUNT.md`: what the kernel needed, what stays wrong, the trust base, and a
+    recommendation for F6.
+- 2026-11-03, **step 9 done: teeth.** `l-core/LCore/Slice/Teeth.lean`, `test/RefusedGen.lean`, `test/refused_diff.py`, receipt `vs1-step9-refused`.
+  - **Under QEMU:** all five refused programs, compiled anyway, leak: `secretBranch` through the PC trace, the others through the result. `clean`, the control,
+    does not. **`secretBranch` takes 9 instructions on both paths**, so measuring time alone would miss it.
+  - **In Lean:** four of those five leak on the model (`secretRet_compiled_leaks` and the rest). `no_pass_pins_env`, `no_pass_drops_a_word` and `no_pass_miscompiles`
+    show the kernel refuses a pass that misses an input or miscompiles.
+  - **One theorem dropped, and not understood.** `decide` over the compiled `secretBranch`'s leakage at fuel 4 is accepted by Lean, the paranoid checker and nanoda,
+    and exhausts lean4lean, con-leche and con-ron (`vs1-step9-export`, `vs1-step9-export2`). I blamed the compile, then the fuel, then an integer power in the model,
+    and each test failed. The gate was left alone. `vs1-step9-export3` is green without it. The leak stays shown on the source and the binary.
+- 2026-11-03, **step 10 done: the account**, [`VS-1-ACCOUNT`](../research/2026-11/VS-1-ACCOUNT.md). No kernel change forced, for a slice with no loops and constant
+  addresses. Recommendation: do not lock F6; a second slice with loops and input-dependent addresses comes next. **This item's acceptance is met**, and the question it
+  was opened for is only partly answered.

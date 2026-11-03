@@ -245,11 +245,13 @@ The same accountancy appears at every level:
 ## The security claim (the original goal)
 
 *Correction of record (2026-11-03).* This section reads as a claim about a working framework. It is not
-one. Nothing certified here reaches anything that runs: there is no compiled output, integers are
-unbounded and pointers are `Int`s. Most results below are proved over small models, not over L.
+one. What runs is one tiny program in a separate language (item VS-1, `l-core/LCore/Slice/`), with no loops
+or heap, on a machine model compared with QEMU. Nothing in `UCmd` compiles to anything that runs: its integers
+are unbounded and its pointers are `Int`s. Most results below are proved over small models, not over L.
 `VULN-COVERAGE.md` §3.0 says which hold on an L language, and on which. The user's assessment of
 2026-11-03 is that the foundation is not yet solid enough to deliver the goal
-([`FOUNDATION-2026-11-03`](research/2026-11/FOUNDATION-2026-11-03.md)). Item VS-1 is the current work.
+([`FOUNDATION-2026-11-03`](research/2026-11/FOUNDATION-2026-11-03.md)). What VS-1 found is in
+[`VS-1-ACCOUNT`](research/2026-11/VS-1-ACCOUNT.md).
 
 The program's origin is a framework for coding that is *inherently* free of
 vulnerabilities. The honest form of that claim — which real vulnerability classes

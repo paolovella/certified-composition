@@ -4230,6 +4230,27 @@ LCore.Slice.Slots.updS	LCore.Slice.Slots
 LCore.Slice.Slots.wordAt	LCore.Slice.Slots	
 LCore.Slice.Slots.wordAt_enc	LCore.Slice.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice.Store	LCore.Slice.Source	
+LCore.Slice.Teeth.compiled	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.envBusy_ne	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.launderedImage	LCore.Slice.Teeth	
+LCore.Slice.Teeth.laundered_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.laundered_literal	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.leak_by_ev	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.no_pass_drops_a_word	LCore.Slice.Teeth	Quot.sound,propext
+LCore.Slice.Teeth.no_pass_miscompiles	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.no_pass_pins_env	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.oneArmImage	LCore.Slice.Teeth	
+LCore.Slice.Teeth.oneArm_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.oneArm_literal	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.refused_programs_compile	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.secretBranchImage	LCore.Slice.Teeth	
+LCore.Slice.Teeth.secretBranch_literal	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.secretRetImage	LCore.Slice.Teeth	
+LCore.Slice.Teeth.secretRet_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.secretRet_literal	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.shadowedImage	LCore.Slice.Teeth	
+LCore.Slice.Teeth.shadowed_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.shadowed_literal	LCore.Slice.Teeth	propext
 LCore.Slice.W64	LCore.Slice.Word	
 LCore.Slice.W64.add	LCore.Slice.Word	
 LCore.Slice.W64.add_wraps	LCore.Slice.Word	

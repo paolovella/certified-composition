@@ -6,6 +6,12 @@ landed.
 
 ## Repository verification
 
+- **The vertical slice: certificates on literal RV64 bytes that run** (2026-11-03, VS-1; `l-core/LCore/Slice/`). One 76-byte program in a
+  new small language, through two chained passes, carrying `rel` and a budget by the kernel's transfers alone, with no kernel change:
+  `LCore.Slice.Image.image_carries`. The bytes run under QEMU and match the model on 204 inputs. No loops, heap, strings, functions or
+  mediation, all addresses constant, and the machine model is not linked to Sail. `UCmd` does not compile. See
+  `research/2026-11/VS-1-ACCOUNT.md`.
+
 - **Component seams on L, in sequence** (2026-11-02, F5 row 12; `conf-typing/ConfTyping/SeamL.lean`).
   `Cert.rel` does not compose, because `Beh` has no final store: `ConfTyping.Seam.bare_rel_breaks` gives
   two programs that each satisfy it and whose sequence leaks. With `bcheck`'s threaded rights and
