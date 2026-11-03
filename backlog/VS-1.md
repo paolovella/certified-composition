@@ -183,3 +183,20 @@ a compiler function, with the bytes produced by running it outside the kernel, d
     `run_eq_laid`. All six then accept (`vs1-step6-export2`). **`lean4lean`'s per-theorem limit is now a design constraint**, and
     step 7's compile by kernel evaluation will press on it. CI's step also hides which kernel failed: a proposal for the user,
     since `tools/ci.sh` is Ring 0.
+- 2026-11-03, **step 7 plan: bytes as a theorem.** In `l-core/LCore/Slice/Image.lean`.
+  - **The literal:** `cleanImage`, the code bytes written out. `compile_is_literal`: the pipeline's output equals it, by kernel
+    evaluation. So no compiler run outside the kernel is believed.
+  - **The carried theorem is about the literal:** `image_carries`, `rel` and a numeric budget on `rvLang`.
+  - **What step 4 required:** every word decodes, none is compressed, and the only `ecall` is the exit. So the model's known
+    deviations cannot apply to this image.
+  - **The encoder:** `decode (encode i) = i` is already general for every instruction the compiler emits (`good_*`, step 6).
+  - **Not covered:** the ELF wrapper and the loader stay in the trust base. PLAN-2026-10's T5, reading bytes from the export the
+    kernels checked, is not done. Step 8 reads the literal from this source file with an independent script instead.
+  - **Done as planned**, in `l-core/LCore/Slice/Image.lean`. No kernel change. All six kernels accept (`vs1-step7-export`), so
+    the worry from step 6 did not bite for 76 bytes. It says nothing about larger programs.
+  - `compile_is_literal` and `pipeline_is_literal`: the pipeline's output is the literal, by kernel evaluation. `image_carries`:
+    the literal has `rel` and a budget of 95 on `rvLang`. The budget is what the transformer gives, and not tight: the program
+    runs 18 (`image_runs`).
+  - `image_decodes`, `image_not_compressed`, `image_one_exit`: the model's two tested deviations cannot apply to these bytes.
+  - **The theorem depends on the bytes:** `tampered_leaks`. Change byte 30, so the branch reads the secret word and not the public
+    one, and `rel` is false.

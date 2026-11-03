@@ -3826,6 +3826,24 @@ LCore.Slice.FT.brecOn	LCore.Slice.Source	propext
 LCore.Slice.FT.casesOn	LCore.Slice.Source	propext
 LCore.Slice.FT.recOn	LCore.Slice.Source	propext
 LCore.Slice.Frame	LCore.Slice.Source	
+LCore.Slice.Image.adm_inp	LCore.Slice.Image	Quot.sound,propext
+LCore.Slice.Image.budget_value	LCore.Slice.Image	Quot.sound,propext
+LCore.Slice.Image.cleanImage	LCore.Slice.Image	
+LCore.Slice.Image.cleanInsns	LCore.Slice.Image	
+LCore.Slice.Image.compile_is_literal	LCore.Slice.Image	propext
+LCore.Slice.Image.imageNats	LCore.Slice.Image	
+LCore.Slice.Image.image_are_bytes	LCore.Slice.Image	
+LCore.Slice.Image.image_carries	LCore.Slice.Image	Classical.choice,Quot.sound,propext
+LCore.Slice.Image.image_decodes	LCore.Slice.Image	propext
+LCore.Slice.Image.image_is_insns	LCore.Slice.Image	
+LCore.Slice.Image.image_not_compressed	LCore.Slice.Image	propext
+LCore.Slice.Image.image_one_exit	LCore.Slice.Image	propext
+LCore.Slice.Image.image_runs	LCore.Slice.Image	propext
+LCore.Slice.Image.low_inp	LCore.Slice.Image	Classical.choice,Quot.sound,propext
+LCore.Slice.Image.pipeline_is_literal	LCore.Slice.Image	Classical.choice,Quot.sound,propext
+LCore.Slice.Image.tampered	LCore.Slice.Image	
+LCore.Slice.Image.tampered_differs	LCore.Slice.Image	
+LCore.Slice.Image.tampered_leaks	LCore.Slice.Image	Classical.choice,Quot.sound,propext
 LCore.Slice.Low	LCore.Slice.Source	
 LCore.Slice.Low.mono	LCore.Slice.Source	
 LCore.Slice.Lower.At	LCore.Slice.Lower	propext
