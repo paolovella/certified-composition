@@ -26,3 +26,4 @@ before the lock than after, so F6 must either do this first or record why the lo
 without it.
 
 ## Log
+- 2026-11-03, held by the user's decision: the vertical slice comes first (VS-1).
