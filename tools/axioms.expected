@@ -3838,6 +3838,114 @@ LCore.Slice.Prog.noConfusion	LCore.Slice.Source
 LCore.Slice.Prog.noConfusionType	LCore.Slice.Source	
 LCore.Slice.Prog.recOn	LCore.Slice.Source	
 LCore.Slice.Prog.ret	LCore.Slice.Source	
+LCore.Slice.Rv.Byte	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.casesOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.ctorIdx	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.mem	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.mk.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.noConfusionType	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.rd	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.recOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.reg	LCore.Slice.Rv	
+LCore.Slice.Rv.Env.wr	LCore.Slice.Rv	
+LCore.Slice.Rv.Ext	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.add.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.add.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.addi.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.addi.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.beq.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.beq.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.casesOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.ctorElim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.ctorElimType	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.ctorIdx	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.ecall.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.ld.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.ld.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.lui.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.lui.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.noConfusionType	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.recOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.sd.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.sd.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.casesOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.ctorIdx	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.get	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.mem	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.mk.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.noConfusionType	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.pc	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.recOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.set	LCore.Slice.Rv	
+LCore.Slice.Rv.Mach.x	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.casesOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.ctorElim	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.ctorElimType	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.ctorIdx	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.exit.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.exit.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.fault.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.fault.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.next.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.next.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.noConfusionType	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.recOn	LCore.Slice.Rv	
+LCore.Slice.Rv.a0	LCore.Slice.Rv	
+LCore.Slice.Rv.a7	LCore.Slice.Rv	
+LCore.Slice.Rv.addImm	LCore.Slice.Rv	
+LCore.Slice.Rv.addrs8	LCore.Slice.Rv	
+LCore.Slice.Rv.bits	LCore.Slice.Rv	
+LCore.Slice.Rv.byteOf	LCore.Slice.Rv	
+LCore.Slice.Rv.canRead	LCore.Slice.Rv	
+LCore.Slice.Rv.canWrite	LCore.Slice.Rv	
+LCore.Slice.Rv.code	LCore.Slice.Rv	
+LCore.Slice.Rv.codeBase	LCore.Slice.Rv	
+LCore.Slice.Rv.compressed_aborts	LCore.Slice.Rv	propext
+LCore.Slice.Rv.dataBase	LCore.Slice.Rv	
+LCore.Slice.Rv.dataSize	LCore.Slice.Rv	
+LCore.Slice.Rv.decode	LCore.Slice.Rv	
+LCore.Slice.Rv.decode_encode_samples	LCore.Slice.Rv	
+LCore.Slice.Rv.elf	LCore.Slice.Rv	
+LCore.Slice.Rv.elf_entry	LCore.Slice.Rv	
+LCore.Slice.Rv.encode	LCore.Slice.Rv	
+LCore.Slice.Rv.env0	LCore.Slice.Rv	
+LCore.Slice.Rv.f3Of	LCore.Slice.Rv	
+LCore.Slice.Rv.fetch	LCore.Slice.Rv	propext
+LCore.Slice.Rv.inBytes	LCore.Slice.Rv	
+LCore.Slice.Rv.inCode	LCore.Slice.Rv	
+LCore.Slice.Rv.inData	LCore.Slice.Rv	
+LCore.Slice.Rv.init	LCore.Slice.Rv	propext
+LCore.Slice.Rv.instDecidableEqInsn	LCore.Slice.Rv	
+LCore.Slice.Rv.instDecidableEqInsn.decEq	LCore.Slice.Rv	
+LCore.Slice.Rv.instReprInsn	LCore.Slice.Rv	propext
+LCore.Slice.Rv.instReprInsn.repr	LCore.Slice.Rv	propext
+LCore.Slice.Rv.le	LCore.Slice.Rv	
+LCore.Slice.Rv.load8	LCore.Slice.Rv	
+LCore.Slice.Rv.probe	LCore.Slice.Rv	
+LCore.Slice.Rv.probe_leaks	LCore.Slice.Rv	Classical.choice,Quot.sound,propext
+LCore.Slice.Rv.probe_leaks_address	LCore.Slice.Rv	propext
+LCore.Slice.Rv.probe_runs	LCore.Slice.Rv	propext
+LCore.Slice.Rv.rdOf	LCore.Slice.Rv	
+LCore.Slice.Rv.retEv	LCore.Slice.Rv	
+LCore.Slice.Rv.rs1Of	LCore.Slice.Rv	
+LCore.Slice.Rv.rs2Of	LCore.Slice.Rv	
+LCore.Slice.Rv.run	LCore.Slice.Rv	propext
+LCore.Slice.Rv.run_diverge	LCore.Slice.Rv	Quot.sound,propext
+LCore.Slice.Rv.run_ext	LCore.Slice.Rv	Quot.sound,propext
+LCore.Slice.Rv.rvLang	LCore.Slice.Rv	propext
+LCore.Slice.Rv.rvLang_lawful	LCore.Slice.Rv	Quot.sound,propext
+LCore.Slice.Rv.sext	LCore.Slice.Rv	
+LCore.Slice.Rv.step	LCore.Slice.Rv	propext
+LCore.Slice.Rv.store8	LCore.Slice.Rv	
+LCore.Slice.Rv.sysExit	LCore.Slice.Rv	
+LCore.Slice.Rv.t0	LCore.Slice.Rv	
+LCore.Slice.Rv.t2	LCore.Slice.Rv	
+LCore.Slice.Rv.word0	LCore.Slice.Rv	
+LCore.Slice.Rv.wordOfInt	LCore.Slice.Rv	
 LCore.Slice.Store	LCore.Slice.Source	
 LCore.Slice.W64	LCore.Slice.Word	
 LCore.Slice.W64.add	LCore.Slice.Word	

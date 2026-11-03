@@ -101,3 +101,29 @@ a compiler function, with the bytes produced by running it outside the kernel, d
   - **Tooling gap, for the user:** `tools/mutants.py` and the witness registry scan only `conf-typing`, so `sliceCheck`
     is outside both. So is everything in `LCore.Slice`. They are Ring 0, so this is a proposal: extend both to `l-core`
     before F6. Nothing checks these 11 stay killed until then.
+- 2026-11-03, **step 4 plan: the RV `Lang`, lawful and tested against QEMU.**
+  - **Model:** `rvLang`, in `l-core/LCore/Slice/Rv.lean`. Program: code bytes at a fixed address, fetched and decoded,
+    so the statement is about bytes. Memory is byte-addressed. Instructions: `lui`, `addi`, `add`, `ld`, `sd`, `beq`,
+    `ecall`. Input: the data segment's bytes and the environment `Env` (initial registers, what the loader mapped).
+  - **Observation:** `Lk.step [pc]` per instruction, `Lk.addr` per access including a faulting one, cost as instructions
+    retired, `Ev.ext "ret"` and `done` at exit, `abort` on a fault.
+  - **The test:** for each case, the model predicts every step's PC and registers, and the outcome. A driver writes the
+    ELF and the prediction, and a script compares them with QEMU's log, instruction by instruction. It covers
+    immediates' edges, sign extension, wrapping, unaligned and overlapping accesses, branches both ways, `x0`, and faults.
+  - **Where the model is known to be wrong**, tested as expected deviations: it aborts on instructions it does not
+    model, while the real machine runs them (a compressed instruction, and an unknown syscall). The compiled program
+    must not use them. Step 7's theorem is about a literal, so that can be checked.
+  - **Done as planned**, in `l-core/LCore/Slice/Rv.lean`, with `test/RvCases.lean` and `test/rv_diff.py`. No kernel change.
+    `rvLang_lawful`. `probe_runs` and `probe_leaks`: the model sees a secret branch, so `rel` on it is not vacuous.
+  - **The comparison** (receipt `vs1-step4-rvdiff2`, QEMU 8.2.2 user mode): 25 cases, 170 steps, every PC and register
+    `x1` to `x31` equal, and every outcome, cost and exit status. The first step's `sp` is the loader's and is not compared.
+  - **The harness can find a wrong model:** 17 broken models, 15 caught. The other two are its stated blind spot: it
+    cannot see leaked addresses, because they come from the same registers. `probe_leaks_address` states that in Lean, on
+    one program only. So addresses are the least tested part of the model.
+  - **The mutants found two things.** My script read exit codes 254 and 255 as signals, which the first run showed
+    (`vs1-step4-rvdiff` is the failing receipt, before the fixes). `fault_store_code` wrote to the ELF header and not to
+    the code, so "code is not writable" was untested until a broken model survived it. Both are fixed.
+  - **Expected deviations, both tested:** a compressed instruction runs on QEMU and aborts in the model, and so does an
+    unknown syscall. So `rvLang` says nothing about a program using them, and step 7 must show the image uses neither.
+  - **Not in CI.** QEMU is on this box and not on the GitHub runners, and `tools/ci.sh` is Ring 0. Proposal for the user:
+    run it on the heavy runner, once P0-06 provides one. Until then a model change is not re-tested automatically.
