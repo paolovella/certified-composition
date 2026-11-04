@@ -99,3 +99,8 @@ back-edges exist. Those three theorems are this plan's template.
   21 broken models are all caught, including the two it was blind to, a wrong address, and a faulting load that leaks none. `image_diff.py` and `refused_diff.py` still pass on the changed model. Receipt `vs2-step3-rvdiff`; the first attempt stopped on my missing `open`. Still not in CI: the runners have no QEMU.
 - 2026-11-04, step 3's CI failed twice on the time ratchet alone. The user raised both budgets and asked for a real fix; none was found. The numbers are in `backlog/F1.md`.
 - 2026-11-05, step 3's CI is green, on an idle machine (`vs2-idle-1`, `vs2-idle-2`). See `backlog/F1.md`.
+- 2026-11-05, **step 4 done: the source language.** `l-core/LCore/Slice2/Source.lean`. No kernel change. VS-1's language is untouched.
+  - `sliceLang_lawful`, with real divergence: `run_diverge`, and `spin_never_finishes` shows a run that never ends, at every fuel. `sliceCheck_rel`: `rel` at every fuel, whether or not the run finishes. `slice_bound` is for loop-free programs only.
+  - Accepted: `scan`, a loop over the array at a public index, whose addresses depend on that index (`scan_runs`); `spin`, which never finishes; `markedFirst`, which meets the fixed point; `load_clears_when_low`.
+  - Refused, each with its leak proved: `secretLoad`, `secretStore`, `secretLoop`, `secondIter`, `throughArray`, `arrayInLoop`. **`secondIter` is the fixed point's witness**: it branches on a secret only on its second iteration.
+  - 19 hand-written mutants, all killed (`research/2026-11/slice2_mut.py`), since `tools/mutants.py` still does not scan `l-core`.
