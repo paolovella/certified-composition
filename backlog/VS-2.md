@@ -64,3 +64,23 @@ back-edges exist. Those three theorems are this plan's template.
 
 ## Log
 - 2026-11-03, the user said to start, and that F6 waits for this item. Step 1 next.
+- 2026-11-03, **step 1, partial: the measurement was stopped by Claude Code for low system memory, and is not finished.** Harness `bench/vs2/kernel_scale.py`, partial data
+  `bench/vs2-kernel.tsv`, receipt `vs2-step1-kernel-scale2`. An earlier run, `vs2-step1-kernel-scale`, measured nothing: no case built, and its exit 0 meant nothing.
+  - **The compiler's output equals a literal, at every size tried:** 88, 776 and 7,624 bytes pass all six kernels, within noise of the baseline. So the compile half of T2 is not
+    the worry at these sizes.
+  - **The machine run on a literal:** 88 bytes pass all six. **776 and 7,624 bytes did not elaborate**: Lean's `decide` hit its heartbeat limit, so no kernel saw them. This is the open
+    question, and it is unanswered.
+  - **The unexplained failure reproduces alone:** `branch-differs-f4` on 44 bytes: Lean, the paranoid checker and nanoda accept; lean4lean, con-leche and con-ron refuse. Its variants, which
+    could explain it, did not run.
+- 2026-11-04, **incident: this measurement caused out-of-memory kills in other projects on this machine.** Receipt `vs2-step1-kernel-rest`.
+  - **What happened.** The 7.6 KB machine run on `decide +kernel` took over 21 GB and hit the harness's 15-minute cap. `subprocess.run`'s timeout killed `lake` and not its `lean` child, which
+    kept running for about 1 h 44 min with memory and swap full. The job's receipt says exit 0 because the harness then saw 0.0 GB available and stopped cleanly.
+  - **What it did.** The kernel log shows the OOM killer, 23:07 to 00:30: `postgres` 9 times, `local-path-prov` 4, `coredns` 4, `tigerbeetle` 2, `hv-ledger` 2, `hv-core` 2, `hv-core-go`, `pg_isready`, `tini`.
+    These belong to other work: the `hv-dev-control-plane` kind cluster and its pods. `kube-apiserver` and `etcd` restarted. The `web-*` containers stayed up. Whether anything lost data is not checked.
+  - **The fix.** The harness now runs each child in its own process group, kills the group on timeout, and caps it at 12 GB (`run_capped`). The orphan was killed by hand when it was found. `tools/run-job.sh`
+    reported nothing, since the job itself had ended. An earlier stop for low memory, on `vs2-step1-kernel-scale2`, is not explained by this: no timeout had fired.
+- 2026-11-04, **step 1, results so far** (`bench/vs2-kernel.tsv`, `bench/vs2-kernel-2.tsv`; times within noise of the baseline except where given):
+  - **Compile equals a literal:** 88, 776 and 7,624 bytes: all six kernels accept. `image_carries`-style theorems need only this and the transfers, so **the compile half of T2 is not refuted at these sizes**, though `okP` caps code at 3 KB today.
+  - **Machine run on a literal:** 88 bytes pass. 776 bytes pass on `decide +kernel`, 16.5 s to elaborate, and each kernel 10 to 20 s over the baseline. **7,624 bytes: over 15 minutes and over 21 GB, no verdict.** Ten times the size cost over fifty times the time. So running a machine in the kernel does
+    not scale as written, and is useful only for small witnesses. The cause is not established, though a list lookup per fetch and memory as nested closures are the obvious suspects.
+  - **`secretBranch`'s leakage on 44 bytes** still splits the kernels, and its five variants have not run.
