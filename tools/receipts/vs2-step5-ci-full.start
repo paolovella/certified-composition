@@ -1,0 +1,4 @@
+started: 2026-11-04T22:54:11+01:00
+head: bde850b
+command: bash tools/ci.sh
+log: tools/receipts/vs2-step5-ci-full.log

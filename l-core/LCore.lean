@@ -11,3 +11,4 @@ import LCore.Slice.Lower
 import LCore.Slice.Image
 import LCore.Slice.Teeth
 import LCore.Slice2.Source
+import LCore.Slice2.Slots
