@@ -93,10 +93,10 @@ inductive USecTy (P : Partition) : UCmd → Prop where
   | skip    : USecTy P .skip
   | assignH : ∀ x e, P x = true → USecTy P (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → USecTy P (.assign x e)
-  | seq     : USecTy P c₁ → USecTy P c₂ → USecTy P (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → USecTy P c₁ → USecTy P c₂ →
+  | seq {c₁ c₂}     : USecTy P c₁ → USecTy P c₂ → USecTy P (.seq c₁ c₂)
+  | iteL {c₁ c₂}    : ∀ e, exprLow P e = true → USecTy P c₁ → USecTy P c₂ →
               USecTy P (.ite e c₁ c₂)
-  | whileL  : ∀ e, exprLow P e = true → USecTy P c → USecTy P (.loop e c)
+  | whileL {c}  : ∀ e, exprLow P e = true → USecTy P c → USecTy P (.loop e c)
   | check   : ∀ r, USecTy P (.check r)
   | access  : ∀ r, USecTy P (.access r)
   /-- **Allocation into a High variable** (stage 1j). The address written is the

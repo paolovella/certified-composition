@@ -81,16 +81,16 @@ def hexec : HCmd → IState → IState
 /-- The pc-label discipline extended to the heap. `pc = true` is a High
     (secret-dependent) context. -/
 inductive HSecTy (P : Partition) (Q : Int → Bool) : Bool → HCmd → Prop where
-  | skip    : HSecTy P Q pc .skip
-  | assignH : ∀ x e, P x = true → HSecTy P Q pc (.assign x e)
+  | skip {pc}    : HSecTy P Q pc .skip
+  | assignH {pc} : ∀ x e, P x = true → HSecTy P Q pc (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → HSecTy P Q false (.assign x e)
-  | seq     : HSecTy P Q pc c₁ → HSecTy P Q pc c₂ → HSecTy P Q pc (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → HSecTy P Q pc c₁ → HSecTy P Q pc c₂ →
+  | seq {pc c₁ c₂}     : HSecTy P Q pc c₁ → HSecTy P Q pc c₂ → HSecTy P Q pc (.seq c₁ c₂)
+  | iteL {pc c₁ c₂}    : ∀ e, exprLow P e = true → HSecTy P Q pc c₁ → HSecTy P Q pc c₂ →
               HSecTy P Q pc (.ite e c₁ c₂)
-  | iteH    : HSecTy P Q true c₁ → HSecTy P Q true c₂ → HSecTy P Q pc (.ite e c₁ c₂)
-  | loadH   : ∀ y k, P y = true → HSecTy P Q pc (.load y k)          -- into High var: any cell
+  | iteH {c₁ c₂ pc e}    : HSecTy P Q true c₁ → HSecTy P Q true c₂ → HSecTy P Q pc (.ite e c₁ c₂)
+  | loadH {pc}   : ∀ y k, P y = true → HSecTy P Q pc (.load y k)          -- into High var: any cell
   | loadL   : ∀ y k, Q k = false → HSecTy P Q false (.load y k)      -- Low cell into any var, Low pc
-  | storeH  : ∀ k e, Q k = true → HSecTy P Q pc (.store k e)         -- High cell: any data
+  | storeH {pc}  : ∀ k e, Q k = true → HSecTy P Q pc (.store k e)         -- High cell: any data
   | storeL  : ∀ k e, exprLow P e = true → HSecTy P Q false (.store k e) -- Low data, Low pc
 
 /-! ## Confinement: High-context commands leave Low observations alone -/

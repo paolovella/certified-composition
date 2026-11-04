@@ -106,10 +106,10 @@ inductive WSecTy (P : Partition) : WCmd → Prop where
   | skip    : WSecTy P .skip
   | assignH : ∀ x e, P x = true → WSecTy P (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → WSecTy P (.assign x e)
-  | seq     : WSecTy P c₁ → WSecTy P c₂ → WSecTy P (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → WSecTy P c₁ → WSecTy P c₂ →
+  | seq {c₁ c₂}     : WSecTy P c₁ → WSecTy P c₂ → WSecTy P (.seq c₁ c₂)
+  | iteL {c₁ c₂}    : ∀ e, exprLow P e = true → WSecTy P c₁ → WSecTy P c₂ →
               WSecTy P (.ite e c₁ c₂)
-  | whileL  : ∀ e, exprLow P e = true → WSecTy P c → WSecTy P (.loop e c)
+  | whileL {c}  : ∀ e, exprLow P e = true → WSecTy P c → WSecTy P (.loop e c)
 
 /-- **Soundness — termination-sensitive noninterference.** At every fuel, two
     Low-equal runs of a well-typed command are Low-equivalent: they halt

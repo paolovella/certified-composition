@@ -4,6 +4,8 @@
 # (S-435). transport-kernel (mathlib) is not part of it.
 name = "CertifiedComposition"
 defaultTargets = ["CertifiedComposition"]
+# An unknown name in a statement is an error, and not a new variable (AI-01).
+leanOptions = { autoImplicit = false }
 
 [[lean_lib]]
 name = "CertifiedComposition"

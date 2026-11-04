@@ -1,0 +1,49 @@
+ConfTyping/Imp.lean:59: {e σ c2 σ2 t2 b2 c1}
+ConfTyping/Imp.lean:57: {e σ c1 σ1 t1 b1 c2}
+ConfTyping/Imp.lean:55: {c1 σ σ1 t1 b1 c2 σ2 t2 b2}
+ConfTyping/Imp.lean:54: {x e σ}
+ConfTyping/Imp.lean:53: {σ}
+ConfTyping/Imp.lean: constructors done, two theorems remained, added by hand below
+ConfTyping/SecTy.lean:61: {c₁ c₂ pc e}
+ConfTyping/SecTy.lean:59: {pc c₁ c₂}
+ConfTyping/SecTy.lean:58: {pc c₁ c₂}
+ConfTyping/SecTy.lean:56: {pc}
+ConfTyping/SecTy.lean:55: {pc}
+ConfTyping/SecTy.lean: clean after 1 rounds
+ConfTyping/SecTyD.lean:88: {c₁ c₂}
+ConfTyping/SecTyD.lean:86: {c₁ c₂ pc e}
+ConfTyping/SecTyD.lean:84: {pc c₁ c₂}
+ConfTyping/SecTyD.lean:83: {pc c₁ c₂}
+ConfTyping/SecTyD.lean:80: {pc}
+ConfTyping/SecTyD.lean:79: {pc}
+ConfTyping/SecTyD.lean: clean after 1 rounds
+ConfTyping/SecTyT.lean:40: {c₁ c₂}
+ConfTyping/SecTyT.lean:39: {c₁ c₂}
+ConfTyping/SecTyT.lean: clean after 1 rounds
+ConfTyping/SecTyTD.lean:44: {c₁ c₂}
+ConfTyping/SecTyTD.lean:42: {c₁ c₂}
+ConfTyping/SecTyTD.lean:41: {c₁ c₂}
+ConfTyping/SecTyTD.lean: clean after 1 rounds
+ConfTyping/WhileImp.lean:112: {c}
+ConfTyping/WhileImp.lean:110: {c₁ c₂}
+ConfTyping/WhileImp.lean:109: {c₁ c₂}
+ConfTyping/WhileImp.lean: clean after 1 rounds
+ConfTyping/UnifiedNI.lean:99: {c}
+ConfTyping/UnifiedNI.lean:97: {c₁ c₂}
+ConfTyping/UnifiedNI.lean:96: {c₁ c₂}
+ConfTyping/UnifiedNI.lean: clean after 1 rounds
+ConfTyping/HeapFlow.lean:93: {pc}
+ConfTyping/HeapFlow.lean:91: {pc}
+ConfTyping/HeapFlow.lean:90: {c₁ c₂ pc e}
+ConfTyping/HeapFlow.lean:88: {pc c₁ c₂}
+ConfTyping/HeapFlow.lean:87: {pc c₁ c₂}
+ConfTyping/HeapFlow.lean:85: {pc}
+ConfTyping/HeapFlow.lean:84: {pc}
+ConfTyping/HeapFlow.lean: clean after 1 rounds
+ConfTyping/LatticeFlow.lean:62: {pc c₁ c₂}
+ConfTyping/LatticeFlow.lean:61: {pc c₁ c₂}
+ConfTyping/LatticeFlow.lean:60: {pc}
+ConfTyping/LatticeFlow.lean:59: {pc}
+ConfTyping/LatticeFlow.lean: clean after 1 rounds
+ConfTyping/Imp.lean:92: {c σ σ' t b} (by hand)
+ConfTyping/Imp.lean:108: {c σ σ1 t1 b1 σ2 t2 b2} (by hand)
