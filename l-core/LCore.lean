@@ -12,3 +12,7 @@ import LCore.Slice.Image
 import LCore.Slice.Teeth
 import LCore.Slice2.Source
 import LCore.Slice2.Slots
+import LCore.Slice2.Lower
+import LCore.Slice2.Chunk
+import LCore.Slice2.Pass
+import LCore.Slice2.OnMachine

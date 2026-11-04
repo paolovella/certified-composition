@@ -58,6 +58,37 @@ theorem good_addi {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) 
   have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
   simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte]
 
+/-- **A negative immediate**: `addi` sign-extends, so a literal near `2^64` is one instruction. -/
+theorem good_addi_neg {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (h0 : 0 < i) (hi : i ≤ 2048) :
+    Good (.addi rd rs (-(Int.ofNat i))) := by
+  obtain ⟨v, hv, hv1, hv2⟩ : ∃ v, v = 4096 - i ∧ 2048 ≤ v ∧ v < 4096 := ⟨_, rfl, by omega, by omega⟩
+  have hbits : bits (-(Int.ofNat i)) 12 = v := by
+    simp only [bits, Nat.reducePow]
+    have : (-(Int.ofNat i)) % ((2 : Int) ^ 12) = Int.ofNat v := by
+      have hp : ((2 : Int) ^ 12) = 4096 := by decide
+      rw [hp]
+      show (-(i : Int)) % 4096 = (v : Int)
+      omega
+    rw [this]; rfl
+  have hw : encode (.addi rd rs (-(Int.ofNat i))) = v * 1048576 + rs * 32768 + rd * 128 + 0x13 := by
+    show bits (-(Int.ofNat i)) 12 * 2 ^ 20 + rs * 2 ^ 15 + rd * 2 ^ 7 + 0x13 = _
+    rw [hbits]
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : v * 1048576 + rs * 32768 + rd * 128 + 0x13 = W
+  have h1 : W % 128 = 0x13 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = rs := by simp only [rs1Of, Nat.reducePow]; omega
+  have h4 : f3Of W = 0 := by simp only [f3Of, Nat.reducePow]; omega
+  have h5 : W / 2 ^ 20 = v := by simp only [Nat.reducePow]; omega
+  have h6 : sext 12 v = -(Int.ofNat i) := by
+    simp only [sext]
+    rw [if_pos (by simp only [Nat.reducePow, Nat.add_one_sub_one]; omega)]
+    show ((v : Int) - ((2 ^ 12 : Nat) : Int)) = -(i : Int)
+    simp only [Nat.reducePow]
+    omega
+  simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte]
+
 theorem good_add {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.add rd a b) := by
   have hw : encode (.add rd a b) = b * 1048576 + a * 32768 + rd * 128 + 0x33 := rfl
   refine ⟨?_, by rw [hw]; omega⟩
@@ -254,8 +285,12 @@ theorem fetchI_code {L : List Insn} (hg : ∀ i ∈ L, Good i) {j : Nat} (hj : j
 
 def wordsMax : Nat := 256
 
+/-- The immediate for a literal: a word near `2^64` is a negative number, which `addi` sign-extends. VS-2 step 6: without this, a compiled loop could not count down. -/
+def litImm (w : W64) : Int :=
+  if w.val < 2048 then Int.ofNat w.val else -(Int.ofNat (18446744073709551616 - w.val))
+
 def genE : SExpr → Nat → List Insn
-  | .lit w, d => [.addi (8 + d) 0 (Int.ofNat w.val)]
+  | .lit w, d => [.addi (8 + d) 0 (litImm w)]
   | .slot n, d => [.ld (8 + d) 7 (Int.ofNat (8 * n))]
   | .add a b, d => genE a d ++ genE b (d + 1) ++ [.add (8 + d) (8 + d) (8 + d + 1)]
 
@@ -278,7 +313,7 @@ def genC : SCmd → List Insn
 
 /-- Does this fit the instructions: small literals, low slots, enough registers? -/
 def okE : SExpr → Nat → Bool
-  | .lit w, d => decide (w.val < 2048) && decide (d < 24)
+  | .lit w, d => (decide (w.val < 2048) || decide (18446744073709549568 ≤ w.val)) && decide (d < 24)
   | .slot n, d => decide (n < wordsMax) && decide (d < 24)
   | .add a b, d => okE a d && okE b (d + 1) && decide (d + 1 < 24)
 
@@ -301,9 +336,14 @@ theorem genC_length : ∀ c : SCmd, (genC c).length = sC c
 
 theorem genE_good : ∀ (e : SExpr) (d : Nat), okE e d = true → ∀ i ∈ genE e d, Good i
   | .lit w, d, h, i, hi => by
-    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
+    simp only [okE, Bool.and_eq_true, Bool.or_eq_true, decide_eq_true_eq] at h
     simp only [genE, List.mem_singleton] at hi
-    subst hi; exact good_addi (by omega) (by omega) h.1
+    subst hi
+    have hw := w.isLt
+    simp only [litImm]
+    split
+    · exact good_addi (by omega) (by omega) (by assumption)
+    · exact good_addi_neg (by omega) (by omega) (by simp only [Nat.reducePow] at hw; omega) (by omega)
   | .slot n, d, h, i, hi => by
     simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
     have hm : wordsMax = 256 := rfl
@@ -548,20 +588,41 @@ theorem At.right {C : List Byte} {pc : Nat} {a b : List Insn} (h : At C pc (a ++
 theorem At.head {C : List Byte} {pc : Nat} {i : Insn} {L : List Insn} (h : At C pc (i :: L)) :
     fetchI C pc = some i := h 0 (by simp)
 
+/-- A literal's immediate, added to `x0`, is the literal. -/
+theorem litImm_value (m : Mach) (w : W64) (h : w.val < 2048 ∨ 18446744073709549568 ≤ w.val) :
+    W64.ofNat (addImm (m.get 0) (litImm w)) = w := by
+  have hlt : w.val < 18446744073709551616 := w.isLt
+  simp only [litImm]
+  split
+  · apply Fin.ext
+    rw [get_zero, addImm_val _ _ (by simp only [W64.ofNat]; omega)]
+    simp only [W64.ofNat, Nat.reducePow]
+    omega
+  · rename_i hge
+    obtain ⟨i, hi, h0⟩ : ∃ i, i = 18446744073709551616 - w.val ∧ 0 < i := ⟨_, rfl, by omega⟩
+    rw [← hi]
+    have hm : (-(Int.ofNat i)) % ((2 : Int) ^ 64) = Int.ofNat w.val := by
+      have hp : ((2 : Int) ^ 64) = 18446744073709551616 := by decide
+      rw [hp]
+      show (-(i : Int)) % 18446744073709551616 = (w.val : Int)
+      omega
+    apply Fin.ext
+    rw [get_zero]
+    simp only [addImm, W64.add, W64.ofNat, wordOfInt, hm]
+    show ((0 % 2 ^ 64 + (w.val % 2 ^ 64)) % 2 ^ 64) % 2 ^ 64 = w.val
+    simp only [Nat.reducePow]
+    omega
+
 /-- **An expression's code**: the value in its register, lower registers and memory untouched. -/
 theorem genE_exec {C : List Byte} {en : Env} : ∀ (e : SExpr) (d : Nat) (m : Mach) (t : Slots),
     okE e d = true → Inv m t → At C m.pc (genE e d) →
     ∃ m', Exec C en (mE e m.pc) m m' ∧ m'.pc = m.pc + 4 * sE e ∧ m'.mem = m.mem ∧
       m'.get (8 + d) = evalS e t ∧ ∀ y, y < 8 + d → m'.get y = m.get y
   | .lit w, d, m, t, hok, _, hat => by
-    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at hok
+    simp only [okE, Bool.and_eq_true, Bool.or_eq_true, decide_eq_true_eq] at hok
     obtain ⟨w', hf, hd⟩ := fetchI_parts (hat.head)
     have hs : Rv.step C en m = .next [] { m with pc := m.pc + 4, x := m.set (8 + d) w } := by
-      have hv : W64.ofNat (addImm (m.get 0) (Int.ofNat w.val)) = w := by
-        apply Fin.ext
-        rw [get_zero, addImm_val _ _ (by simp only [W64.ofNat]; omega)]
-        simp only [W64.ofNat, Nat.reducePow]
-        omega
+      have hv : W64.ofNat (addImm (m.get 0) (litImm w)) = w := litImm_value m w hok.1
       simp only [Rv.step, hf, hd, hv]
     refine ⟨_, Exec.step hs, rfl, rfl, ?_, ?_⟩
     · rw [get_set (by omega)]; simp [evalS]
