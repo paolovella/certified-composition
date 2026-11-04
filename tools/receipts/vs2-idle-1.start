@@ -1,0 +1,4 @@
+started: 2026-11-04T22:10:23+01:00
+head: 46950c4
+command: bash tools/ci.sh
+log: tools/receipts/vs2-idle-1.log

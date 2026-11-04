@@ -15,6 +15,9 @@ def ofNat (n : Nat) : W64 := ⟨n % 2 ^ 64, Nat.mod_lt _ (Nat.two_pow_pos 64)⟩
 /-- Wrapping addition, as RV64's `add`. -/
 def add (a b : W64) : W64 := ofNat (a.val + b.val)
 
+/-- Bitwise and, as RV64's `andi`. -/
+def and (a b : W64) : W64 := ofNat (a.val &&& b.val)
+
 /-- **It wraps**, so it is not addition on unbounded integers. -/
 theorem add_wraps : add (ofNat (2 ^ 64 - 1)) (ofNat 1) = ofNat 0 := by decide
 

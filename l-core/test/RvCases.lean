@@ -6,7 +6,7 @@
 -/
 import LCore.Slice.Rv
 
-open LCore.Slice LCore.Slice.Rv
+open LCore LCore.Slice LCore.Slice.Rv
 
 namespace RvCases
 
@@ -21,21 +21,25 @@ def exit : List Insn := [.addi a7 0 93, .ecall]
 
 def inputWord (v : Nat) : List Byte := le 8 v
 
-/-- The model's steps until it stops, or `n` run out, and how it stopped. -/
-def trace (c : List Byte) (e : Env) : Nat → Mach → List Mach × String × W64
-  | 0, m => ([m], "fuel", W64.ofNat 0)
+/-- The model's steps until it stops, or `n` run out, and how it stopped. Each step has the leakage it adds. -/
+def trace (c : List Byte) (e : Env) : Nat → Mach → List (Mach × List Lk) × String × W64
+  | 0, m => ([(m, [])], "fuel", W64.ofNat 0)
   | n + 1, m =>
     match step c e m with
-    | .next _ m' => let r := trace c e n m'; (m :: r.1, r.2)
-    | .exit w => ([m], "done", w)
-    | .fault _ => ([m], "abort", W64.ofNat 0)
+    | .next l m' => let r := trace c e n m'; ((m, l) :: r.1, r.2)
+    | .exit w => ([(m, [])], "done", w)
+    | .fault l => ([(m, l)], "abort", W64.ofNat 0)
 
 def hex (n : Nat) : String :=
   let s := (Nat.toDigits 16 n).asString
   String.ofList (List.replicate (16 - s.length) '0') ++ s
 
-def line (m : Mach) : String :=
-  " ".intercalate (hex m.pc :: (List.range 31).map fun i => hex (m.get (i + 1)).val)
+/-- A step's PC, registers, and the address it leaks, or `-`. -/
+def line (x : Mach × List Lk) : String :=
+  let a := match x.2 with
+    | [.addr (.ofNat a)] => hex a
+    | _ => "-"
+  " ".intercalate (hex x.1.pc :: ((List.range 31).map fun i => hex (x.1.get (i + 1)).val) ++ [a])
 
 /-- An input as the data segment's bytes, with the rest zero. -/
 def dataFn (d : List Byte) : Nat → Byte := fun off => d.getD off (byteOf 0)
@@ -60,6 +64,11 @@ def cases : List Case :=
   , ins "ld_positive_offset" [.addi t0 0 7, .sd t0 t2 2047, .ld a0 t2 2047]
   , ins "sd_unaligned" [.addi t0 0 (-1), .sd t0 t2 603, .ld a0 t2 600, .ld t1 t2 603, .ld s1 t2 606]
   , ins "sd_overlap" [.lui t0 0x12345, .sd t0 t2 600, .lui t1 0x54321, .sd t1 t2 604, .ld a0 t2 600, .ld s1 t2 604]
+  , ins "andi_mask" [.addi t0 0 (-1), .andi a0 t0 63, .andi t1 t0 (-1), .addi s1 0 200, .andi s1 s1 63]
+  , ins "andi_zero" [.addi t0 0 64, .andi a0 t0 63]
+  , ins "andi_input_near_wrap" [.ld t0 t2 0, .andi a0 t0 63, .andi t1 t0 (-64)] (inputWord (2 ^ 64 - 3))
+  , ins "array_index_doubled" [.addi t0 0 67, .andi t0 t0 63, .add t0 t0 t0, .add t0 t0 t0, .add t0 t0 t0, .add t0 t0 t2,
+      .addi a0 0 9, .sd a0 t0 512, .ld a0 t0 512]
   , ins "beq_taken" [.addi t0 0 1, .beq t0 t0 8, .addi a0 0 9, .addi t1 0 2]
   , ins "beq_not_taken" [.addi t0 0 1, .beq t0 0 8, .addi a0 0 9, .addi t1 0 2]
   , ins "beq_backward" [.addi t0 0 3, .addi t0 t0 (-1), .addi a0 a0 2, .beq t0 0 8, .beq 0 0 (-12)]

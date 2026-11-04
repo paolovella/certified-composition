@@ -4030,6 +4030,8 @@ LCore.Slice.Rv.Insn.add.elim	LCore.Slice.Rv
 LCore.Slice.Rv.Insn.add.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.addi.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.addi.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.andi.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.andi.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.beq.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.beq.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.casesOn	LCore.Slice.Rv	
@@ -4258,6 +4260,7 @@ LCore.Slice.Teeth.shadowed_literal	LCore.Slice.Teeth	propext
 LCore.Slice.W64	LCore.Slice.Word	
 LCore.Slice.W64.add	LCore.Slice.Word	
 LCore.Slice.W64.add_wraps	LCore.Slice.Word	
+LCore.Slice.W64.and	LCore.Slice.Word	propext
 LCore.Slice.W64.ofNat	LCore.Slice.Word	
 LCore.Slice.cap	LCore.Slice.Source	
 LCore.Slice.clean	LCore.Slice.Source	

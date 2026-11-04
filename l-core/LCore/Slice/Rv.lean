@@ -29,6 +29,7 @@ def le (n v : Nat) : List Byte := (List.range n).map fun i => byteOf (v / 256 ^ 
 inductive Insn where
   | lui  (rd imm : Nat)
   | addi (rd rs1 : Nat) (imm : Int)
+  | andi (rd rs1 : Nat) (imm : Int)
   | add  (rd rs1 rs2 : Nat)
   | ld   (rd rs1 : Nat) (imm : Int)
   | sd   (rs2 rs1 : Nat) (imm : Int)
@@ -41,6 +42,7 @@ def bits (imm : Int) (n : Nat) : Nat := (imm % (2 ^ n : Int)).toNat
 def encode : Insn → Nat
   | .lui rd imm => imm * 2 ^ 12 + rd * 2 ^ 7 + 0x37
   | .addi rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + rd * 2 ^ 7 + 0x13
+  | .andi rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + 7 * 2 ^ 12 + rd * 2 ^ 7 + 0x13
   | .add rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + rd * 2 ^ 7 + 0x33
   | .ld rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + 3 * 2 ^ 12 + rd * 2 ^ 7 + 0x03
   | .sd rs2 rs1 imm =>
@@ -68,7 +70,10 @@ def f3Of (w : Nat) : Nat := w / 2 ^ 12 % 8
 def decode (w : Nat) : Option Insn :=
   match w % 128 with
   | 0x37 => some (.lui (rdOf w) (w / 2 ^ 12))
-  | 0x13 => if f3Of w = 0 then some (.addi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))) else none
+  | 0x13 =>
+    if f3Of w = 0 then some (.addi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
+    else if f3Of w = 7 then some (.andi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
+    else none
   | 0x33 => if f3Of w = 0 ∧ w / 2 ^ 25 = 0 then some (.add (rdOf w) (rs1Of w) (rs2Of w)) else none
   | 0x03 => if f3Of w = 3 then some (.ld (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))) else none
   | 0x23 =>
@@ -157,6 +162,7 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
       | .lui rd imm =>
         .next [] { m with pc := n, x := m.set rd (wordOfInt (sext 32 (imm * 2 ^ 12))) }
       | .addi rd rs imm => .next [] { m with pc := n, x := m.set rd (W64.ofNat (addImm (m.get rs) imm)) }
+      | .andi rd rs imm => .next [] { m with pc := n, x := m.set rd (W64.and (m.get rs) (wordOfInt imm)) }
       | .add rd a b => .next [] { m with pc := n, x := m.set rd (W64.add (m.get a) (m.get b)) }
       | .ld rd rs imm =>
         let a := addImm (m.get rs) imm
@@ -344,6 +350,8 @@ theorem decode_encode_samples :
   ∧ decode (encode (.beq 6 0 (-4096))) = some (.beq 6 0 (-4096))
   ∧ decode (encode (.beq 6 0 4094)) = some (.beq 6 0 4094)
   ∧ decode (encode (.lui 2 0xfffff)) = some (.lui 2 0xfffff)
+  ∧ decode (encode (.andi 9 8 63)) = some (.andi 9 8 63)
+  ∧ decode (encode (.andi 9 8 (-1))) = some (.andi 9 8 (-1))
   ∧ decode (encode .ecall) = some .ecall := by
   decide
 

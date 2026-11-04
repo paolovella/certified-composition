@@ -4,14 +4,14 @@
 For each case in RvCases.lean, the model predicts its outcome, cost, and every step's PC and registers. QEMU runs the
 same ELF and logs the same. The first step's sp is the loader's and is not compared: the first instruction replaces it.
 
-What this does not check. The model's leaked addresses come from the same registers and immediates that QEMU's log
-shows, so they are checked only through the registers. It is evidence on these cases, under QEMU, and no more.
+Leaked addresses are compared too: this script decodes each load and store itself, and computes its address from QEMU's registers. It is
+evidence on these cases, under QEMU, and no more.
 
 Usage, from l-core/:
   python3 test/rv_diff.py <scratch directory>             compare the model with QEMU
   python3 test/rv_diff.py <scratch directory> --mutants   the harness finds a wrong model
 Exit 0 if every exact case matches and every expected deviation really deviates, or, with --mutants, if every broken
-model is caught but the one this harness is known to be blind to.
+model is caught.
 """
 import os
 import re
@@ -35,13 +35,34 @@ def parse_log(path):
                 cur["x"][int(name)] = int(val, 16)
     return steps
 
-def compare(pred, steps):
+def sext(v, n):
+    return v - (1 << n) if v >= 1 << (n - 1) else v
+
+def access(word, regs):
+    """The address a load or store touches, from the instruction and the registers. None if it is neither."""
+    op = word & 127
+    rs1 = (word >> 15) & 31
+    base = 0 if rs1 == 0 else regs.get(rs1, 0)
+    if op == 0x03:
+        return (base + sext(word >> 20, 12)) & (2 ** 64 - 1)
+    if op == 0x23:
+        return (base + sext(((word >> 25) << 5) | ((word >> 7) & 31), 12)) & (2 ** 64 - 1)
+    return None
+
+def word_at(image, pc):
+    off = pc - 0x100b0 + 176
+    return int.from_bytes(image[off:off + 4], "little") if 176 <= off and off + 4 <= 0x1000 else 0
+
+def compare(pred, steps, image):
     """The first difference between the model's steps and QEMU's, or None."""
     if len(pred) != len(steps):
         return f"{len(pred)} predicted steps, {len(steps)} logged"
     for i, (p, s) in enumerate(zip(pred, steps)):
         if p[0] != s["pc"]:
             return f"step {i}: pc model {p[0]:#x}, qemu {s['pc']:#x}"
+        want = access(word_at(image, s["pc"]), s["x"])
+        if p[32] != want:
+            return f"step {i}: address model {p[32]}, qemu {want}"
         for r in range(1, 32):
             if i == 0 and r == 2:
                 continue
@@ -53,14 +74,15 @@ def check(name, d):
     lines = open(f"{d}/{name}.pred").read().splitlines()
     out, a0, cost, kind = lines[0].split()
     a0, cost = int(a0, 16), int(cost)
-    pred = [[int(t, 16) for t in l.split()] for l in lines[1:]]
+    pred = [[None if t == "-" else int(t, 16) for t in l.split()] for l in lines[1:]]
+    image = open(f"{d}/{name}", "rb").read()
     log = f"{d}/{name}.log"
     if os.path.exists(log):
         os.remove(log)
     r = subprocess.run(["qemu-riscv64", "-one-insn-per-tb", "-d", "cpu,nochain", "-D", log, f"{d}/{name}"],
                        capture_output=True)
     steps = parse_log(log)
-    diff = compare(pred, steps)
+    diff = compare(pred, steps, image)
     # A signal from the guest is a negative code. 255 is an exit status.
     faulted = r.returncode < 0
     if diff is None:
@@ -104,8 +126,12 @@ MUTANTS = [
     ("data misplaced", "data (a - dataBase)", "data (a - dataBase + 8)", False),
     ("exit number wrong", "W64.ofNat 93", "W64.ofNat 94", False),
     ("a fault is counted", "cost := 0, out := .abort", "cost := 1, out := .abort", False),
-    ("ld leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, x :=", ".next [] { m with pc := n, x :=", True),
-    ("sd leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, mem :=", ".next [] { m with pc := n, mem :=", True),
+    ("ld leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, x :=", ".next [] { m with pc := n, x :=", False),
+    ("sd leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, mem :=", ".next [] { m with pc := n, mem :=", False),
+    ("ld leaks a wrong address", ".next [.addr (Int.ofNat a)] { m with pc := n, x :=", ".next [.addr (Int.ofNat (a + 8))] { m with pc := n, x :=", False),
+    ("a faulting load leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .sd", "else .fault []\n      | .sd", False),
+    ("andi: acts as add", "x := m.set rd (W64.and (m.get rs) (wordOfInt imm))", "x := m.set rd (W64.add (m.get rs) (wordOfInt imm))", False),
+    ("andi: immediate unsigned", ".andi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))", ".andi (rdOf w) (rs1Of w) (Int.ofNat (w / 2 ^ 20))", False),
 ]
 
 def compare_all(d, gen):
