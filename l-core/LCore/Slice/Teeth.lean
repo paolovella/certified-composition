@@ -1,9 +1,8 @@
 /-
   VS-1 step 9: teeth. Compiling is not certifying, and the kernel refuses a pass that misses an input or miscompiles.
 
-  The pipeline compiles what the checker refuses. Four of the five refused programs' compiled forms provably leak on the machine
-  model, so `slice_carries`'s hypothesis `sliceCheck P p = some k` is doing work; the fifth is noted below. `test/refused_diff.py`
-  runs all five binaries under QEMU, and all five leak.
+  The pipeline compiles what the checker refuses. Each refused program's compiled form provably leaks on the machine model, so
+  `slice_carries`'s hypothesis `sliceCheck P p = some k` is doing work. `test/refused_diff.py` runs the same binaries under QEMU.
 
   No certified pass can pin the environment. That was the rejected option of step 1 for the stack pointer: an attacker who
   controls `argv` reaches inputs a pinned encoding does not. No certified pass can compile `clean` to the tampered bytes.
@@ -42,11 +41,29 @@ def secretBranchImage : List Byte := ([183, 3, 2, 0, 3, 180, 3, 0, 99, 6, 4, 0, 
 
 theorem secretBranch_literal : compiled secretBranch = secretBranchImage := by decide
 
-/- **Not proved here: the compiled `secretBranch` leaks on the model.** `decide` on its leakage at fuel 4 is accepted by Lean, the
-   paranoid checker and nanoda, and exhausts lean4lean, con-leche and con-ron, on 44 bytes. Why is not understood: `tampered_leaks`
-   also has a taken branch and passes, and neither a literal image, nor lower fuel, nor a literal modulus changed it. The gate was left
-   alone and the theorem dropped. The leak is shown on the source (`secretBranch_leaks`), and on the real binary by
-   `test/refused_diff.py`: the same instruction count, different PCs. -/
+/-- Leakage as plain numbers. `decide` on the derived `DecidableEq` of `Lk`, over values not yet evaluated, is what exhausts three of the
+    six kernels (`bench/vs2-kernel-5.tsv`). This same comparison, through this map, passes all six. -/
+def lkCode : Lk → Nat
+  | .step [p] => p
+  | .addr (.ofNat a) => a
+  | _ => 0
+
+theorem secretBranch_codes_differ :
+    ((rvLang sec0).run 4 secretBranchImage (encBytes (inp 0 1), env0)).lk.map lkCode ≠
+      ((rvLang sec0).run 4 secretBranchImage (encBytes (inp 6 1), env0)).lk.map lkCode := by
+  decide
+
+/-- **A branch on a secret leaks through the PC trace.** Only there: under QEMU the two paths take the same 9 instructions, since the jump
+    balances the extra `skip`, so measuring time alone would not see this leak. -/
+theorem secretBranch_compiled_leaks : ¬ Cert.rel (rvLang sec0) (compiled secretBranch) := by
+  rw [secretBranch_literal]
+  exact fun h => secretBranch_codes_differ
+    (congrArg (fun b : Beh => b.lk.map lkCode) (h 4 _ _ (adm_inp 0 1) (adm_inp 6 1) (low_inp 0 6 1)))
+
+theorem secretBranch_same_cost :
+    ((rvLang sec0).run 40 secretBranchImage (encBytes (inp 0 1), env0)).cost =
+      ((rvLang sec0).run 40 secretBranchImage (encBytes (inp 6 1), env0)).cost := by
+  decide
 
 def secretRetImage : List Byte := ([183, 3, 2, 0, 19, 0, 0, 0, 3, 180, 3, 0, 51, 5, 4, 0, 147, 8, 208, 5, 115, 0, 0, 0] : List Nat).map byteOf
 

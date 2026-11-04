@@ -232,3 +232,5 @@ a compiler function, with the bytes produced by running it outside the kernel, d
 - 2026-11-03, **step 10 done: the account**, [`VS-1-ACCOUNT`](../research/2026-11/VS-1-ACCOUNT.md). No kernel change forced, for a slice with no loops and constant
   addresses. Recommendation: do not lock F6; a second slice with loops and input-dependent addresses comes next. **This item's acceptance is met**, and the question it
   was opened for is only partly answered.
+- 2026-11-04, *correction of record.* Step 9's entry says one theorem was ~~dropped, and not understood~~. VS-2's step 1 found the cause, the derived `DecidableEq` on `Lk` over unevaluated values,
+  and `secretBranch_compiled_leaks` is restored through `lkCode`. `VS-1-ACCOUNT` §3 carries the same correction.

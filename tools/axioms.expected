@@ -4236,6 +4236,7 @@ LCore.Slice.Teeth.launderedImage	LCore.Slice.Teeth
 LCore.Slice.Teeth.laundered_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
 LCore.Slice.Teeth.laundered_literal	LCore.Slice.Teeth	propext
 LCore.Slice.Teeth.leak_by_ev	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice.Teeth.lkCode	LCore.Slice.Teeth	propext
 LCore.Slice.Teeth.no_pass_drops_a_word	LCore.Slice.Teeth	Quot.sound,propext
 LCore.Slice.Teeth.no_pass_miscompiles	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
 LCore.Slice.Teeth.no_pass_pins_env	LCore.Slice.Teeth	propext
@@ -4244,7 +4245,10 @@ LCore.Slice.Teeth.oneArm_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.
 LCore.Slice.Teeth.oneArm_literal	LCore.Slice.Teeth	propext
 LCore.Slice.Teeth.refused_programs_compile	LCore.Slice.Teeth	propext
 LCore.Slice.Teeth.secretBranchImage	LCore.Slice.Teeth	
+LCore.Slice.Teeth.secretBranch_codes_differ	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.secretBranch_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
 LCore.Slice.Teeth.secretBranch_literal	LCore.Slice.Teeth	propext
+LCore.Slice.Teeth.secretBranch_same_cost	LCore.Slice.Teeth	propext
 LCore.Slice.Teeth.secretRetImage	LCore.Slice.Teeth	
 LCore.Slice.Teeth.secretRet_compiled_leaks	LCore.Slice.Teeth	Classical.choice,Quot.sound,propext
 LCore.Slice.Teeth.secretRet_literal	LCore.Slice.Teeth	propext

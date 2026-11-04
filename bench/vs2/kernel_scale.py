@@ -26,8 +26,7 @@ import time
 
 LIMIT = 900
 MEM_FLOOR_GB = 3.0
-REST = {"baseline", "branch-same-untaken-f4", "branch-same-taken-f4", "branch-cost-taken", "branch-pc-taken",
-        "tampered-differs-f12"}
+REST = {"runcost-776B", "runcost-7624B"}
 
 # No child may take the machine. A first version killed only `lake` on timeout, and its `lean` child kept 21 GB for two hours.
 MEM_CAP_BYTES = 12 * 2 ** 30
@@ -37,9 +36,13 @@ def capped():
     os.setsid()
     resource.setrlimit(resource.RLIMIT_AS, (MEM_CAP_BYTES, MEM_CAP_BYTES))
 
-def run_capped(cmd, timeout, **kw):
+def grouped():
+    """For con-leche, which cannot create its threads under the address-space cap: it rejects even the empty baseline there. Group only."""
+    os.setsid()
+
+def run_capped(cmd, timeout, cap=True, **kw):
     """Run under the cap. On timeout, kill the whole group and wait for it."""
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, preexec_fn=capped, **kw)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, preexec_fn=capped if cap else grouped, **kw)
     try:
         out, err = p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
@@ -102,6 +105,8 @@ def cases(d, sizes):
         img = f"def img : List Byte := ({lit} : List Nat).map byteOf\n"
         out.append((f"compile-{len(lit)}B", len(lit), PRELUDE + CHAIN + img +
                     f"theorem t : code (genP (compile (prog {n}))) = img := by decide\n"))
+        out.append((f"runcost-{len(lit)}B", len(lit), PRELUDE + img +
+                    f"theorem t : (Rv.run img env0 {count + 5} (init img (encBytes (inp 3 1)) env0)).cost = {count} := by decide\n"))
         out.append((f"run-{len(lit)}B", len(lit), PRELUDE + img +
                     f"theorem t : (Rv.run img env0 {count + 5} (init img (encBytes (inp 3 1)) env0)).ev = "
                     f"[Rv.retEv (W64.ofNat {3 * n})] := by decide\n"))
@@ -114,6 +119,14 @@ def cases(d, sizes):
         ("branch-pc-taken", 44, PRELUDE +
          "theorem t : (match Rv.step secretBranchImage env0 (init secretBranchImage (encBytes (inp 0 1)) env0) with\n"
          "  | .next _ m => m.pc | _ => 0) = 65716 := by decide\n"),
+        ("lk-literals", 0, PRELUDE +
+         "theorem t : (Lk.step [65732] ≠ Lk.step [65724]) ∧ (Lk.addr 131072 = Lk.addr 131072) := by decide\n"),
+        ("branch-codes-differ-f4", 44, PRELUDE +
+         "def lkCode : Lk → Nat\n  | .step [p] => p\n  | .addr (.ofNat a) => a\n  | _ => 0\n"
+         f"theorem t : {run(0, 4)}.lk.map lkCode ≠ {run(6, 4)}.lk.map lkCode := by decide\n"),
+        ("branch-codes-same-untaken-f4", 44, PRELUDE +
+         "def lkCode : Lk → Nat\n  | .step [p] => p\n  | .addr (.ofNat a) => a\n  | _ => 0\n"
+         f"theorem t : {run(5, 4)}.lk.map lkCode = {run(6, 4)}.lk.map lkCode := by decide\n"),
         ("tampered-differs-f12", 76, PRELUDE +
          "theorem t : ((rvLang sec0).run 12 tampered (encBytes (inp 0 3), env0)).lk ≠ "
          "((rvLang sec0).run 12 tampered (encBytes (inp 5 3), env0)).lk := by decide\n"),
@@ -140,9 +153,9 @@ def main():
     os.makedirs(d, exist_ok=True)
     root = os.getcwd()
     rest = "--rest" in sys.argv
-    out_tsv = "bench/vs2-kernel-3.tsv" if rest else "bench/vs2-kernel.tsv"
+    out_tsv = "bench/vs2-kernel-6.tsv" if rest else "bench/vs2-kernel.tsv"
     rows = ["case\tbytes\telaborate_s\telaborate\tkernel\tseconds\tverdict\tdetail\tlowest_mem_gb"]
-    for name, size, src in cases(d, [] if rest else [4, 47, 475]):
+    for name, size, src in cases(d, [47, 475] if rest else [4, 47, 475]):
         if rest and name not in REST:
             continue
         if rest and name.startswith("run-"):
@@ -182,7 +195,7 @@ def main():
         for kname, cmd in kernels(exp, d, root):
             t1 = time.time()
             try:
-                r = run_capped(cmd, LIMIT, cwd=d)
+                r = run_capped(cmd, LIMIT, cap=kname != "con-leche", cwd=d)
                 verdict = "accepts" if r.returncode == 0 else "REJECTS"
                 tail = (r.stdout + r.stderr).strip().splitlines()
                 detail = "" if r.returncode == 0 else (tail[-1][:110] if tail else f"exit {r.returncode}")

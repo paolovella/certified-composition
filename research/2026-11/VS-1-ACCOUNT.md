@@ -58,12 +58,13 @@ S-SAIL's proof route is open. It says nothing about timing, caches, speculation,
 - Input by data segment means a new image per input. That is not usable I/O.
 - `comp` refuses literals of 2048 or more: there is no shift instruction.
 
-**Not understood.** The kernels' budgets bit twice:
+**The kernels' budgets bit twice:**
 - `lean4lean` timed out on `run_eq`, and splitting the proof fixed it.
-- Three kernels exhaust their budgets on `decide` over the compiled `secretBranch`'s leakage at fuel 4, on 44 bytes. Lean, the paranoid checker and
-  nanoda accept. `tampered_leaks` looks similar and passes. Three hypotheses failed: the compile, the fuel, and an integer power in the model. The
-  theorem was dropped and the gate left alone. The leak stays shown on the source and on the real binary. **So the cost of kernel evaluation is not
-  understood, and PLAN-2026-10's T2, compiling by kernel evaluation, is at risk at any real size.** 76 bytes says nothing about 76 KB.
+- Three kernels exhausted their budgets on `decide` over the compiled `secretBranch`'s leakage, on 44 bytes. *Correction of record, 2026-11-04:* this said
+  ~~the cost of kernel evaluation is not understood~~, and that the theorem was dropped. VS-2's step 1 found the cause: the derived `DecidableEq` on `Lk`, over values not yet
+  evaluated. Mapped to plain numbers, the same comparison passes all six kernels, and the theorem is restored (`secretBranch_compiled_leaks`).
+- What VS-2's step 1 measured about T2 (`backlog/VS-2.md`): the compiler's output equals a literal on all six kernels up to 7.6 KB, while a machine run in the kernel passes at 776 bytes and
+  did not finish at 7.6 KB. So compile by kernel evaluation stands at these sizes, and running the machine in the kernel is for small witnesses.
 
 ## 4. The trust base of `image_carries`, for a real run
 
