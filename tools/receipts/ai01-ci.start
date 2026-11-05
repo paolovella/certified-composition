@@ -1,0 +1,4 @@
+started: 2026-11-05T00:43:02+01:00
+head: fad915e
+command: bash tools/ci.sh
+log: tools/receipts/ai01-ci.log

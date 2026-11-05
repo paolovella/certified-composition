@@ -76,16 +76,16 @@ theorem relOf_seq (P : Partition) (c₁ c₂ : Cmd) :
     (a declassification *inside* a secret branch would leak through its own
     occurrence). -/
 inductive SecTyD (P : Partition) (Δ : List Permit) : Bool → Cmd → Prop where
-  | skip    : SecTyD P Δ pc .skip
-  | assignH : ∀ x e, P x = true → SecTyD P Δ pc (.assign x e)
+  | skip {pc}    : SecTyD P Δ pc .skip
+  | assignH {pc} : ∀ x e, P x = true → SecTyD P Δ pc (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → SecTyD P Δ false (.assign x e)
   | assignD : ∀ x e, Permit.expr e ∈ Δ → SecTyD P Δ false (.assign x e)
-  | seq     : SecTyD P Δ pc c₁ → SecTyD P Δ pc c₂ → SecTyD P Δ pc (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → SecTyD P Δ pc c₁ → SecTyD P Δ pc c₂ →
+  | seq {pc c₁ c₂}     : SecTyD P Δ pc c₁ → SecTyD P Δ pc c₂ → SecTyD P Δ pc (.seq c₁ c₂)
+  | iteL {pc c₁ c₂}    : ∀ e, exprLow P e = true → SecTyD P Δ pc c₁ → SecTyD P Δ pc c₂ →
               SecTyD P Δ pc (.ite e c₁ c₂)
-  | iteH    : SecTyD P Δ true c₁ → SecTyD P Δ true c₂ →
+  | iteH {c₁ c₂ pc e}    : SecTyD P Δ true c₁ → SecTyD P Δ true c₂ →
               SecTyD P Δ pc (.ite e c₁ c₂)
-  | iteD    : ∀ e, Permit.guard e ∈ Δ →
+  | iteD {c₁ c₂}    : ∀ e, Permit.guard e ∈ Δ →
               SecTyD P Δ false c₁ → SecTyD P Δ false c₂ →
               SecTyD P Δ false (.ite e c₁ c₂)
 

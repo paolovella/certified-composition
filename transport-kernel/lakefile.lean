@@ -1,7 +1,9 @@
 import Lake
 open Lake DSL
 
-package «transport-kernel»
+package «transport-kernel» where
+  -- An unknown name in a statement is an error, and not a new variable (AI-01).
+  leanOptions := #[⟨`autoImplicit, false⟩]
 
 require mathlib from git "https://github.com/leanprover-community/mathlib4.git" @ "v4.35.0"
 
