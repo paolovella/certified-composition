@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VS-2 step 6: hand-written mutants of the second slice's lowering, since tools/mutants.py does not scan l-core.
+"""VS-2 steps 6 and 7: hand-written mutants of the second slice's lowering, since tools/mutants.py does not scan l-core.
 
 Each mutant must fail to build as far as the machine witnesses. It runs on a copy of the package, never on the working
 tree, with each build in its own process group, killed as a group on timeout or above 12 GB resident. A kill counts only with a Lean error at a line of a `.lean` file.
@@ -9,7 +9,7 @@ Usage, from the repo root: python3 research/2026-11/slice2_low_mut.py <scratch d
 import os, re, shutil, signal, subprocess, sys, tempfile, time
 
 WORK = os.path.join(sys.argv[1], 'l-core')
-LOW, CHK, PAS, OLD = ('LCore/Slice2/Lower.lean', 'LCore/Slice2/Chunk.lean', 'LCore/Slice2/Pass.lean', 'LCore/Slice/Lower.lean')
+LOW, CHK, PAS, OLD, IMG = ('LCore/Slice2/Lower.lean', 'LCore/Slice2/Chunk.lean', 'LCore/Slice2/Pass.lean', 'LCore/Slice/Lower.lean', 'LCore/Slice2/Image.lean')
 CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
@@ -33,6 +33,14 @@ M = [
  ("a literal's immediate is off by one", OLD, "else -(Int.ofNat (18446744073709551616 - w.val))", "else -(Int.ofNat (18446744073709551617 - w.val))"),
  ("any literal is accepted", OLD, "(decide (w.val < 2048) || decide (18446744073709549568 ≤ w.val)) && decide (d < 24)", "decide (d < 24)"),
  ("the negative immediate reaches one too far", OLD, "theorem good_addi_neg {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (h0 : 0 < i) (hi : i ≤ 2048) :", "theorem good_addi_neg {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (h0 : 0 < i) (hi : i ≤ 2049) :"),
+ ("one byte of scan's literal is wrong", IMG, "[183, 3, 2, 0, 3, 180, 131, 0,", "[183, 3, 2, 0, 3, 180, 3, 0,"),
+ ("one byte of spin's literal is wrong", IMG, "[183, 3, 2, 0, 19, 4, 16, 0,", "[183, 3, 2, 0, 19, 4, 17, 0,"),
+ ("the listed instructions are not the image's", IMG, ".addi 9 0 (-1), .add 8 8 9, .sd 8 7 1024, .beq 0 0 (-104),", ".addi 9 0 (-2), .add 8 8 9, .sd 8 7 1024, .beq 0 0 (-104),"),
+ ("the index tamper changes nothing", IMG, "(scanNats.take 23 ++ [0] ++ scanNats.drop 24)", "(scanNats.take 23 ++ [64] ++ scanNats.drop 24)"),
+ ("the guard tamper changes nothing", IMG, "(scanNats.take 6 ++ [3] ++ scanNats.drop 7)", "(scanNats.take 6 ++ [131] ++ scanNats.drop 7)"),
+ ("scan's result is misstated", IMG, "(go scanImage env0 200 5 3).ev = [Slice.Rv.retEv (W64.ofNat 9)]", "(go scanImage env0 200 5 3).ev = [Slice.Rv.retEv (W64.ofNat 8)]"),
+ ("scan's cost is misstated", IMG, "(go scanImage env0 200 5 3).cost = 90", "(go scanImage env0 200 5 3).cost = 91"),
+ ("spin is said to finish", IMG, "(go spinImage env0 40 5 1).out = .fuel", "(go spinImage env0 40 5 1).out = .done"),
 ]
 
 
@@ -45,7 +53,7 @@ def build():
     """A resident-memory watchdog, not RLIMIT_AS: an address-space cap stops Lean creating threads, and every build then
     aborts with code 134 before checking a proof. That made the first run of this harness report 19 of 19 killed."""
     with tempfile.TemporaryFile('w+') as log:
-        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.OnMachine'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
+        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Image'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
                              text=True, start_new_session=True)
         t0 = time.time()
         while p.poll() is None:

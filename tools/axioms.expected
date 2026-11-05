@@ -4363,6 +4363,39 @@ LCore.Slice2.FT.brecOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.casesOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.recOn	LCore.Slice2.Source	propext
 LCore.Slice2.Frame	LCore.Slice2.Source	
+LCore.Slice2.Image.go	LCore.Slice2.Image	propext
+LCore.Slice2.Image.pcOnly	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scanImage	LCore.Slice2.Image	
+LCore.Slice2.Image.scanInsns	LCore.Slice2.Image	
+LCore.Slice2.Image.scanNats	LCore.Slice2.Image	
+LCore.Slice2.Image.scan_are_bytes	LCore.Slice2.Image	
+LCore.Slice2.Image.scan_carries	LCore.Slice2.Image	Classical.choice,Quot.sound,propext
+LCore.Slice2.Image.scan_decodes	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scan_fuel_tracks	LCore.Slice2.Image	Quot.sound,propext
+LCore.Slice2.Image.scan_is_insns	LCore.Slice2.Image	
+LCore.Slice2.Image.scan_is_literal	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scan_not_compressed	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scan_one_exit	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scan_pipeline_is_literal	LCore.Slice2.Image	Classical.choice,Quot.sound,propext
+LCore.Slice2.Image.scan_public_moves_addresses	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scan_runs	LCore.Slice2.Image	propext
+LCore.Slice2.Image.scan_secret_does_not	LCore.Slice2.Image	propext
+LCore.Slice2.Image.spinImage	LCore.Slice2.Image	
+LCore.Slice2.Image.spinNats	LCore.Slice2.Image	
+LCore.Slice2.Image.spin_carries	LCore.Slice2.Image	Classical.choice,Quot.sound,propext
+LCore.Slice2.Image.spin_fuel_tracks	LCore.Slice2.Image	Quot.sound,propext
+LCore.Slice2.Image.spin_image_never_finishes	LCore.Slice2.Image	Classical.choice,Quot.sound,propext
+LCore.Slice2.Image.spin_image_runs	LCore.Slice2.Image	propext
+LCore.Slice2.Image.spin_is_literal	LCore.Slice2.Image	propext
+LCore.Slice2.Image.tamperedGuard	LCore.Slice2.Image	
+LCore.Slice2.Image.tamperedGuard_costs_differ	LCore.Slice2.Image	propext
+LCore.Slice2.Image.tamperedGuard_differs	LCore.Slice2.Image	
+LCore.Slice2.Image.tamperedGuard_leaks	LCore.Slice2.Image	Classical.choice,Quot.sound,propext
+LCore.Slice2.Image.tamperedIndex	LCore.Slice2.Image	
+LCore.Slice2.Image.tamperedIndex_addresses_differ	LCore.Slice2.Image	propext
+LCore.Slice2.Image.tamperedIndex_differs	LCore.Slice2.Image	
+LCore.Slice2.Image.tamperedIndex_leaks	LCore.Slice2.Image	Classical.choice,Quot.sound,propext
+LCore.Slice2.Image.tamperedIndex_same_pcs	LCore.Slice2.Image	propext
 LCore.Slice2.LF	LCore.Slice2.Source	propext
 LCore.Slice2.LowS	LCore.Slice2.Source	
 LCore.Slice2.LowS.mono	LCore.Slice2.Source	
