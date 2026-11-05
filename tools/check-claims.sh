@@ -1700,5 +1700,28 @@ if grep -q "^### 3.0 Which verdicts hold on L" VULN-COVERAGE.md; then
   done
 fi
 
+# (r) autoImplicit stays off (AI-01, AI-02). With it on, a typo in a statement becomes a new variable and changes what the
+# statement says, with no error. Packages are found by searching, so a new one cannot escape, and there are no exemptions.
+# Each lakefile sets it at package level, on a line that is not a comment, and never sets it true, because a library's
+# options override its package's. No Lean file sets it true.
+while IFS= read -r f; do
+  case "$f" in
+    *.toml)
+      sed -n '/^\[/q;p' "$f" | grep -qE '^leanOptions[[:space:]]*=.*autoImplicit[[:space:]]*=[[:space:]]*false' \
+        || { echo "DRIFT: $f does not set autoImplicit = false at package level"; fail=1; }
+      if grep -vE '^[[:space:]]*#' "$f" | grep -qE 'autoImplicit[[:space:]]*=[[:space:]]*true'; then
+        echo "DRIFT: $f sets autoImplicit = true"; fail=1
+      fi ;;
+    *.lean)
+      sed 's/--.*//' "$f" | grep -qE 'leanOptions.*autoImplicit,[[:space:]]*false' \
+        || { echo "DRIFT: $f does not set autoImplicit to false in leanOptions"; fail=1; }
+      if sed 's/--.*//' "$f" | grep -qE 'autoImplicit,[[:space:]]*true'; then
+        echo "DRIFT: $f sets autoImplicit to true"; fail=1
+      fi ;;
+  esac
+done < <(find . \( -name .lake -o -name .git \) -prune -o \( -name lakefile.toml -o -name lakefile.lean \) -print)
+on=$(grep -rlE 'set_option[[:space:]]+autoImplicit[[:space:]]+true' --include='*.lean' --exclude-dir=.lake --exclude-dir=.git . 2>/dev/null | tr '\n' ' ')
+[ -z "$on" ] || { echo "DRIFT: set_option autoImplicit true in: $on"; fail=1; }
+
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail

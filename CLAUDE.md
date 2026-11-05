@@ -63,6 +63,7 @@ frozen statement file.
   Edit/Write tools to heredocs for tracked files.
 - **CI never skips silently.** A tool that is absent is a reported status, not a pass.
 - **Mathlib-free packages stay mathlib-free.** `transport-kernel` is the only mathlib package.
+- **`autoImplicit` stays off, in every package.** With it on, a typo in a statement becomes a new variable, with no error. Bind names explicitly. `lake env lean` does not read the lakefile, so scratch checks pass `-D autoImplicit=false`. Check-claims (r).
 - **Never weaken a frozen statement, a guard, a ratchet or a gate** to make something pass. If
   one is wrong, open a G-0 item with the evidence and stop.
 

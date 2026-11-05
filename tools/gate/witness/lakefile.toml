@@ -1,5 +1,7 @@
 name = "GateWitness"
 defaultTargets = ["GateWitness"]
+# An unknown name in a statement is an error, and not a new variable (AI-01).
+leanOptions = { autoImplicit = false }
 
 [[lean_lib]]
 name = "GateWitness"
