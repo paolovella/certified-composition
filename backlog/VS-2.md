@@ -55,7 +55,7 @@ back-edges exist. Those three theorems are this plan's template.
 8. **Differential.** Under QEMU: inputs where the public index really moves the addresses, so the traces differ on public inputs and are identical on secret ones.
    A program that does not finish, run to a fixed instruction count, compared as a prefix.
 9. **Teeth.** A secret index and a secret loop guard are refused, and their binaries are seen to leak. The second leaks through whether and when it finishes.
-10. **The account.** Did the kernel need changing? A recommendation on F6, and whatever this changes about `sliceLang` as a seed of L's core.
+10. **The account.** Did the kernel need changing? A recommendation on F6, and whatever this changes about `sliceLang` as a seed of L's core. **It must state what reached bytes over loops: `rel` only.** VS-1 carried `rel` and `bound`, and over loops `bound` does not reach bytes (step 7), so a certified loop program may run as long as its public input says, or forever, like `spin`. The F6 recommendation is judged on that.
 
 **What this will not show**, whatever happens:
 - That L compiles. `UCmd` still does not. Connecting it, or its replacement, stays separate work.
