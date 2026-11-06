@@ -134,7 +134,12 @@ def stepMax : SCmd → Nat
   | .seq a b => max (stepMax a) (stepMax b)
   | .ite e a b => max (sE e + 2) (max (stepMax a) (stepMax b))
   | .loop e b => max (sE e + 2) (stepMax b)
-  | c => stepC c
+  -- Every other constructor is listed, not caught by `| c => _`: a match with overlapping patterns compiles through `propext`, and this
+  -- definition is axiom-free without it (the manifest gate caught it, PR #21).
+  | .skip => stepC .skip
+  | .set n e => stepC (.set n e)
+  | .load x e => stepC (.load x e)
+  | .store e v => stepC (.store e v)
 
 theorem stepC_le : ∀ (c : SCmd), stepC c ≤ stepMax c
   | .seq _ _ => Nat.zero_le _
