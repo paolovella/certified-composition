@@ -24,3 +24,4 @@ links the two languages. So no checker or row in the map reaches machine code.
 `L-UNIFY`, the directive design and `REL-01` are about a language that may not be the one that compiles, so they wait on this choice.
 
 ## Log
+- 2026-11-06: VS-2 is done, so this item is no longer blocked: the route is the user's to choose. [`VS-2-ACCOUNT`](../research/2026-11/VS-2-ACCOUNT.md) §6 recommends growing `sliceLang`, since loops, an array and negative immediates each reached bytes in one step, and `UCmd`'s unbounded integers still cannot.
