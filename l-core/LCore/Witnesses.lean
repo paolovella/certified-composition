@@ -459,4 +459,61 @@ theorem middleL_unlawful : ¬ middleL.Lawful := by
   have := h.ev_mono () () 0 1 (Nat.zero_le 1)
   simp [middleL] at this
 
+
+/-! ## `boundR`: a budget that depends on the input (BOUND-01) -/
+
+/-- **Accepted**: `true` costs its second input word, so its budget is that word. -/
+theorem toy_boundR_holds : Cert.boundR toy (fun i k => k = i.2) true :=
+  fun i _ => ⟨i.2, rfl, fun _ => by simp [toy]⟩
+
+/-- **And it says what `bound` cannot**: no constant budget holds for `true`, whatever the constant. -/
+theorem toy_no_constant_bound (c : Nat) : ¬ Cert.bound toy c true := by
+  intro h
+  have := h 0 (0, c + 1) trivial
+  simp [toy] at this
+  omega
+
+/-- A language whose one program spends a unit per unit of fuel and never finishes. -/
+def toySpin : Lang where
+  Prog  := Unit
+  In    := Unit
+  lowIn _ _ := True
+  run n _ _ := { ev := [], lk := [], cost := n, out := .fuel }
+
+/-- **Refused**: a run whose cost grows without limit has no budget, whatever the relation. -/
+theorem toySpin_no_boundR (R : Unit → Nat → Prop) : ¬ Cert.boundR toySpin R () :=
+  Cert.boundR_unbounded (i := ()) trivial (fun k => ⟨k + 1, by show k < k + 1; omega⟩)
+
+/-- The first sketch of the shape (VS-2-RESEARCH, corrected): the budget chosen after the fuel. -/
+def boundR_late (L : Lang) (R : L.In → Nat → Prop) (p : L.Prog) : Prop :=
+  ∀ (n : Nat) (i : L.In), L.Adm i → ∃ k, R i k ∧ (L.run n p i).cost ≤ k
+
+/-- **Why the budget is chosen before the fuel**: chosen after, it holds of every program, `toySpin`'s included. -/
+theorem boundR_late_vacuous (L : Lang) (p : L.Prog) : boundR_late L (fun _ _ => True) p :=
+  fun _ _ _ => ⟨_, trivial, Nat.le_refl _⟩
+
+theorem toySpin_late : boundR_late toySpin (fun _ _ => True) () := boundR_late_vacuous toySpin ()
+
+/-- **The transfer, exercised**: through the pad, `true`'s budget arrives as its own plus one, on every input. -/
+theorem padPass_carries_boundR : Cert.boundR toyPad (padPass.liftR padX (fun i k => k = i.2)) true :=
+  padPass.boundR_transfer (p' := true) (t := padX) rfl toy_boundR_holds
+
+/-- Concretely, on the input `(0, 7)` the padded program's budget is 8, and it runs 8. -/
+theorem padPass_budget_concrete :
+    padPass.liftR padX (fun i k => k = i.2) (0, 7) 8 ∧ (toyPad.run 0 true (0, 7)).cost = 8 :=
+  ⟨⟨(0, 7), 7, trivial, rfl, rfl, rfl⟩, rfl⟩
+
+/-- **And it is that input's budget, no other**: on `(0, 7)` the only lifted budget is 8. Without this, a lifting that forgot which input a budget came
+    from, and so allowed any input's budget, the smallest included, would pass every other witness (BOUND-01's mutants found it). -/
+theorem padPass_budget_exact (k : Nat) : padPass.liftR padX (fun i k => k = i.2) (0, 7) k → k = 8 := by
+  rintro ⟨i, k', _, hu, hk', rfl⟩
+  have hi : i = (0, 7) := hu
+  subst hi
+  subst hk'
+  rfl
+
+/-- On a constant budget, the lifted budget is `bound_transfer`'s. -/
+theorem padPass_liftR_const : padPass.liftR padX (fun _ k => k = 3) (0, 7) 4 :=
+  ⟨(0, 7), 3, trivial, rfl, rfl, rfl⟩
+
 end LCore.Witness

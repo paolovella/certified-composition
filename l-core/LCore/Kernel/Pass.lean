@@ -165,6 +165,24 @@ theorem bound_transfer (h : pc.comp p = .ok (p', t)) {k : Nat} (hc : Cert.bound 
   obtain ⟨i, hi, rfl⟩ := pc.cover u hu
   exact Nat.le_trans (pc.cost_sim p p' t h m i hi) (t.costMono _ _ (hc (t.fuel m) i hi))
 
+/-- The budget on the target: a source input that encodes to it, with a budget of its own, through the cost transformer. A relation, so no inverse
+    of `enc` is needed. A target input that encodes several source inputs keeps each one's budget, so a budget that depends only on public input
+    stays so only where `enc` is injective (BOUND-01). -/
+def liftR (t : Xform) (R : S.In → Nat → Prop) : T.In → Nat → Prop :=
+  fun u k => ∃ i k', S.Adm i ∧ pc.enc i = u ∧ R i k' ∧ k = t.cost k'
+
+/-- **A budget that depends on the input transfers** through the (monotone) cost transformer (BOUND-01). -/
+theorem boundR_transfer (h : pc.comp p = .ok (p', t)) {R : S.In → Nat → Prop} (hc : Cert.boundR S R p) :
+    Cert.boundR T (pc.liftR t R) p' := by
+  intro u hu
+  obtain ⟨i, hi, rfl⟩ := pc.cover u hu
+  obtain ⟨k, hR, hk⟩ := hc i hi
+  exact ⟨t.cost k, ⟨i, k, hi, rfl, hR, rfl⟩, fun m => Nat.le_trans (pc.cost_sim p p' t h m i hi) (t.costMono _ _ (hk (t.fuel m)))⟩
+
+/-- On a constant budget, the lifted relation gives exactly `bound_transfer`'s budget, so nothing is lost. -/
+theorem liftR_const (t : Xform) (c : Nat) (u : T.In) (k : Nat) : pc.liftR t (fun _ k => k = c) u k → k = t.cost c := by
+  rintro ⟨_, _, _, _, rfl, rfl⟩; rfl
+
 /-- **A compiled run has its source run's limit** (`Chain.Equiv`), by the four event
     obligations: events a prefix (`ev_sim`), caught up (`catch_up`), and finishing alike both
     ways (`progress`, `reflect`). -/

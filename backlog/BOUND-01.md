@@ -7,7 +7,7 @@ deps: [VS-2]
 closes: ['VS-2: over loops only rel reaches the bytes, and Cert.bound cannot state a budget that depends on input']
 acceptance: Cert.boundR in the kernel with boundR_transfer, bound_iff_boundR, a refused witness that no program with unbounded cost has one, and boundR_late_vacuous recording why the budget is chosen before the fuel; a counted for loop in sliceLang whose checker gives a budget as a function of the inputs, and a capped form for e max N whose budget is a constant; one program with a for loop whose literal RV64 image carries rel and boundR by transfer alone; QEMU's instruction counts within the transformed budget on every input tried
 kill: if boundR's transfer needs a proof about a pass, or about a certificate, stop and report. If the checker's budget cannot be computed by kernel evaluation at the sizes VS-2 used, stop and report
-status: planned
+status: in-progress
 ---
 
 ## Plan
@@ -49,3 +49,14 @@ lemma per pass, about `enc` alone and not about a certificate.
 6. **The account,** including how tight the budget is.
 
 ## Log
+
+- 2026-11-06, **step 1, the kernel: done, and not committed until the user has read the diff** (the user's word: "start, check before"). Branch `bound/boundr`.
+  - **`Kernel/Cert.lean`:** `Cert.boundR`, with the budget chosen before the fuel; `Cert.bound_iff_boundR`; `Cert.boundR_unbounded`; `Lang.Lawful.boundR_finishes`. The header now says seven shapes.
+  - **`Kernel/Pass.lean`:** `PassCert.liftR`, `PassCert.boundR_transfer` and `PassCert.liftR_const`. The transfer is three lines and mirrors `bound_transfer`. It uses `cover` and `cost_sim` only, so no proof is about a pass or a certificate, and the kill rule does not fire.
+  - **Witnesses** (`LCore/Witnesses.lean`, not Ring 0). `toy`'s program `true` costs its secret word: it has the budget `k = i.2` and no constant budget at all (`toy_no_constant_bound`). `toySpin` has no budget under any relation. `boundR_late_vacuous`. Through `padPass`, the budget arrives as one more, and on `(0, 7)` it is exactly 8 (`padPass_budget_exact`).
+  - **Frozen statements, 39 to 42:** `Frozen.boundR_transfer`, `Frozen.bound_iff_boundR`, `Frozen.boundR_finishes`, in `workspace/Statements.lean`, `StatementsProof.lean` and `comparator.json`.
+  - **`ring0.lock`, the whole diff:** the hashes of `Statements.lean` and `comparator.json`; the frozen-statement count, 39 to 42; and two new entries, `LCore.Cert.boundR` and `LCore.PassCert.liftR`. **No existing definition's hash changed**, and `checkers.lock` is unchanged.
+  - **Mutants: 5 of 5 killed** (`research/2026-11/boundr_mut.py`, receipt `bound01-mutants`). The fourth, a lifting that forgets which input a budget came from, **survived at first**. No witness checked that a target budget is that input's own, so the lifted budget could be any input's, the smallest included. `padPass_budget_exact` now kills it. Its first version was killed by name resolution, not by a witness, and was rewritten so that it tested the meaning.
+  - **A count I had wrong:** VS-2's account and research called `boundR` the sixth shape. It is the seventh, since `relView` is the sixth. Corrected of record in both, and in `BoundRSketch.lean`.
+  - **Docs:** `PLAN-2026-10.md` §1 says 7 shapes. `README.md` says the lock holds 524 definitions, after its guard fired at 522. `CHANGELOG.md` has entries for this and for VS-2, which had none.
+

@@ -1,0 +1,4 @@
+started: 2026-11-06T10:57:27+01:00
+head: 41c24b2
+command: python3 research/2026-11/boundr_mut.py /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad/bmut
+log: tools/receipts/bound01-mutants.log

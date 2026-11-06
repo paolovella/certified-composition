@@ -30,7 +30,7 @@ half of constant-time. What is missing is a **number**: an upper bound that a re
 | Barthe, Grégoire, Laporte, Priya, *Structured leakage and applications to cryptographic constant-time and cost* (CCS 2021) | Leakage transformers map source leakage to target leakage, shown on Jasmin, with preservation proved for constant-time **and cost** | The nearest to L's design: `Xform.lk` is a leakage transformer, and cost rides on the same object. *How their cost relates to leakage was not read: the PDF was refused, and the abstract does not say* |
 
 **What this suggests, as a design to decide, not to build yet.**
-- **A sixth shape whose budget may depend on the input, stated as a relation so that no inverse of `enc` is needed:**
+- **~~A sixth shape~~ A seventh shape** (*correction of record, the same day:* `relView` is already the sixth) **whose budget may depend on the input, stated as a relation so that no inverse of `enc` is needed:**
   ~~`boundR L R p := ∀ n i, L.Adm i → ∃ k, R i k ∧ (L.run n p i).cost ≤ k`~~. *Correction of record, the same day, found by checking it before
   planning:* with the budget chosen after the fuel, `k` can be the cost itself, so with a loose `R` every program has a budget, `spin` included
   (`boundR_late_vacuous` in [`BoundRSketch.lean`](BoundRSketch.lean)). The budget is chosen once per input, before the fuel:

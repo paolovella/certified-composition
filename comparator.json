@@ -38,6 +38,9 @@
     "LCore.Frozen.bound_transfer",
     "LCore.Frozen.live_transfer",
     "LCore.Frozen.bound_finishes",
+    "LCore.Frozen.boundR_transfer",
+    "LCore.Frozen.bound_iff_boundR",
+    "LCore.Frozen.boundR_finishes",
     "LCore.Frozen.seq_comp",
     "LCore.Frozen.hyper_transfer",
     "LCore.Frozen.relView_transfer"

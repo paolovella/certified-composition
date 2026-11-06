@@ -1,10 +1,10 @@
 /-
-  Six certificate shapes, their meaning defined once (PLAN-2026-10 §2, `Cert.lean`). Ring 0.
+  Seven certificate shapes, their meaning defined once (PLAN-2026-10 §2, `Cert.lean`). Ring 0.
 
   Every certificate L carries is an instance of one of these, over any `Lang` (a fourth,
   `live`, for what must happen, a fifth, `hyper`, for properties of two runs' limits under a
-  chosen input relation, and a sixth, `relView`, for one observer's whole view, side channels
-  included, are below):
+  chosen input relation, a sixth, `relView`, for one observer's whole view, side channels
+  included, and a seventh, `boundR`, for a budget that may depend on the input, are below):
   - `trace Φ`: every run's events satisfy `Φ`. Mediation, memory safety, taint and path
     properties, and the absence of leaks are all `trace` instances.
   - `rel`: inputs the attacker cannot tell apart give the same observation. Since `Beh` is all
@@ -40,6 +40,25 @@ def rel (L : Lang) (p : L.Prog) : Prop :=
 
 def bound (L : Lang) (k : Nat) (p : L.Prog) : Prop :=
   ∀ (n : Nat) (i : L.In), L.Adm i → (L.run n p i).cost ≤ k
+
+/-- **The seventh shape: a budget that may depend on the input** (the user's decision of 2026-11-06, BOUND-01). Each admissible input has a
+    budget `k` with `R i k`, chosen **once, before the fuel**, that bounds the cost at every fuel. A loop bound by a public input has no constant
+    budget, and has this one. Chosen before the fuel because, chosen after, `k` could be the cost itself and every program would have a budget
+    (`Witness.boundR_late_vacuous`). The budget is as large as `R` says: a formula in a 64-bit input bounds termination, not speed. -/
+def boundR (L : Lang) (R : L.In → Nat → Prop) (p : L.Prog) : Prop :=
+  ∀ (i : L.In), L.Adm i → ∃ k, R i k ∧ ∀ (n : Nat), (L.run n p i).cost ≤ k
+
+/-- `bound` is `boundR` with a constant budget: one meaning. -/
+theorem bound_iff_boundR (L : Lang) (c : Nat) (p : L.Prog) : bound L c p ↔ boundR L (fun _ k => k = c) p :=
+  ⟨fun h i hi => ⟨c, rfl, fun n => h n i hi⟩, fun h n i hi => by obtain ⟨k, rfl, hk⟩ := h i hi; exact hk n⟩
+
+/-- **No budget, whatever `R` is, for a run whose cost grows without limit.** -/
+theorem boundR_unbounded {L : Lang} {R : L.In → Nat → Prop} {p : L.Prog} {i : L.In} (hi : L.Adm i)
+    (hgrow : ∀ k, ∃ n, k < (L.run n p i).cost) : ¬ boundR L R p := by
+  intro h
+  obtain ⟨k, _, hk⟩ := h i hi
+  obtain ⟨n, hn⟩ := hgrow k
+  exact Nat.lt_irrefl k (Nat.lt_of_lt_of_le hn (hk n))
 
 /-- **The sixth shape: one observer's whole view** (the user's decision of 2026-11-02: isolation
     must cover side channels). For admissible inputs related by `R`, the observer `f` sees the same
@@ -117,6 +136,17 @@ theorem Lang.Lawful.bound_finishes {L : Lang} (hL : L.Lawful) {k : Nat} {p : L.P
   refine ⟨k + d + 1, fun hf => ?_⟩
   have h1 := hd (k + d + 1) i hf
   have h2 := h (k + d + 1) i hi
+  exact Nat.lt_irrefl (k + d)
+    (Nat.lt_of_lt_of_le (Nat.lt_succ_self _) (Nat.le_trans h1 (Nat.add_le_add_right h2 d)))
+
+/-- **So does a budget that depends on the input**: `boundR` is not satisfied by a program that never finishes. -/
+theorem Lang.Lawful.boundR_finishes {L : Lang} (hL : L.Lawful) {R : L.In → Nat → Prop} {p : L.Prog}
+    (h : Cert.boundR L R p) (i : L.In) (hi : L.Adm i) : ∃ n, (L.run n p i).out ≠ .fuel := by
+  obtain ⟨k, _, hk⟩ := h i hi
+  obtain ⟨d, hd⟩ := hL.diverge p
+  refine ⟨k + d + 1, fun hf => ?_⟩
+  have h1 := hd (k + d + 1) i hf
+  have h2 := hk (k + d + 1)
   exact Nat.lt_irrefl (k + d)
     (Nat.lt_of_lt_of_le (Nat.lt_succ_self _) (Nat.le_trans h1 (Nat.add_le_add_right h2 d)))
 

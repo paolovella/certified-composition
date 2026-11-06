@@ -6,7 +6,7 @@
 import LCore.Kernel.Pass
 open LCore
 
-/-- The candidate sixth shape: one budget per input, chosen before the fuel, from the relation `R`. -/
+/-- The candidate seventh shape (the kernel has six; a first draft of this comment said sixth): one budget per input, chosen before the fuel, from the relation `R`. -/
 def boundR (L : Lang) (R : L.In → Nat → Prop) (p : L.Prog) : Prop :=
   ∀ (i : L.In), L.Adm i → ∃ k, R i k ∧ ∀ (n : Nat), (L.run n p i).cost ≤ k
 

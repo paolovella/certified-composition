@@ -1,6 +1,6 @@
-file	workspace/Statements.lean	841191195b601b2101c2ec041ece4b6c80bcfacec6ce3e7db1280b978eef1d2b
-file	comparator.json	2a9f34c7dceb4c37772543be6785f488a413264ca870304f93c1eef5af9d7508
-frozen statements	39
+file	workspace/Statements.lean	7f8dfd7d3b318d6e98468210487b514daea1e4f501f564af770ace797659b73e
+file	comparator.json	e33bee56a7e449ab835ba87c3cdb2dd9e1bdb7378bbefb44693f70c58c4e11ce
+frozen statements	42
 checkers	23	ConfTyping.allcheck ConfTyping.bcheck ConfTyping.costCheck ConfTyping.hcheck ConfTyping.jcheck ConfTyping.jcheckW ConfTyping.leakSafe ConfTyping.medCheck ConfTyping.pathCheck ConfTyping.pcheck ConfTyping.pcheckW ConfTyping.secCheck ConfTyping.secCheckD ConfTyping.secCheckT ConfTyping.secCheckTD ConfTyping.slcheck ConfTyping.specCheck ConfTyping.tcheck ConfTyping.tcheckW ConfTyping.ucheck ConfTyping.ucheckNI ConfTyping.umcheck ConfTyping.wcheck
 ConfTyping.Addr	13285864654764339375
 ConfTyping.Cmd	3931117990
@@ -439,6 +439,7 @@ LCore.Beh.mk	3938620485
 LCore.Beh.out	14922758964269783117
 LCore.Beh.view	11134238416926702377
 LCore.Cert.bound	12193867875832571831
+LCore.Cert.boundR	2977160955334508020
 LCore.Cert.hyper	7579409909705046829
 LCore.Cert.live	13241332037465342036
 LCore.Cert.rel	17192613647496917356
@@ -489,6 +490,7 @@ LCore.Outcome.rec	1760540576
 LCore.PassCert	123695316
 LCore.PassCert.comp	2514466273766808539
 LCore.PassCert.enc	2868148569827151970
+LCore.PassCert.liftR	5421429110305908976
 LCore.PassCert.mk	2401572366
 LCore.PassCert.seq	13095768714568781433
 LCore.PassCert.seq._proof_1	3000824720

@@ -6,6 +6,19 @@ landed.
 
 ## Repository verification
 
+- **A budget that depends on the input: the seventh shape** (2026-11-06, BOUND-01 step 1; `l-core/LCore/Kernel/`). `Cert.boundR` gives each
+  admissible input a budget, chosen before the fuel, that bounds its cost at every fuel. `PassCert.boundR_transfer` carries it through any
+  certified pass, `Cert.bound_iff_boundR` makes `bound` its constant case, and `Lang.Lawful.boundR_finishes` makes it force termination. All three
+  are frozen statements (42 now), and `ring0.lock` holds 524 definitions. Witnesses: `toy`'s program `true` has an input-dependent budget and no
+  constant one, `toySpin` has none, and `boundR_late_vacuous` records why a budget chosen after the fuel would be empty. No pass or checker uses it
+  yet: that is BOUND-01's next steps, with a counted `for` loop.
+
+- **The second slice: loops and input-dependent addresses, to literal RV64 bytes** (2026-11-03 to 2026-11-06, VS-2; `l-core/LCore/Slice2/`). `scan`,
+  a loop over an array at a public index, and `spin`, which never finishes, as literal images carrying `rel` by the kernel's transfer alone, with
+  `t.fuel m = m`: `LCore.Slice2.Image.scan_carries`, `spin_carries`. No kernel change was forced. Under QEMU, 117 runs match the model in every PC and
+  address. Every refused program compiles and its bytes leak, through the channel its refusal names. Over loops only `rel` reaches the bytes: no
+  budget. See `research/2026-11/VS-2-ACCOUNT.md`.
+
 - **The vertical slice: certificates on literal RV64 bytes that run** (2026-11-03, VS-1; `l-core/LCore/Slice/`). One 76-byte program in a
   new small language, through two chained passes, carrying `rel` and a budget by the kernel's transfers alone, with no kernel change:
   `LCore.Slice.Image.image_carries`. The bytes run under QEMU and match the model on 204 inputs. No loops, heap, strings, functions or

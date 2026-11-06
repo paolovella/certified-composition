@@ -305,6 +305,19 @@ theorem Frozen.live_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' :
 theorem Frozen.bound_finishes {L : Lang} (hL : L.Lawful) {k : Nat} {p : L.Prog}
     (h : Cert.bound L k p) (i : L.In) (hi : L.Adm i) : ∃ n, (L.run n p i).out ≠ .fuel := sorry
 
+/-- **A budget that depends on the input transfers** (`LCore.PassCert.boundR_transfer`, BOUND-01). -/
+theorem Frozen.boundR_transfer {S T : Lang} (pc : PassCert S T) {p : S.Prog} {p' : T.Prog}
+    {t : Xform} (h : pc.comp p = .ok (p', t)) {R : S.In → Nat → Prop} (hc : Cert.boundR S R p) :
+    Cert.boundR T (pc.liftR t R) p' := sorry
+
+/-- **`bound` is `boundR` with a constant budget** (`LCore.Cert.bound_iff_boundR`): one meaning. -/
+theorem Frozen.bound_iff_boundR (L : Lang) (c : Nat) (p : L.Prog) :
+    Cert.bound L c p ↔ Cert.boundR L (fun _ k => k = c) p := sorry
+
+/-- **So does a budget that depends on the input force termination** (`LCore.Lang.Lawful.boundR_finishes`). -/
+theorem Frozen.boundR_finishes {L : Lang} (hL : L.Lawful) {R : L.In → Nat → Prop} {p : L.Prog}
+    (h : Cert.boundR L R p) (i : L.In) (hi : L.Adm i) : ∃ n, (L.run n p i).out ≠ .fuel := sorry
+
 /-- **Passes compose** (`LCore.PassCert.seq`): a pipeline of certified passes compiles each stage
     once, and its compiled program is the second stage's output on the first stage's. -/
 theorem Frozen.seq_comp {S T U : Lang} (pc : PassCert S T) (qc : PassCert T U) {p : S.Prog}

@@ -45,7 +45,7 @@ will have to do the same.
 - **A budget over loops.** `Cert.bound` takes one number for every input. `scan` runs `27n + 9` instructions on public input `n`, and no single number
   bounds that, so `bound` is not claimed. **Over loops, VS-2 carries `rel` and nothing about running time.** A certified loop program may run as long as
   its public input says, or forever, like `spin`. A budget as a function of public input is a shape the kernel does not have. Adding it would be adding
-  a sixth shape.
+  ~~a sixth shape~~ a seventh shape (*correction of record, the same day:* the kernel already had six, `relView` being the sixth).
 - **`enc` with a program-dependent layout.** It is still the identity in `rvPass` and positional in `slotPass`. Unchanged since VS-1.
 - **Source-level abort.** The index is masked, so nothing aborts. A language with a real out-of-bounds error has not been lowered.
 - **Heap, functions, I/O, mediation, speculation.** None is in either slice.
@@ -108,7 +108,7 @@ each real when it lands.
 
 **On a budget over loops, a decision the user owns, independent of the lock.** Either accept that L's certificates say nothing about running time over
 loops, or add a shape whose budget is a function of the public input, with its transfer. I would add it, before growing the language further, because
-every row the map adds that involves a loop will otherwise be silent on time. It would be a sixth shape, and a G-0 change.
+every row the map adds that involves a loop will otherwise be silent on time. It would be ~~a sixth shape~~ a seventh shape (corrected as above), and a G-0 change.
 
 **What I would not claim from this.** Not that L is close, and not that the kernel is final. Two slices, each too small to be useful, have now met loops,
 arrays, input-dependent addresses and non-termination, with no kernel change. They have not met a heap, a function, I/O, or any of the map's rows.

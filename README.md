@@ -580,7 +580,7 @@ name.
 those statements, with no axiom beyond the standard three. That file is the only one allowed
 `sorry`, as the challenge's bodies. A statement can also be weakened by editing a definition it
 mentions, which the comparator cannot see. So `tools/ring0.lock` hashes every definition in the
-frozen statements' dependency closure that does not pass through a checker, 522 of them, and CI
+frozen statements' dependency closure that does not pass through a checker, 524 of them, and CI
 fails on any change. The checkers the statements name are left out: an edit to one cannot weaken
 a statement, which must still be proved against the locked definitions. Their hashes are in
 `tools/checkers.lock`, which a change may rewrite (`tools/ring0-lock.sh --checkers`), and the base
