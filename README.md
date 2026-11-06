@@ -25,7 +25,7 @@ certificate inside a pass. QEMU runs the bytes and agrees with the model.
   program that never finishes. `scan_carries`: the image has `rel` on every input and in every environment. Every refused program compiles,
   and its bytes provably leak, through an address, the PCs, the result, or whether and when it finishes. **No kernel change was forced
   by either slice.** Over loops only `rel` reached the bytes, with no budget.
-- **BOUND-01, in progress:** the kernel's seventh shape, `Cert.boundR`, a budget that may depend on the input, with its transfer and
+- **BOUND-01** ([`BOUND-01-ACCOUNT`](research/2026-11/BOUND-01-ACCOUNT.md)): the kernel's seventh shape, `Cert.boundR`, a budget that may depend on the input, with its transfer and
   three frozen statements; counted loops `forN` and `forMax`; and the checker's budget for them, proved by a potential. **A budget over
   loops now reaches the bytes:** `countUp_bytes_budget` (`l-core/LCore/Slice2/BoundBytes.lean`), on every input and environment, at most
   `32n + 21` instructions, where QEMU measures `19n + 9`. The capped loop has a constant budget of 97 instructions, and runs at most 83.

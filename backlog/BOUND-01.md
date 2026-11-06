@@ -7,7 +7,7 @@ deps: [VS-2]
 closes: ['VS-2: over loops only rel reaches the bytes, and Cert.bound cannot state a budget that depends on input']
 acceptance: Cert.boundR in the kernel with boundR_transfer, bound_iff_boundR, a refused witness that no program with unbounded cost has one, and boundR_late_vacuous recording why the budget is chosen before the fuel; a counted for loop in sliceLang whose checker gives a budget as a function of the inputs, and a capped form for e max N whose budget is a constant; one program with a for loop whose literal RV64 image carries rel and boundR by transfer alone; QEMU's instruction counts within the transformed budget on every input tried
 kill: if boundR's transfer needs a proof about a pass, or about a certificate, stop and report. If the checker's budget cannot be computed by kernel evaluation at the sizes VS-2 used, stop and report
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -138,4 +138,10 @@ lemma per pass, about `enc` alone and not about a certificate.
     `countUp` now uses up to 59% of its budget, against 18% before.
   - **Mutants: 48 of 48 killed** (receipt `bound01-step5a-mutants`), 2 new. Both, a loop step charged one less and a `stepMax` that forgets a loop's body, are killed where `stepC_le`'s proof stops fitting the definition, which comes before the chunk bound in the file. The property they protect then cannot be proved, so they count.
   - **Docs:** `README.md`'s status line for BOUND-01 updated. `BoundBytes.lean` and `bound_diff.py` keep the old budgets struck through, with the reason.
-
+- 2026-11-06, **step 6 done: the account** ([`BOUND-01-ACCOUNT`](../research/2026-11/BOUND-01-ACCOUNT.md)). A budget over loops reaches literal bytes by transfer alone. The kernel needed one additive shape, and no existing hash moved.
+  - **The acceptance, item by item:**
+    - `Cert.boundR` with its transfer, `bound_iff_boundR`, a refused witness (`toySpin_no_boundR`, `boundR_unbounded`) and `boundR_late_vacuous`.
+    - Counted loops whose checker gives a budget as a function of the inputs (`slice_boundR`), and a capped form with a constant one (`capped_bound`).
+    - A for-loop program whose literal image carries `rel` and `boundR` by transfer alone (`countUp_rel_bytes`, `countUp_boundR_bytes`).
+    - QEMU's counts within the budget on every input tried (step 5).
+  - **Not met as planned, and said in the account:** "`enc` injective for both passes" was not proved as a general lemma. The public-only reading holds for `countUp` concretely, through `wordAt_enc`.

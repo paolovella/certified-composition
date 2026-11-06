@@ -112,3 +112,5 @@ every row the map adds that involves a loop will otherwise be silent on time. It
 
 **What I would not claim from this.** Not that L is close, and not that the kernel is final. Two slices, each too small to be useful, have now met loops,
 arrays, input-dependent addresses and non-termination, with no kernel change. They have not met a heap, a function, I/O, or any of the map's rows.
+
+*Note, 2026-11-06:* §2's first limit, that over loops only `rel` reaches the bytes, is closed for counted loops by BOUND-01 ([`BOUND-01-ACCOUNT`](BOUND-01-ACCOUNT.md)). It was true when written, and a `while` still has no budget.

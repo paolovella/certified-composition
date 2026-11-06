@@ -6,6 +6,11 @@ landed.
 
 ## Repository verification
 
+- **A budget over loops on literal RV64 bytes** (2026-11-06, BOUND-01; `l-core/LCore/Slice2/{For,Budget,BoundBytes}.lean`). Counted loops `forN`
+  and `forMax`; the checker's budget, by a potential over frames (`run_pot`, `slice_boundR`); and through VS-2's passes by `boundR_transfer`:
+  `countUp_bytes_budget`, at most `32n + 21` instructions on every input and environment, where QEMU measures `19n + 9`, and
+  `capped_bound_bytes`, 97. A tighter `rvPass` cost transformer took them from `104n + 78` and 672. See `research/2026-11/BOUND-01-ACCOUNT.md`.
+
 - **A budget that depends on the input: the seventh shape** (2026-11-06, BOUND-01 step 1; `l-core/LCore/Kernel/`). `Cert.boundR` gives each
   admissible input a budget, chosen before the fuel, that bounds its cost at every fuel. `PassCert.boundR_transfer` carries it through any
   certified pass, `Cert.bound_iff_boundR` makes `bound` its constant case, and `Lang.Lawful.boundR_finishes` makes it force termination. All three
