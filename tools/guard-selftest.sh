@@ -263,6 +263,17 @@ run_case "tools/ci.sh drops a gate" drift \
 # 1g. duplicate name in the flat namespace
 run_case "duplicate top-level name" drift \
   bash -c 'printf "\ntheorem medCheck_sound : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'
+# CC-01: the rewritten rules, each both ways
+run_case "declaration outside the namespace" drift \
+  bash -c 'printf "\ntheorem zz_outside : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'
+run_case "same name nested in another namespace" pass \
+  bash -c 'printf "\nnamespace ConfTyping\nnamespace Inner\ntheorem medCheck_sound : True := trivial\nend Inner\nend ConfTyping\n" >> conf-typing/ConfTyping/Race.lean'
+run_case "backlog item loses its acceptance" drift \
+  bash -c 'sed -i "/^acceptance: /d" backlog/P0-01.md && ! grep -q "^acceptance: " backlog/P0-01.md'
+run_case "VULN-cited name renamed everywhere" drift \
+  bash -c 'grep -rl loopFix_terminates conf-typing/ConfTyping transport-calculus | xargs sed -i "s/loopFix_terminates/loopFix_gone/g"'
+run_case "cited module not imported" drift \
+  bash -c 'sed -i "/^import ConfTyping.Race$/d" conf-typing/ConfTyping.lean && ! grep -q "^import ConfTyping.Race$" conf-typing/ConfTyping.lean'
 
 # cross-tool tripwire must not vanish silently
 run_case "cross-tool tripwire renamed" drift \

@@ -86,30 +86,29 @@ fi
 #     actually occupies is its namespace path, not its bare identifier: `Src.parse` and
 #     `parse` are different declarations and the root build accepts both. The guard tracks
 #     the namespace stack rather than being relaxed, so a clash *inside* `Src` still fires.
-qualify() {
-  awk '
+# One awk over every file (CC-01: it ran once per file, twice), printing "file<TAB>qualified name". The namespace stack
+# starts empty in each file, as it did when each file was its own awk run.
+qualified=$(awk '
+    FNR == 1 { depth = 0 }
     /^namespace [A-Za-z_]/ { stack[++depth] = $2; next }
     /^end [A-Za-z_]/       { if (depth > 0 && stack[depth] == $2) depth--; next }
     /^(theorem|lemma|def|abbrev|structure|inductive) [A-Za-z_]/ {
       name = $2; sub(/[ :({[].*/, "", name)
       path = ""
       for (i = 1; i <= depth; i++) path = path stack[i] "."
-      print path name
-    }' "$1"
-}
+      print FILENAME "\t" path name
+    }' conf-typing/ConfTyping/*.lean)
 #     A declaration at depth 0 is in the ROOT namespace, not `ConfTyping` — which is what
 #     an edit appended past the closing `end` looks like. Lean accepts it silently (it does
 #     not clash with the namespaced name), so nothing else would catch it.
-outside=$(for f in conf-typing/ConfTyping/*.lean; do
-            qualify "$f" | grep -v '\.' | sed "s#^#$f: #"
-          done)
+outside=$(printf '%s\n' "$qualified" | awk -F'\t' 'NF == 2 && $2 !~ /\./ { print $1 ": " $2 }')
 if [ -n "$outside" ]; then
   echo "$outside" | while read -r line; do
     echo "DRIFT: declaration outside the ConfTyping namespace: $line"
   done
   fail=1
 fi
-dups=$(for f in conf-typing/ConfTyping/*.lean; do qualify "$f"; done | sort | uniq -d)
+dups=$(printf '%s\n' "$qualified" | cut -f2 | sed '/^$/d' | sort | uniq -d)
 if [ -n "$dups" ]; then
   for d in $dups; do
     bare=${d##*.}
@@ -135,7 +134,7 @@ done
 
 # 1c. Every Lean name VULN-COVERAGE.md cites must exist in the Lean sources —
 #     the map's verdicts are only as good as their citations.
-for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \
+c1_names="qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factors_kernel \
             no_irreducible_admissible ksafety_above_twosafety Rbad_nonseparable \
             summary_not_composable confidential_transport pleak_confidential_deploy \
             taint_is_JNI admissible_taint_is_Jtaint InfluencedAtMost \
@@ -186,8 +185,12 @@ for name in qualitative_admissible_is_JNI simA3_iff_respectsCoarsening A3_factor
             loopFix_terminates findMerge_mergeOne_length \
             Coarsens_collapse coarsen_loop_complete loopSearch_complete loopSearch_correct \
             alsafe2 prog_safe prog_checks loopFix2_correct alcheck2_loop_correct nested_prog_safe \
-            findMerge2_mem weak_accepted weak_prog_safe; do
-  if ! grep -rq "$name" conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null; then
+            findMerge2_mem weak_accepted weak_prog_safe"
+# One grep for every name at once (CC-01: a grep -r per name), keeping only the lines that hold one; each name is then looked for in those lines.
+# grep matches within a line either way, and every name is [A-Za-z0-9_], so this finds a name exactly where `grep -rq "$name"` did.
+c1_lines=$(grep -rhF $(printf -- '-e %s ' $c1_names) conf-typing/ConfTyping/ transport-calculus/TransportCalculus.lean 2>/dev/null)
+for name in $c1_names; do
+  if [[ "$c1_lines" != *"$name"* ]]; then
     echo "DRIFT: VULN-COVERAGE cites $name but it is not in the Lean sources"; fail=1
   fi
 done
@@ -1367,8 +1370,11 @@ if grep -q "Speculate.lean" VULN-COVERAGE.md; then
   done
 fi
 for mod in AliasLoop LexReal QueryGrammar CmdInjection DecimalId LogInjection AliasFix QueryEscape Race Speculate CostBound Mediation Unified Bundle UnifiedNI BundleLedger BundleLoop BundleCoverage MemCert MemLinear HeapNI HeapJoint HeapWiden HeapAlloc FullCert TaintCert AllFive PathCert StringLoop Deploy Attack Reuse HeapValue HeapLabel HeapSecret HeapAttack HeapRetire Interleave Ownership Assumptions SpecUnified SpecBudget SpecTrace SpecFactor BigHandler SpecFused CountedLoop; do
-  if grep -q "$mod.lean" VULN-COVERAGE.md && \
-     ! grep -q "import ConfTyping.$mod" conf-typing/ConfTyping.lean 2>/dev/null; then
+  # Both files read once (CC-01: two greps per module), and only the lines either grep could match: a match of "$mod.lean" holds "lean", one of
+  # "import ConfTyping.$mod" holds "import". The greps' regex "." is any one character but a newline, as is [!$'\n'].
+  [ -n "${vuln_txt+x}" ] || vuln_txt=$(grep -F lean VULN-COVERAGE.md 2>/dev/null)
+  [ -n "${root_txt+x}" ] || root_txt=$(grep -F import conf-typing/ConfTyping.lean 2>/dev/null)
+  if [[ "$vuln_txt" == *"$mod"[!$'\n']lean* ]] && [[ "$root_txt" != *"import ConfTyping"[!$'\n']"$mod"* ]]; then
     echo "DRIFT: $mod.lean cited in VULN-COVERAGE but not imported by the ConfTyping root"; fail=1
   fi
 done
@@ -1447,16 +1453,20 @@ if ! grep -qxE 'full|cells-only|off' AUTONOMY 2>/dev/null; then
 fi
 # (c) Every backlog item carries the fields STATE.md and agents read; an item without a status
 #     or acceptance criterion is a wish, not a work item.
+# One awk per item (CC-01: it was seven greps). It prints a missing key as "missing KEY" and a bad status as "status", in the
+# order the greps checked them, and the messages are the greps' own.
 for f in backlog/*.md; do
   [ -e "$f" ] || continue
-  for k in id title tier status acceptance kill; do
-    if ! grep -q "^$k: " "$f"; then
-      echo "DRIFT: backlog item $f has no '$k:' field"; fail=1
-    fi
-  done
-  if ! grep -qE '^status: (planned|in-progress|blocked|done|killed)$' "$f"; then
-    echo "DRIFT: backlog item $f has an unknown status"; fail=1
-  fi
+  while read -r what key; do
+    [ -n "$what" ] || continue
+    if [ "$what" = missing ]; then echo "DRIFT: backlog item $f has no '$key:' field"
+    else echo "DRIFT: backlog item $f has an unknown status"; fi
+    fail=1
+  done < <(awk '
+    BEGIN { n = split("id title tier status acceptance kill", ks, " ") }
+    { for (i = 1; i <= n; i++) if (index($0, ks[i] ": ") == 1) seen[ks[i]] = 1 }
+    /^status: (planned|in-progress|blocked|done|killed)$/ { ok = 1 }
+    END { for (i = 1; i <= n; i++) if (!seen[ks[i]]) print "missing", ks[i]; if (!ok) print "status" }' "$f")
 done
 # (d) The hooks named in .claude/settings.json exist; a hook pointing at a missing script fails
 #     open and silently, which is the failure mode the hooks exist to prevent.

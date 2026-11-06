@@ -1,0 +1,4 @@
+started: 2026-11-06T13:10:53+01:00
+head: 2468c5e
+command: bash tools/ci.sh
+log: tools/receipts/cc01-ci.log
