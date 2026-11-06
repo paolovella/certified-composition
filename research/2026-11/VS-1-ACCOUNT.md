@@ -95,7 +95,7 @@ comes first.
 
 **Decision the user owns, once that slice is in: is `sliceLang` the seed of L's core?** Two routes:
 - **Grow the slice** into PLAN-2026-10's Core, adding heap, strings and mediation one at a time, each through to the bytes. Every row re-proved, but
-  each is real when it lands. I would take this, because `UCmd`'s unbounded integers cannot reach a machine anyway, and PH3 already plans to replace them.
+  each is real when it lands. I would take this, because ~~`UCmd`'s unbounded integers cannot reach a machine anyway~~, and PH3 already plans to replace them. *Correction of record, 2026-11-06* ([`VS-2-RESEARCH`](VS-2-RESEARCH.md) §1): that was false. CakeML reaches RISC-V with them, through a verified bignum runtime. What holds is narrower: a bignum's time and addresses depend on its size, and for a secret that is what `rel` observes, so secret data needs a constant-time bignum runtime or bounded integers.
 - **Lower `UCmd`** by bridging it to `W64`. It keeps F5's work, and has to settle what an unbounded integer means on a machine.
 
 `L-UNIFY`, the directive design and `REL-01` wait on this choice, since each is about a language that may not be the one that compiles.

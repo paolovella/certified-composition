@@ -103,7 +103,7 @@ VS-1's four are all still open, and two of them bit again:
 So: **choose the L-BYTES route first, then lock.** And when the lock is judged, read §2's first point: over loops, only `rel` was tested to the bytes.
 
 **On the L-BYTES route, VS-2 strengthens VS-1's preference for growing `sliceLang`.** Loops, an array, and negative immediates now reach bytes, and each
-cost one step. `UCmd`'s unbounded integers still cannot reach a machine. The cost is the same as before: every row of the map is re-proved, one at a time,
+cost one step. ~~`UCmd`'s unbounded integers still cannot reach a machine.~~ *Correction of record, the same day* ([`VS-2-RESEARCH`](VS-2-RESEARCH.md) §1): false as stated, since CakeML compiles them through a verified bignum runtime. The reason that holds: for secret data a bignum's size shows in its time and addresses, so `UCmd` needs a constant-time bignum runtime or bounded integers, and `sliceLang` has the second. The cost is the same as before: every row of the map is re-proved, one at a time,
 each real when it lands.
 
 **On a budget over loops, a decision the user owns, independent of the lock.** Either accept that L's certificates say nothing about running time over
