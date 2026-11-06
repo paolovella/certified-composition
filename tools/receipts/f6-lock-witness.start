@@ -1,0 +1,4 @@
+started: 2026-11-06T19:19:54+01:00
+head: 42b79de
+command: bash research/2026-11/f6_lock_witness.sh /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad
+log: tools/receipts/f6-lock-witness.log

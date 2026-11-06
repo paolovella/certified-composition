@@ -4341,6 +4341,87 @@ LCore.Slice.tick_ext	LCore.Slice.Source	propext
 LCore.Slice.upd	LCore.Slice.Source	
 LCore.Slice.wraps_in_source	LCore.Slice.Source	propext
 LCore.Slice2.Arr	LCore.Slice2.Source	
+LCore.Slice2.BoundBytes.budget_countUp	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.cappedImage	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.cappedNats	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.capped_bound_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.capped_is_literal	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.BoundBytes.capped_pipeline	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.capped_rel_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.capped_runs_within	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.BoundBytes.countUpImage	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.countUpNats	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.countUp_boundR_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_bytes_budget	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_cost	LCore.Slice2.BoundBytes	Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_is_literal	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.BoundBytes.countUp_pipeline	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_rel_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_runs_within	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.Budget.Agree	LCore.Slice2.Budget	
+LCore.Slice2.Budget.BodyF	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.IsInit	LCore.Slice2.Budget	
+LCore.Slice2.Budget.IsLoop	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.IsPlain	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.IsSet	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.Ok	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.TopF	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.agree_out	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.agree_upd	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.assigns	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.budget	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.capped_bound	LCore.Slice2.Budget	Classical.choice,Quot.sound,propext
+LCore.Slice2.Budget.capped_budget_const	LCore.Slice2.Budget	Classical.choice,Quot.sound,propext
+LCore.Slice2.Budget.capped_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.capped_runs	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.countUp_budget	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.countUp_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.counted_ok	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.counters	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.eval_agree	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.eval_dec	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.eval_upd_out	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.evars	LCore.Slice2.Budget	
+LCore.Slice2.Budget.fromAssigned	LCore.Slice2.Budget	
+LCore.Slice2.Budget.fromAssigned_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.inputCounter	LCore.Slice2.Budget	
+LCore.Slice2.Budget.inputCounter_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.isDec	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.isDec_shape	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.nested	LCore.Slice2.Budget	
+LCore.Slice2.Budget.nested_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.ok_all	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.ok_cons	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.ok_push_plain	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.ok_top	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plainC	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plain_assign	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plain_ite	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plain_load	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plain_loop	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.plain_seq	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.pot	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.pot_agree	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.pot_mono	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.pot_push_plain	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.push_app	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.push_plain_frames	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.resetInBody	LCore.Slice2.Budget	
+LCore.Slice2.Budget.resetInBody_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.run_pot	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.slice_boundR	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.spin_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.step_loop	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.step_plain	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.step_set	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.tick_cost	LCore.Slice2.Budget	
+LCore.Slice2.Budget.topC	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.topC_frames	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.upd_comm	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.upd_other	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.upd_same	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.upd_upd_same	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Cmd.assign.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.assign.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.below	LCore.Slice2.Source	
@@ -4545,12 +4626,17 @@ LCore.Slice2.Lower.src_done	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.src_nil	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.src_step	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.startPc	LCore.Slice2.Pass	
+LCore.Slice2.Lower.stepC	LCore.Slice2.Pass	
+LCore.Slice2.Lower.stepC_le	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.stepL	LCore.Slice2.Pass	
+LCore.Slice2.Lower.stepMax	LCore.Slice2.Pass	
 LCore.Slice2.Lower.step_add	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_addi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_andi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_beq	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_ld	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_sd	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.tailC	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tailM	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tail_exec	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.tick_view	LCore.Slice2.Pass	propext

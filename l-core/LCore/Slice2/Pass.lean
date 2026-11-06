@@ -119,9 +119,36 @@ theorem play_congr {f : Observer} {F G : Nat → Beh} : ∀ (c : List Micro) (m 
 
 /-! ## Sizes -/
 
+/-- **What one source step can cost on the machine**: the command's own chunk, plus the jump it may push. Not the whole command: a loop's step
+    runs its guard and a branch, and its body is charged to the body's own steps (BOUND-01 step 5a). -/
+def stepC : SCmd → Nat
+  | .skip => 1
+  | .set _ e => sE e + 1
+  | .seq _ _ => 0
+  | .ite e _ _ | .loop e _ => sE e + 2
+  | .load _ e => sE e + 7
+  | .store e v => sE e + 5 + sE v + 1
+
+/-- The largest `stepC` over every frame a command can push, its branches and loop body included. -/
+def stepMax : SCmd → Nat
+  | .seq a b => max (stepMax a) (stepMax b)
+  | .ite e a b => max (sE e + 2) (max (stepMax a) (stepMax b))
+  | .loop e b => max (sE e + 2) (stepMax b)
+  -- Every other constructor is listed, not caught by `| c => _`: a match with overlapping patterns compiles through `propext`, and this
+  -- definition is axiom-free without it (the manifest gate caught it, PR #21).
+  | .skip => stepC .skip
+  | .set n e => stepC (.set n e)
+  | .load x e => stepC (.load x e)
+  | .store e v => stepC (.store e v)
+
+theorem stepC_le : ∀ (c : SCmd), stepC c ≤ stepMax c
+  | .seq _ _ => Nat.zero_le _
+  | .ite _ _ _ | .loop _ _ => Nat.le_max_left _ _
+  | .skip | .set _ _ | .load _ _ | .store _ _ => Nat.le_refl _
+
 def FS (L : Nat) : List TF → Prop
   | [] => True
-  | .cmd c _ :: k => sC c ≤ L ∧ FS L k
+  | .cmd c _ :: k => stepMax c ≤ L ∧ FS L k
   | .jmp _ _ :: k => FS L k
 
 def jc : List TF → Nat
@@ -129,9 +156,9 @@ def jc : List TF → Nat
   | .cmd _ _ :: k => jc k
   | .jmp _ _ :: k => 1 + jc k
 
-theorem push_fs {L : Nat} : ∀ (c : SCmd) (pc : Nat) (k : List TF), sC c ≤ L → FS L k → FS L (pushT c pc k)
+theorem push_fs {L : Nat} : ∀ (c : SCmd) (pc : Nat) (k : List TF), stepMax c ≤ L → FS L k → FS L (pushT c pc k)
   | .seq a b, pc, k, h, hk => by
-    simp only [sC] at h
+    simp only [stepMax] at h
     exact push_fs a _ _ (by omega) (push_fs b _ _ (by omega) hk)
   | .skip, _, _, h, hk | .set _ _, _, _, h, hk | .ite _ _ _, _, _, h, hk | .loop _ _, _, _, h, hk
   | .load _ _, _, _, h, hk | .store _ _, _, _, h, hk => ⟨h, hk⟩
@@ -140,17 +167,17 @@ theorem jc_push : ∀ (c : SCmd) (pc : Nat) (k : List TF), jc (pushT c pc k) = j
   | .seq a b, pc, k => by simp only [pushT, jc_push a, jc_push b]
   | .skip, _, _ | .set _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .store _ _, _, _ => rfl
 
-theorem next_fs {L : Nat} {c : SCmd} {pc : Nat} {k : List TF} (t : Slice.Slots.Slots) (hc : sC c ≤ L) (hk : FS L k) : FS L (nextK c pc k t) := by
+theorem next_fs {L : Nat} {c : SCmd} {pc : Nat} {k : List TF} (t : Slice.Slots.Slots) (hc : stepMax c ≤ L) (hk : FS L k) : FS L (nextK c pc k t) := by
   cases c with
   | ite e a b =>
-    simp only [sC] at hc
+    simp only [stepMax] at hc
     simp only [nextK]
     split
     · exact push_fs _ _ _ (by omega) hk
     · exact push_fs _ _ _ (by omega) hk
   | loop e b =>
     have hc0 := hc
-    simp only [sC] at hc
+    simp only [stepMax] at hc
     simp only [nextK]
     split
     · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
@@ -161,27 +188,27 @@ theorem mIdx_length (e : SExpr) (pc : Nat) : (mIdx e pc).length = sE e + 5 := by
   simp [mIdx, mE_length]
 
 theorem chunk_length {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots) (hs : ∀ a b, c ≠ .seq a b) :
-    0 < (chunkC c pc t).length ∧ (chunkC c pc t).length + jc (nextK c pc k t) ≤ sC c + jc k := by
+    0 < (chunkC c pc t).length ∧ (chunkC c pc t).length + jc (nextK c pc k t) ≤ stepC c + jc k := by
   cases c with
   | seq a b => exact absurd rfl (hs a b)
-  | skip => simp [chunkC, nextK, sC]
-  | set n e => simp [chunkC, nextK, sC, mE_length]
+  | skip => simp [chunkC, nextK, stepC]
+  | set n e => simp [chunkC, nextK, stepC, mE_length]
   | ite e a b =>
-    simp only [chunkC, nextK, sC, List.length_append, mE_length, List.length_cons, List.length_nil]
+    simp only [chunkC, nextK, stepC, List.length_append, mE_length, List.length_cons, List.length_nil]
     constructor
     · omega
     · split
       · rw [jc_push]; simp only [jc]; omega
       · rw [jc_push]; omega
   | loop e b =>
-    simp only [chunkC, nextK, sC, List.length_append, mE_length, List.length_cons, List.length_nil]
+    simp only [chunkC, nextK, stepC, List.length_append, mE_length, List.length_cons, List.length_nil]
     constructor
     · omega
     · split
       · rw [jc_push]; simp only [jc]; omega
       · omega
-  | load x e => simp [chunkC, nextK, sC, mIdx_length]
-  | store e v => simp [chunkC, nextK, sC, mIdx_length, mE_length]; omega
+  | load x e => simp [chunkC, nextK, stepC, mIdx_length]
+  | store e v => simp [chunkC, nextK, stepC, mIdx_length, mE_length]; omega
 
 /-! ## The end of a run -/
 
@@ -268,7 +295,7 @@ theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length
     obtain ⟨m', e', hf', hch', i'⟩ := chunk_exec (en := en) hC hf hch hinv
     have hlen := chunk_length (c := c) pc k t hns
     have hS' : FS L (nextK c pc k t) := next_fs t hs.1 hs.2
-    have hsc : sC c ≤ L := hs.1
+    have hsc : stepC c ≤ L := Nat.le_trans (stepC_le c) hs.1
     have hjc : jc (.cmd c pc :: k) = jc k := rfl
     rw [e' m]
     by_cases hm : m < (chunkC c pc t).length
@@ -535,6 +562,10 @@ def okP (p : SProg) : Bool :=
 def startPc : Nat := codeBase + 4
 def retPc (p : SProg) : Nat := startPc + 4 * sC p.body
 def codeLen (p : SProg) : Nat := (genP p).length
+/-- The per-step charge: the largest step any frame of the body can take (BOUND-01 step 5a; it was `codeLen`). -/
+def stepL (p : SProg) : Nat := stepMax p.body
+/-- The constant: the entry stub, the result's code and the exit. -/
+def tailC (p : SProg) : Nat := sE p.ret + 4
 def k0 (p : SProg) : List TF := pushT p.body startPc []
 def ks0 (p : SProg) : List SFrame := pushS p.body [] []
 
@@ -588,9 +619,7 @@ theorem k0_corr (p : SProg) : Corr (ks0 p) (k0 p) := Corr.push _ _ _ Corr.nil
 
 theorem ks0_noSeq (p : SProg) : Slots.NoSeqS (ks0 p) := Slots.pushS_noSeq _ _ _ (fun _ h => by simp at h)
 
-theorem k0_fs (p : SProg) : FS (codeLen p) (k0 p) := by
-  refine push_fs _ _ _ ?_ trivial
-  simp only [codeLen, genP_length]; omega
+theorem k0_fs (p : SProg) : FS (stepL p) (k0 p) := push_fs _ _ _ (Nat.le_refl _) trivial
 
 theorem k0_jc (p : SProg) : jc (k0 p) = 0 := by
   simp [k0, jc_push, jc]
@@ -607,7 +636,7 @@ theorem entry {p : SProg} (hl : Laid (code (genP p)) p) (d : Nat → Byte) (e : 
 /-- `behind`, from the first byte. -/
 theorem behind_top {p : SProg} (hok : okP p = true) (m : Nat) (d : Nat → Byte) (e : Env) :
     (Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).ev <+: (runS p.ret m (ks0 p) (wordAt d)).ev ∧
-    (Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).cost ≤ codeLen p * (runS p.ret m (ks0 p) (wordAt d)).cost + codeLen p ∧
+    (Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).cost ≤ stepL p * (runS p.ret m (ks0 p) (wordAt d)).cost + tailC p ∧
     ((Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).out ≠ .fuel →
       (Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).out = (runS p.ret m (ks0 p) (wordAt d)).out ∧
       (Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).ev = (runS p.ret m (ks0 p) (wordAt d)).ev) := by
@@ -616,11 +645,11 @@ theorem behind_top {p : SProg} (hok : okP p = true) (m : Nat) (d : Nat → Byte)
   | zero => exact ⟨List.nil_prefix, by show 0 ≤ _; omega, fun h => absurd rfl h⟩
   | succ a =>
     obtain ⟨m₁, e₁, c₁, i₁⟩ := entry (d := d) (e := e) hl
-    obtain ⟨h1, h2, h3⟩ := behind (en := e) hl.size hl.tail (codeLen p) a (k0 p) (ks0 p) (wordAt d) m₁ (k0_corr p) (k0_fs p) (k0_fok hl (okP_body hok)) c₁ i₁
+    obtain ⟨h1, h2, h3⟩ := behind (en := e) hl.size hl.tail (stepL p) a (k0 p) (ks0 p) (wordAt d) m₁ (k0_corr p) (k0_fs p) (k0_fok hl (okP_body hok)) c₁ i₁
     have hx := runS_ext p.ret a (a + 1) (ks0 p) (wordAt d) (by omega)
-    have hm := Nat.mul_le_mul_left (codeLen p) hx.2.2.2
+    have hm := Nat.mul_le_mul_left (stepL p) hx.2.2.2
     have hj := k0_jc p
-    have hL : codeLen p = 1 + sC p.body + sE p.ret + 3 := genP_length p
+    have hL : tailC p = sE p.ret + 4 := rfl
     have ht : (tailM p.ret (retPc p)).length = sE p.ret + 2 := by simp [tailM, mE_length]
     rw [e₁ a]
     refine ⟨List.IsPrefix.trans h1 hx.2.1, ?_, ?_⟩
@@ -665,10 +694,10 @@ theorem compiled_ignores_env {p : SProg} (hok : okP p = true) (f : Observer) (n 
 /-- `t.fuel m = m`. The first slice's constant could not hold a run that never ends. -/
 def xf (p : SProg) : Xform where
   lk l := l
-  cost c := codeLen p * c + codeLen p
+  cost c := stepL p * c + tailC p
   fuel m := m
   costMono a b h := by
-    have := Nat.mul_le_mul_left (codeLen p) h
+    have := Nat.mul_le_mul_left (stepL p) h
     omega
 
 def compR (p : SProg) : Except String (List Byte × Xform) :=

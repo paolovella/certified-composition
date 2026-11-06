@@ -19,3 +19,5 @@ import LCore.Slice2.OnMachine
 import LCore.Slice2.Image
 import LCore.Slice2.Teeth
 import LCore.Slice2.For
+import LCore.Slice2.Budget
+import LCore.Slice2.BoundBytes

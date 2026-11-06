@@ -7,7 +7,7 @@ deps: [VS-2]
 closes: ['VS-2: over loops only rel reaches the bytes, and Cert.bound cannot state a budget that depends on input']
 acceptance: Cert.boundR in the kernel with boundR_transfer, bound_iff_boundR, a refused witness that no program with unbounded cost has one, and boundR_late_vacuous recording why the budget is chosen before the fuel; a counted for loop in sliceLang whose checker gives a budget as a function of the inputs, and a capped form for e max N whose budget is a constant; one program with a for loop whose literal RV64 image carries rel and boundR by transfer alone; QEMU's instruction counts within the transformed budget on every input tried
 kill: if boundR's transfer needs a proof about a pass, or about a certificate, stop and report. If the checker's budget cannot be computed by kernel evaluation at the sizes VS-2 used, stop and report
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -46,6 +46,10 @@ lemma per pass, about `enc` alone and not about a certificate.
    `enc` injective for both passes.
 5. **QEMU.** The instruction count on every input tried is at most the transformed budget, and the comparison can fail: a budget one too small is
    seen to be exceeded.
+5a. **A tighter transformer** (the user's decision of 2026-11-06, "add option a", after a side agent raised the looseness). `rvPass` charges each
+   source step its own largest frame, not the whole program: the program-wide `L` in `xf` becomes the largest `sC` of any frame command, plus the
+   jump each step may push. `behind` already takes that size as a parameter, so only `xf`, `k0_fs` and the constant change. The transfers stay as
+   they are. Measured before and after, on `countUp` and `capped`.
 6. **The account,** including how tight the budget is.
 
 ## Log
@@ -93,4 +97,51 @@ lemma per pass, about `enc` alone and not about a certificate.
   - **The key theorem.** The cost at every fuel is at most `pot`, by induction on fuel, case by case on the head frame. The loop case uses monotonicity.
   - **The budget.** `R i k := k = pot (frames of the body) (the initial store)`. It is a function of the input, and `boundR` follows for the source. For `forMax` it does not depend on the input, so `bound` follows too, through `bound_iff_boundR`.
   - **Refused, to the budget, with witnesses:** a while loop that is not counted; a counter assigned from a variable something assigns; a loop nested in a body; and a counter assigned in a body.
+- 2026-11-06, **step 3 done: the checker's budget is a certificate on the source** (`l-core/LCore/Slice2/Budget.lean`).
+  - **`slice_boundR`:** a program `counted` accepts has `Cert.boundR` on `sliceLang`, with the budget `budget p i`, a function of the input. **`run_pot`:** at every fuel, a run costs at most the potential. The proof is by induction on fuel, with one lemma per kind of head frame. `pot_agree`: the potential reads only the counters and the inputs. `pot_mono`: on the frames after a loop, a smaller counter costs no more.
+  - **Tight on these programs.** `countUp`'s budget is `4n + 2`: 14 for 3 and 42 for 10, and the runs cost exactly that. `capped`'s budget is 23 for every input (`capped_budget_const`, proved for all inputs, not evaluated), and the run costs 23 at the cap and 19 when the body never runs. **`capped_bound`:** a constant budget, plain `Cert.bound`, through `bound_iff_boundR`.
+  - **Refused by the budget rule:** `spin`, whose guard is a literal; a counter reset in its body; a counter set from a variable the program assigns; a loop nested in a body; and a counter that is an input.
+  - **Two slips while proving.** A `sorry` placeholder went into `pot_mono` and was taken out before the first check. It marked a real gap: an expression that reads only inputs is unchanged by a write to a counter, which `eval_upd_out` now proves. The first budget witnesses had guessed numbers, and `decide` refused them. They now use the computed values.
+  - **Mutants: 42 of 42 killed** (receipt `bound01-step3-mutants`), 6 new. Four are killed by a witness or the main proof: a loop round charged one less, a counter's setting not followed, a decrement by two counted as one, and a wrong budget. Two are killed by a proof that no longer fits the changed definition: a loop body that need not be plain, and a counter that may be an input. The property they protect then cannot be proved, so they count.
+  - **Next, step 4:** the budget through both passes to a literal image, with `boundR_transfer`, and `enc` injective for each pass.
+  - CI green (receipt `bound01-step3-ci`). Steps 1 and 2 are on `master`, through PR #20 (`ec1cf21`), merged on the user's word with the gate's `ring0` check failing by design.
+- 2026-11-06, **step 4's plan, before code** (the milestone a review of the repo named: `boundR` over loops reaching the bytes, which closes VS-2's recorded gap).
+  - **`countUp`, to its literal image.** `rel`, by `slice_carries`. `boundR`, by `(pipeline sec0).boundR_transfer` applied to `slice_boundR`. Then a reader's form, on the bytes alone: for every admissible input and environment, and every fuel, the machine runs at most `L * (4n + 2) + L` instructions, where `n` is the input word read back from the bytes (`wordAt`) and `L` is the code's length. That needs `budget countUp i = 4 * (i 1) + 2` for every `i`, proved and not evaluated, and `wordAt_enc`, which is also why `slotPass`'s `enc` is injective.
+  - **`capped`, to its literal image:** a constant budget on the bytes, plain `Cert.bound`, by `bound_transfer` applied to `capped_bound`.
+  - **Not vacuous:** a concrete machine run within the budget, and how close.
+- 2026-11-06, **step 4 done: a budget over loops on literal RV64 bytes, by transfer alone** (`l-core/LCore/Slice2/BoundBytes.lean`). This closes VS-2's recorded gap that over loops only `rel` reached the bytes.
+  - **`countUp_bytes_budget`.** For every admissible input and environment, at every fuel, the 104-byte image runs at most `26 * (4n + 2) + 26` instructions, where `n` is the public input word as the bytes hold it (`wordAt`). It is derived from `countUp_boundR_bytes`, which is `boundR_transfer` through VS-2's pipeline, with `budget_countUp` (the source budget is `4n + 2` for every input, proved) and `wordAt_enc`. `countUp_rel_bytes` too.
+  - **`capped_bound_bytes`:** plain `Cert.bound`, 672 instructions, for every input however large.
+  - **Sound and loose, stated in the module.** The machine runs 66 at `n = 3` and 199 at `n = 10`, against 390 and 1118. `capped` runs 83 at the cap, against 672. The source budget is exact. The looseness is `rvPass`'s transformer, `L * c + L`, which charges every source step the whole code's length. Tightening it is a change to `rvPass`'s `Xform`, not to the kernel, and is not done here.
+  - **Mutants: 46 of 46 killed** (receipt `bound01-step4-mutants`), 4 new on the bytes' budgets.
+  - **Next, step 5:** QEMU, where the instruction count on every input tried is at most the budget, and a budget one too small is seen to fail.
+- 2026-11-06, **step 5a added, on the user's word:** a tighter `rvPass` cost transformer, after step 5 and before the account.
+- 2026-11-06, **step 5 done: the budgets on the bytes, under QEMU** (`l-core/test/bound_diff.py`, receipt `bound01-step5-diff`).
+  - **Model:** 110 runs of `countUp` and `capped`, every PC, address, result and cost equal to the model's.
+  - **Budget:** every run within its proved budget. `capped` runs at most 83 of 672 at inputs up to `2^64 - 1`. `countUp` uses at most 18% of its budget.
+  - **Secret:** 88 comparisons. The secret word changes neither trace nor cost, so the budget is a function of the public word, as the theorem says.
+  - **Vacuity.** The machine's exact cost is `19n + 9` for `countUp` and `51 + 8 min(n, 4)` for `capped`. A budget one below it is exceeded on every `countUp` input and on 7 `capped` inputs, so the check can fail. A budget "one below the proved one" would not have been exceeded, which is why the check uses the exact cost.
+  - `image2_diff.py` and `refused2_diff.py` still pass, after their shared prediction file learned the two new images (receipt `bound01-step5-regress`). Not in CI, like the other QEMU tests.
+- 2026-11-06, **step 5a done: a tighter `rvPass` cost transformer** (`l-core/LCore/Slice2/Pass.lean`). No kernel change, and every transfer is unchanged.
+  - **The change.** `xf`'s cost was `codeLen * c + codeLen`, which charged every source step the whole program. It is now `stepL * c + tailC`.
+    - `stepL` is the largest `stepC` over every frame the body can push.
+    - `stepC` is one step's own chunk, plus the jump it may push. For a loop or an `ite` that is the guard and a branch, not the body.
+    - `tailC` is the entry stub, the result's code and the exit.
+  - **How it was proved.** `chunk_length` now bounds a step by `stepC`, and `FS` bounds `stepMax`, so `behind` and its proof went through unchanged. The option-A estimate in the plan was wrong: the largest frame's size would have gained almost nothing, since a loop's frame is the whole loop. The gain comes from bounding a step by its own chunk.
+  - **Measured, against QEMU** (receipt `bound01-step5a-diff`):
 
+    | Program | Budget before | Budget after | What the machine runs |
+    |---|---|---|---|
+    | `countUp` | `104n + 78` | `32n + 21` | `19n + 9` |
+    | `capped` | 672 | 97 | at most 83 |
+
+    `countUp` now uses up to 59% of its budget, against 18% before.
+  - **Mutants: 48 of 48 killed** (receipt `bound01-step5a-mutants`), 2 new. Both, a loop step charged one less and a `stepMax` that forgets a loop's body, are killed where `stepC_le`'s proof stops fitting the definition, which comes before the chunk bound in the file. The property they protect then cannot be proved, so they count.
+  - **Docs:** `README.md`'s status line for BOUND-01 updated. `BoundBytes.lean` and `bound_diff.py` keep the old budgets struck through, with the reason.
+- 2026-11-06, **step 6 done: the account** ([`BOUND-01-ACCOUNT`](../research/2026-11/BOUND-01-ACCOUNT.md)). A budget over loops reaches literal bytes by transfer alone. The kernel needed one additive shape, and no existing hash moved.
+  - **The acceptance, item by item:**
+    - `Cert.boundR` with its transfer, `bound_iff_boundR`, a refused witness (`toySpin_no_boundR`, `boundR_unbounded`) and `boundR_late_vacuous`.
+    - Counted loops whose checker gives a budget as a function of the inputs (`slice_boundR`), and a capped form with a constant one (`capped_bound`).
+    - A for-loop program whose literal image carries `rel` and `boundR` by transfer alone (`countUp_rel_bytes`, `countUp_boundR_bytes`).
+    - QEMU's counts within the budget on every input tried (step 5).
+  - **Not met as planned, and said in the account:** "`enc` injective for both passes" was not proved as a general lemma. The public-only reading holds for `countUp` concretely, through `wordAt_enc`.
