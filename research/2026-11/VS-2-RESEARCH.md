@@ -31,9 +31,13 @@ half of constant-time. What is missing is a **number**: an upper bound that a re
 
 **What this suggests, as a design to decide, not to build yet.**
 - **A sixth shape whose budget may depend on the input, stated as a relation so that no inverse of `enc` is needed:**
-  `boundR L R p := ∀ n i, L.Adm i → ∃ k, R i k ∧ (L.run n p i).cost ≤ k`. Its transfer would take `R` to
+  ~~`boundR L R p := ∀ n i, L.Adm i → ∃ k, R i k ∧ (L.run n p i).cost ≤ k`~~. *Correction of record, the same day, found by checking it before
+  planning:* with the budget chosen after the fuel, `k` can be the cost itself, so with a loose `R` every program has a budget, `spin` included
+  (`boundR_late_vacuous` in [`BoundRSketch.lean`](BoundRSketch.lean)). The budget is chosen once per input, before the fuel:
+  `boundR L R p := ∀ i, L.Adm i → ∃ k, R i k ∧ ∀ n, (L.run n p i).cost ≤ k`. Its transfer, its agreement with `bound` on a constant budget, and
+  its refusal of any program whose cost grows without limit are proved in that file, against the real kernel. Its transfer would take `R` to
   `R' u k := ∃ i k', enc i = u ∧ R i k' ∧ k = t.cost k'`, from `cover` and `cost_sim`, as `bound_transfer` does now. A budget that may depend only on the public
-  part is `R` respecting `lowIn`. That costs one more condition and no new idea. *This is a sketch: it has not been checked in Lean.*
+  part is `R` respecting `lowIn`. ~~That costs one more condition and no new idea.~~ *Corrected with the rest:* it does not lift through a pass in general, because a target input may be the encoding of several source inputs, and `liftR` keeps each one's budget. It does when `enc` is injective, which needs its own check.
 - **Who supplies `R`.** CerCo and the PLDI 2014 work put bounds in the source and let the compiler carry them. C4B and RAML infer them. For L, the
   checker would infer them, as `costOf` does now. That needs loops it can bound. **`EXPR-02` already did this in `conf-typing`:** nested counted loops,
   checked by `bcheck`, fuel-indexed so that `decide` still reduces. The cheapest route is a counted loop, `for e body`, with `e` evaluated once and public,
