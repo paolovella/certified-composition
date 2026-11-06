@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """BOUND-01 step 5: the budgets on the bytes, under QEMU.
 
-`countUp_bytes_budget` says the 104-byte image of `countUp` runs at most `26 * (4n + 2) + 26` instructions, with `n` the public word, and
-`capped_bound_bytes` says the image of `capped` runs at most 672, on every input. Here QEMU runs both on many inputs, including ones far past the
+`countUp_bytes_budget` says the 104-byte image of `countUp` runs at most `8 * (4n + 2) + 5` instructions, with `n` the public word, and
+`capped_bound_bytes` says the image of `capped` runs at most 97, on every input (BOUND-01 step 5a; before it, ~~`26 * (4n + 2) + 26`~~
+and ~~672~~). Here QEMU runs both on many inputs, including ones far past the
 cap, and each run's instruction count, PCs, addresses and result are compared with the model and then with the budget.
 
   model     every run equals the model's prediction: PCs, addresses, result, cost, outcome
@@ -11,7 +12,7 @@ cap, and each run's instruction count, PCs, addresses and result are compared wi
   vacuity   the comparison can fail: the machine's exact cost, 19n + 9 for countUp and 83 past the cap for capped, is measured, and a
             budget one below it is seen to be exceeded
 
-The budgets are loose (about 5 to 8 times), and this measures how loose. It says nothing about QEMU's fidelity to hardware, or about time.
+This measures how close the budgets are to what the machine runs. It says nothing about QEMU's fidelity to hardware, or about time.
 
 Usage, from l-core/: python3 test/bound_diff.py <scratch directory>
 """
@@ -29,7 +30,7 @@ FUEL = 20000
 
 
 def count_budget(n):
-    return 26 * (4 * n + 2) + 26
+    return 8 * (4 * n + 2) + 5
 
 
 def main():
@@ -54,7 +55,7 @@ def main():
     if not bad:
         print(f"ok   model: {len(cases)} runs, every PC, address, result and cost equal the model's")
 
-    over = [(i, s, n) for (i, s, n), o in obs.items() if o["cost"] > (count_budget(n) if i == "countUp" else 672)]
+    over = [(i, s, n) for (i, s, n), o in obs.items() if o["cost"] > (count_budget(n) if i == "countUp" else 97)]
     if over:
         print(f"FAIL budget: exceeded on {over[:3]}")
         bad += 1
@@ -62,7 +63,7 @@ def main():
         worst = max(o["cost"] / count_budget(n) for (i, s, n), o in obs.items() if i == "countUp")
         cap_max = max(o["cost"] for (i, s, n), o in obs.items() if i == "capped")
         print(f"ok   budget: every run within it. countUp uses at most {worst:.0%} of its budget; capped runs at most {cap_max} "
-              f"of 672, at inputs up to 2^64 - 1")
+              f"of 97, at inputs up to 2^64 - 1")
 
     leaks = sum(1 for (i, s, n), o in obs.items() if (o["trace"], o["cost"]) != (obs[(i, SECRETS[0], n)]["trace"], obs[(i, SECRETS[0], n)]["cost"]))
     if leaks:

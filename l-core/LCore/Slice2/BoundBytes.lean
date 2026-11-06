@@ -3,11 +3,12 @@
 
   VS-2's account recorded that over loops only `rel` reached the bytes. Here `countUp`, a loop counted by its public input, carries `rel` and a
   budget to its literal image: on every admissible input and in every environment, at every fuel, the machine runs at most
-  `26 * (4n + 2) + 26` instructions, where `n` is the public word read back from the bytes. `capped` carries a constant budget, plain `bound`.
+  `8 * (4n + 2) + 5` instructions, where `n` is the public word read back from the bytes. `capped` carries a constant budget, plain `bound`.
 
-  **The budget is sound and loose.** The source budget `4n + 2` is exact (`countUp_budget`), but `rvPass` charges every source step the whole
-  code's length (`xf`: `L * c + L`), so on the bytes it is about five times what the machine runs: 390 against 66 at `n = 3`. A tighter
-  transformer is a change to `rvPass`'s `Xform`, not to the kernel.
+  **How tight.** The source budget `4n + 2` is exact (`countUp_budget`). `rvPass` charges each source step the largest step any frame can take
+  (`xf`: `stepL * c + tailC`, BOUND-01 step 5a), so on the bytes `countUp` is bounded by `32n + 21` and runs `19n + 9`, and `capped` by 97 and runs
+  at most 83. *Before step 5a* the transformer charged every step the whole code's length, and the budgets were ~~`26 * (4n + 2) + 26`~~ and
+  ~~672~~: sound, and five to eight times loose.
 -/
 import LCore.Slice2.Budget
 
@@ -41,11 +42,12 @@ theorem countUp_pipeline :
   rw [← countUp_is_literal]
   exact pipeline_comp sec0 (by decide) (by decide)
 
-/-- The transformer's cost on this program: the code is 26 instructions. -/
-theorem countUp_cost (c : Nat) : (Xform.id.then (xf (compile countUp))).cost c = 26 * c + 26 := by
-  show Lower.codeLen (compile countUp) * c + Lower.codeLen (compile countUp) = _
-  have : Lower.codeLen (compile countUp) = 26 := by decide
-  rw [this]
+/-- The transformer's cost on this program: each step costs at most 8 instructions, and the entry, result and exit 5. -/
+theorem countUp_cost (c : Nat) : (Xform.id.then (xf (compile countUp))).cost c = 8 * c + 5 := by
+  show Lower.stepL (compile countUp) * c + Lower.tailC (compile countUp) = _
+  have h1 : Lower.stepL (compile countUp) = 8 := by decide
+  have h2 : Lower.tailC (compile countUp) = 5 := by decide
+  rw [h1, h2]
 
 /-- **The source budget, for every input**, proved and not evaluated: `4n + 2`, with `n` the second input word. -/
 theorem budget_countUp (i : Nat → W64) : budget countUp i = 4 * (i 1).val + 2 := by
@@ -61,19 +63,19 @@ theorem countUp_boundR_bytes : Cert.boundR (rvLang sec0) ((pipeline sec0).liftR 
   (pipeline sec0).boundR_transfer countUp_pipeline (slice_boundR Env sec0 countUp_counted)
 
 /-- **The budget, read off the bytes.** On every admissible input and in every environment, at every fuel, the machine runs at most
-    `26 * (4n + 2) + 26` instructions, where `n` is the public input word as the bytes hold it. -/
+    `8 * (4n + 2) + 5` instructions, where `n` is the public input word as the bytes hold it. -/
 theorem countUp_bytes_budget (u : (rvLang sec0).In) (hu : (rvLang sec0).Adm u) (m : Nat) :
-    ((rvLang sec0).run m countUpImage u).cost ≤ 26 * (4 * (wordAt u.1 1).val + 2) + 26 := by
+    ((rvLang sec0).run m countUpImage u).cost ≤ 8 * (4 * (wordAt u.1 1).val + 2) + 5 := by
   obtain ⟨k, ⟨i, k', _, henc, hR, hk⟩, hc⟩ := countUp_boundR_bytes u hu
   have hu1 : u.1 = encBytes i.1 := by rw [← henc]; rfl
   rw [hu1, wordAt_enc, ← budget_countUp, ← hR, ← countUp_cost, ← hk]
   exact hc m
 
-/-- **Not vacuous, and how loose**: the machine runs 66 instructions at `n = 3` and 199 at `n = 10`, against budgets of 390 and 1118. -/
+/-- **Not vacuous, and how tight**: the machine runs 66 instructions at `n = 3` and 199 at `n = 10`, against budgets of 117 and 341. -/
 theorem countUp_runs_within :
     (Image.go countUpImage env0 2000 5 3).cost = 66 ∧ (Image.go countUpImage env0 2000 5 10).cost = 199 ∧
     (Image.go countUpImage env0 2000 5 3).out = .done ∧
-    26 * (4 * 3 + 2) + 26 = 390 ∧ 26 * (4 * 10 + 2) + 26 = 1118 := by
+    8 * (4 * 3 + 2) + 5 = 117 ∧ 8 * (4 * 10 + 2) + 5 = 341 := by
   decide +kernel
 
 /-! ## `capped`: a constant budget on the bytes -/
@@ -95,16 +97,17 @@ theorem capped_pipeline :
 
 theorem capped_rel_bytes : Cert.rel (rvLang sec0) cappedImage := slice_carries capped_checks capped_pipeline
 
-/-- **A constant budget on the bytes**, plain `bound`, for every input however large: 672 instructions. -/
-theorem capped_bound_bytes : Cert.bound (rvLang sec0) 672 cappedImage := by
+/-- **A constant budget on the bytes**, plain `bound`, for every input however large: 97 instructions. -/
+theorem capped_bound_bytes : Cert.bound (rvLang sec0) 97 cappedImage := by
   have h := (pipeline sec0).bound_transfer capped_pipeline (capped_bound Env sec0)
-  have : (Xform.id.then (xf (compile capped))).cost 23 = 672 := by
-    show Lower.codeLen (compile capped) * 23 + Lower.codeLen (compile capped) = 672
-    have : Lower.codeLen (compile capped) = 28 := by decide
-    rw [this]
+  have : (Xform.id.then (xf (compile capped))).cost 23 = 97 := by
+    show Lower.stepL (compile capped) * 23 + Lower.tailC (compile capped) = 97
+    have h1 : Lower.stepL (compile capped) = 4 := by decide
+    have h2 : Lower.tailC (compile capped) = 5 := by decide
+    rw [h1, h2]
   rwa [this] at h
 
-/-- The machine runs 83 instructions at the cap and 51 with nothing to do, against the budget of 672. -/
+/-- The machine runs 83 instructions at the cap and 51 with nothing to do, against the budget of 97. -/
 theorem capped_runs_within :
     (Image.go cappedImage env0 2000 5 10).cost = 83 ∧ (Image.go cappedImage env0 2000 5 0).cost = 51 := by
   decide +kernel

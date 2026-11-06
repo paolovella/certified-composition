@@ -4515,7 +4515,7 @@ LCore.Slice2.Lower.Corr.next	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Corr.push	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Corr.recOn	LCore.Slice2.Pass	
 LCore.Slice2.Lower.FOk	LCore.Slice2.Chunk	propext
-LCore.Slice2.Lower.FS	LCore.Slice2.Pass	
+LCore.Slice2.Lower.FS	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Laid.body	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Laid.casesOn	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Laid.lui	LCore.Slice2.Pass	propext
@@ -4626,12 +4626,17 @@ LCore.Slice2.Lower.src_done	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.src_nil	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.src_step	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.startPc	LCore.Slice2.Pass	
+LCore.Slice2.Lower.stepC	LCore.Slice2.Pass	
+LCore.Slice2.Lower.stepC_le	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.stepL	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.stepMax	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.step_add	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_addi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_andi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_beq	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_ld	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_sd	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.tailC	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tailM	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tail_exec	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.tick_view	LCore.Slice2.Pass	propext

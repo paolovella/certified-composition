@@ -122,4 +122,20 @@ lemma per pass, about `enc` alone and not about a certificate.
   - **Secret:** 88 comparisons. The secret word changes neither trace nor cost, so the budget is a function of the public word, as the theorem says.
   - **Vacuity.** The machine's exact cost is `19n + 9` for `countUp` and `51 + 8 min(n, 4)` for `capped`. A budget one below it is exceeded on every `countUp` input and on 7 `capped` inputs, so the check can fail. A budget "one below the proved one" would not have been exceeded, which is why the check uses the exact cost.
   - `image2_diff.py` and `refused2_diff.py` still pass, after their shared prediction file learned the two new images (receipt `bound01-step5-regress`). Not in CI, like the other QEMU tests.
+- 2026-11-06, **step 5a done: a tighter `rvPass` cost transformer** (`l-core/LCore/Slice2/Pass.lean`). No kernel change, and every transfer is unchanged.
+  - **The change.** `xf`'s cost was `codeLen * c + codeLen`, which charged every source step the whole program. It is now `stepL * c + tailC`.
+    - `stepL` is the largest `stepC` over every frame the body can push.
+    - `stepC` is one step's own chunk, plus the jump it may push. For a loop or an `ite` that is the guard and a branch, not the body.
+    - `tailC` is the entry stub, the result's code and the exit.
+  - **How it was proved.** `chunk_length` now bounds a step by `stepC`, and `FS` bounds `stepMax`, so `behind` and its proof went through unchanged. The option-A estimate in the plan was wrong: the largest frame's size would have gained almost nothing, since a loop's frame is the whole loop. The gain comes from bounding a step by its own chunk.
+  - **Measured, against QEMU** (receipt `bound01-step5a-diff`):
+
+    | Program | Budget before | Budget after | What the machine runs |
+    |---|---|---|---|
+    | `countUp` | `104n + 78` | `32n + 21` | `19n + 9` |
+    | `capped` | 672 | 97 | at most 83 |
+
+    `countUp` now uses up to 59% of its budget, against 18% before.
+  - **Mutants: 48 of 48 killed** (receipt `bound01-step5a-mutants`), 2 new. Both, a loop step charged one less and a `stepMax` that forgets a loop's body, are killed where `stepC_le`'s proof stops fitting the definition, which comes before the chunk bound in the file. The property they protect then cannot be proved, so they count.
+  - **Docs:** `README.md`'s status line for BOUND-01 updated. `BoundBytes.lean` and `bound_diff.py` keep the old budgets struck through, with the reason.
 
