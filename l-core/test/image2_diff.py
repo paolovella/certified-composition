@@ -37,8 +37,8 @@ ENVS = [
 ]
 
 
-def literal(name):
-    src = open("LCore/Slice2/Image.lean").read()
+def literal(name, path="LCore/Slice2/Image.lean"):
+    src = open(path).read()
     m = re.search(r"def " + name + r" : List Nat :=\s*\[([^\]]*)\]", src)
     return bytes(int(t) for t in m.group(1).replace("\n", " ").split(",")) if m else None
 
@@ -284,4 +284,5 @@ def main():
     return 1 if bad else 0
 
 
-sys.exit(main())
+if __name__ == "__main__":
+    sys.exit(main())

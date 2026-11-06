@@ -4364,6 +4364,8 @@ LCore.Slice2.FT.casesOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.recOn	LCore.Slice2.Source	propext
 LCore.Slice2.Frame	LCore.Slice2.Source	
 LCore.Slice2.Image.go	LCore.Slice2.Image	propext
+LCore.Slice2.Image.mCode	LCore.Slice2.Image	propext
+LCore.Slice2.Image.mCode_pc_addr	LCore.Slice2.Image	propext
 LCore.Slice2.Image.pcOnly	LCore.Slice2.Image	propext
 LCore.Slice2.Image.scanImage	LCore.Slice2.Image	
 LCore.Slice2.Image.scanInsns	LCore.Slice2.Image	
@@ -4636,6 +4638,51 @@ LCore.Slice2.Slots.spin_comp	LCore.Slice2.Slots	propext
 LCore.Slice2.St	LCore.Slice2.Source	
 LCore.Slice2.Sub	LCore.Slice2.Source	
 LCore.Slice2.Sub.refl	LCore.Slice2.Source	
+LCore.Slice2.Teeth.arrayInLoopImage	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.arrayInLoopNats	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.arrayInLoop_compiled_leaks	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.arrayInLoop_literal	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.compiled	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.evCode	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.evCode_ret	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.leak_by_cost	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.leak_by_ev	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.leak_by_lk	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.leak_by_out	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.pcOnly	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.refused_programs_compile	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.scan_same_at_the_same_points	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secondIterImage	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secondIterNats	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secondIter_compiled_leaks	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.secondIter_first_iteration_same	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secondIter_literal	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretLoadImage	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secretLoadNats	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secretLoad_compiled_leaks	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.secretLoad_literal	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretLoopImage	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secretLoopNats	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secretLoop_compiled_leaks_when	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.secretLoop_compiled_leaks_whether	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.secretLoop_literal	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretLoop_when	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretLoop_when_1	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretLoop_when_2	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretLoop_whether	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretStoreImage	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secretStoreNats	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.secretStore_compiled_leaks	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.secretStore_literal	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretStore_only_the_address	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretStore_same_cost	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretStore_same_pcs	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.secretStore_same_result	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.throughArrayImage	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.throughArrayNats	LCore.Slice2.Teeth	
+LCore.Slice2.Teeth.throughArray_compiled_leaks	LCore.Slice2.Teeth	Classical.choice,Quot.sound,propext
+LCore.Slice2.Teeth.throughArray_literal	LCore.Slice2.Teeth	propext
+LCore.Slice2.Teeth.throughArray_only_the_result	LCore.Slice2.Teeth	propext
 LCore.Slice2.addrLk	LCore.Slice2.Source	
 LCore.Slice2.arrayInLoop	LCore.Slice2.Source	
 LCore.Slice2.arrayInLoop_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext

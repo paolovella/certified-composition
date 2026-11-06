@@ -19,12 +19,21 @@ open Slice.Rv
 open Slice.Slots (encBytes)
 open Slice.Lower (fetchI envBusy)
 open Slice.Image (low_inp adm_inp)
-open Slice.Teeth (lkCode)
 open Slots (compile)
 open Lower (genP pipeline xf)
 open OnMachine
 
 set_option maxRecDepth 100000
+
+/-- **Machine leakage as plain numbers**, one to one on the forms the machine emits: a PC `p` is `2p`, an address `a` is `2a + 1`.
+    Named apart on purpose. Inside `LCore.Slice2`, a bare `mCode` is the source's (`Slice2/Source.lean`), which sends every PC to 0, and it
+    wins over an `open`: this file's first version compared addresses only while saying "trace" (VS-2 log, correction of record). -/
+def mCode : Lk → Nat
+  | .step [p] => 2 * p
+  | .addr (.ofNat a) => 2 * a + 1
+  | _ => 0
+
+theorem mCode_pc_addr : mCode (.step [65712]) = 131424 ∧ mCode (.addr (Int.ofNat 131072)) = 262145 := by decide
 
 /-! ## `scan` -/
 
@@ -101,12 +110,12 @@ theorem scan_runs :
 
 /-- **The public input really does move the addresses**, so the `rel` above is not about a program whose trace is constant. -/
 theorem scan_public_moves_addresses :
-    (go scanImage env0 200 5 3).lk.map lkCode ≠ (go scanImage env0 200 5 2).lk.map lkCode := by
+    (go scanImage env0 200 5 3).lk.map mCode ≠ (go scanImage env0 200 5 2).lk.map mCode := by
   decide +kernel
 
 /-- **The secret does not**, concretely, in a different environment too. The general statement is `scan_carries`. -/
 theorem scan_secret_does_not :
-    (go scanImage env0 200 5 3).lk.map lkCode = (go scanImage envBusy 200 6 3).lk.map lkCode := by
+    (go scanImage env0 200 5 3).lk.map mCode = (go scanImage envBusy 200 6 3).lk.map mCode := by
   decide +kernel
 
 /-! ## The theorem depends on these bytes -/
@@ -117,8 +126,8 @@ def tamperedIndex : List Byte := (scanNats.take 23 ++ [0] ++ scanNats.drop 24).m
 theorem tamperedIndex_differs : tamperedIndex ≠ scanImage := by decide
 
 theorem tamperedIndex_addresses_differ :
-    ((rvLang sec0).run 14 tamperedIndex (encBytes (inp 1 1), env0)).lk.map lkCode ≠
-      ((rvLang sec0).run 14 tamperedIndex (encBytes (inp 2 1), env0)).lk.map lkCode := by
+    ((rvLang sec0).run 14 tamperedIndex (encBytes (inp 1 1), env0)).lk.map mCode ≠
+      ((rvLang sec0).run 14 tamperedIndex (encBytes (inp 2 1), env0)).lk.map mCode := by
   decide +kernel
 
 /-- Program counters alone, which do not see this one. -/
@@ -134,7 +143,7 @@ theorem tamperedIndex_same_pcs :
 /-- **So the certificate is about these bytes, and sees addresses**: with that byte changed, `rel` is false, through an address alone. -/
 theorem tamperedIndex_leaks : ¬ Cert.rel (rvLang sec0) tamperedIndex :=
   fun h => tamperedIndex_addresses_differ
-    (congrArg (fun b : Beh => b.lk.map lkCode) (h 14 _ _ (adm_inp 1 1) (adm_inp 2 1) (low_inp 1 2 1)))
+    (congrArg (fun b : Beh => b.lk.map mCode) (h 14 _ _ (adm_inp 1 1) (adm_inp 2 1) (low_inp 1 2 1)))
 
 /-- **One byte changed**: the loop's counter starts from the secret word, not the public one. -/
 def tamperedGuard : List Byte := (scanNats.take 6 ++ [3] ++ scanNats.drop 7).map byteOf

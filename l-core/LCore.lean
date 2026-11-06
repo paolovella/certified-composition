@@ -17,3 +17,4 @@ import LCore.Slice2.Chunk
 import LCore.Slice2.Pass
 import LCore.Slice2.OnMachine
 import LCore.Slice2.Image
+import LCore.Slice2.Teeth
