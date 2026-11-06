@@ -161,6 +161,42 @@ the one claim it could not independently verify. Restored to sixteen.)*
 | 13 | termination / progress leaks (CWE-385-adjacent) | 2-safety over a fuel-indexed semantics with loops | 1 | IN-WITH-MODEL (generated) | [proved] |
 | 14 | path traversal (CWE-22) | untrusted structure in a filesystem-path sink | 1* | IN (real; safe-by-construction) | [proved] |
 
+### 3.0 Which verdicts hold on L (F5, 2026-11-02)
+
+*Correction of record.* From 2026-07-18 to 2026-11-02 this map's verdicts were read as claims
+about the framework, and since 2026-10-23 about L. Every verdict is proved over a semantic model,
+and until F2 none of those models was an L language: they were toy semantics (`Cmd`, `WCmd`,
+`UCmd` on `uexec`, and per-row machines). A verdict ~~IN~~ meant "IN for that toy model". The table
+below says which rows now hold on an L language, and by which theorem; a row not listed with an L
+theorem is still a claim about its toy model only. Item F5 moves the rest, or records why a row
+does not fit L's certificate shapes (six since 2026-11-02; this said ~~four~~ when written).
+
+*Correction of record.* From 2026-11-02 until this note, the third column's heading said its theorems
+were on ~~`ucmdLangS`, with row 3 on `ucmdLangI`~~. By then rows 14, 7, 9 and 6 used other languages, so
+the table read as one finished language. It is not. These rows hold on four separate languages, and
+nothing combines them: no theorem says one program has all these properties at once, and a compiler
+pass carries only what is on `ucmdLangS`. Item L-UNIFY holds that work. A "yes" below means "yes on the
+language named in its row".
+
+**No row reaches machine code.** `splitPass` rewrites `UCmd` into `UCmd`, so "yes" in its column means a source-to-source pass, not
+a compiled program. The one path to bytes is `research/2026-11/VS-1-ACCOUNT.md`'s, for a separate small language with no theorem linking
+it to `UCmd`. Item L-BYTES holds that gap.
+
+| # | on L | language | through `splitPass` | L theorem |
+|---|---|---|---|---|
+| 1 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` |
+| 2 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` (cost is in the observation) |
+| 13 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_relS` (the outcome at every fuel is in it) |
+| 10 | yes | `ucmdLangS` | yes | `ConfTyping.bcheck_boundS` |
+| 7 | yes, with limits | `ucmdLangS`; isolation on `ucmdLangI` | mediation yes; isolation no | Mediation: `ConfTyping.bcheck_mediatedS`. Isolation: `ConfTyping.Tenant.tenantCheck_relView`, a `Cert.relView` on `ucmdLangI`. Attacker: tenant B, who reads its own channels and measures all leakage, cost and outcome. So A's code must be constant-time in A's integers (`bcheck`), and loops are bounded. Not yet carried through a pass on `ucmdLangI`. The other isolation claims in this map (§3.7) are on toy `Cmd` |
+| 6 | yes, leaks on finished runs | `ucmdLangS`; leaks on `ucmdLangH` | memory safety yes; leaks no | `ConfTyping.bcheck_memsafeS`: use-after-free, double free, wild dereference. `ConfTyping.Leak.leakSafe_traceH`, a `Cert.trace` on `ucmdLangH`, which is `ucmdLangS` plus an exit report: a run that finishes has freed everything it allocated, loops need not be bounded. A run that aborts is not covered (`ConfTyping.Leak.allocThenCheck_abort_unreported`). Not carried through a pass |
+| 12 | yes, in sequence | passes: any; components: `ucmdLangS` | yes | Passes: `LCore.PassCert.seq`. Components: `ConfTyping.Seam.bcheck_seam`, with `bcheck`'s threaded rights and pointers as the interface, so `ConfTyping.Seam.seam_certified` gives the composite all four guarantees at a computed budget and `ConfTyping.Seam.seam_carried` carries them through `splitPass`. `Cert.rel` alone does not compose (`ConfTyping.Seam.bare_rel_breaks`). `Bridge.comp`'s reception and the trusted-base ledger stay on toy `Cmd` (§3.12) |
+| 3 | loop-free, delimiter count | `ucmdLangI` | no | `ConfTyping.tcheck_traceI`, a `Cert.trace` on `ucmdLangI`, whose input includes the initial strings. Attacker: controls every initial string. Observer: the sink. A loop rule (`tcheckW`) is not on L; `san` removes only quotes (EXPR-04) |
+| 14 | loop-free, per sink | `ucmdLangI` | no | `ConfTyping.pcheck_traceI`, a `Cert.trace` on `ucmdLangI`. Attacker: controls every initial string. Observer: the sink `fs`; other sinks are not covered. The alphabet is a segment and `..`. A loop rule (`pcheckW`) is not on L; the depth method of `PathTraversal.lean` stays on its own language |
+| 4 | whole input variables | `ucmdLangS` at the reduced partition | yes | `ConfTyping.Release.bcheck_release`, a `Cert.rel` on `ucmdLangS` at the secrets minus the released variables; carried by `ConfTyping.Release.bcheck_release_carried`. Attacker: sees every channel and all leakage, cost and outcome, and knows the public and released inputs. A computed release (§3.4's ledger) stays on toy `Cmd` until item REL-01; `ConfTyping.Release.revealR_coarser` shows the cost of the limit |
+| 9 | yes, `ite` misprediction | `ucmdLangW` | no | `ConfTyping.Spec.bcheck_relW`, a `Cert.rel` on `ucmdLangW`, at every window; at window 0 it is `ucmdLangS` (`ConfTyping.Spec.ucmdLangW_zero`). Attacker: picks the window, sees every channel and all leakage including the addresses a mispredicted branch touches, and real cost including transient commands. Limits: one global window, correctly predicted loop guards, no nested speculation, addresses and step counts only (no cache model, v2 or v4). Not carried through a pass |
+| 5, 8, 11 | misfit | none | no | quantitative, concurrent, assumption-shaped: outside the shapes as they stand |
+
 ### 3.1 Direct confidentiality leaks — IN, generated [proved]
 
 Home turf. `J_NI` at partition `P` and adversary capability set; per-channel reasoning
@@ -355,7 +391,8 @@ bound. `checker_rederives_pleak_bound` reproduces the hand-proved Paper-1 bound
 (`result_releases_at_most_bit`) from `decide` + soundness, choice-free — a *smaller*
 axiom footprint than the original. Declaration is disclosure, not bypass: an
 undeclared High flow is rejected (`pfull_rejected_undeclared`), and a declared one
-appears in the ledger as a visible line item (`pfull_ledger`).
+appears in the ledger as a visible line item (`pfull_ledger`). All of this paragraph is on
+toy `Cmd`; §3.0 says what holds on L, which is release of whole input variables only.
 
 ### 3.5 Privacy / DP — IN as the f-DP invariant [argued]; OUT-NONCOMPOSABLE as (ε,δ) [proved in miniature]
 

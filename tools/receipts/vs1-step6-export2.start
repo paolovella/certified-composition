@@ -1,0 +1,4 @@
+started: 2026-11-03T04:02:32+01:00
+head: c3a5767
+command: bash tools/gate/export-check.sh
+log: tools/receipts/vs1-step6-export2.log

@@ -1,0 +1,27 @@
+case	bytes	elaborate_s	elaborate	kernel	seconds	verdict	detail	lowest_mem_gb
+baseline	0	1.8	ok	lean	58.0	accepts		19.4
+baseline	0	1.8	ok	paranoid	72.7	accepts		19.3
+baseline	0	1.8	ok	lean4lean	84.7	accepts		19.3
+baseline	0	1.8	ok	nanoda	45.5	accepts		19.2
+baseline	0	1.8	ok	con-leche	4.9	REJECTS	libc++abi: terminating due to uncaught exception of type lean::exception: failed to create thread: Resource te	19.2
+baseline	0	1.8	ok	con-ron	9.2	accepts		19.2
+branch-same-untaken-f4	44	44.2	fail	-	-	-	libc++abi: terminating due to uncaught exception of type std::bad_alloc: std::bad_alloc 
+branch-same-taken-f4	44	0.2	ok	lean	60.4	accepts		19.4
+branch-same-taken-f4	44	0.2	ok	paranoid	72.1	accepts		19.4
+branch-same-taken-f4	44	0.2	ok	lean4lean	87.3	accepts		19.4
+branch-same-taken-f4	44	0.2	ok	nanoda	50.1	accepts		19.2
+branch-same-taken-f4	44	0.2	ok	con-leche	5.3	REJECTS	libc++abi: terminating due to uncaught exception of type lean::exception: failed to create thread: Resource te	19.2
+branch-same-taken-f4	44	0.2	ok	con-ron	9.6	accepts		19.1
+branch-cost-taken	44	0.3	ok	lean	61.1	accepts		19.4
+branch-cost-taken	44	0.3	ok	paranoid	72.5	accepts		19.4
+branch-cost-taken	44	0.3	ok	lean4lean	87.5	accepts		19.4
+branch-cost-taken	44	0.3	ok	nanoda	50.2	accepts		19.2
+branch-cost-taken	44	0.3	ok	con-leche	5.4	REJECTS	libc++abi: terminating due to uncaught exception of type lean::exception: failed to create thread: Resource te	19.2
+branch-cost-taken	44	0.3	ok	con-ron	9.8	accepts		19.1
+branch-pc-taken	44	0.2	ok	lean	60.7	accepts		19.4
+branch-pc-taken	44	0.2	ok	paranoid	73.3	accepts		19.3
+branch-pc-taken	44	0.2	ok	lean4lean	88.9	accepts		19.3
+branch-pc-taken	44	0.2	ok	nanoda	50.5	accepts		19.2
+branch-pc-taken	44	0.2	ok	con-leche	5.2	REJECTS	libc++abi: terminating due to uncaught exception of type lean::exception: failed to create thread: Resource te	19.2
+branch-pc-taken	44	0.2	ok	con-ron	10.0	accepts		19.2
+tampered-differs-f12	76	14.6	fail	-	-	-	artbeats <num>` to set the limit. Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command. 

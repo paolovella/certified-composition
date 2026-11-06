@@ -50,13 +50,13 @@ The judgment `⟨c,σ⟩ ⇓ (σ', t, b)` carries final store, accumulated cost
 `t : ℕ`, and branch trace `b : List Bool` (`true = tt`, `false = ff`). -/
 
 inductive Step : Cmd → Store → Store → Nat → List Bool → Prop where
-  | skip   : Step .skip σ σ 1 []
-  | assign : Step (.assign x e) σ (upd σ x (evalE e σ)) 1 []
-  | seq    : Step c1 σ σ1 t1 b1 → Step c2 σ1 σ2 t2 b2 →
+  | skip {σ}   : Step .skip σ σ 1 []
+  | assign {x e σ} : Step (.assign x e) σ (upd σ x (evalE e σ)) 1 []
+  | seq {c1 σ σ1 t1 b1 c2 σ2 t2 b2}    : Step c1 σ σ1 t1 b1 → Step c2 σ1 σ2 t2 b2 →
              Step (.seq c1 c2) σ σ2 (t1 + t2) (b1 ++ b2)
-  | ifT    : evalE e σ ≠ 0 → Step c1 σ σ1 t1 b1 →
+  | ifT {e σ c1 σ1 t1 b1 c2}    : evalE e σ ≠ 0 → Step c1 σ σ1 t1 b1 →
              Step (.ite e c1 c2) σ σ1 (1 + t1) (true :: b1)
-  | ifF    : evalE e σ = 0 → Step c2 σ σ2 t2 b2 →
+  | ifF {e σ c2 σ2 t2 b2 c1}    : evalE e σ = 0 → Step c2 σ σ2 t2 b2 →
              Step (.ite e c1 c2) σ σ2 (1 + t2) (false :: b2)
 
 /-- The same semantics as a total, structurally-recursive evaluator.
@@ -89,7 +89,7 @@ theorem eval_step : ∀ c σ, Step c σ (eval c σ).1 (eval c σ).2.1 (eval c σ
 
 /-- The relation has no outcomes the evaluator misses: every derivation
     agrees with `eval`. Hence the semantics is deterministic (Sem-Det). -/
-theorem step_eval : Step c σ σ' t b → (σ', t, b) = eval c σ := by
+theorem step_eval {c σ σ' t b} : Step c σ σ' t b →(σ', t, b) = eval c σ := by
   intro h
   induction h with
   | skip => rfl
@@ -105,7 +105,7 @@ theorem step_eval : Step c σ σ' t b → (σ', t, b) = eval c σ := by
       rw [ite_eq_right (by simp [heq]), ← ih]
 
 /-- (Sem-Det): the instrumented semantics is deterministic. -/
-theorem determinism
+theorem determinism {c σ σ1 t1 b1 σ2 t2 b2}
     (h1 : Step c σ σ1 t1 b1) (h2 : Step c σ σ2 t2 b2) :
     σ1 = σ2 ∧ t1 = t2 ∧ b1 = b2 := by
   have e : (σ1, t1, b1) = (σ2, t2, b2) := (step_eval h1).trans (step_eval h2).symm

@@ -1,27 +1,42 @@
 # Certified composition
 
-Three Lean 4 formalizations forming one line of work, unified by a single
-discipline:
+This repo is becoming **L**: a secure language whose compiler carries every certificate down to RISC-V bytes, on top of a small frozen
+kernel that no party can weaken. The plan of record is [`PLAN-2026-10.md`](PLAN-2026-10.md), and [`STATE.md`](STATE.md) says where each
+item stands. "Bulletproof" is always relative to a stated model, a spec and a trusted base, and each claim below names its versions.
 
-> **Evidence carries its hypotheses, and composition *accumulates* them —
-> never discharges or coerces silently.**
-
-Each sub-project is a self-contained Lean package. All are `no sorry` and
-axiom-audited; the two mathlib-free ones build instantly, the third needs the
-mathlib olean cache (and compiles its Physlib dependency locally).
+Four Lean 4 packages, each `no sorry` and axiom-audited:
 
 | dir | what | deps | status |
 |---|---|---|---|
-| [`conf-typing/`](conf-typing) | confidentiality-typing framework (the IMP timing instance + meta-theory) + the security seam/reception modules | `transport-calculus` (path; mathlib-free) | core closed; security program active (`VULN-COVERAGE.md`) |
-| [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question, shipped to its community |
-| [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` (path) | tiers 1–5 done |
+| [`l-core/`](l-core) | **L's kernel** (observations, `Lang`, seven certificate shapes, certified passes and their transfers) and **the slices**: small languages compiled through certified passes to literal RV64 images | none (mathlib-free) | kernel unlocked (F6 waits); two slices to bytes; BOUND-01 in progress |
+| [`conf-typing/`](conf-typing) | the checkers and the `UCmd` language the vulnerability map is about, and the security seam/reception modules | `transport-calculus`, `l-core` (paths) | map on L (F5); `UCmd` does not compile to bytes |
+| [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question |
+| [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` | tiers 1–5 done |
 
 ## Where this stands
 
-[`PLAN-2026-08.md`](PLAN-2026-08.md) is the honest assessment: what was rigged in the
-earlier tests, where this sits against seL4, Jasmin, CN, Verasco and the IFC languages that
-failed to be adopted — and the staged plan that follows from it, with a kill criterion per
-stage.
+**Certificates now reach machine code, for small languages built for the purpose.** Two vertical slices compile through two certified
+passes to literal RV64 images. In each, the kernel's transfer alone takes the checker's certificate to the bytes, with no proof about any
+certificate inside a pass. QEMU runs the bytes and agrees with the model.
+
+- **VS-1** (`l-core/LCore/Slice/`, [`VS-1-ACCOUNT`](research/2026-11/VS-1-ACCOUNT.md)): one 76-byte program carries `rel` and a
+  budget. No loops, and every address constant.
+- **VS-2** (`l-core/LCore/Slice2/`, [`VS-2-ACCOUNT`](research/2026-11/VS-2-ACCOUNT.md)): loops, an array at a public index, and a
+  program that never finishes. `scan_carries`: the image has `rel` on every input and in every environment. Every refused program compiles,
+  and its bytes provably leak, through an address, the PCs, the result, or whether and when it finishes. **No kernel change was forced
+  by either slice.** Over loops only `rel` reached the bytes, with no budget.
+- **BOUND-01, in progress:** the kernel's seventh shape, `Cert.boundR`, a budget that may depend on the input, with its transfer, three
+  frozen statements, and counted loops `forN` and `forMax`. The checker's budget for them is next.
+
+**What it is not, yet.** The slices are not L: `UCmd`, which the checkers and the vulnerability map are about, does not compile, so no
+row of the map reaches bytes. The user chose to grow the slice language into L's core, one construct at a time, each through to the bytes
+(`backlog/L-BYTES.md`). The RISC-V model is compared with QEMU and not linked to Sail, and QEMU is not hardware. The kernel is not
+locked: F6 waits for the language it should cover.
+
+### Earlier stages (PLAN-2026-08, history)
+
+[`PLAN-2026-08.md`](PLAN-2026-08.md) was the honest assessment before L: what was rigged in the earlier tests, where this sat against
+seL4, Jasmin, CN, Verasco and the IFC languages that failed to be adopted, and a staged plan with a kill criterion per stage.
 
 Two of those stages have since closed, neither by tripping its kill criterion:
 
@@ -100,6 +115,14 @@ round trip is proved for the expression layer and **not** for the statement laye
 link from your text to the checked term is not yet machine-checked; and the language is
 still this repo's `UCmd` — no functions, no records, no arrays.
 
+
+**The slices, under QEMU** (from `l-core/`; needs `qemu-riscv64`, and none of these is in CI yet):
+
+```
+python3 test/image_diff.py <scratch>     # VS-1's image against the model
+python3 test/image2_diff.py <scratch>    # VS-2's images: every PC and address, a run that never ends, secrets that do not show
+python3 test/refused2_diff.py <scratch>  # VS-2's refused programs: their bytes leak where the theorems say
+```
 
 ## The through-line
 
@@ -243,6 +266,15 @@ The same accountancy appears at every level:
   formal dip theorem, and the one Theorem Q rests on.
 
 ## The security claim (the original goal)
+
+*Correction of record (2026-11-03).* This section reads as a claim about a working framework. It is not
+one. What runs is one tiny program in a separate language (item VS-1, `l-core/LCore/Slice/`), with no loops
+or heap, on a machine model compared with QEMU. Nothing in `UCmd` compiles to anything that runs: its integers
+are unbounded and its pointers are `Int`s. Most results below are proved over small models, not over L.
+`VULN-COVERAGE.md` §3.0 says which hold on an L language, and on which. The user's assessment of
+2026-11-03 is that the foundation is not yet solid enough to deliver the goal
+([`FOUNDATION-2026-11-03`](research/2026-11/FOUNDATION-2026-11-03.md)). What VS-1 found is in
+[`VS-1-ACCOUNT`](research/2026-11/VS-1-ACCOUNT.md).
 
 The program's origin is a framework for coding that is *inherently* free of
 vulnerabilities. The honest form of that claim — which real vulnerability classes
@@ -546,7 +578,7 @@ else — so what gates a push is exactly what a working session runs, and the tw
 drift:
 
 ```
-tools/ci.sh                  # all three packages, no-sorry, and every guard
+tools/ci.sh                  # all four packages, no-sorry, and every guard
 tools/ci.sh --fast           # skips the mathlib package, for the inner loop
 tools/ci.sh --require-heavy  # the heavy runner: a missing tool (cargo, Verus) is a failure
 ```
@@ -558,18 +590,20 @@ master's `tools/` and `.github/` are laid over the PR tree before `ci.sh` runs. 
 touches a Ring 0 path fails the gate's `ring0` check and needs the user's key. A PR that
 removes or changes a line of `tools/axioms.expected` fails `manifest`.
 
-**Frozen statements** (Ring 0). `workspace/Statements.lean` states 31 results the repo rests on:
+**Frozen statements** (Ring 0). `workspace/Statements.lean` states 42 results the repo rests on:
 every checker's soundness theorem, `leakSafe_sound`, `source_certified`, `Bridge.comp_cert`, and
 L's meaning for UCmd: `bcheck`'s four guarantees on the lawful languages `ucmdLangT` (F2) and
-`ucmdLangS` (step fuel, F4), each language's lawfulness, and that each admits every input. The
-last six lock what "certified" means on L: the language, its run, its events and leakage, the
-inputs its certificates cover, and the kernel's certificate shapes (`l-core`), so no agent can
-redefine them and re-prove a weaker guarantee under the same name.
+`ucmdLangS` (step fuel, F4), each language's lawfulness, and that each admits every input; and
+the kernel's own theorems: the transfers, `bound_finishes`, and how `seq` composes (F6), and the seventh shape's transfer, its agreement with `bound`, and `boundR_finishes` (BOUND-01).
+These lock what "certified" means on L: the language, its run, its events and leakage, the
+inputs its certificates cover, the kernel's certificate shapes, and what a certified pass must
+prove (`l-core`), so no agent can redefine them and re-prove a weaker guarantee under the same
+name.
 `lake comparator` (`comparator.json`) checks that `workspace/StatementsProof.lean` proves exactly
 those statements, with no axiom beyond the standard three. That file is the only one allowed
 `sorry`, as the challenge's bodies. A statement can also be weakened by editing a definition it
 mentions, which the comparator cannot see. So `tools/ring0.lock` hashes every definition in the
-frozen statements' dependency closure that does not pass through a checker, 480 of them, and CI
+frozen statements' dependency closure that does not pass through a checker, 524 of them, and CI
 fails on any change. The checkers the statements name are left out: an edit to one cannot weaken
 a statement, which must still be proved against the locked definitions. Their hashes are in
 `tools/checkers.lock`, which a change may rewrite (`tools/ring0-lock.sh --checkers`), and the base
@@ -589,7 +623,7 @@ baseline (`tools/ring0-lock.sh --baseline`) after reading a report. It looks for
 states: a checker that no longer does what its docstring says, collapses in what it accepts,
 rebuilds locked meaning out of the lock's reach, or picks up trust (`implemented_by`, `partial`).
 
-The gates are: the three Lean packages build; no `sorry` in any tracked source;
+The gates are: the four Lean packages build; no `sorry` in any tracked source;
 `check-claims` (drift between prose and theorem names, and now between CI and this
 script); `guard-selftest` (each guard family is mutated and must fire — a negative test
 that goes stale is worse than none); and `walk-check` (the numeric claims in the
@@ -599,6 +633,7 @@ set-theory notes, with each measurement asserting its own preconditions).
 
 ```sh
 # mathlib-free — instant
+cd l-core             && lake build
 cd conf-typing        && lake build
 cd transport-calculus && lake build
 
@@ -606,7 +641,7 @@ cd transport-calculus && lake build
 cd transport-kernel   && lake exe cache get && lake build
 ```
 
-conf-typing, transport-calculus and transport-kernel are pinned to Lean `v4.35.0`, and so is
+l-core, conf-typing, transport-calculus and transport-kernel are pinned to Lean `v4.35.0`, and so is
 the repo-root workspace that `lake check` runs from (see each `lean-toolchain`). transport-kernel
 pins mathlib `v4.35.0`, and Physlib to the commit of its `v4.35.0` tag, which asks for the same
 mathlib, so the cache is shared. (transport-kernel stayed on `v4.31.0` until P0-10.)
@@ -614,4 +649,4 @@ mathlib, so the cache is shared. (transport-kernel stayed on `v4.31.0` until P0-
 `tools/check-claims.sh` guards the READMEs against status drift (retired
 claims resurfacing, modules or notes going unmentioned); run it after landing
 anything. Per-subdir `README.md` and `CHANGELOG.md` carry the detail; the
-top-level [`CHANGELOG.md`](CHANGELOG.md) traces the arc across all three.
+top-level [`CHANGELOG.md`](CHANGELOG.md) traces the arc across all four.

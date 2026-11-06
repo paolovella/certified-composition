@@ -1,0 +1,4 @@
+started: 2026-11-05T00:42:37+01:00
+head: fad915e
+command: python3 research/2026-11/autoimplicit_witness.py
+log: tools/receipts/ai01-witness.log

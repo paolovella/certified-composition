@@ -1,0 +1,4 @@
+started: 2026-11-03T04:32:51+01:00
+head: ed010d5
+command: bash -c cd l-core && python3 test/image_diff.py /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad/imgd2
+log: tools/receipts/vs1-step8-imagediff.log

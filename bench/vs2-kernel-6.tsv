@@ -1,0 +1,8 @@
+case	bytes	elaborate_s	elaborate	kernel	seconds	verdict	detail	lowest_mem_gb
+runcost-776B	776	20.3	ok	lean	64.7	accepts		17.0
+runcost-776B	776	20.3	ok	paranoid	78.9	accepts		16.3
+runcost-776B	776	20.3	ok	lean4lean	90.0	accepts		16.3
+runcost-776B	776	20.3	ok	nanoda	53.1	accepts		16.3
+runcost-776B	776	20.3	ok	con-leche	27.9	accepts		16.3
+runcost-776B	776	20.3	ok	con-ron	17.3	accepts		16.3
+runcost-7624B	7624	13.3	fail	-	-	-	artbeats <num>` to set the limit. Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command. 

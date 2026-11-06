@@ -52,13 +52,13 @@ theorem evalE_lowEq {P : Partition} {σ σ' : Store} :
     is permitted if both branches type in the High context (and hence, by
     confinement, write nothing Low). -/
 inductive SecTy (P : Partition) : Bool → Cmd → Prop where
-  | skip    : SecTy P pc .skip
-  | assignH : ∀ x e, P x = true → SecTy P pc (.assign x e)
+  | skip {pc}    : SecTy P pc .skip
+  | assignH {pc} : ∀ x e, P x = true → SecTy P pc (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → SecTy P false (.assign x e)
-  | seq     : SecTy P pc c₁ → SecTy P pc c₂ → SecTy P pc (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → SecTy P pc c₁ → SecTy P pc c₂ →
+  | seq {pc c₁ c₂}     : SecTy P pc c₁ → SecTy P pc c₂ → SecTy P pc (.seq c₁ c₂)
+  | iteL {pc c₁ c₂}    : ∀ e, exprLow P e = true → SecTy P pc c₁ → SecTy P pc c₂ →
               SecTy P pc (.ite e c₁ c₂)
-  | iteH    : SecTy P true c₁ → SecTy P true c₂ →
+  | iteH {c₁ c₂ pc e}    : SecTy P true c₁ → SecTy P true c₂ →
               SecTy P pc (.ite e c₁ c₂)
 
 /-! ## Confinement and soundness -/

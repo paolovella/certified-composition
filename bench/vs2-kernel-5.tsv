@@ -1,0 +1,13 @@
+case	bytes	elaborate_s	elaborate	kernel	seconds	verdict	detail	lowest_mem_gb
+branch-codes-differ-f4	44	0.3	ok	lean	58.8	accepts		19.5
+branch-codes-differ-f4	44	0.3	ok	paranoid	72.5	accepts		19.5
+branch-codes-differ-f4	44	0.3	ok	lean4lean	88.4	accepts		19.5
+branch-codes-differ-f4	44	0.3	ok	nanoda	42.7	accepts		19.2
+branch-codes-differ-f4	44	0.3	ok	con-leche	12.7	accepts		19.2
+branch-codes-differ-f4	44	0.3	ok	con-ron	8.9	accepts		19.2
+branch-codes-same-untaken-f4	44	0.2	ok	lean	54.5	accepts		19.5
+branch-codes-same-untaken-f4	44	0.2	ok	paranoid	64.5	accepts		19.4
+branch-codes-same-untaken-f4	44	0.2	ok	lean4lean	77.6	accepts		19.4
+branch-codes-same-untaken-f4	44	0.2	ok	nanoda	40.5	accepts		19.3
+branch-codes-same-untaken-f4	44	0.2	ok	con-leche	12.7	accepts		19.3
+branch-codes-same-untaken-f4	44	0.2	ok	con-ron	8.7	accepts		19.2

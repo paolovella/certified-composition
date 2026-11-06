@@ -1,0 +1,156 @@
+---
+id: VS-2
+title: "The second slice: loops and addresses that depend on public input, down to RV64 bytes"
+ring: 0
+tier: G-0
+deps: [VS-1]
+closes: ['VS-1: no kernel change was shown only for programs with no loops and constant addresses']
+acceptance: for one program with a loop that reads an array at a public index, a theorem that its literal RV64 image carries rel by transfer alone, with t.fuel not a constant; a program that may never finish is covered at every fuel; the image runs under an emulator and its result, cost, PC trace and addresses match the prediction; a program indexing by a secret is refused, and its binary is seen to leak addresses; every kernel change it forces is listed for the user before any lock
+kill: if a pass needs a proof about a certificate, PLAN-2026-10 section 6's central claim fails, so stop and report. If kernel evaluation of a literal image cannot pass all six kernels at the sizes step 1 measures, stop and report, since that puts compile-by-kernel-evaluation in doubt. If det or the fuel alignment needs a kernel change, that is not a failure: stop and propose it, since finding that before the lock is why this item exists
+status: done
+---
+
+## Plan
+
+Written on the user's word of 2026-11-03, as a plan only. **No code until the user has read
+[`VS-1-ACCOUNT`](../research/2026-11/VS-1-ACCOUNT.md) and said to start.** Whether F6 waits for this item is the user's open decision.
+
+**The question.** VS-1 avoided two things on purpose. This slice has both:
+- **Loops.** VS-1's `t.fuel` is a constant, the fuel at which the source has finished. A run that may never finish has no such fuel.
+- **Addresses that depend on input.** All of VS-1's are constants, which makes `det` as easy as it gets.
+
+**A correction to the account's wording.** It calls fuel alignment "untested". `Split.lean` proves it for a pass over loops, with `behind`,
+`ahead` and `det_split`. What is untested is doing it **down to a machine**, where one step becomes several kinds of instruction and
+back-edges exist. Those three theorems are this plan's template.
+
+**The slice.** The same language, extended. Nothing else from L's list comes in.
+- **`loop e body`:** a real `while`, which may never finish.
+- **`x := a[e]` and `a[e] := y`:** one array, whose first words are the positional inputs. The index is masked to its 64 words, so it cannot go out of
+  bounds. **That avoids the source-level abort path, on purpose,** and is a limit to state.
+- **The source must leak the address.** `Lk.addr` of the masked index joins the source's leakage, or `det` cannot follow on the target. This is
+  the first time the source's observation has to anticipate the machine's.
+- **Certificate:** `rel`, at every fuel. `bound` stays for loop-free programs only: a `while` has no budget. A counted-loop budget is out of scope.
+- **Checker:** a loop guard and an index must be low. One label for the whole array, high if any input position is secret, since a public index into
+  a mixed array would otherwise need per-cell labels. That is coarse, and it refuses programs that are safe.
+- **Machine:** `andi` joins `rvLang`, and indexing doubles with `add`, with no shift instruction. `beq` offsets become negative, which S-SAIL's
+  proved `beq` covers, and `Good` needs the signed case.
+- **Out:** heap, strings, functions, mediation, speculation, I/O, residue, optimisation, a source-level abort.
+
+**Steps, riskiest first.** Each ends with a report to the user.
+1. **Measure kernel evaluation, before anything depends on it.** Time-boxed. VS-1's budgets bit twice, and three hypotheses failed on one of those.
+   Run the six kernels on literal images of about 76 bytes, 760 bytes and 7.6 KB, and try again to explain why `decide` on the compiled `secretBranch`'s leakage
+   exhausts three kernels while `tampered_leaks` does not. Output: a table in the log, and a decision on whether step 7's literal theorem is viable. **If
+   only 76 bytes pass, stop here.**
+2. **On paper: fuel and `det`.** Write what `t.fuel`, `behind`, `ahead` and `det` must say when one source step becomes several instructions, and with
+   back-edges. Write how the source's `Lk.addr` fixes the target's. Say what fuel the target needs for a source step that loads through the array. Propose any kernel change.
+3. **The machine.** `andi` and negative `beq` in `rvLang`, compared with QEMU. **`rv_diff.py` learns to derive addresses,** as `image_diff.py` does, which closes
+   VS-1's standing blind spot for every case. Mutants extended.
+4. **The source:** lawful with real divergence (`diverge` is no longer trivial), the checker with accepted and refused witnesses per rule, `rel`, and hand-run
+   mutants, unless the user has extended `tools/mutants.py` to `l-core` by then.
+5. **`slotPass` extended.** Should stay lockstep. If it does not, that is a finding.
+6. **`rvPass` over loops.** **The hard step, and where the kill rule is judged.** `run_eq`'s finite list of micro-steps cannot hold a run that does not finish, so
+   VS-1's `walk` does not carry over. Most of `Lower.lean`'s simulation is expected to be rewritten, to the shape of `behind`, `ahead` and `det_split`.
+   `compiled_ignores_env` must still hold, at every fuel.
+7. **A literal image**, if step 1 allows it: a loop over the array at a public index. `rel` on the literal. The checks on `decode`, compression and the one exit, repeated.
+8. **Differential.** Under QEMU: inputs where the public index really moves the addresses, so the traces differ on public inputs and are identical on secret ones.
+   A program that does not finish, run to a fixed instruction count, compared as a prefix.
+9. **Teeth.** A secret index and a secret loop guard are refused, and their binaries are seen to leak. The second leaks through whether and when it finishes.
+10. **The account.** Did the kernel need changing? A recommendation on F6, and whatever this changes about `sliceLang` as a seed of L's core. **It must state what reached bytes over loops: `rel` only.** VS-1 carried `rel` and `bound`, and over loops `bound` does not reach bytes (step 7), so a certified loop program may run as long as its public input says, or forever, like `spin`. The F6 recommendation is judged on that.
+
+**What this will not show**, whatever happens:
+- That L compiles. `UCmd` still does not. Connecting it, or its replacement, stays separate work.
+- Anything about hardware, timing, caches, or speculation. The machine stays a model tested against QEMU.
+- Heap addresses, which are what real input-dependent addresses mostly are. A masked index into one fixed array is the smallest form of the question.
+
+## Log
+- 2026-11-03, the user said to start, and that F6 waits for this item. Step 1 next.
+- 2026-11-03, **step 1, partial: the measurement was stopped by Claude Code for low system memory, and is not finished.** Harness `bench/vs2/kernel_scale.py`, partial data
+  `bench/vs2-kernel.tsv`, receipt `vs2-step1-kernel-scale2`. An earlier run, `vs2-step1-kernel-scale`, measured nothing: no case built, and its exit 0 meant nothing.
+  - **The compiler's output equals a literal, at every size tried:** 88, 776 and 7,624 bytes pass all six kernels, within noise of the baseline. So the compile half of T2 is not
+    the worry at these sizes.
+  - **The machine run on a literal:** 88 bytes pass all six. **776 and 7,624 bytes did not elaborate**: Lean's `decide` hit its heartbeat limit, so no kernel saw them. This is the open
+    question, and it is unanswered.
+  - **The unexplained failure reproduces alone:** `branch-differs-f4` on 44 bytes: Lean, the paranoid checker and nanoda accept; lean4lean, con-leche and con-ron refuse. Its variants, which
+    could explain it, did not run.
+- 2026-11-04, **incident: this measurement caused out-of-memory kills in other projects on this machine.** Receipt `vs2-step1-kernel-rest`.
+  - **What happened.** The 7.6 KB machine run on `decide +kernel` took over 21 GB and hit the harness's 15-minute cap. `subprocess.run`'s timeout killed `lake` and not its `lean` child, which
+    kept running for about 1 h 44 min with memory and swap full. The job's receipt says exit 0 because the harness then saw 0.0 GB available and stopped cleanly.
+  - **What it did.** The kernel log shows the OOM killer, 23:07 to 00:30: `postgres` 9 times, `local-path-prov` 4, `coredns` 4, `tigerbeetle` 2, `hv-ledger` 2, `hv-core` 2, `hv-core-go`, `pg_isready`, `tini`.
+    These belong to other work: the `hv-dev-control-plane` kind cluster and its pods. `kube-apiserver` and `etcd` restarted. The `web-*` containers stayed up. Whether anything lost data is not checked.
+  - **The fix.** The harness now runs each child in its own process group, kills the group on timeout, and caps it at 12 GB (`run_capped`). The orphan was killed by hand when it was found. `tools/run-job.sh`
+    reported nothing, since the job itself had ended. An earlier stop for low memory, on `vs2-step1-kernel-scale2`, is not explained by this: no timeout had fired.
+- 2026-11-04, **step 1, results so far** (`bench/vs2-kernel.tsv`, `bench/vs2-kernel-2.tsv`; times within noise of the baseline except where given):
+  - **Compile equals a literal:** 88, 776 and 7,624 bytes: all six kernels accept. `image_carries`-style theorems need only this and the transfers, so **the compile half of T2 is not refuted at these sizes**, though `okP` caps code at 3 KB today.
+  - **Machine run on a literal:** 88 bytes pass. 776 bytes pass on `decide +kernel`, 16.5 s to elaborate, and each kernel 10 to 20 s over the baseline. **7,624 bytes: over 15 minutes and over 21 GB, no verdict.** Ten times the size cost over fifty times the time. So running a machine in the kernel does
+    not scale as written, and is useful only for small witnesses. The cause is not established, though a list lookup per fetch and memory as nested closures are the obvious suspects.
+  - **`secretBranch`'s leakage on 44 bytes** still splits the kernels, and its five variants have not run.
+- 2026-11-04, **step 1 done.** Harness `bench/vs2/kernel_scale.py`; data `bench/vs2-kernel.tsv` and `-2` to `-6`; receipts `vs2-step1-*`. Its stop rule does not fire.
+  - **The unexplained failure is explained:** the derived `DecidableEq` on `Lk`, over values not yet evaluated. `branch-differs-f4` refused by three kernels, 31 s to elaborate; the same comparison through a map to `Nat`, accepted by all six, 0.3 s
+    (`vs2-kernel-5.tsv`). Literal `Lk` values are cheap. Three earlier hypotheses were wrong: the compile, the fuel, an integer power. `secretBranch_compiled_leaks` is restored. **For step 7 and later: never `decide` on `Lk` or `Beh` over unevaluated values.**
+  - **Compile equals a literal:** all six kernels at 88, 776 and 7,624 bytes, and a theorem like `image_carries` needs only this and the transfers. So step 7's literal theorem is viable.
+  - **A machine run:** all six at 88 and 776 bytes, on a plain number too (`vs2-kernel-6.tsv`), with 20 s to elaborate at 776, against under a second at 88. At 7,624 bytes, the elaborator's `decide` hits its heartbeat limit, and `decide +kernel` reached over 15 minutes and 21 GB, with no verdict.
+    So this cost is separate from `Lk`'s and grows faster than linearly. Machine runs in the kernel are for small witnesses, and larger programs get their evidence from QEMU.
+  - **A false lead, corrected:** `con-leche`'s rejections in `vs2-kernel-3.tsv`, even on the baseline, came from the harness's address-space cap, which stops it creating threads. It now runs with the group kill and no cap.
+- 2026-11-04, **step 2 done, on paper: no kernel change expected, and three corrections to this plan** ([`VS-2-FUEL`](../research/2026-11/VS-2-FUEL.md)). Nothing proved. The array gets its own region, since its first words being the inputs would alias
+  the input variables on the machine and not in the source. Its label is one flow-sensitive bit. The loop rule needs a fixed point. `run_eq` is replaced by an intermediate machine, `runX`. Waiting on the user before any code.
+- 2026-11-04, the user accepted step 2's three corrections and said to start on the code. Step 3 now: `andi` in `rvLang`, and `rv_diff.py` derives addresses from QEMU's registers and its own decoding, so leaked addresses are compared on every case, and the two
+  broken models it was blind to must now be caught. New `andi` cases cover a mask, a sign-extended immediate, and a value near the wrap. Signed `beq` is already in the decoder; a backward branch is already a case. VS-1's proofs and `image_diff.py` re-run on the changed model.
+- 2026-11-04, **step 3 done.** `andi` in `rvLang`. `rv_diff.py` derives each access's address from QEMU's registers and its own decoder, so **VS-1's address blind spot is closed for every case in that suite**: 29 cases, 205 steps, every PC, register, address, outcome and cost equal.
+  21 broken models are all caught, including the two it was blind to, a wrong address, and a faulting load that leaks none. `image_diff.py` and `refused_diff.py` still pass on the changed model. Receipt `vs2-step3-rvdiff`; the first attempt stopped on my missing `open`. Still not in CI: the runners have no QEMU.
+- 2026-11-04, step 3's CI failed twice on the time ratchet alone. The user raised both budgets and asked for a real fix; none was found. The numbers are in `backlog/F1.md`.
+- 2026-11-05, step 3's CI is green, on an idle machine (`vs2-idle-1`, `vs2-idle-2`). See `backlog/F1.md`.
+- 2026-11-05, **step 4 done: the source language.** `l-core/LCore/Slice2/Source.lean`. No kernel change. VS-1's language is untouched.
+  - `sliceLang_lawful`, with real divergence: `run_diverge`, and `spin_never_finishes` shows a run that never ends, at every fuel. `sliceCheck_rel`: `rel` at every fuel, whether or not the run finishes. `slice_bound` is for loop-free programs only.
+  - Accepted: `scan`, a loop over the array at a public index, whose addresses depend on that index (`scan_runs`); `spin`, which never finishes; `markedFirst`, which meets the fixed point; `load_clears_when_low`.
+  - Refused, each with its leak proved: `secretLoad`, `secretStore`, `secretLoop`, `secondIter`, `throughArray`, `arrayInLoop`. **`secondIter` is the fixed point's witness**: it branches on a secret only on its second iteration.
+  - 19 hand-written mutants, all killed (`research/2026-11/slice2_mut.py`), since `tools/mutants.py` still does not scan `l-core`.
+- 2026-11-05, **step 5 done: the slot pass over loops, still lockstep.** `l-core/LCore/Slice2/Slots.lean`. No kernel change. `compile_sim`: on admissible inputs, the compiled run is the source's, exactly, at every fuel, with `t.fuel` the identity and not VS-1's constant. The array's slots are between the inputs and the locals, so `slotOf_not_arr` rules out step 2's aliasing bug.
+  `scan_carried` and `spin_carried` take `rel` through the kernel's transfer, including for a run that never finishes. This is the easy pass: the two languages take the same steps. Step 6 is where one step becomes many.
+  - **A proposal for the user's key: turn off `autoImplicit` in `l-core`'s lakefile.** Twice now an unopened name (`Lk` in step 3, `sec0` here) became an implicit variable and not an error. Both surfaced as type errors, but a typo in a theorem's statement could change its meaning silently.
+- 2026-11-05, **step 6 plan, a change from step 2's note: no `runX`.** One lemma on the machine itself: from a good state, a frame's list of micro-steps (`chunk`, computed from the frame and slots alone) takes the machine to the next good state. Then each obligation is an induction over frames.
+  `det` runs two machines side by side, in different environments, and their chunks are equal when the source's leakage is. So the environment still cannot show, and `Exec` stays per-fuel. `Slice2/Lower.lean`. `t.fuel m = m`, `t.cost c = L * c + L`. Pending jumps are charged to the step that pushed them, so no bound on nesting depth is needed.
+  This corrects two of the note's risks: pending jumps are not a problem for `cost_sim`, and `eq_mono` is needed on the source only.
+- 2026-11-05, **`autoImplicit` is off in `l-core`, on the user's word** (`l-core/lakefile.toml`, Ring 0). The whole package builds unchanged, so no existing statement relied on it, and a planted unknown name now fails with `Unknown identifier`. Scratch checks with `lake env lean` must pass `-D autoImplicit=false`, since they do not read the lakefile. `conf-typing` and the other packages are unchanged.
+- 2026-11-04, **correction of record, dates.** The five entries above dated 2026-11-05 (step 3's green CI, step 4, step 5, step 6's plan, `autoImplicit`) were written on 2026-11-04; the commits `bde850b`, `8157fee` and `a11bd8a` carry that date. The clock was not consulted. The entries stay as written.
+- 2026-11-04, **step 6 done: `rvPass` over loops. The kill rule did not fire.** `l-core/LCore/Slice2/{Lower,Chunk,Pass,OnMachine}.lean`.
+  - **No kernel change, and no pass proof about a certificate.** `pipeline` is `slotPass.seq rvPass`, and `scan_on_machine` and `spin_on_machine` are `rel_transfer` applied to the checker's result. `t.fuel m = m` and `t.cost c = L * c + L`, where VS-1 had a constant fuel.
+  - **The obligations.** `chunk_exec` takes a frame to the next good state. `behind` gives `ev_sim`, `cost_sim` and `reflect`. `ahead`, on the measure `2n + pending jumps` because a jump spends no source fuel, gives `progress` and `catch_up`. `det_run` runs two machines in different environments, and rests on `same_step`: what the source shows fixes the next chunk and the next frames on both sides. `view_mono` lowers equal views to any lower fuel. It needs each step's leak at the front of the list and no `seq` frame.
+  - **Witnesses.** `spin_never_finishes_on_machine` holds at every fuel and in every environment, with `spin_steps_on_machine` beside it, so "never finishes" is not a machine that stopped. `scan_runs_on_machine` returns 9 by kernel evaluation. `compiled_ignores_env` now holds at every fuel to every observer.
+  - **A finding: the compiled language could not count a loop down.** `okE` took literals below 2048 and expressions have only `add`, so a guard could reach zero only by wrapping past `2^64`. `scan` and the refused programs passed the source and slot layers and then failed `okP`. Step 4's and step 5's witnesses never compiled to bytes, and nothing checked that they did. The fix is in the shared `Slice/Lower.lean`: `litImm` makes a literal in the top 2048 words a negative `addi` immediate. Literals below 2048 encode as before, and VS-1's `compile_is_literal` still passes unchanged. `literal_rule` has accepted and refused witnesses at each end of both ranges. `addi` with negative immediates was already compared with QEMU (`addi_edges`, with `addi: immediate unsigned` among the broken models).
+  - **Mutants: 19 of 19 killed** (`research/2026-11/slice2_low_mut.py`, receipt `vs2-step6-mutants`), each with a Lean error at a line of a proof.
+  - **Correction of record, the mutant harness.** Its first run reported ~~19 of 19 killed~~. That was false, and the 5 seconds and "0 errors" on each line gave it away. Its 12 GB address-space cap stops Lean creating threads, so every compile aborted with code 134 before reaching a proof, and the harness counted any nonzero exit as a kill. Its baseline passed only because nothing needed rebuilding. The receipt was deleted. Three fixes: a resident-memory watchdog replaces the cap, a kill needs an error at a `.lean` line and anything else is `NO VERDICT`, and the baseline is forced to compile. The address-space limit is the same one recorded for `con-leche` in step 1, and I repeated it.
+- 2026-11-05, **AI-01 and AI-02 ran between steps 6 and 7**, on the user's word: `autoImplicit` is off in every package, with a guard. Merged into this branch.
+- 2026-11-05, **step 7 done: the literal images.** `l-core/LCore/Slice2/Image.lean`.
+  - **`scan`, 136 bytes.** `scan_is_literal` by kernel evaluation, `scan_pipeline_is_literal`, and `scan_carries`: `rel` on the literal by the kernel's transfer alone. `scan_fuel_tracks`: `t.fuel m = m`, at every `m`.
+  - **`spin`, 36 bytes.** `spin_carries` and `spin_image_never_finishes`, at every fuel and in every environment, with `spin_image_runs` beside it.
+  - **The checks repeated.** `scan_decodes`, `scan_not_compressed`, `scan_one_exit`.
+  - **Not vacuous.** `scan_runs`: results 9, 4, 0 at costs 90, 63, 9, which is `27n + 9` on these three. `scan_public_moves_addresses`: a public input changes the trace. `scan_secret_does_not`: a secret does not, in a different environment too.
+  - **The theorem depends on these bytes, and sees addresses.** `tamperedIndex` changes one byte so that a store's index reads the secret word. `tamperedIndex_same_pcs` shows the PCs stay the same at fuel 14, and `tamperedIndex_leaks` refutes `rel` through the address alone. `tamperedGuard` changes one byte so that the loop counts from the secret, refuted through cost.
+  - **No instruction budget here, and this is a limit.** `Cert.bound` is not claimed for `scan`: `slice_bound` needs a loop-free program, and a loop bound by a public input has no budget that holds for every input. A budget as a function of public input is not something `Cert.bound` can state.
+  - **Mutants: 27 of 27 killed** (`slice2_low_mut.py`, 8 new on the image, receipt `vs2-step7-mutants`), each with a Lean error at a line. The build target is now the image, so step 6's 19 were rerun through it.
+- 2026-11-06, **step 8 done: under QEMU, the images run as the model says** (`l-core/test/image2_diff.py`, `test/Image2Pred.lean`, receipt `vs2-step8-diff`). Like `image_diff.py`, it reads the bytes from `Image.lean`'s text, writes its own ELF (equal to `elf`'s, byte for byte), and derives each address from QEMU's registers.
+  - **`scan`:** 117 inputs, 108,108 instructions, 48,048 addresses. Result, cost, outcome, and every PC and address equal the model's.
+  - **`spin`, which never exits:** 39 runs, each stopped by the harness and never by the program. Their first 300 instructions equal the model's run at fuel 300.
+  - **The public word moves the addresses.** 9 public words give 9 distinct array-address traces, and the index wraps: the first access is slot 63 at 63, slot 0 at 64, and slot 1 at 65 as at 1. At 100, 64 distinct slots.
+  - **The secret does not:** 144 comparisons, `scan` and `spin`, in three environments with different `argv`, and no difference.
+  - **Vacuity.** A prediction with no addresses, one address shifted by 8, or the last PC moved would fail. On `tamperedIndex` the secret shows in an address while the PCs stay identical, and on `tamperedGuard` in the PCs. Both match the model, so the model's `rel` refutations in step 7 are what QEMU does too.
+  - **Two failures on the first run, both in the test, not the model.** The wrap check assumed every access at 64 hits slot 0, but the counter counts down, so only the first does. The guard tamper was cut at a fixed count, but it finishes first. Fixed, and the corrections are in the file.
+  - **Not in CI**, like VS-1's QEMU tests: still a proposal for the heavy runner.
+- 2026-11-06, **correction of record, step 7's concrete trace witnesses.** From `6329023` to this entry, the step 7 log said that `scan_public_moves_addresses` shows ~~a public input changes the trace~~ and `scan_secret_does_not` shows ~~a secret does not~~ change it. Both, and `tamperedIndex_addresses_differ`, compared addresses only. Inside `namespace LCore.Slice2`, a bare `lkCode` is the source language's (`Slice2/Source.lean`), which sends every PC to 0, and it wins over `open Slice.Teeth (lkCode)`. So the PCs were never compared. `scan_carries` was never affected, since it is the transfer and uses no coding. Step 8's QEMU comparison covers full traces, PCs included. It surfaced in step 9, when two PC leaks would not refute: `lkCode (.step [3])` evaluated to 0. The kernel and the interpreter were never in disagreement. **The fix:** `Image.mCode`, named apart, one to one on what the machine emits (a PC `p` as `2p`, an address `a` as `2a + 1`), with `mCode_pc_addr` as its witness. All of step 7's witnesses now hold under it, so `scan_secret_does_not` now covers PCs as well. A mutant that codes PCs as 0 again is killed.
+- 2026-11-06, **step 9 done: teeth.** `l-core/LCore/Slice2/Teeth.lean`, `l-core/test/refused2_diff.py` (receipt `vs2-step9-diff`).
+  - **Compiling is not certifying.** All six refused programs fit, pass `okP` and compile (`refused_programs_compile`). Each one's literal image provably fails `rel` on the machine, through the channel its refusal names.
+    - `secretLoad`, `secretStore`: an address. `secretStore_only_the_address`: same PCs, cost and result.
+    - `secretLoop`, **when:** 14 against 21 instructions. **Whether:** at fuel 400, secret 1 has finished and secret `2^63` has not (`secretLoop_whether`). Both refute `rel`.
+    - `secondIter`: the PCs at the second iteration's branch, instruction 22, with the first 21 identical. This is the fixed-point rule's case.
+    - `throughArray`: only the result, with the trace identical.
+    - `arrayInLoop`: the PCs.
+  - **Control:** the accepted `scan`, with the same tooling and the same secret pairs, shows no difference (`scan_same_at_the_same_points`).
+  - **Under QEMU:** 17 runs equal the model's, and each leak shows where the theorem says. Secret `2^63` is still running at 400 instructions, stopped by the harness, and the control shows none.
+  - **The kernels, a finding.** The first full CI failed on route 2: `con-leche` and `con-ron` ran out of fuel (`whnfCore`) on `secretStore_only_the_address`, three conjuncts over six machine runs at fuel 40. The other four kernels accepted. Splitting it and cutting each fuel to just past the run's real cost moved the failure to the conjunct comparing `.ev`. **Deciding `=` on `Ev` lists runs the derived `DecidableEq` over unevaluated values, the trap step 1 found for `Lk`.** So results are compared through `evCode`, a plain number, with `evCode_ret` as its witness. All six kernels accept (receipt `vs2-step9-export`). Each fuel is now just past the run's cost: `secretStore` 14, `secretLoop` 22, and 30 for "whether", `throughArray` 22. Each comparison is still made at a fuel where the run has finished, or, for "whether", where one has and the other has not. **For step 10:** VS-1's `image_runs` and step 7's `scan_runs` decide `.ev = [retEv _]` against a literal and pass. Comparing two runs' `ev` with each other does not.
+  - **Mutants: 32 of 32 killed** (5 new on the teeth, and one for the coding; receipt `vs2-step9-mutants`). Step 8's QEMU harness, now importable by step 9's, still passes (receipt `vs2-step8-diff-rerun`).
+- 2026-11-06, **step 10 done: the account** ([`VS-2-ACCOUNT`](../research/2026-11/VS-2-ACCOUNT.md)). **No kernel change was forced:** `l-core/LCore/Kernel/` is untouched since `c3ae7e1`. The kill rule did not fire.
+  - **The limit, first:** over loops only `rel` reaches the bytes, and `Cert.bound` cannot state a budget that depends on public input.
+  - **Recommendation on F6:** the kernel's part of the condition is met. The lock should still wait, for the L-BYTES route, since it would otherwise cover `UCmd`'s languages, which do not compile, and for REL-01.
+  - **Two decisions for the user:** the L-BYTES route, where this slice strengthens the case for growing `sliceLang`, and whether to add a budget shape over loops before growing the language.
+  - **The acceptance, item by item:** a literal loop image with `rel` by transfer alone and `t.fuel` not constant (`scan_carries`, `scan_fuel_tracks`); a program that never finishes covered at every fuel (`spin_carries`, `spin_image_never_finishes`); QEMU equal to the prediction in result, cost, PCs and addresses (step 8); a secret index refused and its binary leaking addresses (`secretLoad`, `secretStore`, under QEMU too); every kernel change listed, and there were none.
+

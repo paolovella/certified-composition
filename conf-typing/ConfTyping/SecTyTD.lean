@@ -38,10 +38,10 @@ inductive SecTyTD (P : Partition) (Δ : List Permit) : Cmd → Prop where
   | assignH : ∀ x e, P x = true → SecTyTD P Δ (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → SecTyTD P Δ (.assign x e)
   | assignD : ∀ x e, Permit.expr e ∈ Δ → SecTyTD P Δ (.assign x e)
-  | seq     : SecTyTD P Δ c₁ → SecTyTD P Δ c₂ → SecTyTD P Δ (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → SecTyTD P Δ c₁ → SecTyTD P Δ c₂ →
+  | seq {c₁ c₂}     : SecTyTD P Δ c₁ → SecTyTD P Δ c₂ → SecTyTD P Δ (.seq c₁ c₂)
+  | iteL {c₁ c₂}    : ∀ e, exprLow P e = true → SecTyTD P Δ c₁ → SecTyTD P Δ c₂ →
               SecTyTD P Δ (.ite e c₁ c₂)
-  | iteD    : ∀ e, Permit.guard e ∈ Δ → SecTyTD P Δ c₁ → SecTyTD P Δ c₂ →
+  | iteD {c₁ c₂}    : ∀ e, Permit.guard e ∈ Δ → SecTyTD P Δ c₁ → SecTyTD P Δ c₂ →
               SecTyTD P Δ (.ite e c₁ c₂)
 
 /-! ## Soundness: the outcome releases at most the ledger -/

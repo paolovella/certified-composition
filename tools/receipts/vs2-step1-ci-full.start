@@ -1,0 +1,4 @@
+started: 2026-11-04T13:52:16+01:00
+head: 3e56b40
+command: bash tools/ci.sh
+log: tools/receipts/vs2-step1-ci-full.log

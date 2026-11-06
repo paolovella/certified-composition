@@ -1,6 +1,6 @@
-file	workspace/Statements.lean	64818f98ae354a2f4236da11e30be8cc0a45036cb4229fc54dcaaab2acd01321
-file	comparator.json	acc0ef3e4de5c7b08ba223aecdf515d173f7623a0367f74ad543f375a051ae4c
-frozen statements	31
+file	workspace/Statements.lean	7f8dfd7d3b318d6e98468210487b514daea1e4f501f564af770ace797659b73e
+file	comparator.json	e33bee56a7e449ab835ba87c3cdb2dd9e1bdb7378bbefb44693f70c58c4e11ce
+frozen statements	42
 checkers	23	ConfTyping.allcheck ConfTyping.bcheck ConfTyping.costCheck ConfTyping.hcheck ConfTyping.jcheck ConfTyping.jcheckW ConfTyping.leakSafe ConfTyping.medCheck ConfTyping.pathCheck ConfTyping.pcheck ConfTyping.pcheckW ConfTyping.secCheck ConfTyping.secCheckD ConfTyping.secCheckT ConfTyping.secCheckTD ConfTyping.slcheck ConfTyping.specCheck ConfTyping.tcheck ConfTyping.tcheckW ConfTyping.ucheck ConfTyping.ucheckNI ConfTyping.umcheck ConfTyping.wcheck
 ConfTyping.Addr	13285864654764339375
 ConfTyping.Cmd	3931117990
@@ -437,14 +437,30 @@ LCore.Beh.ev	16539655607411521739
 LCore.Beh.lk	4573415344376231868
 LCore.Beh.mk	3938620485
 LCore.Beh.out	14922758964269783117
+LCore.Beh.view	11134238416926702377
 LCore.Cert.bound	12193867875832571831
+LCore.Cert.boundR	2977160955334508020
+LCore.Cert.hyper	7579409909705046829
+LCore.Cert.live	13241332037465342036
 LCore.Cert.rel	17192613647496917356
+LCore.Cert.relView	11780946424694214473
 LCore.Cert.trace	13445278419080203711
+LCore.Chain	6796041097569425386
+LCore.Chain.Equiv	15272454672748829933
+LCore.Chan	3931117990
+LCore.Chan.check	1260731256
+LCore.Chan.emit	1260731256
+LCore.Chan.ext	1260731256
+LCore.Chan.read	1260731256
+LCore.Chan.release	1260731256
 LCore.Ev	3931117990
+LCore.Ev.casesOn	7556050962553470948
+LCore.Ev.chan	4635492379973938086
 LCore.Ev.check	1374528839
 LCore.Ev.emit	4180475390
 LCore.Ev.ext	1459356491
 LCore.Ev.read	1374528839
+LCore.Ev.rec	4226314563
 LCore.Ev.release	1374528839
 LCore.Lang	1772266319
 LCore.Lang.Adm	7816479531705584561
@@ -455,12 +471,15 @@ LCore.Lang.Prog	17758190055239810852
 LCore.Lang.lowIn	316078517221116920
 LCore.Lang.mk	1926544075
 LCore.Lang.run	5761093692814892775
+LCore.LimitInv	779152390061157289
+LCore.LimitInv2	14536882282419028770
 LCore.Lk	3931117990
 LCore.Lk.addr	3805333517
 LCore.Lk.branch	1633304581
 LCore.Lk.ext	1954398994
 LCore.Lk.step	3854488104
 LCore.Lk.vtime	3805333517
+LCore.Observer	18080612018559548763
 LCore.Outcome	3931117990
 LCore.Outcome.abort	1249139017
 LCore.Outcome.casesOn	15528482689056001415
@@ -468,9 +487,34 @@ LCore.Outcome.ctorIdx	12686991837478212154
 LCore.Outcome.done	1249139017
 LCore.Outcome.fuel	1249139017
 LCore.Outcome.rec	1760540576
+LCore.PassCert	123695316
+LCore.PassCert.comp	2514466273766808539
+LCore.PassCert.enc	2868148569827151970
+LCore.PassCert.liftR	5421429110305908976
+LCore.PassCert.mk	2401572366
+LCore.PassCert.seq	13095768714568781433
+LCore.PassCert.seq._proof_1	3000824720
+LCore.PassCert.seq._proof_2	572651819
+LCore.PassCert.seq._proof_3	260975065
+LCore.PassCert.seq._proof_4	3826072823
+LCore.PassCert.seq._proof_5	1286478960
+LCore.PassCert.seq._proof_6	702835295
+LCore.PassCert.seq._proof_7	3714272315
+LCore.PassCert.seq._proof_8	2045449725
+LCore.PassCert.seq._proof_9	3043089373
+LCore.PassCert.seq_comp_ok.match_1	16663503520969994205
+LCore.PrefixClosed	15908986626515594536
+LCore.Xform	3931117990
+LCore.Xform.cost	10341293979497475624
+LCore.Xform.fuel	4640269087736378525
+LCore.Xform.lk	1591779044256527474
+LCore.Xform.mk	706727353
+LCore.Xform.then	10630769025759309982
+LCore.Xform.then._proof_1	1834607501
 LCore.instDecidableEqOutcome	18105417926790293242
 LCore.instDecidableEqOutcome._proof_1	1330516955
 LCore.instDecidableEqOutcome._proof_2	3328705913
+LCore.instReprEv.repr.match_1	4324917131581824455
 TransportCalculus.Bridge	1248455741
 TransportCalculus.Bridge.cert	98754388039675929
 TransportCalculus.Bridge.comp	12723489086636728297

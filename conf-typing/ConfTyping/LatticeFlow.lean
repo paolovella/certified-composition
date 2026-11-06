@@ -56,10 +56,10 @@ def exprLevel (Γ : String → L) : Expr → L → L
     (`exprLevel e`) and the context `pc` to flow into `Γ x`; a branch raises the
     context by the guard's level. -/
 inductive LSecTy (Γ : String → L) : L → Cmd → Prop where
-  | skip   : LSecTy Γ pc .skip
-  | assign : ∀ x e, 𝓛.le (exprLevel 𝓛 Γ e pc) (Γ x) → LSecTy Γ pc (.assign x e)
-  | seq    : LSecTy Γ pc c₁ → LSecTy Γ pc c₂ → LSecTy Γ pc (.seq c₁ c₂)
-  | ite    : ∀ e, LSecTy Γ (exprLevel 𝓛 Γ e pc) c₁ → LSecTy Γ (exprLevel 𝓛 Γ e pc) c₂ →
+  | skip {pc}   : LSecTy Γ pc .skip
+  | assign {pc} : ∀ x e, 𝓛.le (exprLevel 𝓛 Γ e pc) (Γ x) → LSecTy Γ pc (.assign x e)
+  | seq {pc c₁ c₂}    : LSecTy Γ pc c₁ → LSecTy Γ pc c₂ → LSecTy Γ pc (.seq c₁ c₂)
+  | ite {pc c₁ c₂}    : ∀ e, LSecTy Γ (exprLevel 𝓛 Γ e pc) c₁ → LSecTy Γ (exprLevel 𝓛 Γ e pc) c₂ →
              LSecTy Γ pc (.ite e c₁ c₂)
 
 /-! ## Store execution (loop-free `eval`, store projection) -/

@@ -14,7 +14,7 @@
     `L` times, and what it finishes the source has finished alike (events, cost, reflection);
   - `ahead`: after `L * n` steps the target has caught up with `n` source steps (progress,
     catch-up);
-  - `det_split`: the target's observation is fixed by the source's. It rests on two facts about
+  - `det_split`: what any observer sees of the target is fixed by what it sees of the source. It rests on two facts about
     `ucmdLangS`, proved here once: a step splits off an observation (`atomS_split`,
     `tickS_split`), and equal observations stay equal at less fuel (`eq_mono`).
   `split_carries`: a `bcheck`-accepted program's four guarantees hold of its split version, by
@@ -141,6 +141,15 @@ theorem chain_full (π : MedPolicy) (x : String) : ∀ (e : Expr) (q : List Nat)
 
 /-- An observation, without the state. -/
 def obs (r : TRun) : List LCore.Ev × List LCore.Lk × Nat × LCore.Outcome := (r.ev, r.lk, r.cost, r.out)
+
+/-- What one observer sees of a run (`LCore.Beh.view`). -/
+def obsV (f : LCore.Observer) (r : TRun) : List LCore.Ev × List LCore.Lk × Nat × LCore.Outcome :=
+  (r.ev.filter (fun e => f e.chan), r.lk, r.cost, r.out)
+
+theorem obsV_of_obs {f : LCore.Observer} {a b : TRun} (h : obs a = obs b) : obsV f a = obsV f b := by
+  simp only [obs, Prod.mk.injEq] at h
+  obtain ⟨h1, h2, h3, h4⟩ := h
+  simp only [obsV, h1, h2, h3, h4]
 
 /-- One assignment step stopped by the fuel. -/
 theorem assign_fuel0 (π : MedPolicy) (x : String) (e : Expr) (q : List Nat) (K : List UFrame)
@@ -505,6 +514,30 @@ theorem stepT_ev_len {c : UCmd} (hc : atomic c = true) (π : MedPolicy) {s : USt
   | sop op x e => cases op <;> cnt_tac
   | _ => cnt_tac
 
+/-- The channels an atomic command's events are on: a function of the command alone. -/
+def cmdChans : UCmd → List LCore.Chan
+  | .check r => [.check r]
+  | .access r => [.read r]
+  | .sop .emit x _ => [.emit x]
+  | _ => []
+
+/-- **A finished step's channels are fixed by its command**, so an observer sees the same number
+    of its events from any two states. This is why an observer that chooses channels, not
+    payloads, can be carried through a one-to-many pass. -/
+theorem stepT_view_len (f : LCore.Observer) {c : UCmd} (hc : atomic c = true) (π : MedPolicy)
+    {s : UState} (hd : s.dead = false) (hdone : (stepT c π s).out = .done) :
+    ((stepT c π s).ev.filter (fun e => f e.chan)).length = ((cmdChans c).filter f).length := by
+  cases c with
+  | seq | ite | loop => simp [atomic] at hc
+  | memop op x => cases op <;> cnt_tac <;> simp [cmdChans]
+  | hop op x y => cases op <;> cnt_tac <;> simp [cmdChans]
+  | sop op x e =>
+    cases op <;> cnt_tac <;> all_goals
+      (simp [cmdChans, LCore.Ev.chan, List.filter]; try (split <;> rfl))
+  | _ =>
+    cnt_tac <;> all_goals
+      (simp [cmdChans, LCore.Ev.chan, List.filter]; try (split <;> rfl))
+
 theorem stepT_done_alive {c : UCmd} {π : MedPolicy} {s : UState}
     (h : (stepT c π s).out = .done) : (stepT c π s).st.dead = false := by
   unfold stepT at *; split at h
@@ -539,12 +572,14 @@ theorem obs_eq {a b : TRun} : obs a = obs b ↔ a.ev = b.ev ∧ a.lk = b.lk ∧ 
 theorem append_split {α} {a a' b b' : List α} (h : a ++ b = a' ++ b') (hl : a.length = a'.length) :
     a = a' ∧ b = b' := List.append_inj h hl
 
+variable {f : LCore.Observer}
+
 /-- **Splitting a branch step off.** -/
 theorem tickS_split {l l' : LCore.Lk} {p : List Nat} {R R' : TRun}
-    (h : obs (R.tickS l p) = obs (R'.tickS l' p)) : l = l' ∧ obs R = obs R' := by
-  simp only [obs, TRun.tickS, Prod.mk.injEq, List.cons.injEq, Nat.add_left_cancel_iff] at h
+    (h : obsV f (R.tickS l p) = obsV f (R'.tickS l' p)) : l = l' ∧ obsV f R = obsV f R' := by
+  simp only [obsV, TRun.tickS, Prod.mk.injEq, List.cons.injEq, Nat.add_left_cancel_iff] at h
   obtain ⟨he, ⟨_, hl, hlk⟩, hc, ho⟩ := h
-  exact ⟨hl, by simp [obs, he, hlk, hc, ho]⟩
+  exact ⟨hl, by simp [obsV, he, hlk, hc, ho]⟩
 
 theorem uexec1_some {c : UCmd} (hc : atomic c = true) (π : MedPolicy) (t : UState) :
     uexec 1 c π t ≠ none := by
@@ -561,76 +596,76 @@ theorem atomS_split {c : UCmd} (hc : atomic c = true) {π : MedPolicy} {s s' : U
     (hd : s.dead = false) (hd' : s'.dead = false) {p : List Nat} {K K' : UState → TRun}
     (hK : ∀ t, t.dead = false → (K t).out = .abort → (K t).lk ≠ [])
     (hK' : ∀ t, t.dead = false → (K' t).out = .abort → (K' t).lk ≠ [])
-    (h : obs ((stepT c π s).atomS p K) = obs ((stepT c π s').atomS p K')) :
-    obs (stepT c π s) = obs (stepT c π s') ∧
-    ((stepT c π s).out = .done → obs (K (stepT c π s).st) = obs (K' (stepT c π s').st)) := by
+    (h : obsV f ((stepT c π s).atomS p K) = obsV f ((stepT c π s').atomS p K')) :
+    obsV f (stepT c π s) = obsV f (stepT c π s') ∧
+    ((stepT c π s).out = .done → obsV f (K (stepT c π s).st) = obsV f (K' (stepT c π s').st)) := by
   have hl := (stepT_lk_len hc π hd).trans (stepT_lk_len hc π hd').symm
   have hc1 := (stepT_cost_one c hc π s).trans (stepT_cost_one c hc π s').symm
   unfold TRun.atomS at h
   rcases stepT_out_cases hc π s with ha | ha <;> rcases stepT_out_cases hc π s' with ha' | ha'
-  · simp only [ha, ha', ↓reduceIte, obs, Prod.mk.injEq, List.cons_append, List.cons.injEq,
-      true_and] at h
+  · simp only [ha, ha', ↓reduceIte, obsV, Prod.mk.injEq, List.cons_append, List.cons.injEq,
+      true_and, List.filter_append] at h
     obtain ⟨he, hlk, hcost, ho⟩ := h
-    have hev := (stepT_ev_len hc π hd ha).trans (stepT_ev_len hc π hd' ha').symm
+    have hev := (stepT_view_len f hc π hd ha).trans (stepT_view_len f hc π hd' ha').symm
     obtain ⟨e1, e2⟩ := append_split he hev
     obtain ⟨l1, l2⟩ := append_split hlk hl
-    refine ⟨by simp [obs, e1, l1, hc1, ha, ha'], fun _ => ?_⟩
-    simp only [obs, e2, l2, ho, Prod.mk.injEq, and_true, true_and]
+    refine ⟨by simp [obsV, e1, l1, hc1, ha, ha'], fun _ => ?_⟩
+    simp only [obsV, e2, l2, ho, Prod.mk.injEq, and_true, true_and]
     rw [hc1] at hcost; omega
   · exfalso
-    simp [ha, ha', obs] at h
+    simp [ha, ha', obsV] at h
     obtain ⟨_, hlk, _, ho⟩ := h
     have hlen := congrArg List.length hlk
     simp only [List.length_append] at hlen
     have : (K (stepT c π s).st).lk = [] := List.eq_nil_of_length_eq_zero (by omega)
     exact hK _ (stepT_done_alive ha) ho this
   · exfalso
-    simp [ha, ha', obs] at h
+    simp [ha, ha', obsV] at h
     obtain ⟨_, hlk, _, ho⟩ := h
     have hlen := congrArg List.length hlk
     simp only [List.length_append] at hlen
     have : (K' (stepT c π s').st).lk = [] := List.eq_nil_of_length_eq_zero (by omega)
     exact hK' _ (stepT_done_alive ha') ho.symm this
-  · simp [ha, ha', obs] at h
+  · simp [ha, ha', obsV] at h
     obtain ⟨he, hlk, hcost⟩ := h
-    exact ⟨by simp [obs, he, hlk, hcost, ha, ha'], fun hd => by rw [ha] at hd; cases hd⟩
+    exact ⟨by simp [obsV, he, hlk, hcost, ha, ha'], fun hd => by rw [ha] at hd; cases hd⟩
 
-theorem tickS_obs {l : LCore.Lk} {p : List Nat} {R R' : TRun} (h : obs R = obs R') :
-    obs (R.tickS l p) = obs (R'.tickS l p) := by
-  simp only [obs, Prod.mk.injEq] at h ⊢
+theorem tickS_obs {l : LCore.Lk} {p : List Nat} {R R' : TRun} (h : obsV f R = obsV f R') :
+    obsV f (R.tickS l p) = obsV f (R'.tickS l p) := by
+  simp only [obsV, Prod.mk.injEq] at h ⊢
   obtain ⟨h1, h2, h3, h4⟩ := h
   simp [TRun.tickS, h1, h2, h3, h4]
 
-theorem atomS_obs {a a' : TRun} {p : List Nat} {K K' : UState → TRun} (h : obs a = obs a')
-    (hk : a.out = .done → obs (K a.st) = obs (K' a'.st)) :
-    obs (a.atomS p K) = obs (a'.atomS p K') := by
-  simp only [obs, Prod.mk.injEq] at h
+theorem atomS_obs {a a' : TRun} {p : List Nat} {K K' : UState → TRun} (h : obsV f a = obsV f a')
+    (hk : a.out = .done → obsV f (K a.st) = obsV f (K' a'.st)) :
+    obsV f (a.atomS p K) = obsV f (a'.atomS p K') := by
+  simp only [obsV, Prod.mk.injEq] at h
   obtain ⟨h1, h2, h3, h4⟩ := h
   unfold TRun.atomS
   by_cases ha : a.out = .done
   · have ha' : a'.out = .done := h4 ▸ ha
     have := hk ha
-    simp only [obs, Prod.mk.injEq] at this
+    simp only [obsV, Prod.mk.injEq] at this
     obtain ⟨k1, k2, k3, k4⟩ := this
-    simp [ha, ha', obs, h1, h2, h3, k1, k2, k3, k4]
+    simp [ha, ha', obsV, h1, h2, h3, k1, k2, k3, k4]
   · have ha' : ¬ a'.out = .done := h4 ▸ ha
-    simp [ha', obs, h1, h2, h3, h4]
+    simp [ha', obsV, h1, h2, h3, h4]
 
 /-- Equal observations at one fuel mean equally dead or alive at the start. -/
 theorem dead_agree (π : MedPolicy) {c : UCmd} {p : List Nat} {k : List UFrame} {s s' : UState}
     (hk : NoSeq ((c, p) :: k)) (n : Nat)
-    (h : obs (urunS π (n + 1) ((c, p) :: k) s) = obs (urunS π (n + 1) ((c, p) :: k) s')) :
+    (h : obsV f (urunS π (n + 1) ((c, p) :: k) s) = obsV f (urunS π (n + 1) ((c, p) :: k) s')) :
     s.dead = s'.dead := by
   by_cases hd : s.dead = true <;> by_cases hd' : s'.dead = true
   · rw [hd, hd']
   · exfalso
     have hl := first_lk π hk (by simpa using hd') n
-    simp only [obs, Prod.mk.injEq] at h
+    simp only [obsV, Prod.mk.injEq] at h
     rw [← h.2.1] at hl
     simp [urunS, hd] at hl
   · exfalso
     have hl := first_lk π hk (by simpa using hd) n
-    simp only [obs, Prod.mk.injEq] at h
+    simp only [obsV, Prod.mk.injEq] at h
     rw [h.2.1] at hl
     simp [urunS, hd'] at hl
   · simp_all
@@ -638,8 +673,8 @@ theorem dead_agree (π : MedPolicy) {c : UCmd} {p : List Nat} {k : List UFrame} 
 /-- **Equality at less fuel.** Two runs of the same frames whose observations agree at fuel `m`
     agree at every smaller fuel. A fact about `ucmdLangS`, used by every pass's determinacy. -/
 theorem eq_mono (π : MedPolicy) : ∀ (m' m : Nat) (k : List UFrame) (s s' : UState), NoSeq k →
-    m' ≤ m → obs (urunS π m k s) = obs (urunS π m k s') →
-    obs (urunS π m' k s) = obs (urunS π m' k s') := by
+    m' ≤ m → obsV f (urunS π m k s) = obsV f (urunS π m k s') →
+    obsV f (urunS π m' k s) = obsV f (urunS π m' k s') := by
   intro m'
   induction m' with
   | zero => intro m k s s' _ _ _; cases k <;> rfl
@@ -654,7 +689,7 @@ theorem eq_mono (π : MedPolicy) : ∀ (m' m : Nat) (k : List UFrame) (s s' : US
       have hdd := dead_agree π hk m0 h
       by_cases hd : s.dead = true
       · have hd' : s'.dead = true := hdd ▸ hd
-        simp [urunS, hd, hd', obs]
+        simp [urunS, hd, hd', obsV]
       have hd0 : s.dead = false := by simpa using hd
       have hd0' : s'.dead = false := hdd ▸ hd0
       cases c with
@@ -700,8 +735,8 @@ theorem eq_mono (π : MedPolicy) : ∀ (m' m : Nat) (k : List UFrame) (s s' : US
 /-- **The split program's observation is fixed by the source's.** Two source runs with equal
     observations at fuel `m` give split runs with equal observations at fuel `m`. -/
 theorem det_split (π : MedPolicy) (L : Nat) : ∀ (m : Nat) (k : List UFrame) (s s' : UState),
-    NoSeq k → FB L k → obs (urunS π m k s) = obs (urunS π m k s') →
-    obs (urunS π m (tF k) s) = obs (urunS π m (tF k) s') := by
+    NoSeq k → FB L k → obsV f (urunS π m k s) = obsV f (urunS π m k s') →
+    obsV f (urunS π m (tF k) s) = obsV f (urunS π m (tF k) s') := by
   intro m
   induction m using Nat.strongRecOn with
   | ind m ih =>
@@ -728,9 +763,9 @@ theorem det_split (π : MedPolicy) (L : Nat) : ∀ (m : Nat) (k : List UFrame) (
       | assign x e =>
         obtain ⟨_, a2, a3, a4, a5⟩ := assign_step π x e p k' m s hd0
         obtain ⟨_, b2, b3, b4, b5⟩ := assign_step π x e p k' m s' hd0'
-        have hrest : obs (urunS π m k' { s with store := upd s.store x (evalE e s.store) }) =
-            obs (urunS π m k' { s' with store := upd s'.store x (evalE e s'.store) }) := by
-          simp only [obs, Prod.mk.injEq] at h ⊢
+        have hrest : obsV f (urunS π m k' { s with store := upd s.store x (evalE e s.store) }) =
+            obsV f (urunS π m k' { s' with store := upd s'.store x (evalE e s'.store) }) := by
+          simp only [obsV, Prod.mk.injEq] at h ⊢
           obtain ⟨h1, h2, h3, h4⟩ := h
           refine ⟨by rw [← a3, ← b3, h1], ?_, by rw [a2, b2] at h3; omega, by rw [← a4, ← b4, h4]⟩
           rw [a5, b5] at h2; exact (List.cons.inj h2).2
@@ -744,10 +779,10 @@ theorem det_split (π : MedPolicy) (L : Nat) : ∀ (m : Nat) (k : List UFrame) (
           obtain ⟨_, u2, u3, u4, u5⟩ := hT'
           have hI := ih j (by have := len_pos x e; omega) k' _ _ hk' hb'
             (eq_mono π j m k' _ _ hk' (by have := len_pos x e; omega) hrest)
-          simp only [obs, Prod.mk.injEq] at hI ⊢
+          simp only [obsV, Prod.mk.injEq] at hI ⊢
           obtain ⟨i1, i2, i3, i4⟩ := hI
           exact ⟨by rw [t3, u3, i1], by rw [t5, u5, i2], by rw [t2, u2, i3], by rw [t4, u4, i4]⟩
-        · exact (chain_partial π x e p (tF k') (m + 1) s s' hd0 hd0' (by omega)).1
+        · exact obsV_of_obs (chain_partial π x e p (tF k') (m + 1) s s' hd0 hd0' (by omega)).1
       | ite e a b =>
         have hab : mlen a ≤ L ∧ mlen b ≤ L := by simpa [mlen, Nat.max_le] using hc
         simp only [urunS, hd0, hd0', Bool.false_eq_true, ↓reduceIte] at h
@@ -833,9 +868,9 @@ theorem split_cost (m : Nat) : (urunS π m (push (split c) [] []) (initU σ)).co
   rwa [tF_start] at this
 
 theorem split_det (m : Nat)
-    (h : obs (urunS π m (push c [] []) (initU σ)) = obs (urunS π m (push c [] []) (initU σ'))) :
-    obs (urunS π m (push (split c) [] []) (initU σ)) =
-      obs (urunS π m (push (split c) [] []) (initU σ')) := by
+    (h : obsV f (urunS π m (push c [] []) (initU σ)) = obsV f (urunS π m (push c [] []) (initU σ'))) :
+    obsV f (urunS π m (push (split c) [] []) (initU σ)) =
+      obsV f (urunS π m (push (split c) [] []) (initU σ')) := by
   have := det_split π (Lc c) m _ _ _ (start_ok c).1 (start_ok c).2 h
   rwa [tF_start] at this
 
@@ -863,18 +898,17 @@ def splitPass (P : Partition) (π : MedPolicy) : LCore.PassCert (ucmdLangS P π)
   low_cover u u' _ _ h := ⟨u, u', trivial, trivial, h, rfl, rfl⟩
   ev_sim c p' t h m σ _ := by cases h; exact split_ev π c σ m
   cost_sim c p' t h m σ _ := by cases h; exact split_cost π c σ m
-  det c p' t h m σ σ' _ _ he := by
+  det c p' t h f m σ σ' _ _ he := by
     cases h
-    have hs : obs (urunS π m (push c [] []) (initU σ)) = obs (urunS π m (push c [] []) (initU σ')) := by
-      simp only [ucmdLangS, LCore.Beh.mk.injEq] at he
+    have hs : obsV f (urunS π m (push c [] []) (initU σ)) = obsV f (urunS π m (push c [] []) (initU σ')) := by
+      simp only [ucmdLangS, LCore.Beh.view, LCore.Beh.mk.injEq] at he
       obtain ⟨h1, h2, h3, h4⟩ := he
-      simp only [obs, scale] at h1 h2 h3 h4 ⊢
+      simp only [obsV, scale] at h1 h2 h3 h4 ⊢
       rw [h1, h2, h3, h4]
     have := split_det π c σ σ' m hs
-    simp only [obs, Prod.mk.injEq] at this
-    obtain ⟨h1, h2, h3, h4⟩ := this
-    show ({ ev := _, lk := _, cost := _, out := _ } : LCore.Beh) = { ev := _, lk := _, cost := _, out := _ }
-    rw [h1, h2, h3, h4]
+    simp only [obsV, Prod.mk.injEq] at this
+    simp only [ucmdLangS, LCore.Beh.view, LCore.Beh.mk.injEq]
+    exact this
   progress c p' t h n σ _ hf := by
     cases h
     obtain ⟨_, h2⟩ := split_ahead π c σ n

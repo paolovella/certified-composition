@@ -1,0 +1,9 @@
+case	bytes	elaborate_s	elaborate	kernel	seconds	verdict	detail	lowest_mem_gb
+lk-literals	0	0.2	ok	lean	58.9	accepts		19.4
+lk-literals	0	0.2	ok	paranoid	71.0	accepts		19.4
+lk-literals	0	0.2	ok	lean4lean	84.1	accepts		19.4
+lk-literals	0	0.2	ok	nanoda	48.1	accepts		19.2
+lk-literals	0	0.2	ok	con-leche	13.3	accepts		19.2
+lk-literals	0	0.2	ok	con-ron	9.4	accepts		19.1
+branch-codes-differ-f4	44	0.2	fail	-	-	-	nch_codes_differ_f4.lean:8:167: error: Ambiguous term code Possible interpretations: _root_.code : Lk → Nat Rv.code : List Insn → List Byte 
+branch-codes-same-untaken-f4	44	0.2	fail	-	-	-	des_same_untaken_f4.lean:8:167: error: Ambiguous term code Possible interpretations: _root_.code : Lk → Nat Rv.code : List Insn → List Byte 

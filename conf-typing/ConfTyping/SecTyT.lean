@@ -36,8 +36,8 @@ inductive SecTyT (P : Partition) : Cmd → Prop where
   | skip    : SecTyT P .skip
   | assignH : ∀ x e, P x = true → SecTyT P (.assign x e)
   | assignL : ∀ x e, exprLow P e = true → SecTyT P (.assign x e)
-  | seq     : SecTyT P c₁ → SecTyT P c₂ → SecTyT P (.seq c₁ c₂)
-  | iteL    : ∀ e, exprLow P e = true → SecTyT P c₁ → SecTyT P c₂ →
+  | seq {c₁ c₂}     : SecTyT P c₁ → SecTyT P c₂ → SecTyT P (.seq c₁ c₂)
+  | iteL {c₁ c₂}    : ∀ e, exprLow P e = true → SecTyT P c₁ → SecTyT P c₂ →
               SecTyT P (.ite e c₁ c₂)
 
 /-- Timing-sensitive typing refines store typing: it is `SecTy` at `pc = false`

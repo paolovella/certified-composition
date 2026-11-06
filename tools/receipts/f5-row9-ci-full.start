@@ -1,0 +1,4 @@
+started: 2026-11-02T14:56:48+01:00
+head: 8ec11d2
+command: bash tools/ci.sh
+log: tools/receipts/f5-row9-ci-full.log

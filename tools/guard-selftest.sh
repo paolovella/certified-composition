@@ -263,6 +263,17 @@ run_case "tools/ci.sh drops a gate" drift \
 # 1g. duplicate name in the flat namespace
 run_case "duplicate top-level name" drift \
   bash -c 'printf "\ntheorem medCheck_sound : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'
+# CC-01: the rewritten rules, each both ways
+run_case "declaration outside the namespace" drift \
+  bash -c 'printf "\ntheorem zz_outside : True := trivial\n" >> conf-typing/ConfTyping/Race.lean'
+run_case "same name nested in another namespace" pass \
+  bash -c 'printf "\nnamespace ConfTyping\nnamespace Inner\ntheorem medCheck_sound : True := trivial\nend Inner\nend ConfTyping\n" >> conf-typing/ConfTyping/Race.lean'
+run_case "backlog item loses its acceptance" drift \
+  bash -c 'sed -i "/^acceptance: /d" backlog/P0-01.md && ! grep -q "^acceptance: " backlog/P0-01.md'
+run_case "VULN-cited name renamed everywhere" drift \
+  bash -c 'grep -rl loopFix_terminates conf-typing/ConfTyping transport-calculus | xargs sed -i "s/loopFix_terminates/loopFix_gone/g"'
+run_case "cited module not imported" drift \
+  bash -c 'sed -i "/^import ConfTyping.Race$/d" conf-typing/ConfTyping.lean && ! grep -q "^import ConfTyping.Race$" conf-typing/ConfTyping.lean'
 
 # cross-tool tripwire must not vanish silently
 run_case "cross-tool tripwire renamed" drift \
@@ -376,6 +387,41 @@ run_case "P1 proves prefix closure itself" drift \
 # (p) the one-to-many pass gains a certificate-specific lemma: fires
 run_case "Split gains a certificate-specific pass lemma" drift \
   bash -c 'printf "\ntheorem split_cheat : True := by have := @bcheck_lcoreS; trivial\n" >> conf-typing/ConfTyping/Split.lean'
+
+# (q) the map's "on L" table names a theorem that does not exist: fires
+run_case "the map claims a missing L theorem" drift \
+  bash -c 'sed -i "s/\`ConfTyping.bcheck_boundS\`/\`ConfTyping.bcheck_boundZ\`/" VULN-COVERAGE.md && grep -q bcheck_boundZ VULN-COVERAGE.md'
+
+# (r) autoImplicit stays off: each way of losing it fires
+run_case "a package drops autoImplicit" drift \
+  bash -c 'sed -i "/^leanOptions/d" conf-typing/lakefile.toml && ! grep -q autoImplicit conf-typing/lakefile.toml'
+run_case "a package comments autoImplicit out" drift \
+  bash -c 'sed -i "s/^leanOptions/# leanOptions/" l-core/lakefile.toml && grep -q "^# leanOptions" l-core/lakefile.toml'
+run_case "autoImplicit only under a library" drift \
+  bash -c 'sed -i "/^leanOptions/d" transport-calculus/lakefile.toml && printf "leanOptions = { autoImplicit = false }\n" >> transport-calculus/lakefile.toml && tail -1 transport-calculus/lakefile.toml | grep -q autoImplicit'
+run_case "a library turns autoImplicit on" drift \
+  bash -c 'printf "\n[[lean_lib]]\nname = \"X\"\nleanOptions = { autoImplicit = true }\n" >> conf-typing/lakefile.toml'
+run_case "lakefile.lean drops autoImplicit" drift \
+  bash -c 'sed -i "/autoImplicit/d" transport-kernel/lakefile.lean && ! grep -q autoImplicit transport-kernel/lakefile.lean'
+run_case "lakefile.lean comments it out" drift \
+  bash -c 'sed -i "s/^  leanOptions :=/  -- leanOptions :=/" transport-kernel/lakefile.lean && grep -q "^  -- leanOptions" transport-kernel/lakefile.lean'
+run_case "lakefile.lean turns autoImplicit on" drift \
+  bash -c 'sed -i "s/autoImplicit, false/autoImplicit, true/" transport-kernel/lakefile.lean && grep -q "autoImplicit, true" transport-kernel/lakefile.lean'
+run_case "a new package without autoImplicit" drift \
+  bash -c 'mkdir newpkg && printf "name = \"New\"\n\n[[lean_lib]]\nname = \"New\"\n" > newpkg/lakefile.toml'
+run_case "the gate witness loses autoImplicit" drift \
+  bash -c 'sed -i "/^leanOptions/d" tools/gate/witness/lakefile.toml && ! grep -q autoImplicit tools/gate/witness/lakefile.toml'
+run_case "a file sets autoImplicit true" drift \
+  bash -c 'printf "\nset_option autoImplicit true\n" >> l-core/LCore/Slice/Word.lean'
+run_case "one declaration sets autoImplicit true" drift \
+  bash -c 'printf "\nset_option autoImplicit true in\nexample : a = a := rfl\n" >> l-core/LCore/Slice/Word.lean'
+# (r) and what it must leave alone
+run_case "a new package that sets autoImplicit" pass \
+  bash -c 'mkdir newpkg && printf "name = \"New\"\nleanOptions = { autoImplicit = false }\n\n[[lean_lib]]\nname = \"New\"\n" > newpkg/lakefile.toml'
+run_case "a file sets autoImplicit false" pass \
+  bash -c 'printf "\nset_option autoImplicit false\n" >> l-core/LCore/Slice/Word.lean'
+run_case "a comment mentions autoImplicit true" pass \
+  bash -c 'printf "\n-- autoImplicit true would hide a typo\n" >> l-core/LCore/Slice/Word.lean'
 
 wait
 for r in "$res"/*; do cat "$r"; done

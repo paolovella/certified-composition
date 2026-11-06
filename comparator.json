@@ -32,7 +32,18 @@
     "ConfTyping.Frozen.bcheck_lcoreS_meaning",
     "ConfTyping.Frozen.ucmdLangS_lawful_meaning",
     "ConfTyping.Frozen.ucmdLangT_admits_all",
-    "ConfTyping.Frozen.ucmdLangS_admits_all"
+    "ConfTyping.Frozen.ucmdLangS_admits_all",
+    "LCore.Frozen.trace_transfer",
+    "LCore.Frozen.rel_transfer",
+    "LCore.Frozen.bound_transfer",
+    "LCore.Frozen.live_transfer",
+    "LCore.Frozen.bound_finishes",
+    "LCore.Frozen.boundR_transfer",
+    "LCore.Frozen.bound_iff_boundR",
+    "LCore.Frozen.boundR_finishes",
+    "LCore.Frozen.seq_comp",
+    "LCore.Frozen.hyper_transfer",
+    "LCore.Frozen.relView_transfer"
   ],
   "definition_names": [],
   "permitted_axioms": [

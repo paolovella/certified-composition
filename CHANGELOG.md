@@ -6,6 +6,106 @@ landed.
 
 ## Repository verification
 
+- **A budget that depends on the input: the seventh shape** (2026-11-06, BOUND-01 step 1; `l-core/LCore/Kernel/`). `Cert.boundR` gives each
+  admissible input a budget, chosen before the fuel, that bounds its cost at every fuel. `PassCert.boundR_transfer` carries it through any
+  certified pass, `Cert.bound_iff_boundR` makes `bound` its constant case, and `Lang.Lawful.boundR_finishes` makes it force termination. All three
+  are frozen statements (42 now), and `ring0.lock` holds 524 definitions. Witnesses: `toy`'s program `true` has an input-dependent budget and no
+  constant one, `toySpin` has none, and `boundR_late_vacuous` records why a budget chosen after the fuel would be empty. No pass or checker uses it
+  yet: that is BOUND-01's next steps, with a counted `for` loop.
+
+- **The second slice: loops and input-dependent addresses, to literal RV64 bytes** (2026-11-03 to 2026-11-06, VS-2; `l-core/LCore/Slice2/`). `scan`,
+  a loop over an array at a public index, and `spin`, which never finishes, as literal images carrying `rel` by the kernel's transfer alone, with
+  `t.fuel m = m`: `LCore.Slice2.Image.scan_carries`, `spin_carries`. No kernel change was forced. Under QEMU, 117 runs match the model in every PC and
+  address. Every refused program compiles and its bytes leak, through the channel its refusal names. Over loops only `rel` reaches the bytes: no
+  budget. See `research/2026-11/VS-2-ACCOUNT.md`.
+
+- **The vertical slice: certificates on literal RV64 bytes that run** (2026-11-03, VS-1; `l-core/LCore/Slice/`). One 76-byte program in a
+  new small language, through two chained passes, carrying `rel` and a budget by the kernel's transfers alone, with no kernel change:
+  `LCore.Slice.Image.image_carries`. The bytes run under QEMU and match the model on 204 inputs. No loops, heap, strings, functions or
+  mediation, all addresses constant, and the machine model is not linked to Sail. `UCmd` does not compile. See
+  `research/2026-11/VS-1-ACCOUNT.md`.
+
+- **Component seams on L, in sequence** (2026-11-02, F5 row 12; `conf-typing/ConfTyping/SeamL.lean`).
+  `Cert.rel` does not compose, because `Beh` has no final store: `ConfTyping.Seam.bare_rel_breaks` gives
+  two programs that each satisfy it and whose sequence leaks. With `bcheck`'s threaded rights and
+  pointers as the interface, `ConfTyping.Seam.bcheck_seam` composes two components at the sum of their
+  costs, and `seam_carried` takes the composite's four guarantees through `splitPass`. No new checker or
+  kernel change. `Bridge.comp`'s reception and the trusted-base ledger stay on toy `Cmd`.
+
+- **Memory leaks on L, for runs that finish** (2026-11-02, F5 row 6;
+  `conf-typing/ConfTyping/LeakL.lean`). `Beh` has no final heap, so a leak could not be stated on
+  `ucmdLangS`. `ucmdLangH` is the same run plus an exit report, and `ConfTyping.Leak.leakSafe_traceH`
+  says what `leakSafe` accepts never reports a leak, unbounded loops included. No new checker or kernel
+  change. Refused with the leak shown: CWE-401's error path, an allocation in a loop body, and
+  overwriting the only handle. Limits: a run that aborts is not covered, and the certificate is not
+  carried through a pass.
+
+- **Speculative execution on L, for `ite` misprediction** (2026-11-02, F5 row 9;
+  `conf-typing/ConfTyping/SpecL.lean`). `ucmdLangW` is a lawful L language in which each `ite` first
+  runs the branch it will not take, for up to `w` commands, with its state discarded and its addresses
+  and commands observed. At window 0 it is `ucmdLangS`. `ConfTyping.Spec.bcheck_relW`: what `bcheck`
+  accepts shows the same on low-equivalent inputs at every window and fuel, counted loops included.
+  No new checker or kernel change. Refused with the leak shown: a secret address in a branch that never
+  runs, and a bounds-check-bypass gadget that needs a window of two. Limits: one global window, loop
+  guards predicted correctly, no nested speculation, no cache model, and not carried through a pass.
+
+- **Declassification on L, for whole input variables** (2026-11-02, F5 row 4;
+  `conf-typing/ConfTyping/ReleaseL.lean`). `ConfTyping.Release.bcheck_release`: what `bcheck` accepts
+  with variables `R` released shows the same on inputs that agree on public and released variables,
+  and `bcheck_release_carried` carries that through `splitPass`. No new checker or kernel change.
+  Refused with the leak shown: an undeclared release, a branch on an unreleased secret, and a secret
+  written into a released variable. Limit: a computed release cannot be stated (`revealR_coarser`);
+  that is the new item REL-01, which F6 must schedule or set aside before the lock.
+
+- **Tenant isolation on L, against an attacker who measures side channels** (2026-11-02, F5 row
+  7b; `conf-typing/ConfTyping/TenantL.lean`). `ConfTyping.Tenant.tenantCheck_relView`: what `bcheck`
+  and `tenantCheck` both accept shows tenant B the same events on its channels and the same leakage,
+  cost and outcome, at every fuel, on inputs that differ only in tenant A's data. A's own channels
+  may still depend on A's data (`twoTenants_all_fails`). A string cannot change timing, addresses,
+  cost or outcome in UCmd (`runS_blind`), so `bcheck` handles A's integers and `tenantCheck` A's
+  strings. Refused, each with a run showing the difference: A's data on B's channel, through an
+  assignment, through `san`, and a branch on A's integer. A's code must be constant-time in A's
+  integers, loops are bounded, and this is about the leakage `Beh` records.
+
+- **Path traversal on L, for loop-free programs, per sink** (2026-11-02, F5 row 14;
+  `conf-typing/ConfTyping/PathL.lean`). `ConfTyping.pcheck_traceI`: what `pcheck fs` accepts sends
+  only paths that stay inside their root to `fs`, on every input and at every fuel, as a
+  `Cert.trace` on `ucmdLangI`. The vulnerable program is refused on the `../..` input
+  (`vulnPath_traceI_fails`). Other sinks are not covered (`dbProg_db_fails`).
+
+- **Injection on L, for loop-free programs** (2026-11-02, F5 row 3;
+  `conf-typing/ConfTyping/InjectionL.lean`). L had no entry point for untrusted strings:
+  `ucmdLangS` starts the string store empty, so the vulnerable query is safe on it
+  (`vulnQuery_empty_shows_two`). `ucmdLangI` adds the initial strings to the input and is equal to
+  `ucmdLangS` on empty strings. `ConfTyping.tcheck_traceI`: what `tcheck` accepts emits only
+  predicted delimiter counts, on every input and at every fuel, as a `Cert.trace`; the vulnerable
+  query is refused on the attacker's input (`vulnQuery_traceI_fails`). Injection here means the
+  delimiter count over a two-symbol alphabet. Correction of record: F5's table said this row
+  needed a different `lowIn`; it is a trace property.
+
+- **A sixth certificate shape: one observer's whole view, side channels included** (2026-11-02,
+  the user's decision; `l-core/LCore/Kernel/{Obs,Cert,Pass}.lean`, Ring 0;
+  `conf-typing/ConfTyping/Split.lean`). `hyper` compares only event limits, so a branch on tenant
+  A's data passes "tenant B sees the same". `Cert.relView R f`: for inputs related by `R`, observer
+  `f` sees the same events on its channels and the same leakage, cost and outcome, at every fuel.
+  An `Observer` chooses channels, never payloads, by its type. `PassCert.det` now holds for every
+  observer, so `LCore.PassCert.relView_transfer` needs no per-observer proof, and it is
+  axiom-free; `splitPass` proves it too (`stepT_view_len`: a finished step's channels are fixed by
+  its command). Witnesses: `timing_outputs_pass` and `timing_view_fails` show the same program
+  passing outputs-only and refused here; `clean_view_holds` and `clean_view_all_fails` show this
+  says what `rel` cannot. 39 frozen statements, and `ring0.lock` holds 522 definitions. This is
+  about the leakage `Beh` records, not hardware L does not model.
+
+- **A fifth certificate shape: one observer, a chosen input relation** (2026-11-02, F5's kill
+  rule and the user's decision; `l-core/LCore/Kernel/{Cert,Pass}.lean`, Ring 0). Injection,
+  declassification and tenant isolation are each noninterference for a particular observer under
+  a particular input relation, which `rel` cannot state. `Cert.hyper R Θ`: for inputs related by
+  `R`, the two runs' limits satisfy `Θ`. Every pass already gives each compiled run its source
+  run's limit, so with one fact about the pass's inputs `LCore.PassCert.hyper_transfer` carries
+  it, and it is axiom-free. Witnesses: a property that holds, one that fails, and one carried
+  through a pass. Also frozen, with the kernel's other theorems (F6): 38 frozen statements, and
+  `ring0.lock` holds 509 definitions.
+
 - **Certificates through a one-to-many pass** (2026-11-01, F4; `conf-typing/ConfTyping/Split.lean`).
   Expression splitting accumulates `x := (a + b) + c` in place as `x := a + b; x := x + c`, so
   one source step becomes several target steps, cost grows with the expression, and a partial

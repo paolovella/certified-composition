@@ -1,5 +1,7 @@
 name = "LCore"
 defaultTargets = ["LCore"]
+# An unknown name in a statement is an error, and not a new variable (the user's decision of 2026-11-05).
+leanOptions = { autoImplicit = false }
 
 # The trusted core of L (PLAN-2026-10 §2). LCore/Kernel/ is Ring 0: changed only with the user's key.
 # Mathlib-free, like every package here except transport-kernel.

@@ -1,0 +1,39 @@
+case	bytes	elaborate_s	elaborate	kernel	seconds	verdict	detail
+baseline	0	0.2	ok	lean	58.3	accepts	
+baseline	0	0.2	ok	paranoid	68.3	accepts	
+baseline	0	0.2	ok	lean4lean	81.8	accepts	
+baseline	0	0.2	ok	nanoda	49.9	accepts	
+baseline	0	0.2	ok	con-leche	12.8	accepts	
+baseline	0	0.2	ok	con-ron	7.6	accepts	
+compile-88B	88	0.4	ok	lean	54.5	accepts	
+compile-88B	88	0.4	ok	paranoid	62.7	accepts	
+compile-88B	88	0.4	ok	lean4lean	75.5	accepts	
+compile-88B	88	0.4	ok	nanoda	38.1	accepts	
+compile-88B	88	0.4	ok	con-leche	11.3	accepts	
+compile-88B	88	0.4	ok	con-ron	7.0	accepts	
+run-88B	88	0.5	ok	lean	51.6	accepts	
+run-88B	88	0.5	ok	paranoid	62.5	accepts	
+run-88B	88	0.5	ok	lean4lean	74.1	accepts	
+run-88B	88	0.5	ok	nanoda	39.7	accepts	
+run-88B	88	0.5	ok	con-leche	11.5	accepts	
+run-88B	88	0.5	ok	con-ron	6.9	accepts	
+compile-776B	776	0.5	ok	lean	51.3	accepts	
+compile-776B	776	0.5	ok	paranoid	62.1	accepts	
+compile-776B	776	0.5	ok	lean4lean	73.8	accepts	
+compile-776B	776	0.5	ok	nanoda	38.0	accepts	
+compile-776B	776	0.5	ok	con-leche	12.7	accepts	
+compile-776B	776	0.5	ok	con-ron	6.9	accepts	
+run-776B	776	10.1	fail	-	-	-	artbeats <num>` to set the limit. Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command. 
+compile-7624B	7624	4.4	ok	lean	51.6	accepts	
+compile-7624B	7624	4.4	ok	paranoid	63.1	accepts	
+compile-7624B	7624	4.4	ok	lean4lean	75.4	accepts	
+compile-7624B	7624	4.4	ok	nanoda	40.0	accepts	
+compile-7624B	7624	4.4	ok	con-leche	12.2	accepts	
+compile-7624B	7624	4.4	ok	con-ron	7.4	accepts	
+run-7624B	7624	13.3	fail	-	-	-	artbeats <num>` to set the limit. Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command. 
+branch-differs-f4	44	31.1	ok	lean	82.5	accepts	
+branch-differs-f4	44	31.1	ok	paranoid	104.4	accepts	
+branch-differs-f4	44	31.1	ok	lean4lean	55.9	REJECTS	uncaught exception: at t: (kernel) deep recursion detected, use `set_option maxRecDepth <num>` to increase the
+branch-differs-f4	44	31.1	ok	nanoda	41.3	accepts	
+branch-differs-f4	44	31.1	ok	con-leche	14.0	REJECTS	con-leche: internal error: fuel exhausted: whnfCore [at theorem t, fold position 48683] (--verified) t=12.8s
+branch-differs-f4	44	31.1	ok	con-ron	7.3	REJECTS	con-ron: error: fuel exhausted: whnfCore [at theorem t, fold position 48683] (--verified) t=7.266s

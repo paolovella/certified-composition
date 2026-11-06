@@ -1,0 +1,4 @@
+started: 2026-11-06T00:24:03+01:00
+head: 8c4dfd3
+command: bash tools/ci.sh
+log: tools/receipts/vs2-step8-ci.log

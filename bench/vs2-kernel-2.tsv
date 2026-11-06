@@ -1,0 +1,14 @@
+case	bytes	elaborate_s	elaborate	kernel	seconds	verdict	detail	lowest_mem_gb
+baseline	0	0.2	ok	lean	52.7	accepts		19.3
+baseline	0	0.2	ok	paranoid	64.1	accepts		19.2
+baseline	0	0.2	ok	lean4lean	78.6	accepts		19.2
+baseline	0	0.2	ok	nanoda	45.2	accepts		19.0
+baseline	0	0.2	ok	con-leche	12.1	accepts		19.0
+baseline	0	0.2	ok	con-ron	7.3	accepts		18.8
+run-776B	776	16.5	ok	lean	69.0	accepts		16.0
+run-776B	776	16.5	ok	paranoid	83.4	accepts		15.1
+run-776B	776	16.5	ok	lean4lean	91.5	accepts		15.1
+run-776B	776	16.5	ok	nanoda	56.3	accepts		15.1
+run-776B	776	16.5	ok	con-leche	32.6	accepts		15.1
+run-776B	776	16.5	ok	con-ron	20.3	accepts		15.1
+run-7624B	7624	932.9	fail	-	-	-	timeout 900 s

@@ -7,7 +7,7 @@ deps: [P0-03]
 closes: ['certificates proved per pass']
 acceptance: ucmd_p1_carries with zero certificate-specific pass proofs
 kill: S-OBS fails: public-only allocator
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -153,3 +153,6 @@ toy `Lang`. Then 6, 5, 7. Each step builds and runs CI before the next.
   claim with one passes. On its first run the guard also caught `Obs.lean`, which said an
   out-of-fuel record ~~is a prefix of a longer run~~; corrected the same way. PH1's exit is restated as the foundation's S1–S3
   (research/2026-10/FOUNDATION-2026-10-29.md).
+- 2026-11-02, **done**: the kernel, UCmd on L and P1 merged into master with the user's key,
+  inside the foundation merge (#17, 7b92ed0). The exit restated by F0 (S1-S3) holds: lawful
+  languages (F2), certificates landing on the target (F3), a one-to-many pass (F4).

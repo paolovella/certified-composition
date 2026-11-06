@@ -1,0 +1,4 @@
+started: 2026-11-04T18:58:21+01:00
+head: 46950c4
+command: bash -c cd l-core && python3 test/rv_diff.py /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad/v2e && python3 test/rv_diff.py /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad/v2f --mutants && python3 test/image_diff.py /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad/v2g && python3 test/refused_diff.py /tmp/claude-1000/-home-paolo-certified-composition/48adff28-9f11-45af-a415-b383b9bacc36/scratchpad/v2h
+log: tools/receipts/vs2-step3-rvdiff.log

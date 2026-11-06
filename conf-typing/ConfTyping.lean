@@ -104,4 +104,12 @@ import ConfTyping.MemT
 import ConfTyping.NiT
 import ConfTyping.UStep
 import ConfTyping.Split
+import ConfTyping.SplitView
+import ConfTyping.InjectionL
+import ConfTyping.PathL
+import ConfTyping.TenantL
+import ConfTyping.ReleaseL
+import ConfTyping.SpecL
+import ConfTyping.LeakL
+import ConfTyping.SeamL
 import ConfTyping.Vacuity
