@@ -1,0 +1,4 @@
+started: 2026-11-06T19:42:26+01:00
+head: 14dd6ba
+command: bash tools/ci.sh
+log: tools/receipts/f6-fix-ci.log
