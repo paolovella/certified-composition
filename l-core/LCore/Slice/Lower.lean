@@ -102,6 +102,66 @@ theorem good_add {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Goo
   have h6 : W / 2 ^ 25 = 0 := by simp only [Nat.reducePow]; omega
   simp [decode, h1, h2, h3, h4, h5, h6]
 
+/-- **The R-type instructions RC-01 needs**, `sub`, `xor`, `or` and `and`: their encodings decode back. -/
+theorem good_sub {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.sub rd a b) := by
+  have hw : encode (.sub rd a b) = 32 * 33554432 + b * 1048576 + a * 32768 + rd * 128 + 0x33 := rfl
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : 32 * 33554432 + b * 1048576 + a * 32768 + rd * 128 + 0x33 = W
+  have h1 : W % 128 = 0x33 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = a := by simp only [rs1Of, Nat.reducePow]; omega
+  have h4 : rs2Of W = b := by simp only [rs2Of, Nat.reducePow]; omega
+  have h5 : f3Of W = 0 := by simp only [f3Of, Nat.reducePow]; omega
+  have h6 : W / 2 ^ 25 = 32 := by simp only [Nat.reducePow]; omega
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+theorem good_r3 {rd a b f : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) (hf : f < 8) :
+    let W := b * 1048576 + a * 32768 + f * 4096 + rd * 128 + 0x33
+    W % 128 = 0x33 ∧ rdOf W = rd ∧ rs1Of W = a ∧ rs2Of W = b ∧ f3Of W = f ∧ W / 2 ^ 25 = 0 ∧ W < 4294967296 := by
+  intro W
+  refine ⟨by omega, ?_, ?_, ?_, ?_, ?_, by omega⟩
+  · simp only [W, rdOf, Nat.reducePow]; omega
+  · simp only [W, rs1Of, Nat.reducePow]; omega
+  · simp only [W, rs2Of, Nat.reducePow]; omega
+  · simp only [W, f3Of, Nat.reducePow]; omega
+  · simp only [W, Nat.reducePow]; omega
+
+theorem good_xor {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.xor rd a b) := by
+  have hw : encode (.xor rd a b) = b * 1048576 + a * 32768 + 4 * 4096 + rd * 128 + 0x33 := rfl
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := good_r3 (f := 4) hd ha hb (by omega)
+  refine ⟨?_, by rw [hw]; exact h7⟩
+  rw [hw]
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+theorem good_or {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.or rd a b) := by
+  have hw : encode (.or rd a b) = b * 1048576 + a * 32768 + 6 * 4096 + rd * 128 + 0x33 := rfl
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := good_r3 (f := 6) hd ha hb (by omega)
+  refine ⟨?_, by rw [hw]; exact h7⟩
+  rw [hw]
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+theorem good_and {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.and rd a b) := by
+  have hw : encode (.and rd a b) = b * 1048576 + a * 32768 + 7 * 4096 + rd * 128 + 0x33 := rfl
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := good_r3 (f := 7) hd ha hb (by omega)
+  refine ⟨?_, by rw [hw]; exact h7⟩
+  rw [hw]
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+/-- **`srli` by a shift below 64.** -/
+theorem good_srli {rd a k : Nat} (hd : rd < 32) (ha : a < 32) (hk : k < 64) : Good (.srli rd a k) := by
+  have hw : encode (.srli rd a k) = k * 1048576 + a * 32768 + 5 * 4096 + rd * 128 + 0x13 := rfl
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : k * 1048576 + a * 32768 + 5 * 4096 + rd * 128 + 0x13 = W
+  have h1 : W % 128 = 0x13 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = a := by simp only [rs1Of, Nat.reducePow]; omega
+  have h5 : f3Of W = 5 := by simp only [f3Of, Nat.reducePow]; omega
+  have h6 : W / 2 ^ 26 = 0 := by simp only [Nat.reducePow]; omega
+  have h7 : W / 2 ^ 20 % 64 = k := by simp only [Nat.reducePow]; omega
+  simp [decode, h1, h2, h3, h5, h6, h7]
+
 theorem good_ld {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
     Good (.ld rd rs (Int.ofNat i)) := by
   have hw : encode (.ld rd rs (Int.ofNat i)) = i * 1048576 + rs * 32768 + 12288 + rd * 128 + 0x03 := by

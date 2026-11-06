@@ -31,6 +31,11 @@ inductive Insn where
   | addi (rd rs1 : Nat) (imm : Int)
   | andi (rd rs1 : Nat) (imm : Int)
   | add  (rd rs1 rs2 : Nat)
+  | sub  (rd rs1 rs2 : Nat)
+  | xor  (rd rs1 rs2 : Nat)
+  | or   (rd rs1 rs2 : Nat)
+  | and  (rd rs1 rs2 : Nat)
+  | srli (rd rs1 shamt : Nat)
   | ld   (rd rs1 : Nat) (imm : Int)
   | sd   (rs2 rs1 : Nat) (imm : Int)
   | beq  (rs1 rs2 : Nat) (imm : Int)
@@ -44,6 +49,11 @@ def encode : Insn → Nat
   | .addi rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + rd * 2 ^ 7 + 0x13
   | .andi rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + 7 * 2 ^ 12 + rd * 2 ^ 7 + 0x13
   | .add rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + rd * 2 ^ 7 + 0x33
+  | .sub rd rs1 rs2 => 32 * 2 ^ 25 + rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + rd * 2 ^ 7 + 0x33
+  | .xor rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + 4 * 2 ^ 12 + rd * 2 ^ 7 + 0x33
+  | .or rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + 6 * 2 ^ 12 + rd * 2 ^ 7 + 0x33
+  | .and rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + 7 * 2 ^ 12 + rd * 2 ^ 7 + 0x33
+  | .srli rd rs1 sh => sh * 2 ^ 20 + rs1 * 2 ^ 15 + 5 * 2 ^ 12 + rd * 2 ^ 7 + 0x13
   | .ld rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + 3 * 2 ^ 12 + rd * 2 ^ 7 + 0x03
   | .sd rs2 rs1 imm =>
     let i := bits imm 12
@@ -73,8 +83,15 @@ def decode (w : Nat) : Option Insn :=
   | 0x13 =>
     if f3Of w = 0 then some (.addi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
     else if f3Of w = 7 then some (.andi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
+    else if f3Of w = 5 ∧ w / 2 ^ 26 = 0 then some (.srli (rdOf w) (rs1Of w) (w / 2 ^ 20 % 64))
     else none
-  | 0x33 => if f3Of w = 0 ∧ w / 2 ^ 25 = 0 then some (.add (rdOf w) (rs1Of w) (rs2Of w)) else none
+  | 0x33 =>
+    if f3Of w = 0 ∧ w / 2 ^ 25 = 0 then some (.add (rdOf w) (rs1Of w) (rs2Of w))
+    else if f3Of w = 0 ∧ w / 2 ^ 25 = 32 then some (.sub (rdOf w) (rs1Of w) (rs2Of w))
+    else if f3Of w = 4 ∧ w / 2 ^ 25 = 0 then some (.xor (rdOf w) (rs1Of w) (rs2Of w))
+    else if f3Of w = 6 ∧ w / 2 ^ 25 = 0 then some (.or (rdOf w) (rs1Of w) (rs2Of w))
+    else if f3Of w = 7 ∧ w / 2 ^ 25 = 0 then some (.and (rdOf w) (rs1Of w) (rs2Of w))
+    else none
   | 0x03 => if f3Of w = 3 then some (.ld (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))) else none
   | 0x23 =>
     if f3Of w = 3 then some (.sd (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w))) else none
@@ -164,6 +181,11 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
       | .addi rd rs imm => .next [] { m with pc := n, x := m.set rd (W64.ofNat (addImm (m.get rs) imm)) }
       | .andi rd rs imm => .next [] { m with pc := n, x := m.set rd (W64.and (m.get rs) (wordOfInt imm)) }
       | .add rd a b => .next [] { m with pc := n, x := m.set rd (W64.add (m.get a) (m.get b)) }
+      | .sub rd a b => .next [] { m with pc := n, x := m.set rd (W64.sub (m.get a) (m.get b)) }
+      | .xor rd a b => .next [] { m with pc := n, x := m.set rd (W64.xor (m.get a) (m.get b)) }
+      | .or rd a b => .next [] { m with pc := n, x := m.set rd (W64.or (m.get a) (m.get b)) }
+      | .and rd a b => .next [] { m with pc := n, x := m.set rd (W64.and (m.get a) (m.get b)) }
+      | .srli rd a k => .next [] { m with pc := n, x := m.set rd (W64.shr (m.get a) k) }
       | .ld rd rs imm =>
         let a := addImm (m.get rs) imm
         if (addrs8 a).all (canRead code e) then

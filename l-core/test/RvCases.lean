@@ -69,6 +69,16 @@ def cases : List Case :=
   , ins "andi_input_near_wrap" [.ld t0 t2 0, .andi a0 t0 63, .andi t1 t0 (-64)] (inputWord (2 ^ 64 - 3))
   , ins "array_index_doubled" [.addi t0 0 67, .andi t0 t0 63, .add t0 t0 t0, .add t0 t0 t0, .add t0 t0 t0, .add t0 t0 t2,
       .addi a0 0 9, .sd a0 t0 512, .ld a0 t0 512]
+  , ins "sub_wraps" [.addi t0 0 3, .addi t1 0 5, .sub a0 t0 t1, .sub s1 t1 t0, .sub t0 0 t1]
+  , ins "sub_full_width" [.ld t0 t2 0, .ld t1 t2 8, .sub a0 t0 t1, .sub s1 t1 t0] (inputWord (2 ^ 64 - 1) ++ inputWord (2 ^ 63))
+  , ins "xor_or_and" [.addi t0 0 0x5a, .addi t1 0 0x3c, .xor a0 t0 t1, .or s1 t0 t1, .and t0 t0 t1, .add a0 a0 s1, .add a0 a0 t0]
+  , ins "xor_or_and_wide" [.ld t0 t2 0, .ld t1 t2 8, .xor a0 t0 t1, .or s1 t0 t1, .and t1 t0 t1]
+      (inputWord 0xf0f0f0f0f0f0f0f0 ++ inputWord 0xff00ff00ff00ff00)
+  , ins "xor_self_is_zero" [.addi t0 0 (-7), .xor a0 t0 t0, .or s1 t0 0]
+  , ins "srli_edges" [.addi t0 0 (-1), .srli a0 t0 8, .srli s1 t0 63, .srli t1 t0 0, .addi t0 0 256, .srli t0 t0 8]
+  , ins "srli_wide" [.ld t0 t2 0, .srli a0 t0 32, .srli s1 t0 1] (inputWord (2 ^ 63 + 5))
+  , ins "verify_tail" [.addi t0 0 0, .addi t0 t0 (-1), .srli t0 t0 8, .andi t0 t0 1, .addi a0 t0 (-1),
+      .addi t1 0 7, .addi t1 t1 (-1), .srli t1 t1 8, .andi t1 t1 1, .addi s1 t1 (-1)]
   , ins "beq_taken" [.addi t0 0 1, .beq t0 t0 8, .addi a0 0 9, .addi t1 0 2]
   , ins "beq_not_taken" [.addi t0 0 1, .beq t0 0 8, .addi a0 0 9, .addi t1 0 2]
   , ins "beq_backward" [.addi t0 0 3, .addi t0 t0 (-1), .addi a0 a0 2, .beq t0 0 8, .beq 0 0 (-12)]

@@ -132,6 +132,16 @@ MUTANTS = [
     ("a faulting load leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .sd", "else .fault []\n      | .sd", False),
     ("andi: acts as add", "x := m.set rd (W64.and (m.get rs) (wordOfInt imm))", "x := m.set rd (W64.add (m.get rs) (wordOfInt imm))", False),
     ("andi: immediate unsigned", ".andi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))", ".andi (rdOf w) (rs1Of w) (Int.ofNat (w / 2 ^ 20))", False),
+    # RC-01 step 2a: the five instructions crypto_verify_16 needs.
+    ("sub: acts as add", "x := m.set rd (W64.sub (m.get a) (m.get b))", "x := m.set rd (W64.add (m.get a) (m.get b))", False),
+    ("sub: operands swapped", "x := m.set rd (W64.sub (m.get a) (m.get b))", "x := m.set rd (W64.sub (m.get b) (m.get a))", False),
+    ("xor: acts as or", "x := m.set rd (W64.xor (m.get a) (m.get b))", "x := m.set rd (W64.or (m.get a) (m.get b))", False),
+    ("or: acts as xor", "x := m.set rd (W64.or (m.get a) (m.get b))", "x := m.set rd (W64.xor (m.get a) (m.get b))", False),
+    ("and: acts as or", "| .and rd a b => .next [] { m with pc := n, x := m.set rd (W64.and (m.get a) (m.get b)) }", "| .and rd a b => .next [] { m with pc := n, x := m.set rd (W64.or (m.get a) (m.get b)) }", False),
+    ("srli: shamt 5 bits", "some (.srli (rdOf w) (rs1Of w) (w / 2 ^ 20 % 64))", "some (.srli (rdOf w) (rs1Of w) (w / 2 ^ 20 % 32))", False),
+    ("srli: arithmetic", "x := m.set rd (W64.shr (m.get a) k)", "x := m.set rd (if (m.get a).val ≥ 2 ^ 63 then W64.ofNat ((m.get a).val >>> k + (2 ^ 64 - 2 ^ (64 - k))) else W64.shr (m.get a) k)", False),
+    ("xor and or decoded swapped", "else if f3Of w = 4 ∧ w / 2 ^ 25 = 0 then some (.xor", "else if f3Of w = 6 ∧ w / 2 ^ 25 = 0 then some (.xor", False,
+     "else if f3Of w = 6 ∧ w / 2 ^ 25 = 0 then some (.or", "else if f3Of w = 4 ∧ w / 2 ^ 25 = 0 then some (.or"),
 ]
 
 def compare_all(d, gen):
