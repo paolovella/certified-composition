@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VS-2 steps 6, 7 and 9, and BOUND-01 steps 2 and 3: hand-written mutants of the second slice's lowering, since tools/mutants.py does not scan l-core.
+"""VS-2 steps 6, 7 and 9, and BOUND-01 steps 2 to 4: hand-written mutants of the second slice's lowering, since tools/mutants.py does not scan l-core.
 
 Each mutant must fail to build as far as the machine witnesses. It runs on a copy of the package, never on the working
 tree, with each build in its own process group, killed as a group on timeout or above 12 GB resident. A kill counts only with a Lean error at a line of a `.lean` file.
@@ -9,7 +9,7 @@ Usage, from the repo root: python3 research/2026-11/slice2_low_mut.py <scratch d
 import os, re, shutil, signal, subprocess, sys, tempfile, time
 
 WORK = os.path.join(sys.argv[1], 'l-core')
-LOW, CHK, PAS, OLD, IMG, TTH, FOR, BUD = ('LCore/Slice2/Lower.lean', 'LCore/Slice2/Chunk.lean', 'LCore/Slice2/Pass.lean', 'LCore/Slice/Lower.lean', 'LCore/Slice2/Image.lean', 'LCore/Slice2/Teeth.lean', 'LCore/Slice2/For.lean', 'LCore/Slice2/Budget.lean')
+LOW, CHK, PAS, OLD, IMG, TTH, FOR, BUD, BYT = ('LCore/Slice2/Lower.lean', 'LCore/Slice2/Chunk.lean', 'LCore/Slice2/Pass.lean', 'LCore/Slice/Lower.lean', 'LCore/Slice2/Image.lean', 'LCore/Slice2/Teeth.lean', 'LCore/Slice2/For.lean', 'LCore/Slice2/Budget.lean', 'LCore/Slice2/BoundBytes.lean')
 CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
@@ -56,6 +56,10 @@ M = [
  ("a counter may be an input", BUD, "topC (counters p.body) p.inputs p.body && (counters p.body).all (fun c => !p.inputs.contains c)", "topC (counters p.body) p.inputs p.body"),
  ("a decrement by two counts as one", BUD, "  | .add (.var y) (.lit w) => y == c && w.val == 2 ^ 64 - 1", "  | .add (.var y) (.lit w) => y == c && decide (2 ^ 64 - 2 ≤ w.val)"),
  ("countUp's budget is said to be one less", BUD, "budget countUp (inp 5 3) = 14 ∧", "budget countUp (inp 5 3) = 13 ∧"),
+ ("the bytes' budget formula is one less per round", BYT, "≤ 26 * (4 * (wordAt u.1 1).val + 2) + 26 := by", "≤ 26 * (3 * (wordAt u.1 1).val + 2) + 26 := by"),
+ ("the source budget is said to be 4n + 1", BYT, "budget countUp i = 4 * (i 1).val + 2 := by", "budget countUp i = 4 * (i 1).val + 1 := by"),
+ ("the capped budget on the bytes is one less", BYT, "theorem capped_bound_bytes : Cert.bound (rvLang sec0) 672 cappedImage := by", "theorem capped_bound_bytes : Cert.bound (rvLang sec0) 671 cappedImage := by"),
+ ("one byte of countUp's literal is wrong", BYT, "[183, 3, 2, 0, 3, 180, 131, 0, 35, 176, 131, 64, 3, 180, 3, 64, 99, 4, 4, 4,", "[183, 3, 2, 0, 3, 180, 131, 0, 35, 176, 131, 64, 3, 180, 3, 64, 99, 4, 4, 5,"),
 ]
 
 
@@ -68,7 +72,7 @@ def build():
     """A resident-memory watchdog, not RLIMIT_AS: an address-space cap stops Lean creating threads, and every build then
     aborts with code 134 before checking a proof. That made the first run of this harness report 19 of 19 killed."""
     with tempfile.TemporaryFile('w+') as log:
-        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Budget'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
+        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.BoundBytes'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
                              text=True, start_new_session=True)
         t0 = time.time()
         while p.poll() is None:

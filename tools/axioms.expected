@@ -4341,6 +4341,23 @@ LCore.Slice.tick_ext	LCore.Slice.Source	propext
 LCore.Slice.upd	LCore.Slice.Source	
 LCore.Slice.wraps_in_source	LCore.Slice.Source	propext
 LCore.Slice2.Arr	LCore.Slice2.Source	
+LCore.Slice2.BoundBytes.budget_countUp	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.cappedImage	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.cappedNats	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.capped_bound_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.capped_is_literal	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.BoundBytes.capped_pipeline	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.capped_rel_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.capped_runs_within	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.BoundBytes.countUpImage	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.countUpNats	LCore.Slice2.BoundBytes	
+LCore.Slice2.BoundBytes.countUp_boundR_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_bytes_budget	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_cost	LCore.Slice2.BoundBytes	Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_is_literal	LCore.Slice2.BoundBytes	propext
+LCore.Slice2.BoundBytes.countUp_pipeline	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_rel_bytes	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.BoundBytes.countUp_runs_within	LCore.Slice2.BoundBytes	propext
 LCore.Slice2.Budget.Agree	LCore.Slice2.Budget	
 LCore.Slice2.Budget.BodyF	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.IsInit	LCore.Slice2.Budget	
