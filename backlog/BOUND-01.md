@@ -46,6 +46,10 @@ lemma per pass, about `enc` alone and not about a certificate.
    `enc` injective for both passes.
 5. **QEMU.** The instruction count on every input tried is at most the transformed budget, and the comparison can fail: a budget one too small is
    seen to be exceeded.
+5a. **A tighter transformer** (the user's decision of 2026-11-06, "add option a", after a side agent raised the looseness). `rvPass` charges each
+   source step its own largest frame, not the whole program: the program-wide `L` in `xf` becomes the largest `sC` of any frame command, plus the
+   jump each step may push. `behind` already takes that size as a parameter, so only `xf`, `k0_fs` and the constant change. The transfers stay as
+   they are. Measured before and after, on `countUp` and `capped`.
 6. **The account,** including how tight the budget is.
 
 ## Log
@@ -111,4 +115,5 @@ lemma per pass, about `enc` alone and not about a certificate.
   - **Sound and loose, stated in the module.** The machine runs 66 at `n = 3` and 199 at `n = 10`, against 390 and 1118. `capped` runs 83 at the cap, against 672. The source budget is exact. The looseness is `rvPass`'s transformer, `L * c + L`, which charges every source step the whole code's length. Tightening it is a change to `rvPass`'s `Xform`, not to the kernel, and is not done here.
   - **Mutants: 46 of 46 killed** (receipt `bound01-step4-mutants`), 4 new on the bytes' budgets.
   - **Next, step 5:** QEMU, where the instruction count on every input tried is at most the budget, and a budget one too small is seen to fail.
+- 2026-11-06, **step 5a added, on the user's word:** a tighter `rvPass` cost transformer, after step 5 and before the account.
 
