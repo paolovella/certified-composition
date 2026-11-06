@@ -76,3 +76,21 @@ lemma per pass, about `enc` alone and not about a certificate.
   - **Not here yet:** any budget. That is step 3, the checker's.
   - **CI** (`bound01-step2-ci`): every check passes, and `lake check` is over its time budget, 109 s against 104 s. Alone it takes 99 to 101 s. In the last six CI runs it went 87, 98, 91, 86, 101, 109 s. This is real growth: `lake check` replays every proof through the kernel, and each slice adds kernel-evaluated witnesses, `For.lean` about 2 to 3 s. Unlike guard-selftest, there is no overhead to cut without removing witnesses. The budget is the user's decision.
 - 2026-11-06, **`lake check`'s budget raised from 104 to 130 s, on the user's word** ("a"), in `tools/ci-budget/Paolo.tsv`. It is real growth: every kernel-evaluated witness adds to what route 1 replays. 130 s leaves about 25% over the 99 to 109 s measured.
+- 2026-11-06, **step 3's design, before code: a potential, as in amortised analysis** (Hoffmann's AARA, Carbonneaux's quantitative logic; `VS-2-RESEARCH` §2).
+  - **The shapes the checker accepts.** The body is a `seq` tree of three kinds of command:
+    - *plain*: loop-free, assigning no counter and no stable variable;
+    - *init*: `c := e` for a counter `c`, where `e` reads only stable variables;
+    - *counted loop*: `loop (var c) (seq B (c := c + -1))`, with `B` plain.
+  - **Counters and stable variables.** The counters are the loop guards. The stable variables are inputs that nothing assigns. Loops are not nested, and no loop sits inside an `ite`. `forN` and `forMax` are both of this form. In `forMax`, `d` is a plain variable, and the loop's body is an `ite`, which is plain.
+  - **The potential.** `pot` over frames and a store.
+    - A plain frame costs `costOf`.
+    - An init frame costs 1, plus the rest at the store with `c` updated.
+    - A loop frame costs `(s c) * (costOf B + 2) + 1`.
+    - The decrement inside a body costs 1, plus the rest at `c - 1`.
+  - **Two lemmas.**
+    - `pot` depends only on the counters and the stable variables, which plain frames do not touch.
+    - On the frames after a loop, which hold no decrement, `pot` is monotone in each counter.
+  - **The key theorem.** The cost at every fuel is at most `pot`, by induction on fuel, case by case on the head frame. The loop case uses monotonicity.
+  - **The budget.** `R i k := k = pot (frames of the body) (the initial store)`. It is a function of the input, and `boundR` follows for the source. For `forMax` it does not depend on the input, so `bound` follows too, through `bound_iff_boundR`.
+  - **Refused, to the budget, with witnesses:** a while loop that is not counted; a counter assigned from a variable something assigns; a loop nested in a body; and a counter assigned in a body.
+
