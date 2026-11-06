@@ -2,12 +2,12 @@
   VS-2 step 8: the model's prediction for `image2_diff.py`. For each line on stdin, the leakage, result, cost and outcome the model gives one of the
   second slice's images at a given fuel. It also writes the Lean `elf` of `scan` once, for the script to compare with its own.
 
-  Input lines: `image a b fuel`, where `image` is `scan`, `spin`, `tidx`, `tguard` or a refused program's name (`Slice2/Teeth.lean`), and `a`, `b` are the two input words in decimal. Run by
+  Input lines: `image a b fuel`, where `image` is `scan`, `spin`, `tidx`, `tguard` a refused program's name (`Slice2/Teeth.lean`), or `countUp` or `capped` (`Slice2/BoundBytes.lean`), and `a`, `b` are the two input words in decimal. Run by
   `image2_diff.py`. Not part of the library.
 -/
-import LCore.Slice2.Teeth
+import LCore.Slice2.BoundBytes
 
-open LCore LCore.Slice LCore.Slice.Rv LCore.Slice.Slots LCore.Slice2.Image LCore.Slice2.Teeth
+open LCore LCore.Slice LCore.Slice.Rv LCore.Slice.Slots LCore.Slice2.Image LCore.Slice2.Teeth LCore.Slice2.BoundBytes
 
 def words (a b : Nat) : Nat → W64 :=
   fun k => if k = 0 then W64.ofNat a else if k = 1 then W64.ofNat b else W64.ofNat 0
@@ -28,6 +28,8 @@ def image : String → Option (List Byte)
   | "secondIter" => some secondIterImage
   | "throughArray" => some throughArrayImage
   | "arrayInLoop" => some arrayInLoopImage
+  | "countUp" => some countUpImage
+  | "capped" => some cappedImage
   | _ => none
 
 def main (args : List String) : IO Unit := do

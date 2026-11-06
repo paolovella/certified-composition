@@ -116,4 +116,10 @@ lemma per pass, about `enc` alone and not about a certificate.
   - **Mutants: 46 of 46 killed** (receipt `bound01-step4-mutants`), 4 new on the bytes' budgets.
   - **Next, step 5:** QEMU, where the instruction count on every input tried is at most the budget, and a budget one too small is seen to fail.
 - 2026-11-06, **step 5a added, on the user's word:** a tighter `rvPass` cost transformer, after step 5 and before the account.
+- 2026-11-06, **step 5 done: the budgets on the bytes, under QEMU** (`l-core/test/bound_diff.py`, receipt `bound01-step5-diff`).
+  - **Model:** 110 runs of `countUp` and `capped`, every PC, address, result and cost equal to the model's.
+  - **Budget:** every run within its proved budget. `capped` runs at most 83 of 672 at inputs up to `2^64 - 1`. `countUp` uses at most 18% of its budget.
+  - **Secret:** 88 comparisons. The secret word changes neither trace nor cost, so the budget is a function of the public word, as the theorem says.
+  - **Vacuity.** The machine's exact cost is `19n + 9` for `countUp` and `51 + 8 min(n, 4)` for `capped`. A budget one below it is exceeded on every `countUp` input and on 7 `capped` inputs, so the check can fail. A budget "one below the proved one" would not have been exceeded, which is why the check uses the exact cost.
+  - `image2_diff.py` and `refused2_diff.py` still pass, after their shared prediction file learned the two new images (receipt `bound01-step5-regress`). Not in CI, like the other QEMU tests.
 
