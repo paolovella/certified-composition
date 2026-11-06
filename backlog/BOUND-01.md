@@ -60,3 +60,18 @@ lemma per pass, about `enc` alone and not about a certificate.
   - **A count I had wrong:** VS-2's account and research called `boundR` the sixth shape. It is the seventh, since `relView` is the sixth. Corrected of record in both, and in `BoundRSketch.lean`.
   - **Docs:** `PLAN-2026-10.md` §1 says 7 shapes. `README.md` says the lock holds 524 definitions, after its guard fired at 522. `CHANGELOG.md` has entries for this and for VS-2, which had none.
 - 2026-11-06, step 1's CI (`bound01-ci`) failed only on guard-selftest's time budget, 52 s against 49 s. Committed as `2468c5e` with that stated. The cause was this machine's process-creation speed, not the change. `CC-01` cut `check-claims`'s processes, and the self-test now takes 34 s.
+- 2026-11-06, **step 2's design, settled before code: sugar, as planned.** `slotPass` stays lockstep, and the lowering is VS-2's, unchanged.
+  - `forN c e b` is `c := e; loop c (b; c := c + -1)`.
+  - `forMax c d N e b` is `c := N; d := e; loop c ((if d then (b; d := d + -1) else skip); c := c + -1)`. The language has no `min`, so it always
+    runs `N` rounds, and the body runs while `d`, started at `e`, is not 0. Its running time does not depend on `e`, only on which rounds ran the body.
+    The constant budget is therefore `N` rounds of the dearer arm. **The cap is on the count, not on the time per round.**
+  - The names `c` and `d` are the writer's. The checker's job in step 3 is to bound loops of exactly these shapes, where `b` does not assign `c`
+    or `d`, and to refuse a budget otherwise. A writer who builds the same shape by hand gets the same budget, which is right, since it means the same.
+- 2026-11-06, **step 2 done: the counted loops, as sugar** (`l-core/LCore/Slice2/For.lean`). VS-2's checker, passes and bytes are unchanged.
+  - **Accepted:** `countUp`, counted by a public input, and `capped`, by the same input with a cap of 4. **Refused:** `countSecret`, counted by the secret.
+  - **They mean what they say, in the source.** `forN` runs its body `n` times. `forMax` runs it `min n 4` times: twice for 2, four times for 10.
+  - **Why the cap** (`why_the_cap`): counted by a public input of `2^63`, `forN` has not finished after 400 steps, and would not for `2^63` rounds. `forMax` with the same input has finished. `capped_steps_constant_past_the_cap`: past the cap, the step count does not depend on the input, at 4, 10 and `2^63`.
+  - **They compile, and run on the machine as in the source** (`capped_on_machine`, `countUp_on_machine`).
+  - **Mutants: 36 of 36 killed** (receipt `bound01-step2-mutants`): 4 new on the loops, and the earlier 32 rerun through this module.
+  - **Not here yet:** any budget. That is step 3, the checker's.
+  - **CI** (`bound01-step2-ci`): every check passes, and `lake check` is over its time budget, 109 s against 104 s. Alone it takes 99 to 101 s. In the last six CI runs it went 87, 98, 91, 86, 101, 109 s. This is real growth: `lake check` replays every proof through the kernel, and each slice adds kernel-evaluated witnesses, `For.lean` about 2 to 3 s. Unlike guard-selftest, there is no overhead to cut without removing witnesses. The budget is the user's decision.

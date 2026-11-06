@@ -4369,6 +4369,23 @@ LCore.Slice2.FT.below.casesOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.brecOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.casesOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.recOn	LCore.Slice2.Source	propext
+LCore.Slice2.For.capped	LCore.Slice2.For	
+LCore.Slice2.For.capped_caps	LCore.Slice2.For	propext
+LCore.Slice2.For.capped_checks	LCore.Slice2.For	propext
+LCore.Slice2.For.capped_ok	LCore.Slice2.For	propext
+LCore.Slice2.For.capped_on_machine	LCore.Slice2.For	propext
+LCore.Slice2.For.capped_steps_constant_past_the_cap	LCore.Slice2.For	propext
+LCore.Slice2.For.countSecret	LCore.Slice2.For	
+LCore.Slice2.For.countSecret_refused	LCore.Slice2.For	propext
+LCore.Slice2.For.countUp	LCore.Slice2.For	
+LCore.Slice2.For.countUp_checks	LCore.Slice2.For	propext
+LCore.Slice2.For.countUp_counts	LCore.Slice2.For	propext
+LCore.Slice2.For.countUp_ok	LCore.Slice2.For	propext
+LCore.Slice2.For.countUp_on_machine	LCore.Slice2.For	propext
+LCore.Slice2.For.forMax	LCore.Slice2.For	
+LCore.Slice2.For.forN	LCore.Slice2.For	
+LCore.Slice2.For.src	LCore.Slice2.For	propext
+LCore.Slice2.For.why_the_cap	LCore.Slice2.For	propext
 LCore.Slice2.Frame	LCore.Slice2.Source	
 LCore.Slice2.Image.go	LCore.Slice2.Image	propext
 LCore.Slice2.Image.mCode	LCore.Slice2.Image	propext

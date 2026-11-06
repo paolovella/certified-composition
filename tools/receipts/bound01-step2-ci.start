@@ -1,0 +1,4 @@
+started: 2026-11-06T14:07:47+01:00
+head: 5ceda64
+command: bash tools/ci.sh
+log: tools/receipts/bound01-step2-ci.log
