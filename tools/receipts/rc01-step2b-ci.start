@@ -1,0 +1,4 @@
+started: 2026-11-07T22:10:58+01:00
+head: b2c3026
+command: bash tools/ci.sh
+log: tools/receipts/rc01-step2b-ci.log

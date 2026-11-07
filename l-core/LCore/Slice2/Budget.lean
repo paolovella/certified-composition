@@ -19,7 +19,8 @@ open Slice (W64 Expr Store upd eval initFrom sec0 inp tick)
 def evars : Expr → List String
   | .lit _ => []
   | .var x => [x]
-  | .add a b => evars a ++ evars b
+  | .add a b | .bin _ a b => evars a ++ evars b
+  | .shr a _ => evars a
 
 def assigns : Cmd → List String
   | .assign x _ | .load x _ => [x]
@@ -104,9 +105,12 @@ theorem eval_agree {cs S : List String} {s s' : Store} (h : Agree cs S s s') : �
   | .var x, he => by
     simp only [evars, List.all_cons, List.all_nil, Bool.and_true] at he
     exact h x (Or.inr he)
-  | .add a b, he => by
+  | .add a b, he | .bin _ a b, he => by
     simp only [evars, List.all_append, Bool.and_eq_true] at he
     simp only [eval, eval_agree h a he.1, eval_agree h b he.2]
+  | .shr a _, he => by
+    simp only [evars] at he
+    simp only [eval, eval_agree h a he]
 
 /-- An expression that reads only inputs is unchanged by a write to something that is not an input. -/
 theorem eval_upd_out {S : List String} {c : String} (hc : S.contains c = false) (s : Store) (v : W64) :
@@ -116,9 +120,12 @@ theorem eval_upd_out {S : List String} {c : String} (hc : S.contains c = false) 
     simp only [evars, List.all_cons, List.all_nil, Bool.and_true] at he
     have : x ≠ c := by rintro rfl; simp_all
     simp [eval, upd, this]
-  | .add a b, he => by
+  | .add a b, he | .bin _ a b, he => by
     simp only [evars, List.all_append, Bool.and_eq_true] at he
     simp only [eval, eval_upd_out hc s v a he.1, eval_upd_out hc s v b he.2]
+  | .shr a _, he => by
+    simp only [evars] at he
+    simp only [eval, eval_upd_out hc s v a he]
 
 theorem isDec_shape {x : String} {d : Expr} (h : isDec x d = true) : ∃ w : W64, d = .add (.var x) (.lit w) ∧ w.val = 2 ^ 64 - 1 := by
   match d, h with

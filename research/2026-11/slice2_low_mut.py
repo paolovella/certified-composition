@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VS-2 steps 6, 7 and 9, and BOUND-01 steps 2 to 5a: hand-written mutants of the second slice's lowering, since tools/mutants.py does not scan l-core.
+"""VS-2 steps 6, 7 and 9, and BOUND-01 steps 2 to 5a, and RC-01 step 2b: hand-written mutants of the second slice's lowering, since tools/mutants.py does not scan l-core.
 
 Each mutant must fail to build as far as the machine witnesses. It runs on a copy of the package, never on the working
 tree, with each build in its own process group, killed as a group on timeout or above 12 GB resident. A kill counts only with a Lean error at a line of a `.lean` file.
@@ -9,7 +9,7 @@ Usage, from the repo root: python3 research/2026-11/slice2_low_mut.py <scratch d
 import os, re, shutil, signal, subprocess, sys, tempfile, time
 
 WORK = os.path.join(sys.argv[1], 'l-core')
-LOW, CHK, PAS, OLD, IMG, TTH, FOR, BUD, BYT = ('LCore/Slice2/Lower.lean', 'LCore/Slice2/Chunk.lean', 'LCore/Slice2/Pass.lean', 'LCore/Slice/Lower.lean', 'LCore/Slice2/Image.lean', 'LCore/Slice2/Teeth.lean', 'LCore/Slice2/For.lean', 'LCore/Slice2/Budget.lean', 'LCore/Slice2/BoundBytes.lean')
+LOW, CHK, PAS, OLD, IMG, TTH, FOR, BUD, BYT, OPS, WRD, SRC, RVM = ('LCore/Slice2/Lower.lean', 'LCore/Slice2/Chunk.lean', 'LCore/Slice2/Pass.lean', 'LCore/Slice/Lower.lean', 'LCore/Slice2/Image.lean', 'LCore/Slice2/Teeth.lean', 'LCore/Slice2/For.lean', 'LCore/Slice2/Budget.lean', 'LCore/Slice2/BoundBytes.lean', 'LCore/Slice2/Ops.lean', 'LCore/Slice/Word.lean', 'LCore/Slice/Source.lean', 'LCore/Slice/Rv.lean')
 CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
@@ -62,6 +62,12 @@ M = [
  ("a loop step is charged one less", PAS, "  | .ite e _ _ | .loop e _ => sE e + 2\n", "  | .ite e _ _ | .loop e _ => sE e + 1\n"),
  ("stepMax forgets a loop's body", PAS, "  | .loop e b => max (sE e + 2) (stepMax b)\n", "  | .loop e b => sE e + 2\n"),
  ("one byte of countUp's literal is wrong", BYT, "[183, 3, 2, 0, 3, 180, 131, 0, 35, 176, 131, 64, 3, 180, 3, 64, 99, 4, 4, 4,", "[183, 3, 2, 0, 3, 180, 131, 0, 35, 176, 131, 64, 3, 180, 3, 64, 99, 4, 4, 5,"),
+ ("xor means or", WRD, "  | .xor => W64.xor\n", "  | .xor => W64.or\n"),
+ ("a shift moves one place too far", WRD, "def shr (a : W64) (k : Nat) : W64 := ofNat (a.val >>> k)", "def shr (a : W64) (k : Nat) : W64 := ofNat (a.val >>> (k + 1))"),
+ ("the taint rule ignores an operator's first operand", SRC, "  | .add a b | .bin _ a b => highE H a || highE H b\n", "  | .add a b => highE H a || highE H b\n  | .bin _ _ b => highE H b\n"),
+ ("the lowering emits add for every operator", OLD, "[opInsn o (8 + d) (8 + d) (8 + d + 1)]", "[.add (8 + d) (8 + d) (8 + d + 1)]"),
+ ("a shift by 64 is accepted", OLD, "  | .shr a k, d => okE a d && decide (k < 64)\n", "  | .shr a k, d => okE a d && decide (k < 65)\n"),
+ ("sub is emitted as xor", RVM, "  | .sub, rd, a, b => .sub rd a b\n", "  | .sub, rd, a, b => .xor rd a b\n"),
 ]
 
 
@@ -74,7 +80,7 @@ def build():
     """A resident-memory watchdog, not RLIMIT_AS: an address-space cap stops Lean creating threads, and every build then
     aborts with code 134 before checking a proof. That made the first run of this harness report 19 of 19 killed."""
     with tempfile.TemporaryFile('w+') as log:
-        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.BoundBytes'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
+        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Ops'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
                              text=True, start_new_session=True)
         t0 = time.time()
         while p.poll() is None:

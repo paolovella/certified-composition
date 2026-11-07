@@ -35,4 +35,16 @@ theorem add_wraps : add (ofNat (2 ^ 64 - 1)) (ofNat 1) = ofNat 0 := by decide
 
 end W64
 
+/-- **The binary operators beyond `add`** (RC-01): what `crypto_verify_16` needs. -/
+inductive Op where
+  | sub | xor | or | and
+  deriving DecidableEq, Repr
+
+/-- An operator's meaning on words, the machine's. -/
+def Op.w : Op → W64 → W64 → W64
+  | .sub => W64.sub
+  | .xor => W64.xor
+  | .or => W64.or
+  | .and => W64.and
+
 end LCore.Slice

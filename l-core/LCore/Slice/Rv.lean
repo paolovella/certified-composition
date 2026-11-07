@@ -103,6 +103,13 @@ def decode (w : Nat) : Option Insn :=
   | 0x73 => if w = 0x73 then some .ecall else none
   | _ => none
 
+/-- An operator's instruction. -/
+def opInsn : Op → Nat → Nat → Nat → Insn
+  | .sub, rd, a, b => .sub rd a b
+  | .xor, rd, a, b => .xor rd a b
+  | .or, rd, a, b => .or rd a b
+  | .and, rd, a, b => .and rd a b
+
 /-! ## The machine -/
 
 /-- Where the code and the data segment are. The ELF's two headers occupy the code segment's first bytes. -/

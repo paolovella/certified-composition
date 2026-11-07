@@ -217,6 +217,8 @@ def cE (p : Prog) : Expr → SExpr
   | .lit w => .lit w
   | .var x => .slot (slotOf p x)
   | .add a b => .add (cE p a) (cE p b)
+  | .bin o a b => .bin o (cE p a) (cE p b)
+  | .shr a k => .shr (cE p a) k
 
 def cC (p : Prog) : Cmd → SCmd
   | .skip => .skip
@@ -255,10 +257,13 @@ theorem evalS_cE {p : Prog} {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) 
     ∀ e, (∀ x ∈ evars e, x ∈ allVars p) → evalS (cE p e) t = eval e s
   | .lit _, _ => rfl
   | .var x, hv => h.1 x (hv x (by simp [evars]))
-  | .add x y, hv => by
+  | .add x y, hv | .bin _ x y, hv => by
     simp only [cE, evalS, eval]
     rw [evalS_cE h x (fun v hx => hv v (by simp [evars, hx])),
       evalS_cE h y (fun v hx => hv v (by simp [evars, hx]))]
+  | .shr x _, hv => by
+    simp only [cE, evalS, eval]
+    rw [evalS_cE h x (fun v hx => hv v (by simp [evars, hx]))]
 
 def cF (p : Prog) (f : Frame) : SFrame := (cC p f.1, f.2)
 
