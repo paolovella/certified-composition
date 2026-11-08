@@ -34,6 +34,10 @@ def chunkC (c : SCmd) (pc : Nat) (t : Slice.Slots.Slots) : List Micro :=
   | .load x e =>
     mIdx e pc ++ [(pc + 4 * (sE e + 5), [.addr (Int.ofNat (arrAddr (idx (evalS e t))))]),
       (pc + 4 * (sE e + 5) + 4, [.addr (Int.ofNat (slotAddr x))])]
+  | .loadB x ws e =>
+    mE e pc ++ [(pc + 4 * sE e, []), (pc + 4 * sE e + 4, []),
+      (pc + 4 * sE e + 8, [.addr (Int.ofNat (dataBase + 8 * ws.headD 0 + Slots.bidxS ws (evalS e t)))]),
+      (pc + 4 * sE e + 12, [.addr (Int.ofNat (slotAddr x))])]
   | .store e v =>
     mIdx e pc ++ mE v (pc + 4 * (sE e + 5)) ++
       [(pc + 4 * (sE e + 5) + 4 * sE v, [.addr (Int.ofNat (arrAddr (idx (evalS e t))))])]
@@ -47,6 +51,7 @@ def nextT (c : SCmd) (t : Slice.Slots.Slots) : Slice.Slots.Slots :=
   match c with
   | .set n e => updS t n (evalS e t)
   | .load x e => updS t x (t (arrBase + idx (evalS e t)))
+  | .loadB x ws e => updS t x (Slots.byteAtS t ws (Slots.bidxS ws (evalS e t)))
   | .store e v => updS t (arrBase + idx (evalS e t)) (evalS v t)
   | _ => t
 
@@ -84,7 +89,8 @@ theorem push_fok {C : List Byte} : ∀ (c : SCmd) (pc : Nat) (k : List TF), okC 
     rw [genC_length] at hr
     exact push_fok a pc _ hc.1 (Slice.Lower.At.left hat) (push_fok b _ k hc.2 hr hk)
   | .skip, _, _, hc, hat, hk | .set _ _, _, _, hc, hat, hk | .ite _ _ _, _, _, hc, hat, hk
-  | .loop _ _, _, _, hc, hat, hk | .load _ _, _, _, hc, hat, hk | .store _ _, _, _, hc, hat, hk =>
+  | .loop _ _, _, _, hc, hat, hk | .load _ _, _, _, hc, hat, hk | .loadB _ _ _, _, _, hc, hat, hk
+  | .store _ _, _, _, hc, hat, hk =>
     ⟨(by intro a b h; cases h), hc, hat, hk⟩
 
 theorem push_chain : ∀ (c : SCmd) (pc : Nat) (k : List TF) (f : Nat), Chain (pc + 4 * sC c) k f →
@@ -95,7 +101,7 @@ theorem push_chain : ∀ (c : SCmd) (pc : Nat) (k : List TF) (f : Nat), Chain (p
     have : pc + 4 * sC a + 4 * sC b = pc + 4 * sC (.seq a b) := by simp only [sC]; omega
     rw [this]; exact h
   | .skip, _, _, _, h | .set _ _, _, _, _, h | .ite _ _ _, _, _, _, h | .loop _ _, _, _, _, h
-  | .load _ _, _, _, _, h | .store _ _, _, _, _, h => ⟨rfl, h⟩
+  | .load _ _, _, _, _, h | .loadB _ _ _, _, _, _, h | .store _ _, _, _, _, h => ⟨rfl, h⟩
 
 /-- A jump, forward or back. -/
 theorem exec_jmp {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {i : Int} {q : Nat}
@@ -208,6 +214,16 @@ theorem chunk_exec {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots}
   | load x e =>
     simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at hoc
     obtain ⟨m', e', p', i'⟩ := exec_load (en := en) hoc.1 hoc.2 hinv hat
+    exact ⟨m', e', hok', by rw [p']; exact hch', i'⟩
+  | loadB x ws e =>
+    simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at hoc
+    obtain ⟨⟨⟨⟨hx, he⟩, hws⟩, hm⟩, hb⟩ := hoc
+    generalize hB : ws.headD 0 = b at hws hb ⊢
+    generalize hL : ws.length = len at hws hm hb
+    subst hws
+    obtain ⟨m', e', p', i'⟩ := exec_loadB (en := en) hx he hm hb hinv hat
+    have hhead : (List.range' b len).headD 0 = b := hB
+    simp only [chunkC, nextT, hhead]
     exact ⟨m', e', hok', by rw [p']; exact hch', i'⟩
   | store e v =>
     simp only [okC, Bool.and_eq_true] at hoc

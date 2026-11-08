@@ -24,6 +24,8 @@ inductive SCmd where
   | ite   : SExpr → SCmd → SCmd → SCmd
   | loop  : SExpr → SCmd → SCmd
   | load  : Nat → SExpr → SCmd
+  /-- Byte `i` of the slots `ws` (RC-01). -/
+  | loadB : Nat → List Nat → SExpr → SCmd
   | store : SExpr → SExpr → SCmd
   deriving DecidableEq, Repr
 
@@ -41,6 +43,15 @@ def pushS : SCmd → List Nat → List SFrame → List SFrame
 /-- The array's first slot. -/
 def arrBase : Nat := 64
 
+/-- A byte array's index on the slots, masked to its bytes. -/
+def bidxS (ws : List Nat) (v : W64) : Nat := v.val % (8 * ws.length)
+
+/-- Byte `i` of the slots `ws`, and 0 past their end. -/
+def byteAtS (t : Slots) (ws : List Nat) (i : Nat) : W64 :=
+  match ws[i / 8]? with
+  | some w => byteOfWord (t w) (i % 8)
+  | none => W64.ofNat 0
+
 def runS (ret : SExpr) : Nat → List SFrame → Slots → Beh
   | _, [], t => { ev := [retEv (evalS ret t)], lk := [], cost := 0, out := .done }
   | 0, _ :: _, _ => { ev := [], lk := [], cost := 0, out := .fuel }
@@ -56,6 +67,7 @@ def runS (ret : SExpr) : Nat → List SFrame → Slots → Beh
       if (evalS e t).val ≠ 0 then tick [.branch true] p (runS ret n (pushS b (p ++ [0]) ((.loop e b, p) :: k)) t)
       else tick [.branch false] p (runS ret n k t)
     | .load x e => tick [addrLk (idx (evalS e t))] p (runS ret n k (updS t x (t (arrBase + idx (evalS e t)))))
+    | .loadB x ws e => tick [addrLk (bidxS ws (evalS e t))] p (runS ret n k (updS t x (byteAtS t ws (bidxS ws (evalS e t)))))
     | .store e v => tick [addrLk (idx (evalS e t))] p (runS ret n k (updS t (arrBase + idx (evalS e t)) (evalS v t)))
 
 /-- **The slot language.** Its input is the data segment's bytes. -/
@@ -100,6 +112,7 @@ theorem runS_ext (ret : SExpr) : ∀ (n n' : Nat) (k : List SFrame) (t : Slots),
         · exact tick_ext _ _ (ih m' _ t hm)
         · exact tick_ext _ _ (ih m' _ t hm)
       | load x e => exact tick_ext _ _ (ih m' _ _ hm)
+      | loadB x ws e => exact tick_ext _ _ (ih m' _ _ hm)
       | store e v => exact tick_ext _ _ (ih m' _ _ hm)
 
 def NoSeqS (k : List SFrame) : Prop := ∀ f ∈ k, ∀ a b, f.1 ≠ .seq a b
@@ -107,7 +120,7 @@ def NoSeqS (k : List SFrame) : Prop := ∀ f ∈ k, ∀ a b, f.1 ≠ .seq a b
 theorem pushS_noSeq : ∀ (c : SCmd) (p : List Nat) (k : List SFrame), NoSeqS k → NoSeqS (pushS c p k)
   | .seq a b, p, k, h => pushS_noSeq a _ _ (pushS_noSeq b _ k h)
   | .skip, _, k, h | .set _ _, _, k, h | .ite _ _ _, _, k, h | .loop _ _, _, k, h
-  | .load _ _, _, k, h | .store _ _, _, k, h => by
+  | .load _ _, _, k, h | .loadB _ _ _, _, k, h | .store _ _, _, k, h => by
     intro f hf a b
     simp only [pushS, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -156,6 +169,9 @@ theorem runS_diverge (ret : SExpr) : ∀ (n : Nat) (k : List SFrame) (t : Slots)
       | load x e =>
         simp only [runS, tick] at hf ⊢
         have := ih k _ hk' hf; omega
+      | loadB x ws e =>
+        simp only [runS, tick] at hf ⊢
+        have := ih k _ hk' hf; omega
       | store e v =>
         simp only [runS, tick] at hf ⊢
         have := ih k _ hk' hf; omega
@@ -177,6 +193,7 @@ def cvars : Cmd → List String
   | .ite e a b => evars e ++ cvars a ++ cvars b
   | .loop e b => evars e ++ cvars b
   | .load x e => x :: evars e
+  | .loadB x ns e => x :: ns ++ evars e
   | .store e v => evars e ++ evars v
 
 def allVars (p : Prog) : List String := cvars p.body ++ evars p.ret
@@ -227,6 +244,7 @@ def cC (p : Prog) : Cmd → SCmd
   | .ite e a b => .ite (cE p e) (cC p a) (cC p b)
   | .loop e b => .loop (cE p e) (cC p b)
   | .load x e => .load (slotOf p x) (cE p e)
+  | .loadB x ns e => .loadB (slotOf p x) (ns.map (slotOf p)) (cE p e)
   | .store e v => .store (cE p e) (cE p v)
 
 def compile (p : Prog) : SProg := { body := cC p p.body, ret := cE p p.ret }
@@ -272,7 +290,8 @@ theorem pushS_cC (p : Prog) : ∀ (c : Cmd) (q : List Nat) (k : List Frame),
   | .seq a b, q, k => by
     simp only [cC, pushS, push]
     rw [pushS_cC p b, pushS_cC p a]
-  | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .store _ _, _, _ => rfl
+  | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
+  | .store _ _, _, _ => rfl
 
 def Cov (p : Prog) (k : List Frame) : Prop := ∀ f ∈ k, ∀ x ∈ cvars f.1, x ∈ allVars p
 
@@ -282,12 +301,20 @@ theorem push_cov {p : Prog} : ∀ (c : Cmd) (q : List Nat) (k : List Frame),
     apply push_cov a _ _ (fun x hx => hc x (by simp [cvars, hx]))
     exact push_cov b _ _ (fun x hx => hc x (by simp [cvars, hx])) hk
   | .skip, _, k, hc, hk | .assign _ _, _, k, hc, hk | .ite _ _ _, _, k, hc, hk | .loop _ _, _, k, hc, hk
-  | .load _ _, _, k, hc, hk | .store _ _, _, k, hc, hk => by
+  | .load _ _, _, k, hc, hk | .loadB _ _ _, _, k, hc, hk | .store _ _, _, k, hc, hk => by
     intro f hf
     simp only [push, List.mem_cons] at hf
     rcases hf with rfl | hf
     · exact hc
     · exact hk f hf
+
+/-- **The slots' byte is the store's**, for an array of the program's own variables. -/
+theorem byteAtS_map {p : Prog} {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) {ns : List String}
+    (hns : ∀ y ∈ ns, y ∈ allVars p) (i : Nat) : byteAtS t (ns.map (slotOf p)) i = byteAt s ns i := by
+  simp only [byteAtS, byteAt, List.getElem?_map]
+  cases hy : ns[i / 8]? with
+  | none => rfl
+  | some y => simp only [Option.map_some]; rw [h.1 y (hns y (List.mem_of_getElem? hy))]
 
 /-- Setting a variable's slot keeps the relation. -/
 theorem rel_set {p : Prog} (hf : p.inputs.length ≤ 64) {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) {x : String}
@@ -373,6 +400,13 @@ theorem runS_sim {p : Prog} (hf : p.inputs.length ≤ 64) (hret : ∀ x ∈ evar
         have hx : x ∈ allVars p := hc0 x (by simp [cvars])
         have he := evalS_cE hr e (fun y hy => hc0 y (by simp [cvars, hy]))
         rw [he, hr.2 _ (idx_lt _), ih k _ _ _ hk (rel_set hf hr hx _)]
+      | loadB x ns e =>
+        simp only [List.map, cF, cC, runS, run]
+        have hx : x ∈ allVars p := hc0 x (by simp [cvars])
+        have he := evalS_cE hr e (fun y hy => hc0 y (by simp [cvars, hy]))
+        have hb := byteAtS_map (ns := ns) hr (fun y (hy : y ∈ ns) => hc0 y (by simp [cvars, hy])) (bidx ns (eval e s))
+        have hi : bidxS (ns.map (slotOf p)) (eval e s) = bidx ns (eval e s) := by simp [bidxS, bidx]
+        rw [he, hi, hb, ih k _ _ _ hk (rel_set hf hr hx _)]
       | store e v =>
         simp only [List.map, cF, cC, runS, run]
         have he := evalS_cE hr e (fun y hy => hc0 y (by simp [cvars, hy]))
