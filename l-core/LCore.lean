@@ -26,3 +26,4 @@ import LCore.Slice2.Bytes
 import LCore.Slice2.CT
 import LCore.Slice2.CSrc
 import LCore.Slice2.CFront
+import LCore.Slice2.CTBytes

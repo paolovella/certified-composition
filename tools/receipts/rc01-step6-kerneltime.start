@@ -1,0 +1,4 @@
+started: 2026-11-08T15:59:53+01:00
+head: 9dc11bf
+command: bash -c echo WITH; /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/kt/time-kernels.sh /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/kt/with.ndjson; echo WITHOUT; /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/kt/time-kernels.sh /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/kt/without.ndjson; uptime
+log: tools/receipts/rc01-step6-kerneltime.log

@@ -14,7 +14,7 @@ budget	step
 23	frozen statements: the comparator refuses a weakened solution (witness)
 49	guard-selftest (the guards actually fire)
 15	l-core builds (L's trusted core and its witnesses)
-130	lake check from the root workspace (route 1)
+160	lake check from the root workspace (route 1)
 15	no sorry in our sources
 71	ring0.lock catches what the comparator cannot (witness)
 16	ring0.lock is current

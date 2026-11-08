@@ -4764,6 +4764,18 @@ LCore.Slice2.CT.verify16_ct	LCore.Slice2.CT	Quot.sound,propext
 LCore.Slice2.CT.verify16_ct_checks	LCore.Slice2.CT	propext
 LCore.Slice2.CT.verify16_not_rel	LCore.Slice2.CT	Quot.sound,propext
 LCore.Slice2.CT.verify16_same_trace_different_result	LCore.Slice2.CT	propext
+LCore.Slice2.CTBytes.earlyExitImage	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.earlyExit_bytes_leak	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16C_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.CTBytes.verify16Image	LCore.Slice2.CTBytes	
+LCore.Slice2.CTBytes.verify16Nats	LCore.Slice2.CTBytes	
+LCore.Slice2.CTBytes.verify16_bound	LCore.Slice2.CTBytes	Quot.sound,propext
+LCore.Slice2.CTBytes.verify16_bound_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.CTBytes.verify16_budget_const	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16_counted	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.CTBytes.verify16_is_literal	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16_pipeline	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
 LCore.Slice2.Cmd.assign.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.assign.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.below	LCore.Slice2.Source	
