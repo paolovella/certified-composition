@@ -3812,6 +3812,8 @@ LCore.Slice.Cmd.skip.elim	LCore.Slice.Source
 LCore.Slice.Expr.add.elim	LCore.Slice.Source	
 LCore.Slice.Expr.add.noConfusion	LCore.Slice.Source	
 LCore.Slice.Expr.below	LCore.Slice.Source	
+LCore.Slice.Expr.bin.elim	LCore.Slice.Source	
+LCore.Slice.Expr.bin.noConfusion	LCore.Slice.Source	
 LCore.Slice.Expr.brecOn	LCore.Slice.Source	
 LCore.Slice.Expr.brecOn.eq	LCore.Slice.Source	
 LCore.Slice.Expr.brecOn.go	LCore.Slice.Source	
@@ -3824,6 +3826,8 @@ LCore.Slice.Expr.lit.noConfusion	LCore.Slice.Source
 LCore.Slice.Expr.noConfusion	LCore.Slice.Source	
 LCore.Slice.Expr.noConfusionType	LCore.Slice.Source	
 LCore.Slice.Expr.recOn	LCore.Slice.Source	
+LCore.Slice.Expr.shr.elim	LCore.Slice.Source	
+LCore.Slice.Expr.shr.noConfusion	LCore.Slice.Source	
 LCore.Slice.Expr.var.elim	LCore.Slice.Source	
 LCore.Slice.Expr.var.noConfusion	LCore.Slice.Source	
 LCore.Slice.Ext	LCore.Slice.Source	
@@ -3941,11 +3945,19 @@ LCore.Slice.Lower.get_zero	LCore.Slice.Lower
 LCore.Slice.Lower.good_add	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_addi	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_addi_neg	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_and	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_beq	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice.Lower.good_ecall	LCore.Slice.Lower	
+LCore.Slice.Lower.good_lbu	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_ld	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_lui	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_op	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_or	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_r3	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_sd	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_srli	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_sub	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_xor	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.high_slot_refused	LCore.Slice.Lower	
 LCore.Slice.Lower.inData_slot	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.init_inv	LCore.Slice.Lower	Quot.sound,propext
@@ -3972,6 +3984,7 @@ LCore.Slice.Lower.mK	LCore.Slice.Lower
 LCore.Slice.Lower.mK_push	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.okC	LCore.Slice.Lower	
 LCore.Slice.Lower.okE	LCore.Slice.Lower	
+LCore.Slice.Lower.okE_depth	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.okP	LCore.Slice.Lower	
 LCore.Slice.Lower.pcE	LCore.Slice.Lower	
 LCore.Slice.Lower.pipeline	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
@@ -4002,6 +4015,7 @@ LCore.Slice.Lower.srcRun	LCore.Slice.Lower	propext
 LCore.Slice.Lower.src_any	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.src_done	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.startPc	LCore.Slice.Lower	
+LCore.Slice.Lower.step_op	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.store8_in	LCore.Slice.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice.Lower.store8_out	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.tickM	LCore.Slice.Lower	
@@ -4015,6 +4029,20 @@ LCore.Slice.Lower.word_of_bytes	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.wordsMax	LCore.Slice.Lower	
 LCore.Slice.Lower.xf	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.NoSeq	LCore.Slice.Source	
+LCore.Slice.Op.and.elim	LCore.Slice.Word	
+LCore.Slice.Op.casesOn	LCore.Slice.Word	
+LCore.Slice.Op.ctorElim	LCore.Slice.Word	
+LCore.Slice.Op.ctorElimType	LCore.Slice.Word	
+LCore.Slice.Op.ctorIdx	LCore.Slice.Word	
+LCore.Slice.Op.noConfusion	LCore.Slice.Word	
+LCore.Slice.Op.noConfusionType	LCore.Slice.Word	
+LCore.Slice.Op.ofNat	LCore.Slice.Word	
+LCore.Slice.Op.ofNat_ctorIdx	LCore.Slice.Word	
+LCore.Slice.Op.or.elim	LCore.Slice.Word	
+LCore.Slice.Op.recOn	LCore.Slice.Word	
+LCore.Slice.Op.sub.elim	LCore.Slice.Word	
+LCore.Slice.Op.w	LCore.Slice.Word	propext
+LCore.Slice.Op.xor.elim	LCore.Slice.Word	
 LCore.Slice.Prog.body	LCore.Slice.Source	
 LCore.Slice.Prog.casesOn	LCore.Slice.Source	
 LCore.Slice.Prog.ctorIdx	LCore.Slice.Source	
@@ -4040,6 +4068,8 @@ LCore.Slice.Rv.Insn.add.elim	LCore.Slice.Rv
 LCore.Slice.Rv.Insn.add.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.addi.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.addi.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.and.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.and.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.andi.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.andi.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.beq.elim	LCore.Slice.Rv	
@@ -4049,15 +4079,25 @@ LCore.Slice.Rv.Insn.ctorElim	LCore.Slice.Rv
 LCore.Slice.Rv.Insn.ctorElimType	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ctorIdx	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ecall.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.lbu.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.lbu.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ld.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ld.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.lui.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.lui.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.noConfusionType	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.or.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.or.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.recOn	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.sd.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.sd.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.srli.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.srli.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.sub.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.sub.noConfusion	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.xor.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.xor.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Mach.casesOn	LCore.Slice.Rv	
 LCore.Slice.Rv.Mach.ctorIdx	LCore.Slice.Rv	
 LCore.Slice.Rv.Mach.get	LCore.Slice.Rv	
@@ -4113,6 +4153,7 @@ LCore.Slice.Rv.instReprInsn	LCore.Slice.Rv	propext
 LCore.Slice.Rv.instReprInsn.repr	LCore.Slice.Rv	propext
 LCore.Slice.Rv.le	LCore.Slice.Rv	
 LCore.Slice.Rv.load8	LCore.Slice.Rv	
+LCore.Slice.Rv.opInsn	LCore.Slice.Rv	
 LCore.Slice.Rv.probe	LCore.Slice.Rv	
 LCore.Slice.Rv.probe_leaks	LCore.Slice.Rv	Classical.choice,Quot.sound,propext
 LCore.Slice.Rv.probe_leaks_address	LCore.Slice.Rv	propext
@@ -4158,6 +4199,8 @@ LCore.Slice.Slots.SCmd.skip.elim	LCore.Slice.Slots
 LCore.Slice.Slots.SExpr.add.elim	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.add.noConfusion	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.below	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.bin.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.bin.noConfusion	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.brecOn	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.brecOn.eq	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.brecOn.go	LCore.Slice.Slots	
@@ -4170,6 +4213,8 @@ LCore.Slice.Slots.SExpr.lit.noConfusion	LCore.Slice.Slots
 LCore.Slice.Slots.SExpr.noConfusion	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.noConfusionType	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.recOn	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.shr.elim	LCore.Slice.Slots	
+LCore.Slice.Slots.SExpr.shr.noConfusion	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.slot.elim	LCore.Slice.Slots	
 LCore.Slice.Slots.SExpr.slot.noConfusion	LCore.Slice.Slots	
 LCore.Slice.Slots.SFrame	LCore.Slice.Slots	
@@ -4200,7 +4245,7 @@ LCore.Slice.Slots.compile_sim	LCore.Slice.Slots	Classical.choice,Quot.sound,prop
 LCore.Slice.Slots.cvars	LCore.Slice.Slots	
 LCore.Slice.Slots.encBytes	LCore.Slice.Slots	
 LCore.Slice.Slots.enc_wordAt	LCore.Slice.Slots	Quot.sound,propext
-LCore.Slice.Slots.evalS	LCore.Slice.Slots	
+LCore.Slice.Slots.evalS	LCore.Slice.Slots	propext
 LCore.Slice.Slots.evalS_cE	LCore.Slice.Slots	propext
 LCore.Slice.Slots.evars	LCore.Slice.Slots	
 LCore.Slice.Slots.fits	LCore.Slice.Slots	
@@ -4272,6 +4317,10 @@ LCore.Slice.W64.add	LCore.Slice.Word
 LCore.Slice.W64.add_wraps	LCore.Slice.Word	
 LCore.Slice.W64.and	LCore.Slice.Word	propext
 LCore.Slice.W64.ofNat	LCore.Slice.Word	
+LCore.Slice.W64.or	LCore.Slice.Word	propext
+LCore.Slice.W64.shr	LCore.Slice.Word	
+LCore.Slice.W64.sub	LCore.Slice.Word	
+LCore.Slice.W64.xor	LCore.Slice.Word	propext
 LCore.Slice.cap	LCore.Slice.Source	
 LCore.Slice.clean	LCore.Slice.Source	
 LCore.Slice.clean_bound	LCore.Slice.Source	Quot.sound,propext
@@ -4282,7 +4331,7 @@ LCore.Slice.costK	LCore.Slice.Source
 LCore.Slice.costK_push	LCore.Slice.Source	Quot.sound,propext
 LCore.Slice.costOf	LCore.Slice.Source	
 LCore.Slice.env_passive	LCore.Slice.Source	propext
-LCore.Slice.eval	LCore.Slice.Source	
+LCore.Slice.eval	LCore.Slice.Source	propext
 LCore.Slice.eval_low	LCore.Slice.Source	propext
 LCore.Slice.highC	LCore.Slice.Source	propext
 LCore.Slice.highE	LCore.Slice.Source	propext
@@ -4296,12 +4345,15 @@ LCore.Slice.instDecidableEqCmd	LCore.Slice.Source
 LCore.Slice.instDecidableEqCmd.decEq	LCore.Slice.Source	
 LCore.Slice.instDecidableEqExpr	LCore.Slice.Source	
 LCore.Slice.instDecidableEqExpr.decEq	LCore.Slice.Source	
+LCore.Slice.instDecidableEqOp	LCore.Slice.Word	
 LCore.Slice.instDecidableEqProg	LCore.Slice.Source	
 LCore.Slice.instDecidableEqProg.decEq	LCore.Slice.Source	
 LCore.Slice.instReprCmd	LCore.Slice.Source	propext
 LCore.Slice.instReprCmd.repr	LCore.Slice.Source	propext
 LCore.Slice.instReprExpr	LCore.Slice.Source	propext
 LCore.Slice.instReprExpr.repr	LCore.Slice.Source	propext
+LCore.Slice.instReprOp	LCore.Slice.Word	
+LCore.Slice.instReprOp.repr	LCore.Slice.Word	
 LCore.Slice.instReprProg	LCore.Slice.Source	propext
 LCore.Slice.instReprProg.repr	LCore.Slice.Source	propext
 LCore.Slice.laundered	LCore.Slice.Source	
@@ -4399,6 +4451,7 @@ LCore.Slice2.Budget.plainC	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.plain_assign	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.plain_ite	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.plain_load	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plain_loadB	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.plain_loop	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.plain_seq	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.pot	LCore.Slice2.Budget	propext
@@ -4422,6 +4475,307 @@ LCore.Slice2.Budget.upd_comm	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.upd_other	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.upd_same	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.upd_upd_same	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Bytes.emptyArray_refused	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.layout_rules	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.readPublic_checks	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.readSecret_refused	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.readX	LCore.Slice2.Bytes	
+LCore.Slice2.Bytes.readX_bytes	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.readX_on_machine	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.secX	LCore.Slice2.Bytes	
+LCore.Slice2.Bytes.secretIndex	LCore.Slice2.Bytes	
+LCore.Slice2.Bytes.secretIndex_refused	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.src	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.verify16	LCore.Slice2.Bytes	
+LCore.Slice2.Bytes.verify16_compares	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.verify16_not_rel	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.verify16_ok	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.verify16_on_machine	LCore.Slice2.Bytes	propext
+LCore.Slice2.Bytes.words4	LCore.Slice2.Bytes	
+LCore.Slice2.CFront.Bd.arr.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.arr.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.int.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.lit.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.lit.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Bd.word.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.n.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.n.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.v.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CArg.v.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.below	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.bin.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.bin.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.brecOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.brecOn.eq	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.brecOn.go	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.call.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.call.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.cast.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.cast.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.idx.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.idx.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.num.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.num.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.var.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CE.var.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.body	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.inline	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.mk.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.name	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.params	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CFun.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.add.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.and.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.ofNat	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.ofNat_ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.or.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.shr.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.sub.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.COp.xor.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.below	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.below_1	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.brecOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.brecOn.eq	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.brecOn.go	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.brecOn_1	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.brecOn_1.eq	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.brecOn_1.go	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.decl.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.decl.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.forN.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.forN.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.orEq.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.orEq.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.ret.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.CS.ret.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Env	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.amp.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.bar.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.caret.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.comma.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.eq.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.inc.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.lb.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.lc.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.lp.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.lt.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.minus.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.ofNat	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.ofNat_ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.orEq.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.other.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.plus.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.rb.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.rc.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.rp.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.semi.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.shr.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.P.star.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.id.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.id.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.num.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.num.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.sym.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Tok.sym.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.casesOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.ctorElim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.ctorElimType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.int.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.noConfusion	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.noConfusionType	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.ofNat	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.ofNat_ctorIdx	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.ptr.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.recOn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.Ty.word.elim	LCore.Slice2.CFront	
+LCore.Slice2.CFront.bindArgs	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.bound	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.classify	LCore.Slice2.CFront	
+LCore.Slice2.CFront.closing	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.digits	LCore.Slice2.CFront	
+LCore.Slice2.CFront.dropU	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.findFun	LCore.Slice2.CFront	
+LCore.Slice2.CFront.inRange	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.instDecidableEqCOp	LCore.Slice2.CFront	
+LCore.Slice2.CFront.instDecidableEqP	LCore.Slice2.CFront	
+LCore.Slice2.CFront.instDecidableEqTok	LCore.Slice2.CFront	
+LCore.Slice2.CFront.instDecidableEqTok.decEq	LCore.Slice2.CFront	
+LCore.Slice2.CFront.instDecidableEqTy	LCore.Slice2.CFront	
+LCore.Slice2.CFront.int_bound	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.isAlpha	LCore.Slice2.CFront	
+LCore.Slice2.CFront.isDigit	LCore.Slice2.CFront	
+LCore.Slice2.CFront.isIdc	LCore.Slice2.CFront	
+LCore.Slice2.CFront.isQual	LCore.Slice2.CFront	
+LCore.Slice2.CFront.isSpace	LCore.Slice2.CFront	
+LCore.Slice2.CFront.isTyWord	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kB16	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kB32	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kChar	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kConst	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kFast16	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kFor	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kInline	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kInt	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kLong	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kReturn	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kStatic	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kU64	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kUnsigned	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kV16	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kV32	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kVolatile	LCore.Slice2.CFront	
+LCore.Slice2.CFront.kw	LCore.Slice2.CFront	
+LCore.Slice2.CFront.lex	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.lexF	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.look	LCore.Slice2.CFront	
+LCore.Slice2.CFront.missing_define_refused	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.odd_length_refused	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.okLocal	LCore.Slice2.CFront	
+LCore.Slice2.CFront.opAt	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pArgs	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pE	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pFun	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pFuns	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pL	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pP	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pParams	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pS	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.pSs	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.parse	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.precedence	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.rdBody	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.rdE	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.rdS	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.read16	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.readC	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.read_verify16	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.read_verify32	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.refusal_stages	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.refused_by_front	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.refused_by_reading	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.refused_by_reading'	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.sec8	LCore.Slice2.CFront	
+LCore.Slice2.CFront.secretIndex_read_refused	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.seqAll	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.spanW	LCore.Slice2.CFront	
+LCore.Slice2.CFront.startsIdc	LCore.Slice2.CFront	
+LCore.Slice2.CFront.str	LCore.Slice2.CFront	
+LCore.Slice2.CFront.sym1	LCore.Slice2.CFront	
+LCore.Slice2.CFront.sym2	LCore.Slice2.CFront	
+LCore.Slice2.CFront.takeTy	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.tmp	LCore.Slice2.CFront	
+LCore.Slice2.CFront.verify16C_ct	LCore.Slice2.CFront	Quot.sound,propext
+LCore.Slice2.CFront.verify32	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.verify32_ct	LCore.Slice2.CFront	Quot.sound,propext
+LCore.Slice2.CFront.verify32_ct_checks	LCore.Slice2.CFront	propext
+LCore.Slice2.CFront.words	LCore.Slice2.CFront	
+LCore.Slice2.CFront.wrong_length_refused	LCore.Slice2.CFront	propext
+LCore.Slice2.CSrc.PINS	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.divisionC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.earlyExitC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.maskPastC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.maskedLoopC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.notInlineC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.pastEndC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.precC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.precLeftC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.precRightC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.reservedNameC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.secretIndexC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.shift64C	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.startAt1C	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.twiceC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.uncountedC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.updateOtherC	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.verify16C	LCore.Slice2.CSrc	
+LCore.Slice2.CSrc.verify32C	LCore.Slice2.CSrc	
+LCore.Slice2.CT.chain	LCore.Slice2.CT	
+LCore.Slice2.CT.chainOk	LCore.Slice2.CT	
+LCore.Slice2.CT.chainOk_checks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.chain_leaks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.chain_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.ctCheck	LCore.Slice2.CT	propext
+LCore.Slice2.CT.ctCheck_relView	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.earlyExit	LCore.Slice2.CT	
+LCore.Slice2.CT.earlyExit_leaks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.earlyExit_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.noRet	LCore.Slice2.CT	
+LCore.Slice2.CT.run_view_ret	LCore.Slice2.CT	propext
+LCore.Slice2.CT.secretLookup	LCore.Slice2.CT	
+LCore.Slice2.CT.secretLookup_leaks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.secretLookup_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.sliceCheck_ctCheck	LCore.Slice2.CT	propext
+LCore.Slice2.CT.tick_view	LCore.Slice2.CT	
+LCore.Slice2.CT.verify16_ct	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.verify16_ct_checks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.verify16_not_rel	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.verify16_same_trace_different_result	LCore.Slice2.CT	propext
+LCore.Slice2.CTBytes.earlyExitImage	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.earlyExit_bytes_leak	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16C_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.CTBytes.verify16Image	LCore.Slice2.CTBytes	
+LCore.Slice2.CTBytes.verify16Nats	LCore.Slice2.CTBytes	
+LCore.Slice2.CTBytes.verify16_bound	LCore.Slice2.CTBytes	Quot.sound,propext
+LCore.Slice2.CTBytes.verify16_bound_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.CTBytes.verify16_budget_const	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16_counted	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.CTBytes.verify16_is_literal	LCore.Slice2.CTBytes	propext
+LCore.Slice2.CTBytes.verify16_pipeline	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
 LCore.Slice2.Cmd.assign.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.assign.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.below	LCore.Slice2.Source	
@@ -4436,6 +4790,8 @@ LCore.Slice2.Cmd.ite.elim	LCore.Slice2.Source
 LCore.Slice2.Cmd.ite.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.load.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.load.noConfusion	LCore.Slice2.Source	
+LCore.Slice2.Cmd.loadB.elim	LCore.Slice2.Source	
+LCore.Slice2.Cmd.loadB.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.loop.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.loop.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.noConfusion	LCore.Slice2.Source	
@@ -4552,8 +4908,8 @@ LCore.Slice2.Lower.arr_lt	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.behind	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.behind_top	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.beq_neg_fields	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
-LCore.Slice2.Lower.chunk	LCore.Slice2.Chunk	
-LCore.Slice2.Lower.chunkC	LCore.Slice2.Chunk	
+LCore.Slice2.Lower.chunk	LCore.Slice2.Chunk	propext
+LCore.Slice2.Lower.chunkC	LCore.Slice2.Chunk	propext
 LCore.Slice2.Lower.chunk_exec	LCore.Slice2.Chunk	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.chunk_length	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.codeLen	LCore.Slice2.Pass	
@@ -4562,11 +4918,14 @@ LCore.Slice2.Lower.compR_ok	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.compiled_ignores_env	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.det_run	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.det_top	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
+LCore.Slice2.Lower.dig0	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.digS	LCore.Slice2.Lower	propext
 LCore.Slice2.Lower.entry	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.exec_guard	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.exec_ite	LCore.Slice2.Chunk	Quot.sound,propext
 LCore.Slice2.Lower.exec_jmp	LCore.Slice2.Chunk	Quot.sound,propext
 LCore.Slice2.Lower.exec_load	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice2.Lower.exec_loadB	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.exec_loop	LCore.Slice2.Chunk	Quot.sound,propext
 LCore.Slice2.Lower.exec_set	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.exec_store	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
@@ -4598,8 +4957,11 @@ LCore.Slice2.Lower.ks0_noSeq	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.laid	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.lkOf	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.lkOf_length	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.load8_byte	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.mIdx	LCore.Slice2.Lower	
 LCore.Slice2.Lower.mIdx_length	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.maskOK	LCore.Slice2.Lower	
+LCore.Slice2.Lower.mask_mod	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.nextK	LCore.Slice2.Chunk	propext
 LCore.Slice2.Lower.nextS	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.nextT	LCore.Slice2.Chunk	propext
@@ -4634,6 +4996,7 @@ LCore.Slice2.Lower.step_add	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_addi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_andi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_beq	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.step_lbu	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_ld	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_sd	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.tailC	LCore.Slice2.Pass	
@@ -4656,6 +5019,20 @@ LCore.Slice2.OnMachine.spin_ok	LCore.Slice2.OnMachine	propext
 LCore.Slice2.OnMachine.spin_on_machine	LCore.Slice2.OnMachine	Classical.choice,Quot.sound,propext
 LCore.Slice2.OnMachine.spin_pipeline	LCore.Slice2.OnMachine	Classical.choice,Quot.sound,propext
 LCore.Slice2.OnMachine.spin_steps_on_machine	LCore.Slice2.OnMachine	propext
+LCore.Slice2.Ops.lit	LCore.Slice2.Ops	
+LCore.Slice2.Ops.mixSecret	LCore.Slice2.Ops	
+LCore.Slice2.Ops.mixSecret_refused	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.ops_values	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.shift63_accepted	LCore.Slice2.Ops	
+LCore.Slice2.Ops.shift64_refused	LCore.Slice2.Ops	
+LCore.Slice2.Ops.shiftSecret_refused	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.src	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.tailE	LCore.Slice2.Ops	
+LCore.Slice2.Ops.verifyTail	LCore.Slice2.Ops	
+LCore.Slice2.Ops.verifyTail_checks	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.verifyTail_means	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.verifyTail_ok	LCore.Slice2.Ops	propext
+LCore.Slice2.Ops.verifyTail_on_machine	LCore.Slice2.Ops	propext
 LCore.Slice2.Prog.body	LCore.Slice2.Source	
 LCore.Slice2.Prog.casesOn	LCore.Slice2.Source	
 LCore.Slice2.Prog.ctorIdx	LCore.Slice2.Source	
@@ -4665,6 +5042,17 @@ LCore.Slice2.Prog.noConfusion	LCore.Slice2.Source
 LCore.Slice2.Prog.noConfusionType	LCore.Slice2.Source	
 LCore.Slice2.Prog.recOn	LCore.Slice2.Source	
 LCore.Slice2.Prog.ret	LCore.Slice2.Source	
+LCore.Slice2.Sha256.H0	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.K	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.be32	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.compress	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.hex32	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.hexDigit	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.ofString	LCore.Slice2.Sha256	propext
+LCore.Slice2.Sha256.pad	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.rotr	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.selfTest	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.sha256	LCore.Slice2.Sha256	Quot.sound,propext
 LCore.Slice2.Slots.Cov	LCore.Slice2.Slots	
 LCore.Slice2.Slots.NoSeqS	LCore.Slice2.Slots	
 LCore.Slice2.Slots.Rel	LCore.Slice2.Slots	propext
@@ -4680,6 +5068,8 @@ LCore.Slice2.Slots.SCmd.ite.elim	LCore.Slice2.Slots
 LCore.Slice2.Slots.SCmd.ite.noConfusion	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.load.elim	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.load.noConfusion	LCore.Slice2.Slots	
+LCore.Slice2.Slots.SCmd.loadB.elim	LCore.Slice2.Slots	
+LCore.Slice2.Slots.SCmd.loadB.noConfusion	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.loop.elim	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.loop.noConfusion	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.noConfusion	LCore.Slice2.Slots	
@@ -4705,6 +5095,9 @@ LCore.Slice2.Slots.Slots	LCore.Slice2.Slots
 LCore.Slice2.Slots.allVars	LCore.Slice2.Slots	
 LCore.Slice2.Slots.arrBase	LCore.Slice2.Slots	
 LCore.Slice2.Slots.array_does_not_alias	LCore.Slice2.Slots	Quot.sound,propext
+LCore.Slice2.Slots.bidxS	LCore.Slice2.Slots	
+LCore.Slice2.Slots.byteAtS	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.byteAtS_map	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.cC	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.cE	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.cF	LCore.Slice2.Slots	propext
@@ -4721,10 +5114,10 @@ LCore.Slice2.Slots.instDecidableEqSCmd	LCore.Slice2.Slots
 LCore.Slice2.Slots.instDecidableEqSCmd.decEq	LCore.Slice2.Slots	
 LCore.Slice2.Slots.instDecidableEqSProg	LCore.Slice2.Slots	
 LCore.Slice2.Slots.instDecidableEqSProg.decEq	LCore.Slice2.Slots	
-LCore.Slice2.Slots.instReprSCmd	LCore.Slice2.Slots	
-LCore.Slice2.Slots.instReprSCmd.repr	LCore.Slice2.Slots	
-LCore.Slice2.Slots.instReprSProg	LCore.Slice2.Slots	
-LCore.Slice2.Slots.instReprSProg.repr	LCore.Slice2.Slots	
+LCore.Slice2.Slots.instReprSCmd	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.instReprSCmd.repr	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.instReprSProg	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.instReprSProg.repr	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS_cC	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS_noSeq	LCore.Slice2.Slots	propext
@@ -4797,6 +5190,10 @@ LCore.Slice2.addrLk	LCore.Slice2.Source
 LCore.Slice2.arrayInLoop	LCore.Slice2.Source	
 LCore.Slice2.arrayInLoop_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.arrayInLoop_refused	LCore.Slice2.Source	propext
+LCore.Slice2.bidx	LCore.Slice2.Source	
+LCore.Slice2.byteAt	LCore.Slice2.Source	propext
+LCore.Slice2.byteAt_low	LCore.Slice2.Source	propext
+LCore.Slice2.byteOfWord	LCore.Slice2.Source	
 LCore.Slice2.costK	LCore.Slice2.Source	propext
 LCore.Slice2.costK_push	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.costOf	LCore.Slice2.Source	propext
@@ -4815,6 +5212,7 @@ LCore.Slice2.leak_lk	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.lkCode	LCore.Slice2.Source	propext
 LCore.Slice2.load_clears_when_low	LCore.Slice2.Source	propext
 LCore.Slice2.loopFree	LCore.Slice2.Source	propext
+LCore.Slice2.loop_inv	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.low_high	LCore.Slice2.Source	propext
 LCore.Slice2.low_set	LCore.Slice2.Source	propext
 LCore.Slice2.markedFirst	LCore.Slice2.Source	

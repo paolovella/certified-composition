@@ -27,6 +27,8 @@ inductive Cmd where
   | ite    : Expr → Cmd → Cmd → Cmd
   | loop   : Expr → Cmd → Cmd
   | load   : String → Expr → Cmd
+  /-- `x := names[i]`, byte `i` of the input words `names`, read-only (RC-01): `crypto_verify_16`'s `x[i]`. -/
+  | loadB  : String → List String → Expr → Cmd
   | store  : Expr → Expr → Cmd
   deriving DecidableEq, Repr
 
@@ -49,6 +51,18 @@ def push : Cmd → List Nat → List Frame → List Frame
   | .seq a b, p, k => push a (p ++ [0]) (push b (p ++ [1]) k)
   | c, p, k => (c, p) :: k
 
+/-- A byte array's index, masked to its `8 * length` bytes. -/
+def bidx (ns : List String) (v : W64) : Nat := v.val % (8 * ns.length)
+
+/-- Byte `i` of a word, little-endian, as RISC-V and x86 store them. -/
+def byteOfWord (w : W64) (j : Nat) : W64 := W64.ofNat (w.val / 256 ^ j % 256)
+
+/-- Byte `i` of the words `ns`, and 0 past their end. -/
+def byteAt (s : Store) (ns : List String) (i : Nat) : W64 :=
+  match ns[i / 8]? with
+  | some y => byteOfWord (s y) (i % 8)
+  | none => W64.ofNat 0
+
 /-- An access's leakage: its masked index. -/
 def addrLk (i : Nat) : Lk := .addr (Int.ofNat i)
 
@@ -68,6 +82,7 @@ def run (ret : Expr) : Nat → List Frame → Store → Arr → Beh
       if (eval e s).val ≠ 0 then tick [.branch true] p (run ret n (push b (p ++ [0]) ((.loop e b, p) :: k)) s a)
       else tick [.branch false] p (run ret n k s a)
     | .load x e => tick [addrLk (idx (eval e s))] p (run ret n k (upd s x (a (idx (eval e s)))) a)
+    | .loadB x ns e => tick [addrLk (bidx ns (eval e s))] p (run ret n k (upd s x (byteAt s ns (bidx ns (eval e s)))) a)
     | .store e v => tick [addrLk (idx (eval e s))] p (run ret n k s (updA a (idx (eval e s)) (eval v s)))
 
 def zeroA : Arr := fun _ => W64.ofNat 0
@@ -114,6 +129,7 @@ theorem run_ext (ret : Expr) : ∀ (n n' : Nat) (k : List Frame) (s : Store) (a 
         · exact tick_ext _ _ (ih m' _ s a hm)
         · exact tick_ext _ _ (ih m' _ s a hm)
       | load x e => exact tick_ext _ _ (ih m' _ _ a hm)
+      | loadB x ns e => exact tick_ext _ _ (ih m' _ _ a hm)
       | store e v => exact tick_ext _ _ (ih m' _ s _ hm)
 
 def NoSeq (k : List Frame) : Prop := ∀ f ∈ k, ∀ a b, f.1 ≠ .seq a b
@@ -121,7 +137,7 @@ def NoSeq (k : List Frame) : Prop := ∀ f ∈ k, ∀ a b, f.1 ≠ .seq a b
 theorem push_noSeq : ∀ (c : Cmd) (p : List Nat) (k : List Frame), NoSeq k → NoSeq (push c p k)
   | .seq a b, p, k, h => push_noSeq a _ _ (push_noSeq b _ k h)
   | .skip, _, k, h | .assign _ _, _, k, h | .ite _ _ _, _, k, h | .loop _ _, _, k, h
-  | .load _ _, _, k, h | .store _ _, _, k, h => by
+  | .load _ _, _, k, h | .loadB _ _ _, _, k, h | .store _ _, _, k, h => by
     intro f hf a b
     simp only [push, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -171,6 +187,9 @@ theorem run_diverge (ret : Expr) : ∀ (n : Nat) (k : List Frame) (s : Store) (a
       | load x e =>
         simp only [run, tick] at hf ⊢
         have := ih k _ a hk' hf; omega
+      | loadB x ns e =>
+        simp only [run, tick] at hf ⊢
+        have := ih k _ a hk' hf; omega
       | store e v =>
         simp only [run, tick] at hf ⊢
         have := ih k s _ hk' hf; omega
@@ -200,14 +219,24 @@ def highC (st : St) : Cmd → Option St
     else (highC st a).bind fun sa => (highC st b).map fun sb => (sa.1 ++ sb.1, sa.2 || sb.2)
   | .loop e b =>
     if highE st.1 e then none
-    else (highC st b).bind fun s₁ => if sub s₁ st then some st else none
+    else (highC st b).bind fun s₁ =>
+      if sub s₁ st then some st
+      else
+        -- one widening step: from the head joined with what the body raised
+        if highE (s₁.1 ++ st.1) e then none
+        else (highC (s₁.1 ++ st.1, st.2 || s₁.2) b).bind fun s₂ =>
+          if sub s₂ (s₁.1 ++ st.1, st.2 || s₁.2) then some (s₁.1 ++ st.1, st.2 || s₁.2) else none
   | .load x e =>
     if highE st.1 e then none
     else if st.2 then some (x :: st.1, st.2) else some (st.1.filter (· ≠ x), st.2)
+  | .loadB x ns e =>
+    if highE st.1 e || ns.isEmpty then none
+    else if ns.any (fun y => decide (y ∈ st.1)) then some (x :: st.1, st.2) else some (st.1.filter (· ≠ x), st.2)
   | .store e v =>
     if highE st.1 e then none else some (st.1, st.2 || highE st.1 v)
 
-/-- **The checker**: no secret guard, loop guard, index or result, and no loop that raises anything past its head. -/
+/-- **The checker**: no secret guard, loop guard, index or result. A loop whose body raises something past its head is retried once from the
+    head joined with the body's result, and refused if the body still raises something past that. -/
 def sliceCheck (P : Nat → Bool) (p : Prog) : Bool :=
   match highC (highInit P p.inputs 0, false) p.body with
   | some st => !highE st.1 p.ret
@@ -237,6 +266,15 @@ theorem LowS.mono {x y : St} {s s' : Store} {a a' : Arr} (hs : Sub x y) (h : Low
     | false => rfl
     | true => have := hs.2 hx; rw [hy] at this; cases this)⟩
 
+/-- **A byte of a low array is the same in two runs**: the mask keeps the index inside the array, so the word it reads is one of its own. -/
+theorem byteAt_low {H : List String} {s s' : Store} {ns : List String} (h : Low H s s') (hns : ∀ y ∈ ns, y ∉ H)
+    (i : Nat) : byteAt s ns i = byteAt s' ns i := by
+  simp only [byteAt]
+  split
+  · rename_i y hy
+    rw [h y (hns y (List.mem_of_getElem? hy))]
+  · rfl
+
 inductive FT (ret : Expr) : St → List Frame → Prop where
   | nil  : ∀ {st : St}, highE st.1 ret = false → FT ret st []
   | cons : ∀ {st s₁ s₂ : St} {c : Cmd} {p : List Nat} {k : List Frame},
@@ -252,7 +290,8 @@ theorem push_ft {ret : Expr} : ∀ (c : Cmd) (p : List Nat) {st s₁ s₂ : St} 
       exact push_ft a _ ea (Sub.refl _) (push_ft b _ hc hs hk)
   | .skip, _, _, _, _, _, hc, hs, hk | .assign _ _, _, _, _, _, _, hc, hs, hk
   | .ite _ _ _, _, _, _, _, _, hc, hs, hk | .loop _ _, _, _, _, _, _, hc, hs, hk
-  | .load _ _, _, _, _, _, _, hc, hs, hk | .store _ _, _, _, _, _, _, hc, hs, hk => FT.cons hc hs hk
+  | .load _ _, _, _, _, _, _, hc, hs, hk | .loadB _ _ _, _, _, _, _, _, hc, hs, hk
+  | .store _ _, _, _, _, _, _, hc, hs, hk => FT.cons hc hs hk
 
 theorem low_set {H : List String} {s s' : Store} {x : String} {v v' : W64} (hl : Low H s s') (hv : v = v') :
     Low (H.filter (· ≠ x)) (upd s x v) (upd s' x v') := by
@@ -268,6 +307,40 @@ theorem low_high {H : List String} {s s' : Store} {x : String} {v v' : W64} (hl 
   have hne : y ≠ x := fun h => hy (by simp [h])
   have hyH : y ∉ H := fun h => hy (List.mem_cons_of_mem _ h)
   simp [upd, hne, hl y hyH]
+
+/-- **An accepted loop has an invariant** `w` that contains its head's state: a public guard, and a body that stays within it. -/
+theorem loop_inv {st s₁ : St} {e : Expr} {b : Cmd} (h : highC st (.loop e b) = some s₁) :
+    ∃ w : St, Sub st w ∧ s₁ = w ∧ highE w.1 e = false ∧ ∃ s₂, highC w b = some s₂ ∧ Sub s₂ w ∧ highC w (.loop e b) = some w := by
+  have h0 := h
+  simp only [highC] at h
+  split at h
+  · simp at h
+  rename_i he
+  rcases eb : highC st b with _ | sb
+  · rw [eb] at h; simp at h
+  rw [eb, Option.bind_some] at h
+  split at h
+  · rename_i hsub
+    simp only [Option.some.injEq] at h
+    subst h
+    exact ⟨st, Sub.refl _, rfl, by simpa using he, sb, eb, sub_sound hsub, h0⟩
+  · rename_i hsub
+    split at h
+    · simp at h
+    rename_i he'
+    rcases eb' : highC (sb.1 ++ st.1, st.2 || sb.2) b with _ | sc
+    · rw [eb'] at h; simp at h
+    rw [eb', Option.bind_some] at h
+    split at h
+    · rename_i hsub'
+      simp only [Option.some.injEq] at h
+      subst h
+      refine ⟨_, ⟨fun v hv => List.mem_append_right _ hv, fun hv => by simp [hv]⟩, rfl, by simpa using he', sc, eb',
+        sub_sound hsub', ?_⟩
+      simp only [highC, eb', Option.bind_some, hsub', ite_true]
+      simp only [Bool.not_eq_true] at he'
+      simp [he']
+    · simp at h
 
 /-- **Two low-equal runs of accepted frames show the same, at every fuel**, whether or not they ever finish. -/
 theorem run_same {ret : Expr} : ∀ (n : Nat) (st : St) (k : List Frame) (s s' : Store) (a a' : Arr),
@@ -334,20 +407,14 @@ theorem run_same {ret : Expr} : ∀ (n : Nat) (st : St) (k : List Frame) (s s' :
         simp only [highC] at hc
         split at hc
         · simp at hc
-        rename_i he
-        rcases eb : highC st b with _ | sb
-        · rw [eb] at hc; simp at hc
-        rw [eb, Option.bind_some] at hc
-        split at hc
-        · rename_i hsub
-          simp only [Option.some.injEq] at hc
-          subst hc
-          have hg : eval e s = eval e s' := eval_low hl.1 e (by simpa using he)
-          simp only [run, hg]
-          split
-          · rw [ih _ _ s s' a a' (push_ft b _ eb (sub_sound hsub) (FT.cons hc0 hs hk')) hl]
-          · rw [ih _ _ s s' a a' hk' (LowS.mono hs hl)]
-        · simp at hc
+        obtain ⟨w, hsw, hw, he, s₂, eb, hsub, hloop⟩ := loop_inv hc0
+        subst hw
+        have hl' := LowS.mono hsw hl
+        have hg : eval e s = eval e s' := eval_low hl'.1 e he
+        simp only [run, hg]
+        split
+        · rw [ih _ _ s s' a a' (push_ft b _ eb hsub (FT.cons hloop hs hk')) hl']
+        · rw [ih _ _ s s' a a' hk' (LowS.mono hs hl')]
       | load x e =>
         simp only [highC] at hc
         split at hc
@@ -365,6 +432,28 @@ theorem run_same {ret : Expr} : ∀ (n : Nat) (st : St) (k : List Frame) (s s' :
             subst hc
             have ha : a = a' := hl.2 (by simpa using hh)
             exact ⟨low_set hl.1 (by rw [hg, ha]), hl.2⟩
+        simp only [run, hg]
+        rw [hg] at hnew
+        rw [ih _ _ _ _ _ _ hk' (LowS.mono hs hnew)]
+      | loadB x ns e =>
+        simp only [highC] at hc
+        split at hc
+        · simp at hc
+        rename_i he
+        simp only [Bool.or_eq_true, not_or] at he
+        have hg : eval e s = eval e s' := eval_low hl.1 e (by simpa using he.1)
+        have hne : ns ≠ [] := by intro h; apply he.2; simp [h]
+        have hnew : LowS s₁ (upd s x (byteAt s ns (bidx ns (eval e s)))) (upd s' x (byteAt s' ns (bidx ns (eval e s')))) a a' := by
+          split at hc
+          · simp only [Option.some.injEq] at hc
+            subst hc
+            exact ⟨low_high hl.1, hl.2⟩
+          · rename_i hh
+            simp only [Option.some.injEq] at hc
+            subst hc
+            simp only [List.any_eq_true, decide_eq_true_eq, not_exists, not_and] at hh
+            have hb := byteAt_low hl.1 hh (bidx ns (eval e s))
+            exact ⟨low_set hl.1 (by rw [hg] at hb ⊢; exact hb), hl.2⟩
         simp only [run, hg]
         rw [hg] at hnew
         rw [ih _ _ _ _ _ _ hk' (LowS.mono hs hnew)]
@@ -416,7 +505,8 @@ def costK : List Frame → Nat
 
 theorem costK_push : ∀ (c : Cmd) (p : List Nat) (k : List Frame), costK (push c p k) = costOf c + costK k
   | .seq a b, p, k => by simp only [push, costK_push a, costK_push b, costOf]; omega
-  | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .store _ _, _, _ => rfl
+  | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
+  | .store _ _, _, _ => rfl
 
 def LF (k : List Frame) : Prop := ∀ f ∈ k, loopFree f.1 = true
 
@@ -425,7 +515,7 @@ theorem push_lf : ∀ (c : Cmd) (p : List Nat) (k : List Frame), loopFree c = tr
     simp only [loopFree, Bool.and_eq_true] at hc
     exact push_lf a _ _ hc.1 (push_lf b _ _ hc.2 hk)
   | .skip, _, _, hc, hk | .assign _ _, _, _, hc, hk | .ite _ _ _, _, _, hc, hk | .loop _ _, _, _, hc, hk
-  | .load _ _, _, _, hc, hk | .store _ _, _, _, hc, hk => by
+  | .load _ _, _, _, hc, hk | .loadB _ _ _, _, _, hc, hk | .store _ _, _, _, hc, hk => by
     intro f hf
     simp only [push, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -449,6 +539,7 @@ theorem run_cost (ret : Expr) : ∀ (n : Nat) (k : List Frame) (s : Store) (a : 
       | skip => have := ih k s a hk'; simp only [run, tick, costK, costOf]; omega
       | assign x e => have := ih k (upd s x (eval e s)) a hk'; simp only [run, tick, costK, costOf]; omega
       | load x e => have := ih k (upd s x (a (idx (eval e s)))) a hk'; simp only [run, tick, costK, costOf]; omega
+      | loadB x ns e => have := ih k (upd s x (byteAt s ns (bidx ns (eval e s)))) a hk'; simp only [run, tick, costK, costOf]; omega
       | store e v => have := ih k s (updA a (idx (eval e s)) (eval v s)) hk'; simp only [run, tick, costK, costOf]; omega
       | loop e b => simp [loopFree] at hc
       | seq c₁ c₂ =>

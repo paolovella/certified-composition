@@ -1,0 +1,4 @@
+started: 2026-11-08T18:05:38+01:00
+head: ba6652f
+command: bash tools/ci.sh
+log: tools/receipts/rc01-budgets-ci.log

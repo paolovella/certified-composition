@@ -102,6 +102,66 @@ theorem good_add {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Goo
   have h6 : W / 2 ^ 25 = 0 := by simp only [Nat.reducePow]; omega
   simp [decode, h1, h2, h3, h4, h5, h6]
 
+/-- **The R-type instructions RC-01 needs**, `sub`, `xor`, `or` and `and`: their encodings decode back. -/
+theorem good_sub {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.sub rd a b) := by
+  have hw : encode (.sub rd a b) = 32 * 33554432 + b * 1048576 + a * 32768 + rd * 128 + 0x33 := rfl
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : 32 * 33554432 + b * 1048576 + a * 32768 + rd * 128 + 0x33 = W
+  have h1 : W % 128 = 0x33 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = a := by simp only [rs1Of, Nat.reducePow]; omega
+  have h4 : rs2Of W = b := by simp only [rs2Of, Nat.reducePow]; omega
+  have h5 : f3Of W = 0 := by simp only [f3Of, Nat.reducePow]; omega
+  have h6 : W / 2 ^ 25 = 32 := by simp only [Nat.reducePow]; omega
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+theorem good_r3 {rd a b f : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) (hf : f < 8) :
+    let W := b * 1048576 + a * 32768 + f * 4096 + rd * 128 + 0x33
+    W % 128 = 0x33 ∧ rdOf W = rd ∧ rs1Of W = a ∧ rs2Of W = b ∧ f3Of W = f ∧ W / 2 ^ 25 = 0 ∧ W < 4294967296 := by
+  intro W
+  refine ⟨by omega, ?_, ?_, ?_, ?_, ?_, by omega⟩
+  · simp only [W, rdOf, Nat.reducePow]; omega
+  · simp only [W, rs1Of, Nat.reducePow]; omega
+  · simp only [W, rs2Of, Nat.reducePow]; omega
+  · simp only [W, f3Of, Nat.reducePow]; omega
+  · simp only [W, Nat.reducePow]; omega
+
+theorem good_xor {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.xor rd a b) := by
+  have hw : encode (.xor rd a b) = b * 1048576 + a * 32768 + 4 * 4096 + rd * 128 + 0x33 := rfl
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := good_r3 (f := 4) hd ha hb (by omega)
+  refine ⟨?_, by rw [hw]; exact h7⟩
+  rw [hw]
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+theorem good_or {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.or rd a b) := by
+  have hw : encode (.or rd a b) = b * 1048576 + a * 32768 + 6 * 4096 + rd * 128 + 0x33 := rfl
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := good_r3 (f := 6) hd ha hb (by omega)
+  refine ⟨?_, by rw [hw]; exact h7⟩
+  rw [hw]
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+theorem good_and {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (.and rd a b) := by
+  have hw : encode (.and rd a b) = b * 1048576 + a * 32768 + 7 * 4096 + rd * 128 + 0x33 := rfl
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := good_r3 (f := 7) hd ha hb (by omega)
+  refine ⟨?_, by rw [hw]; exact h7⟩
+  rw [hw]
+  simp [decode, h1, h2, h3, h4, h5, h6]
+
+/-- **`srli` by a shift below 64.** -/
+theorem good_srli {rd a k : Nat} (hd : rd < 32) (ha : a < 32) (hk : k < 64) : Good (.srli rd a k) := by
+  have hw : encode (.srli rd a k) = k * 1048576 + a * 32768 + 5 * 4096 + rd * 128 + 0x13 := rfl
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : k * 1048576 + a * 32768 + 5 * 4096 + rd * 128 + 0x13 = W
+  have h1 : W % 128 = 0x13 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = a := by simp only [rs1Of, Nat.reducePow]; omega
+  have h5 : f3Of W = 5 := by simp only [f3Of, Nat.reducePow]; omega
+  have h6 : W / 2 ^ 26 = 0 := by simp only [Nat.reducePow]; omega
+  have h7 : W / 2 ^ 20 % 64 = k := by simp only [Nat.reducePow]; omega
+  simp [decode, h1, h2, h3, h5, h6, h7]
+
 theorem good_ld {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
     Good (.ld rd rs (Int.ofNat i)) := by
   have hw : encode (.ld rd rs (Int.ofNat i)) = i * 1048576 + rs * 32768 + 12288 + rd * 128 + 0x03 := by
@@ -117,6 +177,23 @@ theorem good_ld {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
   have h5 : W / 2 ^ 20 = i := by simp only [Nat.reducePow]; omega
   have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
   simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte]
+
+/-- **`lbu`** (RC-01): a byte, zero-extended. -/
+theorem good_lbu {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
+    Good (.lbu rd rs (Int.ofNat i)) := by
+  have hw : encode (.lbu rd rs (Int.ofNat i)) = i * 1048576 + rs * 32768 + 16384 + rd * 128 + 0x03 := by
+    show bits (Int.ofNat i) 12 * 2 ^ 20 + rs * 2 ^ 15 + 4 * 2 ^ 12 + rd * 2 ^ 7 + 0x03 = _
+    rw [bits_ofNat i 12 (by simp only [Nat.reducePow]; omega)]
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : i * 1048576 + rs * 32768 + 16384 + rd * 128 + 0x03 = W
+  have h1 : W % 128 = 0x03 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = rs := by simp only [rs1Of, Nat.reducePow]; omega
+  have h4 : f3Of W = 4 := by simp only [f3Of, Nat.reducePow]; omega
+  have h5 : W / 2 ^ 20 = i := by simp only [Nat.reducePow]; omega
+  have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
+  simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte, show (4 : Nat) ≠ 3 by decide]
 
 /-- A field of a word, which `omega` cannot always find alone in a sum this wide. -/
 theorem div_field {W k : Nat} (a b : Nat) (h : W = a * k + b) (hb : b < k) : W / k = a := by
@@ -293,10 +370,13 @@ def genE : SExpr → Nat → List Insn
   | .lit w, d => [.addi (8 + d) 0 (litImm w)]
   | .slot n, d => [.ld (8 + d) 7 (Int.ofNat (8 * n))]
   | .add a b, d => genE a d ++ genE b (d + 1) ++ [.add (8 + d) (8 + d) (8 + d + 1)]
+  | .bin o a b, d => genE a d ++ genE b (d + 1) ++ [opInsn o (8 + d) (8 + d) (8 + d + 1)]
+  | .shr a k, d => genE a d ++ [.srli (8 + d) (8 + d) k]
 
 def sE : SExpr → Nat
   | .lit _ | .slot _ => 1
-  | .add a b => sE a + sE b + 1
+  | .add a b | .bin _ a b => sE a + sE b + 1
+  | .shr a _ => sE a + 1
 
 def sC : SCmd → Nat
   | .skip => 1
@@ -315,7 +395,8 @@ def genC : SCmd → List Insn
 def okE : SExpr → Nat → Bool
   | .lit w, d => (decide (w.val < 2048) || decide (18446744073709549568 ≤ w.val)) && decide (d < 24)
   | .slot n, d => decide (n < wordsMax) && decide (d < 24)
-  | .add a b, d => okE a d && okE b (d + 1) && decide (d + 1 < 24)
+  | .add a b, d | .bin _ a b, d => okE a d && okE b (d + 1) && decide (d + 1 < 24)
+  | .shr a k, d => okE a d && decide (k < 64)
 
 def okC : SCmd → Bool
   | .skip => true
@@ -325,7 +406,8 @@ def okC : SCmd → Bool
 
 theorem genE_length : ∀ (e : SExpr) (d : Nat), (genE e d).length = sE e
   | .lit _, _ | .slot _, _ => rfl
-  | .add a b, d => by simp only [genE, sE, List.length_append, genE_length a, genE_length b]; rfl
+  | .add a b, d | .bin _ a b, d => by simp only [genE, sE, List.length_append, genE_length a, genE_length b]; rfl
+  | .shr a _, d => by simp only [genE, sE, List.length_append, genE_length a]; rfl
 
 theorem genC_length : ∀ c : SCmd, (genC c).length = sC c
   | .skip => rfl
@@ -333,6 +415,19 @@ theorem genC_length : ∀ c : SCmd, (genC c).length = sC c
   | .seq a b => by simp only [genC, sC, List.length_append, genC_length a, genC_length b]
   | .ite e a b => by
     simp only [genC, sC, List.length_append, genE_length, genC_length a, genC_length b]; rfl
+
+theorem good_op (o : Op) {rd a b : Nat} (hd : rd < 32) (ha : a < 32) (hb : b < 32) : Good (opInsn o rd a b) := by
+  cases o
+  · exact good_sub hd ha hb
+  · exact good_xor hd ha hb
+  · exact good_or hd ha hb
+  · exact good_and hd ha hb
+
+/-- Every expression `okE` accepts uses registers below `8 + 24`. -/
+theorem okE_depth : ∀ {e : SExpr} {d : Nat}, okE e d = true → d < 24
+  | .lit _, _, h | .slot _, _, h => by simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h; exact h.2
+  | .add a _, _, h | .bin _ a _, _, h => by simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h; omega
+  | .shr a _, _, h => by simp only [okE, Bool.and_eq_true] at h; exact okE_depth h.1
 
 theorem genE_good : ∀ (e : SExpr) (d : Nat), okE e d = true → ∀ i ∈ genE e d, Good i
   | .lit w, d, h, i, hi => by
@@ -356,6 +451,20 @@ theorem genE_good : ∀ (e : SExpr) (d : Nat), okE e d = true → ∀ i ∈ genE
     · exact genE_good a d h.1.1 i hi
     · exact genE_good b (d + 1) h.1.2 i hi
     · subst hi; exact good_add (by omega) (by omega) (by omega)
+  | .bin o a b, d, h, i, hi => by
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
+    simp only [genE, List.mem_append, List.mem_singleton] at hi
+    rcases hi with (hi | hi) | hi
+    · exact genE_good a d h.1.1 i hi
+    · exact genE_good b (d + 1) h.1.2 i hi
+    · subst hi; exact good_op o (by omega) (by omega) (by omega)
+  | .shr a k, d, h, i, hi => by
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
+    simp only [genE, List.mem_append, List.mem_singleton] at hi
+    rcases hi with hi | hi
+    · exact genE_good a d h.1 i hi
+    · have hd : d < 24 := okE_depth h.1
+      subst hi; exact good_srli (by omega) (by omega) h.2
 
 theorem genC_good : ∀ c : SCmd, okC c = true → ∀ i ∈ genC c, Good i
   | .skip, _, i, hi => by
@@ -566,7 +675,8 @@ theorem addrs8_slot {n : Nat} (hn : n < wordsMax) {x : Nat} (hx : x ∈ addrs8 (
 def mE : SExpr → Nat → List Micro
   | .lit _, pc => [(pc, [])]
   | .slot n, pc => [(pc, [.addr (Int.ofNat (slotAddr n))])]
-  | .add a b, pc => mE a pc ++ mE b (pc + 4 * sE a) ++ [(pc + 4 * (sE a + sE b), [])]
+  | .add a b, pc | .bin _ a b, pc => mE a pc ++ mE b (pc + 4 * sE a) ++ [(pc + 4 * (sE a + sE b), [])]
+  | .shr a _, pc => mE a pc ++ [(pc + 4 * sE a, [])]
 
 /-- The list of instructions at `pc`. -/
 def At (C : List Byte) (pc : Nat) (L : List Insn) : Prop :=
@@ -612,6 +722,12 @@ theorem litImm_value (m : Mach) (w : W64) (h : w.val < 2048 ∨ 1844674407370954
     show ((0 % 2 ^ 64 + (w.val % 2 ^ 64)) % 2 ^ 64) % 2 ^ 64 = w.val
     simp only [Nat.reducePow]
     omega
+
+/-- **One machine step of any of the four operators.** -/
+theorem step_op {C : List Byte} {en : Env} {m : Mach} {o : Op} {rd a b : Nat} (h : fetchI C m.pc = some (opInsn o rd a b)) :
+    Rv.step C en m = .next [] { m with pc := m.pc + 4, x := m.set rd (o.w (m.get a) (m.get b)) } := by
+  obtain ⟨w', hf, hd⟩ := fetchI_parts h
+  cases o <;> simp only [Rv.step, hf, hd, opInsn, Op.w]
 
 /-- **An expression's code**: the value in its register, lower registers and memory untouched. -/
 theorem genE_exec {C : List Byte} {en : Env} : ∀ (e : SExpr) (d : Nat) (m : Mach) (t : Slots),
@@ -688,6 +804,68 @@ theorem genE_exec {C : List Byte} {en : Env} : ∀ (e : SExpr) (d : Nat) (m : Ma
       rw [get_set (by omega)]
       simp only [show y ≠ 8 + d by omega, ↓reduceIte]
       rw [low₂ y (by omega), low₁ y hy]
+
+  | .bin o a b, d, m, t, hok, hinv, hat => by
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at hok
+    obtain ⟨⟨hoa, hob⟩, hd24⟩ := hok
+    simp only [genE] at hat
+    have hab := hat.left
+    have hadd := hat.right
+    obtain ⟨m₁, e₁, p₁, mem₁, v₁, low₁⟩ := genE_exec a d m t hoa hinv hab.left
+    have hinv₁ : Inv m₁ t := by
+      refine ⟨by rw [low₁ 7 (by omega)]; exact hinv.1, fun n hn => ?_⟩
+      have : load8 m₁ (slotAddr n) = load8 m (slotAddr n) := by simp only [load8, mem₁]
+      rw [this]; exact hinv.2 n hn
+    have hb : At C m₁.pc (genE b (d + 1)) := by
+      rw [p₁, ← genE_length a d]
+      exact hab.right
+    obtain ⟨m₂, e₂, p₂, mem₂, v₂, low₂⟩ := genE_exec b (d + 1) m₁ t hob hinv₁ hb
+    have hpc : m₂.pc = m.pc + 4 * (sE a + sE b) := by rw [p₂, p₁]; omega
+    have hat3 : fetchI C m₂.pc = some (opInsn o (8 + d) (8 + d) (8 + d + 1)) := by
+      have := hadd.head
+      simp only [List.length_append, genE_length] at this
+      rw [hpc]
+      rw [show m.pc + 4 * (sE a + sE b) = m.pc + 4 * (sE a + sE b) from rfl]
+      exact this
+    have hs : Rv.step C en m₂ = .next [] { m₂ with pc := m₂.pc + 4, x := m₂.set (8 + d) (o.w (m₂.get (8 + d)) (m₂.get (8 + d + 1))) } :=
+      step_op hat3
+    have e₃ := Exec.step hs
+    refine ⟨_, ((e₁.trans (by rw [p₁] at e₂; exact e₂)).trans (by
+      rw [hpc] at e₃
+      exact e₃)), ?_, ?_, ?_, ?_⟩
+    · simp only [sE]; omega
+    · simp only; rw [mem₂, mem₁]
+    · rw [get_set (by omega)]
+      have h1 : m₂.get (8 + d) = evalS a t := by rw [low₂ (8 + d) (by omega)]; exact v₁
+      have h2 : m₂.get (8 + d + 1) = evalS b t := v₂
+      simp [evalS, h1, h2]
+    · intro y hy
+      rw [get_set (by omega)]
+      simp only [show y ≠ 8 + d by omega, ↓reduceIte]
+      rw [low₂ y (by omega), low₁ y hy]
+  | .shr a k, d, m, t, hok, hinv, hat => by
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at hok
+    obtain ⟨hoa, hk⟩ := hok
+    have hd24 : d < 24 := okE_depth hoa
+    simp only [genE] at hat
+    obtain ⟨m₁, e₁, p₁, mem₁, v₁, low₁⟩ := genE_exec a d m t hoa hinv hat.left
+    have hat2 : fetchI C m₁.pc = some (.srli (8 + d) (8 + d) k) := by
+      have := hat.right.head
+      simp only [List.length_append, genE_length] at this
+      rw [p₁]; exact this
+    obtain ⟨w', hf, hd⟩ := fetchI_parts hat2
+    have hs : Rv.step C en m₁ = .next [] { m₁ with pc := m₁.pc + 4, x := m₁.set (8 + d) (W64.shr (m₁.get (8 + d)) k) } := by
+      simp only [Rv.step, hf, hd]
+    have e₂ := Exec.step hs
+    refine ⟨_, e₁.trans (by rw [p₁] at e₂; exact e₂), ?_, ?_, ?_, ?_⟩
+    · simp only [sE]; omega
+    · simp only; rw [mem₁]
+    · rw [get_set (by omega)]
+      simp [evalS, v₁]
+    · intro y hy
+      rw [get_set (by omega)]
+      simp only [show y ≠ 8 + d by omega, ↓reduceIte]
+      rw [low₁ y hy]
 
 /-! ## Commands: what the machine shows, computed from the slots alone -/
 
@@ -1085,7 +1263,8 @@ theorem walk_same (ret : SExpr) : ∀ (N : Nat) (k : List TF) (ks : List SFrame)
 
 theorem mE_length : ∀ (e : SExpr) (pc : Nat), (mE e pc).length = sE e
   | .lit _, _ | .slot _, _ => rfl
-  | .add a b, pc => by simp only [mE, sE, List.length_append, mE_length a, mE_length b]; rfl
+  | .add a b, pc | .bin _ a b, pc => by simp only [mE, sE, List.length_append, mE_length a, mE_length b]; rfl
+  | .shr a _, pc => by simp only [mE, sE, List.length_append, mE_length a]; rfl
 
 /-- Every frame's command is at most `L` instructions. -/
 def FS (L : Nat) : List TF → Prop

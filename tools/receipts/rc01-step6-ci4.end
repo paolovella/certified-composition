@@ -1,0 +1,4 @@
+ended: 2026-11-08T15:35:44+01:00
+exit: killed
+seconds: 1199
+note: written by hand. The WSL VM went down at 15:35:44 (last line of the previous boot's journal; the next boot is 15:38:11) while the job ran the rule-mutants step. No OOM kill is in that boot's journal on 2026-11-08, so the cause is outside the VM. The log stops mid-step. Incident I-0004.

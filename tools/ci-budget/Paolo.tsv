@@ -9,12 +9,12 @@ budget	step
 15	checkers.baseline names a commit and the checkers ring0.lock lists
 15	conf-typing builds
 15	cross-check witnesses (independent Rust port)
-194	export accepted by all six kernels (route 2)
+319	export accepted by all six kernels (route 2)
 23	frozen statements: lake comparator accepts the solution
 23	frozen statements: the comparator refuses a weakened solution (witness)
 49	guard-selftest (the guards actually fire)
 15	l-core builds (L's trusted core and its witnesses)
-130	lake check from the root workspace (route 1)
+216	lake check from the root workspace (route 1)
 15	no sorry in our sources
 71	ring0.lock catches what the comparator cannot (witness)
 16	ring0.lock is current

@@ -22,6 +22,10 @@ inductive Expr where
   | lit : W64 → Expr
   | var : String → Expr
   | add : Expr → Expr → Expr
+  /-- `^ | & -`, RC-01. -/
+  | bin : Op → Expr → Expr → Expr
+  /-- A logical shift right by a literal amount, RC-01. -/
+  | shr : Expr → Nat → Expr
   deriving DecidableEq, Repr
 
 inductive Cmd where
@@ -46,6 +50,8 @@ def eval : Expr → Store → W64
   | .lit w, _   => w
   | .var x, s   => s x
   | .add a b, s => W64.add (eval a s) (eval b s)
+  | .bin o a b, s => o.w (eval a s) (eval b s)
+  | .shr a k, s => W64.shr (eval a s) k
 
 /-- A frame: a command and its position. -/
 abbrev Frame := Cmd × List Nat
@@ -247,7 +253,8 @@ theorem slice_bound (E : Type) (P : Nat → Bool) (p : Prog) :
 def highE (H : List String) : Expr → Bool
   | .lit _   => false
   | .var x   => decide (x ∈ H)
-  | .add a b => highE H a || highE H b
+  | .add a b | .bin _ a b => highE H a || highE H b
+  | .shr a _ => highE H a
 
 /-- Track which variables may hold a secret. `none` refuses a branch on a secret. -/
 def highC (H : List String) : Cmd → Option (List String)
@@ -281,9 +288,12 @@ theorem eval_low {H : List String} {s s' : Store} (h : Low H s s') :
     ∀ e, highE H e = false → eval e s = eval e s'
   | .lit _, _ => rfl
   | .var x, he => h x (by simpa [highE] using he)
-  | .add a b, he => by
+  | .add a b, he | .bin _ a b, he => by
     simp only [highE, Bool.or_eq_false_iff] at he
     simp only [eval, eval_low h a he.1, eval_low h b he.2]
+  | .shr a _, he => by
+    simp only [highE] at he
+    simp only [eval, eval_low h a he]
 
 /-- Frames the checker accepts, ending where the result is low. A later frame may track more than an
     earlier one ended with, which is what the arms of a branch need. -/

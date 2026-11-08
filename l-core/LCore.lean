@@ -21,3 +21,9 @@ import LCore.Slice2.Teeth
 import LCore.Slice2.For
 import LCore.Slice2.Budget
 import LCore.Slice2.BoundBytes
+import LCore.Slice2.Ops
+import LCore.Slice2.Bytes
+import LCore.Slice2.CT
+import LCore.Slice2.CSrc
+import LCore.Slice2.CFront
+import LCore.Slice2.CTBytes

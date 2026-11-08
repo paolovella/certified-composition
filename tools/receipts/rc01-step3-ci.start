@@ -1,0 +1,4 @@
+started: 2026-11-08T10:03:03+01:00
+head: f9df3c6
+command: bash tools/ci.sh
+log: tools/receipts/rc01-step3-ci.log

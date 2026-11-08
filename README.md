@@ -8,7 +8,7 @@ Four Lean 4 packages, each `no sorry` and axiom-audited:
 
 | dir | what | deps | status |
 |---|---|---|---|
-| [`l-core/`](l-core) | **L's kernel** (observations, `Lang`, seven certificate shapes, certified passes and their transfers) and **the slices**: small languages compiled through certified passes to literal RV64 images | none (mathlib-free) | kernel unlocked (F6 waits); two slices to bytes; BOUND-01 in progress |
+| [`l-core/`](l-core) | **L's kernel** (observations, `Lang`, seven certificate shapes, certified passes and their transfers) and **the slices**: small languages compiled through certified passes to literal RV64 images | none (mathlib-free) | kernel locked (F6); two slices to bytes; BOUND-01 in progress |
 | [`conf-typing/`](conf-typing) | the checkers and the `UCmd` language the vulnerability map is about, and the security seam/reception modules | `transport-calculus`, `l-core` (paths) | map on L (F5); `UCmd` does not compile to bytes |
 | [`transport-calculus/`](transport-calculus) | the transport interface, its qualitative frontier, and the set-theoretic research line it opened | none (mathlib-free) | core proved; frontier reduced to one open question |
 | [`transport-kernel/`](transport-kernel) | instances of the interface against libraries other people built | mathlib, Physlib, `transport-calculus` | tiers 1–5 done |
@@ -32,8 +32,8 @@ certificate inside a pass. QEMU runs the bytes and agrees with the model.
 
 **What it is not, yet.** The slices are not L: `UCmd`, which the checkers and the vulnerability map are about, does not compile, so no
 row of the map reaches bytes. The user chose to grow the slice language into L's core, one construct at a time, each through to the bytes
-(`backlog/L-BYTES.md`). The RISC-V model is compared with QEMU and not linked to Sail, and QEMU is not hardware. The kernel is not
-locked: F6 waits for the language it should cover.
+(`backlog/L-BYTES.md`). The RISC-V model is compared with QEMU and not linked to Sail, and QEMU is not hardware. The kernel's meaning is
+locked (F6): changing it needs the user's key, and each slice language joins the lock as it becomes part of L.
 
 ### Earlier stages (PLAN-2026-08, history)
 

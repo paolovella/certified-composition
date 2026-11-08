@@ -1,0 +1,29 @@
+seconds	status	step
+285	FAILED (over budget: 285 s > 217 s)	rule mutants: every one killed, table current
+227	ok	export accepted by all six kernels (route 2)
+141	FAILED (over budget: 141 s > 130 s)	lake check from the root workspace (route 1)
+127	ok	both kernel gates refuse a planted axiom (witness)
+93	FAILED (over budget: 93 s > 53 s)	walk-check (numeric claims in the notes)
+60	ok	ring0.lock catches what the comparator cannot (witness)
+59	FAILED (over budget: 59 s > 49 s)	guard-selftest (the guards actually fire)
+23	ok	base gate: ring0 and manifest rules accept and refuse (witness)
+18	ok	witness registry finds what is missing (witness)
+17	FAILED (over budget: 17 s > 15 s)	conf-typing builds
+13	ok	rule mutants: the runner finds a survivor (witness)
+11	ok	frozen statements: lake comparator accepts the solution
+10	ok	frozen statements: the comparator refuses a weakened solution (witness)
+5	ok	axiom manifest is current
+4	ok	check-claims (drift guards)
+4	ok	witness registry: every checker accepts and refuses
+2	ok	transport-kernel builds (mathlib)
+1	ok	boundary warden: parser and drift report (witness)
+1	ok	certcheck gives every documented example its verdict
+1	ok	ring0.lock is current
+1	ok	transport-calculus builds
+1	ok	verus lcheck verifies and runs
+0	ok	certcompose builds and consumes the emission
+0	ok	checkers.baseline names a commit and the checkers ring0.lock lists
+0	ok	cross-check witnesses (independent Rust port)
+0	ok	l-core builds (L's trusted core and its witnesses)
+0	ok	no sorry in our sources
+0	ok	time budgets accept and refuse (witness)

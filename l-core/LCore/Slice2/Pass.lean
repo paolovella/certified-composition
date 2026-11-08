@@ -23,6 +23,7 @@ def lkOf (c : SCmd) (t : Slice.Slots.Slots) : List Lk :=
   match c with
   | .ite e _ _ | .loop e _ => if (evalS e t).val ≠ 0 then [.branch true] else [.branch false]
   | .load _ e | .store e _ => [addrLk (idx (evalS e t))]
+  | .loadB _ ws e => [addrLk (Slots.bidxS ws (evalS e t))]
   | _ => []
 
 /-- The source's frames after a command. -/
@@ -36,7 +37,7 @@ theorem src_step (ret : SExpr) {c : SCmd} (hc : ∀ a b, c ≠ .seq a b) (n : Na
     runS ret (n + 1) ((c, q) :: ks) t = tick (lkOf c t) q (runS ret n (nextS c q ks t) (nextT c t)) := by
   cases c with
   | seq a b => exact absurd rfl (hc a b)
-  | skip | set _ _ | load _ _ | store _ _ => rfl
+  | skip | set _ _ | load _ _ | loadB _ _ _ | store _ _ => rfl
   | ite e a b =>
     by_cases hg : (evalS e t).val ≠ 0
     · simp [runS, lkOf, nextS, nextT, hg]
@@ -55,7 +56,7 @@ inductive Corr : List SFrame → List TF → Prop where
 theorem Corr.push : ∀ (c : SCmd) (q : List Nat) (pc : Nat) {ks : List SFrame} {k : List TF}, Corr ks k → Corr (pushS c q ks) (pushT c pc k)
   | .seq a b, q, pc, _, _, h => Corr.push a _ _ (Corr.push b _ _ h)
   | .skip, _, _, _, _, h | .set _ _, _, _, _, _, h | .ite _ _ _, _, _, _, _, h | .loop _ _, _, _, _, _, h
-  | .load _ _, _, _, _, _, h | .store _ _, _, _, _, _, h => Corr.cmd h
+  | .load _ _, _, _, _, _, h | .loadB _ _ _, _, _, _, _, h | .store _ _, _, _, _, _, h => Corr.cmd h
 
 theorem Corr.next {ks : List SFrame} {k : List TF} (h : Corr ks k) (c : SCmd) (q : List Nat) (pc : Nat) (t : Slice.Slots.Slots) :
     Corr (nextS c q ks t) (nextK c pc k t) := by
@@ -127,6 +128,7 @@ def stepC : SCmd → Nat
   | .seq _ _ => 0
   | .ite e _ _ | .loop e _ => sE e + 2
   | .load _ e => sE e + 7
+  | .loadB _ _ e => sE e + 4
   | .store e v => sE e + 5 + sE v + 1
 
 /-- The largest `stepC` over every frame a command can push, its branches and loop body included. -/
@@ -139,12 +141,13 @@ def stepMax : SCmd → Nat
   | .skip => stepC .skip
   | .set n e => stepC (.set n e)
   | .load x e => stepC (.load x e)
+  | .loadB x ws e => stepC (.loadB x ws e)
   | .store e v => stepC (.store e v)
 
 theorem stepC_le : ∀ (c : SCmd), stepC c ≤ stepMax c
   | .seq _ _ => Nat.zero_le _
   | .ite _ _ _ | .loop _ _ => Nat.le_max_left _ _
-  | .skip | .set _ _ | .load _ _ | .store _ _ => Nat.le_refl _
+  | .skip | .set _ _ | .load _ _ | .loadB _ _ _ | .store _ _ => Nat.le_refl _
 
 def FS (L : Nat) : List TF → Prop
   | [] => True
@@ -161,11 +164,12 @@ theorem push_fs {L : Nat} : ∀ (c : SCmd) (pc : Nat) (k : List TF), stepMax c �
     simp only [stepMax] at h
     exact push_fs a _ _ (by omega) (push_fs b _ _ (by omega) hk)
   | .skip, _, _, h, hk | .set _ _, _, _, h, hk | .ite _ _ _, _, _, h, hk | .loop _ _, _, _, h, hk
-  | .load _ _, _, _, h, hk | .store _ _, _, _, h, hk => ⟨h, hk⟩
+  | .load _ _, _, _, h, hk | .loadB _ _ _, _, _, h, hk | .store _ _, _, _, h, hk => ⟨h, hk⟩
 
 theorem jc_push : ∀ (c : SCmd) (pc : Nat) (k : List TF), jc (pushT c pc k) = jc k
   | .seq a b, pc, k => by simp only [pushT, jc_push a, jc_push b]
-  | .skip, _, _ | .set _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .store _ _, _, _ => rfl
+  | .skip, _, _ | .set _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
+  | .store _ _, _, _ => rfl
 
 theorem next_fs {L : Nat} {c : SCmd} {pc : Nat} {k : List TF} (t : Slice.Slots.Slots) (hc : stepMax c ≤ L) (hk : FS L k) : FS L (nextK c pc k t) := by
   cases c with
@@ -193,6 +197,7 @@ theorem chunk_length {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots)
   | seq a b => exact absurd rfl (hs a b)
   | skip => simp [chunkC, nextK, stepC]
   | set n e => simp [chunkC, nextK, stepC, mE_length]
+  | loadB x ws e => simp [chunkC, nextK, stepC, mE_length]
   | ite e a b =>
     simp only [chunkC, nextK, stepC, List.length_append, mE_length, List.length_cons, List.length_nil]
     constructor
@@ -433,6 +438,9 @@ theorem same_step {c : SCmd} {t t' : Slice.Slots.Slots} (h : lkOf c t = lkOf c t
     · simp only [nextK, hg]
     · simp only [nextS, hg]
   | load x e =>
+    simp only [lkOf, addrLk, List.cons.injEq, Lk.addr.injEq, Int.ofNat.injEq, and_true] at h
+    exact ⟨by simp only [chunkC, h], rfl, rfl⟩
+  | loadB x ws e =>
     simp only [lkOf, addrLk, List.cons.injEq, Lk.addr.injEq, Int.ofNat.injEq, and_true] at h
     exact ⟨by simp only [chunkC, h], rfl, rfl⟩
   | store e v =>
