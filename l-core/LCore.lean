@@ -29,3 +29,4 @@ import LCore.Slice2.CFront
 import LCore.Slice2.CTBytes
 import LCore.Slice2.Out
 import LCore.Slice2.CTOut
+import LCore.Slice2.Add

@@ -10,10 +10,14 @@ the release's files.
 
 | File | sha256 | What is read |
 |---|---|---|
-| `src/libsodium/sodium/utils.c` | `62ef6a5e2289a69a1e72d8d2d77d7080ee30be1c1e75f758bfdd816e91756d96` | lines 313 to 318 and 354 to 360: `sodium_add` without the `HAVE_AMD64_ASM` block |
+| `src/libsodium/sodium/utils.c` | `62ef6a5e2289a69a1e72d8d2d77d7080ee30be1c1e75f758bfdd816e91756d96` | lines 313 to 318 and 355 to 360: `sodium_add` without the `HAVE_AMD64_ASM` block (correction below) |
 | `src/libsodium/include/sodium/utils.h` | `89e4062d53fa0d43834c83fb2e488a71367a6344b39636d08cc601f942c6f0a5` | line 54, the declaration |
 | `src/libsodium/crypto_core/ed25519/core_ed25519.c` | `799dfef3e6ba0a63f36438dedede34a162594aa6ddd616543698a6a3d2fcfed8` | line 164, the call site that fixes `len` |
 | `src/libsodium/include/sodium/crypto_core_ed25519.h` | `d8e7c59a0225df93b2d61ea10bbe16550ef7f23d81af8d88e357a58e81af9f6a` | line 23, `crypto_core_ed25519_SCALARBYTES 32` |
+
+**Correction of record, 2026-11-08, RC-02 step 5.** This table said the excerpt is lines ~~313 to 318 and 354 to 360~~, from step 1 until
+step 5. Line 354 is the `#endif` that closes the `HAVE_AMD64_ASM` block, so the function's text resumes at 355. Found when the excerpt was
+cut for the front end; the code reads 313 to 318 and 355 to 360, and `CSrc`'s build check holds it to those lines.
 
 Step 5 vendors them beside `verify.c`, and `CSrc`'s `#eval` hashes them at every build, as it does `verify.c`.
 

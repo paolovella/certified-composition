@@ -1,0 +1,4 @@
+started: 2026-11-08T23:52:09+01:00
+head: 34afced
+command: bash -c cd l-core && python3 ../research/2026-11/cfront_mut.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/mf
+log: tools/receipts/rc02-step5-cfrontmut.log
