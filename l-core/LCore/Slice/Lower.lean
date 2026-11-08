@@ -178,6 +178,23 @@ theorem good_ld {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
   have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
   simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte]
 
+/-- **`lbu`** (RC-01): a byte, zero-extended. -/
+theorem good_lbu {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
+    Good (.lbu rd rs (Int.ofNat i)) := by
+  have hw : encode (.lbu rd rs (Int.ofNat i)) = i * 1048576 + rs * 32768 + 16384 + rd * 128 + 0x03 := by
+    show bits (Int.ofNat i) 12 * 2 ^ 20 + rs * 2 ^ 15 + 4 * 2 ^ 12 + rd * 2 ^ 7 + 0x03 = _
+    rw [bits_ofNat i 12 (by simp only [Nat.reducePow]; omega)]
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : i * 1048576 + rs * 32768 + 16384 + rd * 128 + 0x03 = W
+  have h1 : W % 128 = 0x03 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = rs := by simp only [rs1Of, Nat.reducePow]; omega
+  have h4 : f3Of W = 4 := by simp only [f3Of, Nat.reducePow]; omega
+  have h5 : W / 2 ^ 20 = i := by simp only [Nat.reducePow]; omega
+  have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
+  simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte, show (4 : Nat) ≠ 3 by decide]
+
 /-- A field of a word, which `omega` cannot always find alone in a sum this wide. -/
 theorem div_field {W k : Nat} (a b : Nat) (h : W = a * k + b) (hb : b < k) : W / k = a := by
   subst h

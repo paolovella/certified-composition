@@ -36,6 +36,8 @@ inductive Insn where
   | or   (rd rs1 rs2 : Nat)
   | and  (rd rs1 rs2 : Nat)
   | srli (rd rs1 shamt : Nat)
+  /-- A byte, zero-extended (RC-01): `crypto_verify_16`'s `x[i]`. -/
+  | lbu  (rd rs1 : Nat) (imm : Int)
   | ld   (rd rs1 : Nat) (imm : Int)
   | sd   (rs2 rs1 : Nat) (imm : Int)
   | beq  (rs1 rs2 : Nat) (imm : Int)
@@ -54,6 +56,7 @@ def encode : Insn → Nat
   | .or rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + 6 * 2 ^ 12 + rd * 2 ^ 7 + 0x33
   | .and rd rs1 rs2 => rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + 7 * 2 ^ 12 + rd * 2 ^ 7 + 0x33
   | .srli rd rs1 sh => sh * 2 ^ 20 + rs1 * 2 ^ 15 + 5 * 2 ^ 12 + rd * 2 ^ 7 + 0x13
+  | .lbu rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + 4 * 2 ^ 12 + rd * 2 ^ 7 + 0x03
   | .ld rd rs1 imm => bits imm 12 * 2 ^ 20 + rs1 * 2 ^ 15 + 3 * 2 ^ 12 + rd * 2 ^ 7 + 0x03
   | .sd rs2 rs1 imm =>
     let i := bits imm 12
@@ -92,7 +95,10 @@ def decode (w : Nat) : Option Insn :=
     else if f3Of w = 6 ∧ w / 2 ^ 25 = 0 then some (.or (rdOf w) (rs1Of w) (rs2Of w))
     else if f3Of w = 7 ∧ w / 2 ^ 25 = 0 then some (.and (rdOf w) (rs1Of w) (rs2Of w))
     else none
-  | 0x03 => if f3Of w = 3 then some (.ld (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))) else none
+  | 0x03 =>
+    if f3Of w = 3 then some (.ld (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
+    else if f3Of w = 4 then some (.lbu (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
+    else none
   | 0x23 =>
     if f3Of w = 3 then some (.sd (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w))) else none
   | 0x63 =>
@@ -197,6 +203,11 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
         let a := addImm (m.get rs) imm
         if (addrs8 a).all (canRead code e) then
           .next [.addr (Int.ofNat a)] { m with pc := n, x := m.set rd (load8 m a) }
+        else .fault [.addr (Int.ofNat a)]
+      | .lbu rd rs imm =>
+        let a := addImm (m.get rs) imm
+        if canRead code e a then
+          .next [.addr (Int.ofNat a)] { m with pc := n, x := m.set rd (W64.ofNat (m.mem a).val) }
         else .fault [.addr (Int.ofNat a)]
       | .sd rv rs imm =>
         let a := addImm (m.get rs) imm

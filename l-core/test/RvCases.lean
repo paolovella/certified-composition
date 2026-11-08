@@ -79,6 +79,11 @@ def cases : List Case :=
   , ins "srli_wide" [.ld t0 t2 0, .srli a0 t0 32, .srli s1 t0 1] (inputWord (2 ^ 63 + 5))
   , ins "verify_tail" [.addi t0 0 0, .addi t0 t0 (-1), .srli t0 t0 8, .andi t0 t0 1, .addi a0 t0 (-1),
       .addi t1 0 7, .addi t1 t1 (-1), .srli t1 t1 8, .andi t1 t1 1, .addi s1 t1 (-1)]
+  , ins "lbu_bytes" [.ld t0 t2 0, .lbu a0 t2 0, .lbu t1 t2 7, .lbu s1 t2 3, .add a0 a0 t1] (inputWord 0xff2233445566778f)
+  , ins "lbu_offsets" [.addi t0 t2 16, .lbu a0 t0 (-15), .lbu t1 t0 (-1), .lbu s1 t2 9] (inputWord 0x0102030405060708 ++ inputWord 0xa0b0c0d0e0f00010)
+  , ins "lbu_index_loop" [.addi t0 0 5, .andi t0 t0 15, .add t0 t0 t2, .lbu a0 t0 0, .addi t1 0 12, .add t1 t1 t2, .lbu s1 t1 0]
+      (inputWord 0x1122334455667788 ++ inputWord 0x99aabbccddeeff00)
+  , ins "fault_lbu_null" [.lbu a0 0 0, .addi a0 0 1]
   , ins "beq_taken" [.addi t0 0 1, .beq t0 t0 8, .addi a0 0 9, .addi t1 0 2]
   , ins "beq_not_taken" [.addi t0 0 1, .beq t0 0 8, .addi a0 0 9, .addi t1 0 2]
   , ins "beq_backward" [.addi t0 0 3, .addi t0 t0 (-1), .addi a0 a0 2, .beq t0 0 8, .beq 0 0 (-12)]
