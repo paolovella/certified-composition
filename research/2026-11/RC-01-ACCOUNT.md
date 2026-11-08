@@ -60,7 +60,7 @@ Each item is in `backlog/RC-01.md`'s log, with its correction where one applies.
    budget was raised to 240 s on the user's word, as was lake check's, to 160 s. A concrete-run witness in step 6 cost 15 s per kernel check
    and was removed before any commit, since its content is covered by other theorems and the QEMU runs. With step 6, route 2 is at its
    budget again: `CTBytes` adds about 20 s to lean4lean, the slowest of the six, though under a second to Lean's own kernel (receipt
-   `rc01-step6-kerneltime`). Both budgets are held for the user's key. **The kernel-evaluated witnesses are now the main cost of CI, and
+   `rc01-step6-kerneltime`). On the user's word, route 2's budget is now 319 s and lake check's 216 s, by `ci-budget.sh`'s rule on the quietest run. **The kernel-evaluated witnesses are now the main cost of CI, and
    they grow with every real program.** The machine's steps are what cost: a literal image is no faster than a compiled one.
 7. **A CI run was lost** when the machine's VM went down mid-run (`incidents/I-0004.md`). Nothing was lost but the run.
 
@@ -88,12 +88,12 @@ of `crypto_scalarmult`, for one, stores its results, and most real code branches
 
 ## 6. Recommendations
 
-**On the merge.** RC-01 meets its acceptance, with CI green on substance. Branch `rc/real-c` carries two footprint changes, and route 2's
-and lake check's time budgets (245 s against 240, 166 s against 160 on the quietest run), for the user's key, each in the log. `TP-01` should be taken with the merge, since the claim "read from libsodium's text" rests on the pins.
+**On the merge.** RC-01 meets its acceptance. Branch `rc/real-c` carries two footprint changes for the user's key, in the log. The time
+budgets were raised on the user's word. `TP-01` should be taken with the merge, since the claim "read from libsodium's text" rests on the pins.
 
 **On what comes next.** In order of what I would do:
 1. **Output arrays**: a write-only byte array, stored with `sb`, through both passes. It opens every function that returns data, not a flag.
 2. **`if` on a public condition** in the front end. The language and the checker already have `ite`; only the reading is missing.
-3. **Make the kernel-evaluated witnesses cheaper**, or move the heavy ones out of route 2's closure. At the current rate, each real
-   function adds 20 to 40 s to CI.
+3. **Make the kernel-evaluated witnesses cheaper.** The user chose higher budgets over moving them out of route 2's closure. `crypto_verify_16`'s
+   certificate on the bytes added about 20 s to lean4lean, measured. That each real function will add as much is an estimate.
 4. The QEMU tests in CI, now six scripts (VS-1's proposal 3, still open).
