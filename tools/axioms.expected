@@ -3954,6 +3954,7 @@ LCore.Slice.Lower.good_lui	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_op	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_or	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_r3	LCore.Slice.Lower	Quot.sound,propext
+LCore.Slice.Lower.good_sb	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_sd	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_srli	LCore.Slice.Lower	Quot.sound,propext
 LCore.Slice.Lower.good_sub	LCore.Slice.Lower	Quot.sound,propext
@@ -4090,6 +4091,8 @@ LCore.Slice.Rv.Insn.noConfusionType	LCore.Slice.Rv
 LCore.Slice.Rv.Insn.or.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.or.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.recOn	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.sb.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.sb.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.sd.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.sd.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.srli.elim	LCore.Slice.Rv	
@@ -4121,6 +4124,8 @@ LCore.Slice.Rv.Step.next.elim	LCore.Slice.Rv
 LCore.Slice.Rv.Step.next.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Step.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Step.noConfusionType	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.out.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Step.out.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Step.recOn	LCore.Slice.Rv	
 LCore.Slice.Rv.a0	LCore.Slice.Rv	
 LCore.Slice.Rv.a7	LCore.Slice.Rv	
@@ -4171,6 +4176,8 @@ LCore.Slice.Rv.sext	LCore.Slice.Rv
 LCore.Slice.Rv.step	LCore.Slice.Rv	propext
 LCore.Slice.Rv.store8	LCore.Slice.Rv	
 LCore.Slice.Rv.sysExit	LCore.Slice.Rv	
+LCore.Slice.Rv.sysWrite	LCore.Slice.Rv	
+LCore.Slice.Rv.sysWriteStep	LCore.Slice.Rv	
 LCore.Slice.Rv.t0	LCore.Slice.Rv	
 LCore.Slice.Rv.t2	LCore.Slice.Rv	
 LCore.Slice.Rv.word0	LCore.Slice.Rv	

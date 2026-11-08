@@ -60,9 +60,16 @@ def compare(pred, steps, image):
     for i, (p, s) in enumerate(zip(pred, steps)):
         if p[0] != s["pc"]:
             return f"step {i}: pc model {p[0]:#x}, qemu {s['pc']:#x}"
-        want = access(word_at(image, s["pc"]), s["x"])
-        if p[32] != want:
-            return f"step {i}: address model {p[32]}, qemu {want}"
+        word = word_at(image, s["pc"])
+        if word == 0x73 and s["x"].get(17) == 64:
+            # RC-02: write(1, buf, len) reads buf .. buf + len - 1; QEMU's registers say which
+            n = s["x"].get(12, 0)
+            want, wantc = (s["x"].get(11, 0) if n else None), n
+        else:
+            want = access(word, s["x"])
+            wantc = 0 if want is None else 1
+        if p[32] != want or p[33] != wantc:
+            return f"step {i}: address model {p[32]} x{p[33]}, qemu {want} x{wantc}"
         for r in range(1, 32):
             if i == 0 and r == 2:
                 continue
@@ -85,6 +92,10 @@ def check(name, d):
     diff = compare(pred, steps, image)
     # A signal from the guest is a negative code. 255 is an exit status.
     faulted = r.returncode < 0
+    # RC-02: the bytes written to stdout must be the model's emitted bytes
+    want_out = open(f"{d}/{name}.stdout", "rb").read() if os.path.exists(f"{d}/{name}.stdout") else b""
+    if diff is None and out == "done" and r.stdout != want_out:
+        diff = f"stdout {r.stdout!r}, model {want_out!r}"
     if diff is None:
         if out == "done":
             if faulted:
@@ -103,8 +114,10 @@ def check(name, d):
         else:
             diff = f"model ran out of fuel"
     if kind == "deviates":
-        ok = diff is not None
-        return ok, f"{'deviates as expected' if ok else 'NO DEVIATION'}: rc {r.returncode}, {diff}", len(steps)
+        # Every stated deviation is the model aborting where Linux carries on (Rv.lean's header and sysWriteStep), so a
+        # model that runs on, or deviates some other way, is not the stated deviation (RC-02).
+        ok = diff is not None and out == "abort"
+        return ok, f"{'deviates as expected' if ok else 'NOT THE STATED DEVIATION'}: model {out}, rc {r.returncode}, {diff}", len(steps)
     return diff is None, diff or f"match: {out}, rc {r.returncode}, {len(steps)} steps", len(steps)
 
 # Broken models. Each must fail some case, except the ones named as blind spots.
@@ -113,7 +126,7 @@ MUTANTS = [
     ("addi: immediate unsigned", ".addi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))", ".addi (rdOf w) (rs1Of w) (Int.ofNat (w / 2 ^ 20))", False),
     ("add: drops the second operand", "W64.add (m.get a) (m.get b)", "m.get a", False),
     ("ld: offset unsigned", ".ld (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))", ".ld (rdOf w) (rs1Of w) (Int.ofNat (w / 2 ^ 20))", False),
-    ("sd: offset unsigned", "sext 12 ((w / 2 ^ 25) * 32 + rdOf w)", "Int.ofNat ((w / 2 ^ 25) * 32 + rdOf w)", False),
+    ("sd: offset unsigned", "some (.sd (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w)))", "some (.sd (rs2Of w) (rs1Of w) (Int.ofNat ((w / 2 ^ 25) * 32 + rdOf w)))", False),
     ("beq: offset unsigned", "(sext 13\n        ((w / 2 ^ 31)", "(Int.ofNat\n        ((w / 2 ^ 31)", False),
     ("beq: inverted", "if m.get a = m.get b then", "if m.get a ≠ m.get b then", False),
     # x0 is guarded where it is read and where it is written, so only breaking both changes anything.
@@ -127,10 +140,12 @@ MUTANTS = [
     ("exit number wrong", "W64.ofNat 93", "W64.ofNat 94", False),
     ("a fault is counted", "cost := 0, out := .abort", "cost := 1, out := .abort", False),
     ("ld leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, x := m.set rd (load8 m a) }", ".next [] { m with pc := n, x := m.set rd (load8 m a) }", False),
-    ("sd leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, mem :=", ".next [] { m with pc := n, mem :=", False),
+    ("sd leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, mem := store8", ".next [] { m with pc := n, mem := store8", False),
     ("ld leaks a wrong address", ".next [.addr (Int.ofNat a)] { m with pc := n, x := m.set rd (load8 m a) }", ".next [.addr (Int.ofNat (a + 8))] { m with pc := n, x := m.set rd (load8 m a) }", False),
     ("a faulting load leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .lbu", "else .fault []\n      | .lbu", False),
-    ("a faulting lbu leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .sd", "else .fault []\n      | .sd", False),
+    ("a faulting lbu leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .sb", "else .fault []\n      | .sb", False),
+    ("a faulting sb leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .sd", "else .fault []\n      | .sd", False),
+    ("a faulting sd leaks none", "else .fault [.addr (Int.ofNat a)]\n      | .beq", "else .fault []\n      | .beq", False),
     ("andi: acts as add", "x := m.set rd (W64.and (m.get rs) (wordOfInt imm))", "x := m.set rd (W64.add (m.get rs) (wordOfInt imm))", False),
     ("andi: immediate unsigned", ".andi (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20))", ".andi (rdOf w) (rs1Of w) (Int.ofNat (w / 2 ^ 20))", False),
     # RC-01 step 2a: the five instructions crypto_verify_16 needs.
@@ -147,6 +162,18 @@ MUTANTS = [
     ("lbu leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, x := m.set rd (W64.ofNat (m.mem a).val) }", ".next [] { m with pc := n, x := m.set rd (W64.ofNat (m.mem a).val) }", False),
     ("xor and or decoded swapped", "else if f3Of w = 4 ∧ w / 2 ^ 25 = 0 then some (.xor", "else if f3Of w = 6 ∧ w / 2 ^ 25 = 0 then some (.xor", False,
      "else if f3Of w = 6 ∧ w / 2 ^ 25 = 0 then some (.or", "else if f3Of w = 4 ∧ w / 2 ^ 25 = 0 then some (.or"),
+    # RC-02 step 2: sb, and write(1, buf, len) as an emitted event.
+    ("sb: stores the second byte", "byteOf (m.get rv).val else m.mem b", "byteOf ((m.get rv).val / 256) else m.mem b", False),
+    ("sb: stores at the next address", "mem := fun b => if b = a then", "mem := fun b => if b = a + 1 then", False),
+    ("sb: offset unsigned", "some (.sb (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w)))", "some (.sb (rs2Of w) (rs1Of w) (Int.ofNat ((w / 2 ^ 25) * 32 + rdOf w)))", False),
+    ("sb leaks no address", ".next [.addr (Int.ofNat a)] { m with pc := n, mem := fun b", ".next [] { m with pc := n, mem := fun b", False),
+    ("sb: decoded as sd", "else if f3Of w = 0 then some (.sb", "else if f3Of w = 0 then some (.sd", False),
+    ("write: one byte short", "let as := (List.range len).map", "let as := (List.range (len - 1)).map", False),
+    ("write: bytes reversed", "(.emit \"out\" (as.map fun b => (m.mem b).val))", "(.emit \"out\" (as.reverse.map fun b => (m.mem b).val))", False),
+    ("write leaks no address", "(as.map fun b => .addr (Int.ofNat b))", "[]", False),
+    ("write returns 0", "x := m.set 10 (m.get 12) }", "x := m.set 10 (W64.ofNat 0) }", False),
+    ("write number wrong", "def sysWrite : W64 := W64.ofNat 64", "def sysWrite : W64 := W64.ofNat 63", False),
+    ("write to any descriptor", "if m.get 10 = W64.ofNat 1 ∧ len", "if True ∧ len", False),
 ]
 
 def compare_all(d, gen):

@@ -1,0 +1,4 @@
+started: 2026-11-08T20:50:18+01:00
+head: 12dc8ec
+command: bash -c cd l-core && timeout 3000 lake build 2>&1 | grep -E 'error|✖|Build completed|failed' | head -40
+log: tools/receipts/rc02-step2-build.log

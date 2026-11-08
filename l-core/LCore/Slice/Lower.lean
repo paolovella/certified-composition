@@ -232,6 +232,39 @@ theorem good_sd {rv rs i : Nat} (hv : rv < 32) (hs : rs < 32) (hi : i < 2048) :
   have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
   simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte]
 
+/-- `sb`, RC-02: `sd`'s encoding with `funct3` 0. -/
+theorem good_sb {rv rs i : Nat} (hv : rv < 32) (hs : rs < 32) (hi : i < 2048) :
+    Good (.sb rv rs (Int.ofNat i)) := by
+  obtain ⟨q, r, hir, hr, hq⟩ : ∃ q r, i = 32 * q + r ∧ r < 32 ∧ q < 64 :=
+    ⟨i / 32, i % 32, by omega, by omega, by omega⟩
+  have hq' : i / 32 = q := by omega
+  have hr' : i % 32 = r := by omega
+  have hw : encode (.sb rv rs (Int.ofNat i)) =
+      q * 33554432 + rv * 1048576 + rs * 32768 + r * 128 + 0x23 := by
+    show (bits (Int.ofNat i) 12 / 32) * 2 ^ 25 + rv * 2 ^ 20 + rs * 2 ^ 15
+      + (bits (Int.ofNat i) 12 % 32) * 2 ^ 7 + 0x23 = _
+    rw [bits_ofNat i 12 (by simp only [Nat.reducePow]; omega), hq', hr']
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : q * 33554432 + rv * 1048576 + rs * 32768 + r * 128 + 0x23 = W
+  have h1 : W % 128 = 0x23 := by omega
+  have h2 : rs2Of W = rv := by
+    simp only [rs2Of, Nat.reducePow]
+    rw [div_field (q * 32 + rv) (rs * 32768 + r * 128 + 0x23) (by omega) (by omega)]; omega
+  have h3 : rs1Of W = rs := by
+    simp only [rs1Of, Nat.reducePow]
+    rw [div_field (q * 1024 + rv * 32 + rs) (r * 128 + 0x23) (by omega) (by omega)]; omega
+  have h4 : f3Of W = 0 := by
+    simp only [f3Of, Nat.reducePow]
+    rw [div_field (q * 8192 + rv * 256 + rs * 8) (r * 128 + 0x23) (by omega) (by omega)]; omega
+  have h5 : (W / 2 ^ 25) * 32 + rdOf W = i := by
+    simp only [rdOf, Nat.reducePow]
+    rw [div_field q (rv * 1048576 + rs * 32768 + r * 128 + 0x23) (by omega) (by omega),
+      div_field (q * 262144 + rv * 8192 + rs * 256 + r) 0x23 (by omega) (by omega)]
+    omega
+  have h6 : sext 12 i = Int.ofNat i := sext_small (by show i < 2048; omega)
+  simp only [decode, h1, h2, h3, h4, h5, h6, ↓reduceIte, show (0 : Nat) ≠ 3 by decide]
+
 theorem beq_fields (h b a l t : Nat) (hl : l < 16) (ht : t < 2) :
     (h * 262144 + b * 8192 + a * 256 + l * 2 + t) % 2 = t ∧ (h * 131072 + b * 4096 + a * 128 + l) % 16 = l := by
   omega
