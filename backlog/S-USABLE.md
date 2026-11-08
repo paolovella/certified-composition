@@ -7,7 +7,7 @@ deps: [RC-01]
 closes: ['the user, 2026-11-08: "research how to pass from toy language to actual usable language"']
 acceptance: research/2026-11/USABLE-L.md, every number from a receipt or a bench/usable tsv row; the kernel cost of checking and compiling at about 1x, 10x and 100x verify16's size; the front end's cost against text length; lines touched per construct over RC-01, VS-2 and BOUND-01; a construct inventory of at least five candidate real functions; a recommended milestone and an ordered route of planned items
 kill: -
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -45,3 +45,12 @@ The user's words of 2026-11-08: "research how to pass from toy language to actua
 
 ## Log
 - 2026-11-08, **filed and planned**, on branch `spike/usable` from `master` at `870c4e4`. RC-02 is paused after its step 1.
+- 2026-11-08, **done: [`USABLE-L`](../research/2026-11/USABLE-L.md).**
+  - **S1** (receipt `usable-s1b`, `bench/usable/s1.tsv`). Kernel cost is linear: the compiler in the kernel gives a 72 KB image in 11 s, and `ctCheck` runs on 3,000 statements in 1 s. The transfers cost nothing measurable. `verify16`, the 1x point, reproduces `CTBytes`.
+  - **The caps are what refuse.** `fits` counts variable occurrences, and refuses 100 statements with 12 variables. The image bound of 3,000 bytes is a proof constant, against 65,360 bytes of room.
+  - **S2** (receipts `usable-s2`, `usable-s2b`). CFront is linear, 27 KB of C in 9.7 s, and the `if` variant is refused. S-KERNEL's rule against parsing text in the kernel was about UCmd's string parser, and does not apply here.
+  - **S3** (`bench/usable/s3.tsv`). Eleven constructs, no kernel change, at most 23 lines removed from existing proofs. The new certificate cost no pass lines.
+  - **S4** (`bench/usable/s4.tsv`). Eleven libsodium functions, pinned. The recommended milestones are `crypto_core_hchacha20`, then `fe25519_mul`.
+  - **A correction to this item's plan:** Jasmin does not inline by default. Since 2023.06.0 a bare `fn` is a subroutine. Inline-first stands, because the targets' helpers are `static inline` or macros.
+  - **Filed `planned`:** `CAP-01`, `W32-01`, `CPP-01`, `RC-03` (M1), `ROUTE2-01` (G-0, for the user's key), `MUL-01`, `RC-04` (M2), `LSYN-01`.
+  - **The route 2 estimate**, about 20 times Lean's kernel, is from one measured pair.

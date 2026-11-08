@@ -1,0 +1,9 @@
+text	chars	kernel_ms	elab_ms	status	maxrss_kb
+read_m1	595	102	0	ok	553304
+read_m4	673	131	0	ok	559380
+read_m16	985	212	0	ok	594536
+read_m64	2233	590	0	ok	713076
+read_m256	7225	2330	0	ok	1221672
+read_m1_refused	606	74	0	ok	546836
+read_m1024	27193	9660	0	ok	3297436
+read_m1_refused	606	76	0	ok	548980
