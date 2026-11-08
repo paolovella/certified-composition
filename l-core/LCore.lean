@@ -23,3 +23,4 @@ import LCore.Slice2.Budget
 import LCore.Slice2.BoundBytes
 import LCore.Slice2.Ops
 import LCore.Slice2.Bytes
+import LCore.Slice2.CT

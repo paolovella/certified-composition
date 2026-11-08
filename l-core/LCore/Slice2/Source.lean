@@ -219,7 +219,13 @@ def highC (st : St) : Cmd → Option St
     else (highC st a).bind fun sa => (highC st b).map fun sb => (sa.1 ++ sb.1, sa.2 || sb.2)
   | .loop e b =>
     if highE st.1 e then none
-    else (highC st b).bind fun s₁ => if sub s₁ st then some st else none
+    else (highC st b).bind fun s₁ =>
+      if sub s₁ st then some st
+      else
+        -- one widening step: from the head joined with what the body raised
+        if highE (s₁.1 ++ st.1) e then none
+        else (highC (s₁.1 ++ st.1, st.2 || s₁.2) b).bind fun s₂ =>
+          if sub s₂ (s₁.1 ++ st.1, st.2 || s₁.2) then some (s₁.1 ++ st.1, st.2 || s₁.2) else none
   | .load x e =>
     if highE st.1 e then none
     else if st.2 then some (x :: st.1, st.2) else some (st.1.filter (· ≠ x), st.2)
@@ -229,7 +235,8 @@ def highC (st : St) : Cmd → Option St
   | .store e v =>
     if highE st.1 e then none else some (st.1, st.2 || highE st.1 v)
 
-/-- **The checker**: no secret guard, loop guard, index or result, and no loop that raises anything past its head. -/
+/-- **The checker**: no secret guard, loop guard, index or result. A loop whose body raises something past its head is retried once from the
+    head joined with the body's result, and refused if the body still raises something past that. -/
 def sliceCheck (P : Nat → Bool) (p : Prog) : Bool :=
   match highC (highInit P p.inputs 0, false) p.body with
   | some st => !highE st.1 p.ret
@@ -301,6 +308,40 @@ theorem low_high {H : List String} {s s' : Store} {x : String} {v v' : W64} (hl 
   have hyH : y ∉ H := fun h => hy (List.mem_cons_of_mem _ h)
   simp [upd, hne, hl y hyH]
 
+/-- **An accepted loop has an invariant** `w` that contains its head's state: a public guard, and a body that stays within it. -/
+theorem loop_inv {st s₁ : St} {e : Expr} {b : Cmd} (h : highC st (.loop e b) = some s₁) :
+    ∃ w : St, Sub st w ∧ s₁ = w ∧ highE w.1 e = false ∧ ∃ s₂, highC w b = some s₂ ∧ Sub s₂ w ∧ highC w (.loop e b) = some w := by
+  have h0 := h
+  simp only [highC] at h
+  split at h
+  · simp at h
+  rename_i he
+  rcases eb : highC st b with _ | sb
+  · rw [eb] at h; simp at h
+  rw [eb, Option.bind_some] at h
+  split at h
+  · rename_i hsub
+    simp only [Option.some.injEq] at h
+    subst h
+    exact ⟨st, Sub.refl _, rfl, by simpa using he, sb, eb, sub_sound hsub, h0⟩
+  · rename_i hsub
+    split at h
+    · simp at h
+    rename_i he'
+    rcases eb' : highC (sb.1 ++ st.1, st.2 || sb.2) b with _ | sc
+    · rw [eb'] at h; simp at h
+    rw [eb', Option.bind_some] at h
+    split at h
+    · rename_i hsub'
+      simp only [Option.some.injEq] at h
+      subst h
+      refine ⟨_, ⟨fun v hv => List.mem_append_right _ hv, fun hv => by simp [hv]⟩, rfl, by simpa using he', sc, eb',
+        sub_sound hsub', ?_⟩
+      simp only [highC, eb', Option.bind_some, hsub', ite_true]
+      simp only [Bool.not_eq_true] at he'
+      simp [he']
+    · simp at h
+
 /-- **Two low-equal runs of accepted frames show the same, at every fuel**, whether or not they ever finish. -/
 theorem run_same {ret : Expr} : ∀ (n : Nat) (st : St) (k : List Frame) (s s' : Store) (a a' : Arr),
     FT ret st k → LowS st s s' a a' → run ret n k s a = run ret n k s' a' := by
@@ -366,20 +407,14 @@ theorem run_same {ret : Expr} : ∀ (n : Nat) (st : St) (k : List Frame) (s s' :
         simp only [highC] at hc
         split at hc
         · simp at hc
-        rename_i he
-        rcases eb : highC st b with _ | sb
-        · rw [eb] at hc; simp at hc
-        rw [eb, Option.bind_some] at hc
-        split at hc
-        · rename_i hsub
-          simp only [Option.some.injEq] at hc
-          subst hc
-          have hg : eval e s = eval e s' := eval_low hl.1 e (by simpa using he)
-          simp only [run, hg]
-          split
-          · rw [ih _ _ s s' a a' (push_ft b _ eb (sub_sound hsub) (FT.cons hc0 hs hk')) hl]
-          · rw [ih _ _ s s' a a' hk' (LowS.mono hs hl)]
-        · simp at hc
+        obtain ⟨w, hsw, hw, he, s₂, eb, hsub, hloop⟩ := loop_inv hc0
+        subst hw
+        have hl' := LowS.mono hsw hl
+        have hg : eval e s = eval e s' := eval_low hl'.1 e he
+        simp only [run, hg]
+        split
+        · rw [ih _ _ s s' a a' (push_ft b _ eb hsub (FT.cons hloop hs hk')) hl']
+        · rw [ih _ _ s s' a a' hk' (LowS.mono hs hl')]
       | load x e =>
         simp only [highC] at hc
         split at hc

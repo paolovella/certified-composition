@@ -3,7 +3,7 @@
 
   `verify16` is libsodium's `crypto_verify_16` (`RC-01-READING`), written in L by hand: two 16-byte arrays, the input words `x0 x1` and
   `y0 y1`, compared in a counted loop whose index runs up from 0. It is the program step 5's front end must produce. Here it is only run: its
-  constant-time certificate is step 4's.
+  constant-time certificate on the source is `CT.verify16_ct`.
 -/
 import LCore.Slice2.Ops
 
@@ -111,7 +111,7 @@ theorem verify16_on_machine :
       (init (code (genP (compile verify16))) (Slice.Slots.encBytes (words4 0xdeadbeef 0x1234 0xdeadbeee 0x1234)) env0)).ev.map Teeth.evCode = [2 ^ 64] := by
   decide +kernel
 
-/-- **`sliceCheck` refuses it, rightly**: its result depends on the secret by design. Constant time is a different certificate, step 4's. -/
+/-- **`sliceCheck` refuses it, rightly**: its result depends on the secret by design. Constant time is a different certificate, `CT.verify16_ct`. -/
 theorem verify16_not_rel : sliceCheck secX verify16 = false := by decide
 
 end LCore.Slice2.Bytes

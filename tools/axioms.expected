@@ -4492,6 +4492,27 @@ LCore.Slice2.Bytes.verify16_not_rel	LCore.Slice2.Bytes	propext
 LCore.Slice2.Bytes.verify16_ok	LCore.Slice2.Bytes	propext
 LCore.Slice2.Bytes.verify16_on_machine	LCore.Slice2.Bytes	propext
 LCore.Slice2.Bytes.words4	LCore.Slice2.Bytes	
+LCore.Slice2.CT.chain	LCore.Slice2.CT	
+LCore.Slice2.CT.chainOk	LCore.Slice2.CT	
+LCore.Slice2.CT.chainOk_checks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.chain_leaks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.chain_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.ctCheck	LCore.Slice2.CT	propext
+LCore.Slice2.CT.ctCheck_relView	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.earlyExit	LCore.Slice2.CT	
+LCore.Slice2.CT.earlyExit_leaks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.earlyExit_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.noRet	LCore.Slice2.CT	
+LCore.Slice2.CT.run_view_ret	LCore.Slice2.CT	propext
+LCore.Slice2.CT.secretLookup	LCore.Slice2.CT	
+LCore.Slice2.CT.secretLookup_leaks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.secretLookup_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.sliceCheck_ctCheck	LCore.Slice2.CT	propext
+LCore.Slice2.CT.tick_view	LCore.Slice2.CT	
+LCore.Slice2.CT.verify16_ct	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.verify16_ct_checks	LCore.Slice2.CT	propext
+LCore.Slice2.CT.verify16_not_rel	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.verify16_same_trace_different_result	LCore.Slice2.CT	propext
 LCore.Slice2.Cmd.assign.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.assign.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.below	LCore.Slice2.Source	
@@ -4917,6 +4938,7 @@ LCore.Slice2.leak_lk	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.lkCode	LCore.Slice2.Source	propext
 LCore.Slice2.load_clears_when_low	LCore.Slice2.Source	propext
 LCore.Slice2.loopFree	LCore.Slice2.Source	propext
+LCore.Slice2.loop_inv	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.low_high	LCore.Slice2.Source	propext
 LCore.Slice2.low_set	LCore.Slice2.Source	propext
 LCore.Slice2.markedFirst	LCore.Slice2.Source	
