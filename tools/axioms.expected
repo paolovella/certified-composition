@@ -4759,21 +4759,35 @@ LCore.Slice2.CT.chain_leaks	LCore.Slice2.CT	propext
 LCore.Slice2.CT.chain_refused	LCore.Slice2.CT	propext
 LCore.Slice2.CT.ctCheck	LCore.Slice2.CT	propext
 LCore.Slice2.CT.ctCheck_relView	LCore.Slice2.CT	Quot.sound,propext
+LCore.Slice2.CT.ctOutCheck	LCore.Slice2.CTOut	propext
+LCore.Slice2.CT.ctOutCheck_put1	LCore.Slice2.CTOut	propext
+LCore.Slice2.CT.ctOutCheck_relView	LCore.Slice2.CTOut	Quot.sound,propext
+LCore.Slice2.CT.ctOut_secretIndex_refused	LCore.Slice2.CTOut	propext
+LCore.Slice2.CT.eF	LCore.Slice2.CTOut	
 LCore.Slice2.CT.earlyExit	LCore.Slice2.CT	
 LCore.Slice2.CT.earlyExit_leaks	LCore.Slice2.CT	propext
 LCore.Slice2.CT.earlyExit_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.eraseC	LCore.Slice2.CTOut	
+LCore.Slice2.CT.eraseP	LCore.Slice2.CTOut	
 LCore.Slice2.CT.etick_view_congr	LCore.Slice2.CT	propext
+LCore.Slice2.CT.noOut	LCore.Slice2.CTOut	
 LCore.Slice2.CT.noRet	LCore.Slice2.CT	
+LCore.Slice2.CT.push_erase	LCore.Slice2.CTOut	propext
+LCore.Slice2.CT.put1_ct_out	LCore.Slice2.CTOut	Quot.sound,propext
+LCore.Slice2.CT.put1_not_noRet	LCore.Slice2.CTOut	Quot.sound,propext
+LCore.Slice2.CT.run_view_erase	LCore.Slice2.CTOut	propext
 LCore.Slice2.CT.run_view_ret	LCore.Slice2.CT	propext
 LCore.Slice2.CT.secretLookup	LCore.Slice2.CT	
 LCore.Slice2.CT.secretLookup_leaks	LCore.Slice2.CT	propext
 LCore.Slice2.CT.secretLookup_refused	LCore.Slice2.CT	propext
 LCore.Slice2.CT.sliceCheck_ctCheck	LCore.Slice2.CT	propext
 LCore.Slice2.CT.tick_view	LCore.Slice2.CT	
+LCore.Slice2.CT.tick_viewE	LCore.Slice2.CTOut	
 LCore.Slice2.CT.verify16_ct	LCore.Slice2.CT	Quot.sound,propext
 LCore.Slice2.CT.verify16_ct_checks	LCore.Slice2.CT	propext
 LCore.Slice2.CT.verify16_not_rel	LCore.Slice2.CT	Quot.sound,propext
 LCore.Slice2.CT.verify16_same_trace_different_result	LCore.Slice2.CT	propext
+LCore.Slice2.CT.view_noOut	LCore.Slice2.CTOut	Quot.sound,propext
 LCore.Slice2.CTBytes.earlyExitImage	LCore.Slice2.CTBytes	propext
 LCore.Slice2.CTBytes.earlyExit_bytes_leak	LCore.Slice2.CTBytes	propext
 LCore.Slice2.CTBytes.verify16C_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
