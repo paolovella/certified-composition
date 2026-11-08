@@ -1,0 +1,4 @@
+started: 2026-11-08T21:50:55+01:00
+head: d878e51
+command: bash -c cd l-core && python3 ../research/2026-11/slice2_mut.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/m2
+log: tools/receipts/rc02-step3-slice2mut2.log

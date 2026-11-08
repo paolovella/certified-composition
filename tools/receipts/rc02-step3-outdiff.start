@@ -1,0 +1,4 @@
+started: 2026-11-08T21:54:07+01:00
+head: d878e51
+command: bash -c cd l-core && python3 test/out_diff.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/od
+log: tools/receipts/rc02-step3-outdiff.log

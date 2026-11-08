@@ -4426,6 +4426,7 @@ LCore.Slice2.Budget.IsSet	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.Ok	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.TopF	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.agree_out	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.agree_storeAt	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.agree_upd	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.assigns	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.budget	LCore.Slice2.Budget	propext
@@ -4461,6 +4462,7 @@ LCore.Slice2.Budget.plain_load	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.plain_loadB	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.plain_loop	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.plain_seq	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.plain_storeB	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.pot	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.pot_agree	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.pot_mono	LCore.Slice2.Budget	Quot.sound,propext
@@ -4760,6 +4762,7 @@ LCore.Slice2.CT.ctCheck_relView	LCore.Slice2.CT	Quot.sound,propext
 LCore.Slice2.CT.earlyExit	LCore.Slice2.CT	
 LCore.Slice2.CT.earlyExit_leaks	LCore.Slice2.CT	propext
 LCore.Slice2.CT.earlyExit_refused	LCore.Slice2.CT	propext
+LCore.Slice2.CT.etick_view_congr	LCore.Slice2.CT	propext
 LCore.Slice2.CT.noRet	LCore.Slice2.CT	
 LCore.Slice2.CT.run_view_ret	LCore.Slice2.CT	propext
 LCore.Slice2.CT.secretLookup	LCore.Slice2.CT	
@@ -4793,6 +4796,8 @@ LCore.Slice2.Cmd.casesOn	LCore.Slice2.Source
 LCore.Slice2.Cmd.ctorElim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.ctorElimType	LCore.Slice2.Source	
 LCore.Slice2.Cmd.ctorIdx	LCore.Slice2.Source	
+LCore.Slice2.Cmd.emitB.elim	LCore.Slice2.Source	
+LCore.Slice2.Cmd.emitB.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.ite.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.ite.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.load.elim	LCore.Slice2.Source	
@@ -4809,6 +4814,8 @@ LCore.Slice2.Cmd.seq.noConfusion	LCore.Slice2.Source
 LCore.Slice2.Cmd.skip.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.store.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.store.noConfusion	LCore.Slice2.Source	
+LCore.Slice2.Cmd.storeB.elim	LCore.Slice2.Source	
+LCore.Slice2.Cmd.storeB.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.FT.below.casesOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.brecOn	LCore.Slice2.Source	propext
 LCore.Slice2.FT.casesOn	LCore.Slice2.Source	propext
@@ -4877,6 +4884,10 @@ LCore.Slice2.Lower.Corr.casesOn	LCore.Slice2.Pass
 LCore.Slice2.Lower.Corr.next	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Corr.push	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Corr.recOn	LCore.Slice2.Pass	
+LCore.Slice2.Lower.ExecE	LCore.Slice2.Lower	propext
+LCore.Slice2.Lower.ExecE.ofExec	LCore.Slice2.Lower	propext
+LCore.Slice2.Lower.ExecE.out	LCore.Slice2.Lower	propext
+LCore.Slice2.Lower.ExecE.pre	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.FOk	LCore.Slice2.Chunk	propext
 LCore.Slice2.Lower.FS	LCore.Slice2.Pass	
 LCore.Slice2.Lower.Laid.body	LCore.Slice2.Pass	propext
@@ -4903,10 +4914,12 @@ LCore.Slice2.Lower.Tail.res	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Tail.x0	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Tail.x1	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.Tail.x2	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.addEv	LCore.Slice2.Lower	
 LCore.Slice2.Lower.addImm_arr	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.addImm_back	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.addImm_slot	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.add_ofNat	LCore.Slice2.Lower	propext
+LCore.Slice2.Lower.addi0	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.ahead	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.ahead_top	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.and_63	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
@@ -4915,6 +4928,8 @@ LCore.Slice2.Lower.arr_lt	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.behind	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.behind_top	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.beq_neg_fields	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice2.Lower.catch_run	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
+LCore.Slice2.Lower.catch_top	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.chunk	LCore.Slice2.Chunk	propext
 LCore.Slice2.Lower.chunkC	LCore.Slice2.Chunk	propext
 LCore.Slice2.Lower.chunk_exec	LCore.Slice2.Chunk	Classical.choice,Quot.sound,propext
@@ -4928,6 +4943,9 @@ LCore.Slice2.Lower.det_top	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.dig0	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.digS	LCore.Slice2.Lower	propext
 LCore.Slice2.Lower.entry	LCore.Slice2.Pass	Quot.sound,propext
+LCore.Slice2.Lower.evC	LCore.Slice2.Chunk	propext
+LCore.Slice2.Lower.evC_chan	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.exec_emitB	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.exec_guard	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.exec_ite	LCore.Slice2.Chunk	Quot.sound,propext
 LCore.Slice2.Lower.exec_jmp	LCore.Slice2.Chunk	Quot.sound,propext
@@ -4936,7 +4954,11 @@ LCore.Slice2.Lower.exec_loadB	LCore.Slice2.Lower	Classical.choice,Quot.sound,pro
 LCore.Slice2.Lower.exec_loop	LCore.Slice2.Chunk	Quot.sound,propext
 LCore.Slice2.Lower.exec_set	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.exec_store	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
-LCore.Slice2.Lower.fuel_ev	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.exec_storeB	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice2.Lower.filter_chan_length	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.flatMap_congr_mem	LCore.Slice2.Lower	propext
+LCore.Slice2.Lower.flat_range	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.foldr8_congr	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.genC	LCore.Slice2.Lower	
 LCore.Slice2.Lower.genC_good	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.genC_length	LCore.Slice2.Lower	propext
@@ -4946,11 +4968,14 @@ LCore.Slice2.Lower.genIdx_length	LCore.Slice2.Lower	propext
 LCore.Slice2.Lower.genP	LCore.Slice2.Pass	
 LCore.Slice2.Lower.genP_good	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.genP_length	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.get_upd_other	LCore.Slice2.Lower	propext
+LCore.Slice2.Lower.get_upd_same	LCore.Slice2.Lower	propext
 LCore.Slice2.Lower.good_andi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.good_beq_back	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.guard_same	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.idx_exec	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.inv_store	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
+LCore.Slice2.Lower.inv_storeB	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.jc	LCore.Slice2.Pass	
 LCore.Slice2.Lower.jc_next	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.jc_push	LCore.Slice2.Pass	propext
@@ -4978,6 +5003,7 @@ LCore.Slice2.Lower.ofNat_val	LCore.Slice2.Lower	propext
 LCore.Slice2.Lower.okC	LCore.Slice2.Lower	
 LCore.Slice2.Lower.okP	LCore.Slice2.Pass	
 LCore.Slice2.Lower.okP_body	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.out_bytes	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.pipeline	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.play_congr	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.play_long	LCore.Slice2.Pass	Quot.sound,propext
@@ -5005,14 +5031,19 @@ LCore.Slice2.Lower.step_andi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_beq	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_lbu	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_ld	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.step_sb	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_sd	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.tailC	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tailM	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tail_exec	LCore.Slice2.Pass	Quot.sound,propext
+LCore.Slice2.Lower.tickE	LCore.Slice2.Pass	
 LCore.Slice2.Lower.tick_view	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.view_addEv	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.view_mono	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.view_peel	LCore.Slice2.Pass	Quot.sound,propext
+LCore.Slice2.Lower.view_peelE	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.view_tick	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.view_tickE	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.xf	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.NoSeq	LCore.Slice2.Source	
 LCore.Slice2.OnMachine.literal_rule	LCore.Slice2.OnMachine	
@@ -5040,6 +5071,17 @@ LCore.Slice2.Ops.verifyTail_checks	LCore.Slice2.Ops	propext
 LCore.Slice2.Ops.verifyTail_means	LCore.Slice2.Ops	propext
 LCore.Slice2.Ops.verifyTail_ok	LCore.Slice2.Ops	propext
 LCore.Slice2.Ops.verifyTail_on_machine	LCore.Slice2.Ops	propext
+LCore.Slice2.Out.emit_rules	LCore.Slice2.Out	propext
+LCore.Slice2.Out.out_layout_rules	LCore.Slice2.Out	propext
+LCore.Slice2.Out.put1	LCore.Slice2.Out	
+LCore.Slice2.Out.put1Out	LCore.Slice2.Out	
+LCore.Slice2.Out.put1_mid_run	LCore.Slice2.Out	propext
+LCore.Slice2.Out.put1_on_machine	LCore.Slice2.Out	propext
+LCore.Slice2.Out.put1_src	LCore.Slice2.Out	propext
+LCore.Slice2.Out.sec0	LCore.Slice2.Out	
+LCore.Slice2.Out.storeSecret	LCore.Slice2.Out	
+LCore.Slice2.Out.storeSecretIndex_refused	LCore.Slice2.Out	propext
+LCore.Slice2.Out.storeSecret_rules	LCore.Slice2.Out	propext
 LCore.Slice2.Prog.body	LCore.Slice2.Source	
 LCore.Slice2.Prog.casesOn	LCore.Slice2.Source	
 LCore.Slice2.Prog.ctorIdx	LCore.Slice2.Source	
@@ -5071,6 +5113,8 @@ LCore.Slice2.Slots.SCmd.casesOn	LCore.Slice2.Slots
 LCore.Slice2.Slots.SCmd.ctorElim	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.ctorElimType	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.ctorIdx	LCore.Slice2.Slots	
+LCore.Slice2.Slots.SCmd.emitB.elim	LCore.Slice2.Slots	
+LCore.Slice2.Slots.SCmd.emitB.noConfusion	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.ite.elim	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.ite.noConfusion	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.load.elim	LCore.Slice2.Slots	
@@ -5089,6 +5133,8 @@ LCore.Slice2.Slots.SCmd.set.noConfusion	LCore.Slice2.Slots
 LCore.Slice2.Slots.SCmd.skip.elim	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.store.elim	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SCmd.store.noConfusion	LCore.Slice2.Slots	
+LCore.Slice2.Slots.SCmd.storeB.elim	LCore.Slice2.Slots	
+LCore.Slice2.Slots.SCmd.storeB.noConfusion	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SFrame	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SProg.body	LCore.Slice2.Slots	
 LCore.Slice2.Slots.SProg.casesOn	LCore.Slice2.Slots	
@@ -5125,12 +5171,15 @@ LCore.Slice2.Slots.instReprSCmd	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.instReprSCmd.repr	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.instReprSProg	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.instReprSProg.repr	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.outBytesS	LCore.Slice2.Slots	
+LCore.Slice2.Slots.outBytesS_map	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS_cC	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS_noSeq	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.push_cov	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.rel_set	LCore.Slice2.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice2.Slots.rel_store	LCore.Slice2.Slots	Quot.sound,propext
+LCore.Slice2.Slots.rel_storeB	LCore.Slice2.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice2.Slots.runS	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.runS_diverge	LCore.Slice2.Slots	Quot.sound,propext
 LCore.Slice2.Slots.runS_ext	LCore.Slice2.Slots	Quot.sound,propext
@@ -5145,6 +5194,7 @@ LCore.Slice2.Slots.slotOf_not_arr	LCore.Slice2.Slots	Quot.sound,propext
 LCore.Slice2.Slots.slotPass	LCore.Slice2.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice2.Slots.spin_carried	LCore.Slice2.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice2.Slots.spin_comp	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.storeAtS	LCore.Slice2.Slots	propext
 LCore.Slice2.St	LCore.Slice2.Source	
 LCore.Slice2.Sub	LCore.Slice2.Source	
 LCore.Slice2.Sub.refl	LCore.Slice2.Source	
@@ -5204,6 +5254,8 @@ LCore.Slice2.byteOfWord	LCore.Slice2.Source
 LCore.Slice2.costK	LCore.Slice2.Source	propext
 LCore.Slice2.costK_push	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.costOf	LCore.Slice2.Source	propext
+LCore.Slice2.etick	LCore.Slice2.Source	
+LCore.Slice2.etick_ext	LCore.Slice2.Source	propext
 LCore.Slice2.highC	LCore.Slice2.Source	propext
 LCore.Slice2.idx	LCore.Slice2.Source	
 LCore.Slice2.instDecidableEqCmd	LCore.Slice2.Source	
@@ -5226,6 +5278,8 @@ LCore.Slice2.markedFirst	LCore.Slice2.Source
 LCore.Slice2.markedFirst_checks	LCore.Slice2.Source	propext
 LCore.Slice2.minusOne	LCore.Slice2.Source	
 LCore.Slice2.num	LCore.Slice2.Source	
+LCore.Slice2.outBytes	LCore.Slice2.Source	
+LCore.Slice2.outBytes_low	LCore.Slice2.Source	propext
 LCore.Slice2.push	LCore.Slice2.Source	propext
 LCore.Slice2.push_ft	LCore.Slice2.Source	propext
 LCore.Slice2.push_lf	LCore.Slice2.Source	propext
@@ -5242,6 +5296,9 @@ LCore.Slice2.scan_runs	LCore.Slice2.Source	propext
 LCore.Slice2.secondIter	LCore.Slice2.Source	
 LCore.Slice2.secondIter_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.secondIter_refused	LCore.Slice2.Source	propext
+LCore.Slice2.secretEmit	LCore.Slice2.Source	
+LCore.Slice2.secretEmit_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
+LCore.Slice2.secretEmit_refused	LCore.Slice2.Source	propext
 LCore.Slice2.secretLoad	LCore.Slice2.Source	
 LCore.Slice2.secretLoad_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.secretLoad_refused	LCore.Slice2.Source	propext
@@ -5249,8 +5306,12 @@ LCore.Slice2.secretLoop	LCore.Slice2.Source
 LCore.Slice2.secretLoop_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.secretLoop_refused	LCore.Slice2.Source	propext
 LCore.Slice2.secretStore	LCore.Slice2.Source	
+LCore.Slice2.secretStoreB	LCore.Slice2.Source	
+LCore.Slice2.secretStoreB_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
+LCore.Slice2.secretStoreB_refused	LCore.Slice2.Source	propext
 LCore.Slice2.secretStore_leaks	LCore.Slice2.Source	Classical.choice,Quot.sound,propext
 LCore.Slice2.secretStore_refused	LCore.Slice2.Source	propext
+LCore.Slice2.setByte	LCore.Slice2.Source	
 LCore.Slice2.sliceCheck	LCore.Slice2.Source	propext
 LCore.Slice2.sliceCheck_rel	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.sliceLang	LCore.Slice2.Source	propext
@@ -5260,6 +5321,10 @@ LCore.Slice2.spin	LCore.Slice2.Source
 LCore.Slice2.spin_checks	LCore.Slice2.Source	propext
 LCore.Slice2.spin_covered	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.spin_never_finishes	LCore.Slice2.Source	Quot.sound,propext
+LCore.Slice2.storeAt	LCore.Slice2.Source	propext
+LCore.Slice2.storeAt_high	LCore.Slice2.Source	propext
+LCore.Slice2.storeAt_low	LCore.Slice2.Source	propext
+LCore.Slice2.storeAt_other	LCore.Slice2.Source	propext
 LCore.Slice2.sub	LCore.Slice2.Source	propext
 LCore.Slice2.sub_sound	LCore.Slice2.Source	Quot.sound,propext
 LCore.Slice2.throughArray	LCore.Slice2.Source	

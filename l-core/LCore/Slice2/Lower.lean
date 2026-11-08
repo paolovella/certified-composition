@@ -142,6 +142,8 @@ def sC : SCmd → Nat
   | .load _ e => sE e + 5 + 2
   | .loadB _ _ e => sE e + 4
   | .store e v => sE e + 5 + sE v + 1
+  | .storeB _ e v => sE e + 2 + sE v + 1
+  | .emitB _ => 5
 
 /-- The masked index's address, in `x8`. -/
 def genIdx (e : SExpr) : List Insn :=
@@ -159,6 +161,10 @@ def genC : SCmd → List Insn
   | .loadB x ws e =>
     genE e 0 ++ [.andi 8 8 (Int.ofNat (8 * ws.length - 1)), .add 8 8 7, .lbu 8 8 (Int.ofNat (8 * ws.headD 0)), .sd 8 7 (Int.ofNat (8 * x))]
   | .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 512)]
+  | .storeB ws e v =>
+    genE e 0 ++ [.andi 8 8 (Int.ofNat (8 * ws.length - 1)), .add 8 8 7] ++ genE v 1 ++ [.sb 9 8 (Int.ofNat (8 * ws.headD 0))]
+  | .emitB ws =>
+    [.addi 10 0 (Int.ofNat 1), .addi 11 7 (Int.ofNat (8 * ws.headD 0)), .addi 12 0 (Int.ofNat (8 * ws.length)), .addi 17 0 (Int.ofNat 64), .ecall]
 
 /-- A byte array's length, in words, for which the mask `8 * len - 1` is the index modulo its bytes. -/
 def maskOK (len : Nat) : Bool := len == 1 || len == 2 || len == 4 || len == 8
@@ -173,6 +179,10 @@ def okC : SCmd → Bool
   | .loadB x ws e => decide (x < wordsMax) && okE e 0 && decide (ws = List.range' (ws.headD 0) ws.length) && maskOK ws.length &&
       decide (ws.headD 0 + ws.length ≤ 64)
   | .store e v => okE e 0 && okE v 1
+  | .storeB ws e v => okE e 0 && okE v 1 && decide (ws = List.range' (ws.headD 0) ws.length) && maskOK ws.length &&
+      decide (ws.headD 0 + ws.length ≤ 64)
+  | .emitB ws => decide (ws = List.range' (ws.headD 0) ws.length) && decide (0 < ws.length) && decide (ws.length ≤ 8) &&
+      decide (ws.headD 0 + ws.length ≤ 64)
 
 theorem genIdx_length (e : SExpr) : (genIdx e).length = sE e + 5 := by
   simp only [genIdx, List.length_append, genE_length, List.length_cons, List.length_nil]
@@ -186,6 +196,8 @@ theorem genC_length : ∀ c : SCmd, (genC c).length = sC c
   | .load x e => by simp only [genC, sC, List.length_append, genIdx_length]; rfl
   | .loadB x ws e => by simp only [genC, sC, List.length_append, genE_length, List.length_cons, List.length_nil]
   | .store e v => by simp only [genC, sC, List.length_append, genIdx_length, genE_length]; rfl
+  | .storeB ws e v => by simp only [genC, sC, List.length_append, genE_length, List.length_cons, List.length_nil]
+  | .emitB ws => rfl
 
 theorem genIdx_good (e : SExpr) (h : okE e 0 = true) : ∀ i ∈ genIdx e, Good i := by
   intro i hi
@@ -259,6 +271,28 @@ theorem genC_good : ∀ c : SCmd, okC c = true → ∀ i ∈ genC c, Good i
     · exact genIdx_good e h.1 i hi
     · exact genE_good v 1 h.2 i hi
     · subst hi; exact good_sd (by omega) (by omega) (by omega)
+  | .storeB ws e v, h, i, hi => by
+    simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at h
+    obtain ⟨⟨⟨⟨he, hv⟩, _⟩, hm⟩, hb⟩ := h
+    have hlen : ws.length ≤ 8 := by simp only [maskOK, Bool.or_eq_true, beq_iff_eq] at hm; omega
+    simp only [genC, List.mem_append, List.mem_cons, List.not_mem_nil, or_false] at hi
+    rcases hi with ((hi | hi | hi) | hi) | hi
+    · exact genE_good e 0 he i hi
+    · subst hi; exact good_andi (by omega) (by omega) (by omega)
+    · subst hi; exact Slice.Lower.good_add (by omega) (by omega) (by omega)
+    · exact genE_good v 1 hv i hi
+    · subst hi; exact Slice.Lower.good_sb (by omega) (by omega) (by omega)
+  | .emitB ws, h, i, hi => by
+    simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at h
+    obtain ⟨⟨⟨_, _⟩, hl⟩, hb⟩ := h
+    simp only [genC, List.mem_cons, List.not_mem_nil, or_false] at hi
+    rcases hi with hi | hi | hi | hi | hi
+    all_goals subst hi
+    · exact good_addi (by omega) (by omega) (by omega)
+    · exact good_addi (by omega) (by omega) (by omega)
+    · exact good_addi (by omega) (by omega) (by omega)
+    · exact good_addi (by omega) (by omega) (by omega)
+    · exact Slice.Lower.good_ecall
 
 /-! ## Single instructions -/
 
@@ -688,5 +722,311 @@ theorem exec_guard {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots}
       rw [h0]; rfl
     show (if m₁.get 8 = m₁.get 0 then addImm (W64.ofNat m₁.pc) (Int.ofNat off) else m₁.pc + 4) = _
     rw [if_pos heq, ha, if_neg hg, p₁]
+
+/-! ## RC-02: a byte store, and `write` as an event -/
+
+/-- Events, in front of a run's. -/
+def addEv (evs : List Ev) (r : Beh) : Beh := { r with ev := evs ++ r.ev }
+
+/-- **From `m` the machine plays `c`, emitting `evs` at its last micro-step, and arrives at `m'`.** With no events it is `Exec`. -/
+def ExecE (C : List Byte) (en : Env) (c : List Micro) (evs : List Ev) (m m' : Mach) : Prop :=
+  ∀ n, Slice.Rv.run C en n m = playApp c (fun k => addEv evs (Slice.Rv.run C en k m')) n
+
+theorem ExecE.ofExec {C : List Byte} {en : Env} {c : List Micro} {m m' : Mach} (h : Exec C en c m m') : ExecE C en c [] m m' :=
+  fun n => h n
+
+theorem ExecE.pre {C : List Byte} {en : Env} {a b : List Micro} {evs : List Ev} {m m₁ m₂ : Mach}
+    (h₁ : Exec C en a m m₁) (h₂ : ExecE C en b evs m₁ m₂) : ExecE C en (a ++ b) evs m m₂ := by
+  intro n
+  rw [playApp_append, h₁ n]
+  have : (fun k => Slice.Rv.run C en k m₁) = playApp b (fun k => addEv evs (Slice.Rv.run C en k m₂)) := funext h₂
+  rw [this]
+
+/-- One step that emits an event. -/
+theorem ExecE.out {C : List Byte} {en : Env} {m m' : Mach} {v : Ev} {l : List Lk} (h : Slice.Rv.step C en m = .out v l m') :
+    ExecE C en [(m.pc, l)] [v] m m' := by
+  intro n
+  cases n with
+  | zero => rfl
+  | succ k => simp only [Slice.Rv.run, h]; rfl
+
+/-- A byte store inside the data segment, whatever the environment. -/
+theorem step_sb {C : List Byte} {en : Env} {m : Mach} {rv a : Nat} {i : Int} {addr : Nat} (h : fetchI C m.pc = some (.sb rv a i))
+    (ha : addImm (m.get a) i = addr) (hd : inData addr = true) :
+    Slice.Rv.step C en m = .next [.addr (Int.ofNat addr)]
+      { m with pc := m.pc + 4, mem := fun b => if b = addr then byteOf (m.get rv).val else m.mem b } := by
+  obtain ⟨w, hf, hdc⟩ := fetchI_parts h
+  have hw : canWrite C en addr = true := by simp [canWrite, hd]
+  simp only [Slice.Rv.step, hf, hdc, ha, hw, ↓reduceIte]
+
+theorem foldr8_congr {f g : Nat → Nat} (h : ∀ i, i < 8 → f i = g i) :
+    (List.range 8).foldr (fun i acc => f i + 256 * acc) 0 = (List.range 8).foldr (fun i acc => g i + 256 * acc) 0 := by
+  have hr : List.range 8 = [0, 1, 2, 3, 4, 5, 6, 7] := rfl
+  simp only [hr, List.foldr]
+  rw [h 0 (by omega), h 1 (by omega), h 2 (by omega), h 3 (by omega), h 4 (by omega), h 5 (by omega), h 6 (by omega),
+    h 7 (by omega)]
+
+/-- **A byte store at byte `j` of slot `n` is `setByte` on that slot's word**, and leaves the other slots alone. -/
+theorem inv_storeB {m : Mach} {t : Slice.Slots.Slots} (hinv : Inv m t) {n j : Nat} (hn : n < wordsMax) (hj : j < 8) (q : Nat) (v : W64) :
+    Inv { m with pc := q, mem := fun b => if b = slotAddr n + j then byteOf v.val else m.mem b }
+      (updS t n (setByte (t n) j v)) := by
+  have hmax : wordsMax = 256 := rfl
+  have hA : ∀ k, k < wordsMax → slotAddr k + 8 < 18446744073709551616 := by
+    intro k hk; simp only [slotAddr, dataBase]; omega
+  refine ⟨hinv.1, fun k hk => ?_⟩
+  have hmod : ∀ i, i < 8 → (slotAddr k + i) % 2 ^ 64 = slotAddr k + i := fun i hi =>
+    Nat.mod_eq_of_lt (by have := hA k hk; omega)
+  by_cases hkn : k = n
+  · subst hkn
+    have hu : updS t k (setByte (t k) j v) k = setByte (t k) j v := by simp [updS]
+    rw [hu]
+    unfold load8 setByte
+    refine congrArg W64.ofNat (foldr8_congr fun i hi => ?_)
+    simp only
+    rw [hmod i hi]
+    by_cases hij : i = j
+    · subst hij; simp [byteOf]
+    · have hne : slotAddr k + i ≠ slotAddr k + j := by omega
+      simp only [hne, ↓reduceIte, hij]
+      rw [← hinv.2 k hk, load8_byte m _ i (hA k hk) hi]
+  · have hu : updS t n (setByte (t n) j v) k = t k := by simp [updS, hkn]
+    rw [hu, ← hinv.2 k hk]
+    unfold load8
+    refine congrArg W64.ofNat (foldr8_congr fun i hi => ?_)
+    have hne : slotAddr k + i ≠ slotAddr n + j := by
+      simp only [slotAddr]; omega
+    simp only
+    rw [hmod i hi]
+    simp [hne]
+
+/-- **`names[e] := v`**: the index, masked, plus the data segment's base; the value; one `sb`. -/
+theorem exec_storeB {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {b len : Nat} {e v : SExpr}
+    (hok : okE e 0 = true) (hov : okE v 1 = true) (hm : maskOK len = true) (hb : b + len ≤ 64) (hinv : Inv m t)
+    (hat : At C m.pc (genC (.storeB (List.range' b len) e v))) :
+    ∃ m', Exec C en (mE e m.pc ++ [(m.pc + 4 * sE e, []), (m.pc + 4 * sE e + 4, [])] ++ mE v (m.pc + 4 * sE e + 8) ++
+        [(m.pc + 4 * sE e + 8 + 4 * sE v, [.addr (Int.ofNat (dataBase + 8 * b + Slots.bidxS (List.range' b len) (evalS e t)))])]) m m' ∧
+      m'.pc = m.pc + 4 * (sE e + 2 + sE v + 1) ∧
+      Inv m' (Slots.storeAtS t (List.range' b len) (Slots.bidxS (List.range' b len) (evalS e t)) (evalS v t)) := by
+  have hlen : 0 < len ∧ len ≤ 8 := by simp only [maskOK, Bool.or_eq_true, beq_iff_eq] at hm; omega
+  have hhead : (List.range' b len).headD 0 = b := by
+    obtain ⟨k, rfl⟩ : ∃ k, len = k + 1 := ⟨len - 1, by omega⟩
+    simp [List.range'_succ]
+  have hlen' : (List.range' b len).length = len := List.length_range'
+  simp only [genC, hhead, hlen'] at hat
+  have at3 := Slice.Lower.At.left hat
+  have at2 := Slice.Lower.At.left at3
+  have atE := Slice.Lower.At.left at2
+  have atT : At C (m.pc + 4 * sE e) [.andi 8 8 (Int.ofNat (8 * len - 1)), .add 8 8 7] := by
+    have := Slice.Lower.At.right at2
+    rwa [genE_length] at this
+  obtain ⟨m₁, e₁, p₁, mem₁, v₁, low₁⟩ := genE_exec (en := en) e 0 m t hok hinv atE
+  have h7₁ : m₁.get 7 = W64.ofNat dataBase := by rw [low₁ 7 (by omega)]; exact hinv.1
+  have hv₁ : m₁.get 8 = evalS e t := v₁
+  generalize hI : Slots.bidxS (List.range' b len) (evalS e t) = i
+  have hi : i < 8 * len := by
+    rw [← hI]; simp only [Slots.bidxS, hlen']; exact Nat.mod_lt _ (by omega)
+  have hdb : dataBase = 0x20000 := rfl
+  -- andi
+  have fa : fetchI C m₁.pc = some (.andi 8 8 (Int.ofNat (8 * len - 1))) := At.get atT (j := 0) (by simp) rfl (by rw [p₁]; omega)
+  let m₂ : Mach := { m₁ with pc := m₁.pc + 4, x := m₁.set 8 (W64.and (m₁.get 8) (wordOfInt (Int.ofNat (8 * len - 1)))) }
+  have s₂ : Slice.Rv.step C en m₁ = .next [] m₂ := step_andi fa
+  have v₂ : m₂.get 8 = W64.ofNat i := by
+    simp only [m₂]
+    rw [get_set (by omega)]
+    simp only [↓reduceIte, hv₁]
+    apply Fin.ext
+    rw [mask_mod _ hm, ← hI, ofNat_val (by omega)]
+    simp only [Slots.bidxS, hlen']
+  have l₂ : ∀ y, y < 8 → m₂.get y = m₁.get y := by
+    intro y hy; simp only [m₂]; rw [get_set (by omega)]; simp [show y ≠ 8 by omega]
+  -- add 8 8 7
+  have f₃ : fetchI C m₂.pc = some (.add 8 8 7) := At.get atT (j := 1) (by simp) rfl (by simp only [m₂, p₁])
+  let m₃ : Mach := { m₂ with pc := m₂.pc + 4, x := m₂.set 8 (W64.add (m₂.get 8) (m₂.get 7)) }
+  have s₃ : Slice.Rv.step C en m₂ = .next [] m₃ := step_add f₃
+  have v₃ : m₃.get 8 = W64.ofNat (i + dataBase) := by
+    simp only [m₃]
+    rw [get_set (by omega)]
+    simp only [↓reduceIte, v₂, l₂ 7 (by omega), h7₁]
+    exact add_ofNat (by omega) (by omega) (by omega)
+  have l₃ : ∀ y, y < 8 → m₃.get y = m₁.get y := by
+    intro y hy; simp only [m₃]; rw [get_set (by omega)]; simp [show y ≠ 8 by omega, l₂ y hy]
+  have p₃ : m₃.pc = m.pc + 4 * sE e + 8 := by simp only [m₃, m₂, p₁]
+  have mem₃ : m₃.mem = m.mem := by simp only [m₃, m₂, mem₁]
+  have hinv₃ : Inv m₃ t := Inv.mono_mem hinv (by rw [l₃ 7 (by omega), h7₁]; exact hinv.1.symm) mem₃
+  -- the value
+  have atV : At C m₃.pc (genE v 1) := by
+    have := Slice.Lower.At.right at3
+    rw [p₃]
+    simp only [List.length_append, genE_length, List.length_cons, List.length_nil] at this
+    have e2 : m.pc + 4 * (sE e + (1 + 1)) = m.pc + 4 * sE e + 8 := by omega
+    rwa [e2] at this
+  obtain ⟨m₄, e₄, p₄, mem₄, v₄, low₄⟩ := genE_exec (en := en) v 1 m₃ t hov hinv₃ atV
+  have h8₄ : m₄.get 8 = W64.ofNat (i + dataBase) := by rw [low₄ 8 (by omega)]; exact v₃
+  have h9₄ : m₄.get 9 = evalS v t := v₄
+  -- sb
+  have atS : At C (m₃.pc + 4 * sE v) [.sb 9 8 (Int.ofNat (8 * b))] := by
+    have := Slice.Lower.At.right hat
+    rw [p₃]
+    simp only [List.length_append, genE_length, List.length_cons, List.length_nil] at this
+    have e2 : m.pc + 4 * (sE e + (1 + 1) + sE v) = m.pc + 4 * sE e + 8 + 4 * sE v := by omega
+    rwa [e2] at this
+  have f₅ : fetchI C m₄.pc = some (.sb 9 8 (Int.ofNat (8 * b))) := At.get atS (j := 0) (by simp) rfl (by rw [p₄]; omega)
+  have haddr : addImm (m₄.get 8) (Int.ofNat (8 * b)) = dataBase + 8 * b + i := by
+    rw [h8₄, addImm_val _ _ (by rw [ofNat_val (by omega)]; omega), ofNat_val (by omega)]; omega
+  have hin : inData (dataBase + 8 * b + i) = true := by
+    have hs : dataSize = 4096 := rfl
+    simp only [inData, Bool.and_eq_true, decide_eq_true_eq]; omega
+  have s₅ := step_sb (en := en) f₅ haddr hin
+  have hw : i / 8 < len := by omega
+  have hsl : b + i / 8 < wordsMax := by have : wordsMax = 256 := rfl; omega
+  have hA : dataBase + 8 * b + i = slotAddr (b + i / 8) + i % 8 := by simp only [slotAddr]; omega
+  have hinv₄ : Inv m₄ t := Inv.mono_mem hinv₃ (by rw [low₄ 7 (by omega)]) mem₄
+  have hI5 := inv_storeB hinv₄ hsl (Nat.mod_lt i (by omega)) (m₄.pc + 4) (m₄.get 9)
+  have hst : Slots.storeAtS t (List.range' b len) i (evalS v t) = updS t (b + i / 8) (setByte (t (b + i / 8)) (i % 8) (evalS v t)) := by
+    simp only [Slots.storeAtS, List.getElem?_range' hw, Nat.one_mul]
+  rw [← hA, h9₄] at hI5
+  rw [h9₄] at s₅
+  refine ⟨_, ((e₁.trans ((Exec.stepAt s₂ p₁).trans (Exec.stepAt s₃ (by simp only [m₂, p₁])))).trans
+    (by rw [p₃] at e₄; exact e₄)).trans (Exec.stepAt s₅ (by rw [p₄, p₃])), ?_, ?_⟩
+  · simp only; rw [p₄, p₃]; omega
+  · rw [hst]; exact hI5
+
+/-- The bytes of `len` consecutive words from word `b`, word by word, are the bytes from `8 * b`, in order. -/
+theorem flat_range (g : Nat → Nat) : ∀ (len b : Nat),
+    (List.range' b len).flatMap (fun w => (List.range 8).map (fun j => g (8 * w + j))) = (List.range (8 * len)).map (fun i => g (8 * b + i))
+  | 0, _ => by simp
+  | n + 1, b => by
+    rw [List.range'_succ, List.flatMap_cons, flat_range g n (b + 1), show 8 * (n + 1) = 8 + 8 * n by omega, List.range_add,
+      List.map_append, List.map_map]
+    congr 1
+    apply List.map_congr_left
+    intro i _
+    simp only [Function.comp]
+    congr 1
+    omega
+
+theorem flatMap_congr_mem {α β : Type} {F G : α → List β} : ∀ {l : List α}, (∀ x ∈ l, F x = G x) → l.flatMap F = l.flatMap G
+  | [], _ => rfl
+  | x :: xs, h => by
+    rw [List.flatMap_cons, List.flatMap_cons, h x List.mem_cons_self, flatMap_congr_mem (fun y hy => h y (List.mem_cons_of_mem _ hy))]
+
+/-- **The bytes a `write` of slots `b` to `b + len - 1` reads are the slots' bytes.** -/
+theorem out_bytes {m : Mach} {t : Slice.Slots.Slots} (hinv : Inv m t) {b len : Nat} (hb : b + len ≤ 64) :
+    (List.range (8 * len)).map (fun i => (m.mem (dataBase + 8 * b + i)).val) = Slots.outBytesS t (List.range' b len) := by
+  have hmax : wordsMax = 256 := rfl
+  simp only [Slots.outBytesS]
+  rw [flatMap_congr_mem (G := fun w => (List.range 8).map (fun j => (fun x => (m.mem (dataBase + x)).val) (8 * w + j)))]
+  · rw [flat_range (fun x => (m.mem (dataBase + x)).val) len b]
+    apply List.map_congr_left
+    intro i _
+    show (m.mem (dataBase + 8 * b + i)).val = (m.mem (dataBase + (8 * b + i))).val
+    rw [Nat.add_assoc]
+  · intro w hw
+    have hw' : w < b + len := (List.mem_range'_1.mp hw).2
+    apply List.map_congr_left
+    intro j hj
+    have hj' : j < 8 := List.mem_range.mp hj
+    rw [← hinv.2 w (by omega), load8_byte m _ j (by simp only [slotAddr, dataBase]; omega) hj']
+    simp only [slotAddr]
+    congr 2
+    omega
+
+/-- Reading a register after a write: the written one, or the old value. -/
+theorem get_upd_same (mm : Mach) (q r : Nat) (v : W64) (hr : r ≠ 0) : ({ mm with pc := q, x := mm.set r v } : Mach).get r = v := by
+  rw [get_set hr]; simp
+
+theorem get_upd_other (mm : Mach) (q r : Nat) (v : W64) {y : Nat} (hr : r ≠ 0) (hy : y ≠ r) :
+    ({ mm with pc := q, x := mm.set r v } : Mach).get y = mm.get y := by
+  rw [get_set hr]; simp [hy]
+
+theorem addi0 (k : Nat) (hk : k < 2048) : W64.ofNat (addImm (W64.ofNat 0) (Int.ofNat k)) = W64.ofNat k := by
+  rw [addImm_val _ _ (by rw [ofNat_val (by omega)]; omega), ofNat_val (by omega), Nat.zero_add]
+
+/-- **`emitB`**: `a0 := 1`, `a1 := ` the first slot's address, `a2 := ` the bytes, `a7 := 64`, and the `ecall`, which emits them. -/
+theorem exec_emitB {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {b len : Nat}
+    (hl0 : 0 < len) (hl : len ≤ 8) (hb : b + len ≤ 64) (hinv : Inv m t) (hat : At C m.pc (genC (.emitB (List.range' b len)))) :
+    ∃ m', ExecE C en [(m.pc, []), (m.pc + 4, []), (m.pc + 8, []), (m.pc + 12, []),
+        (m.pc + 16, (List.range (8 * len)).map fun i => .addr (Int.ofNat (dataBase + 8 * b + i)))]
+        [.emit "out" (Slots.outBytesS t (List.range' b len))] m m' ∧
+      m'.pc = m.pc + 20 ∧ Inv m' t := by
+  have hlen' : (List.range' b len).length = len := List.length_range'
+  have hhead : (List.range' b len).headD 0 = b := by
+    obtain ⟨k, rfl⟩ : ∃ k, len = k + 1 := ⟨len - 1, by omega⟩
+    simp [List.range'_succ]
+  simp only [genC, hlen', hhead] at hat
+  have hdb : dataBase = 0x20000 := rfl
+  have h7 : m.get 7 = W64.ofNat dataBase := hinv.1
+  -- a0 := 1
+  let m₁ : Mach := { m with pc := m.pc + 4, x := m.set 10 (W64.ofNat (addImm (m.get 0) (Int.ofNat 1))) }
+  have s₁ : Slice.Rv.step C en m = .next [] m₁ := step_addi (At.get hat (j := 0) (by simp) rfl (by omega))
+  have r₁10 : m₁.get 10 = W64.ofNat 1 := by rw [get_upd_same _ _ _ _ (by omega), get_zero, addi0 1 (by omega)]
+  have r₁7 : m₁.get 7 = W64.ofNat dataBase := by rw [get_upd_other _ _ _ _ (by omega) (by omega), h7]
+  -- a1 := x7 + 8b
+  let m₂ : Mach := { m₁ with pc := m₁.pc + 4, x := m₁.set 11 (W64.ofNat (addImm (m₁.get 7) (Int.ofNat (8 * b)))) }
+  have s₂ : Slice.Rv.step C en m₁ = .next [] m₂ := step_addi (At.get hat (j := 1) (by simp) rfl (by simp only [m₁]))
+  have hdv : (W64.ofNat dataBase).val = dataBase := ofNat_val (by rw [hdb]; omega)
+  have r₂11 : (m₂.get 11).val = dataBase + 8 * b := by
+    rw [get_upd_same _ _ _ _ (by omega), r₁7, addImm_val (W64.ofNat dataBase) (8 * b) (by rw [hdv, hdb]; omega), hdv,
+      ofNat_val (by rw [hdb]; omega)]
+  have r₂10 : m₂.get 10 = W64.ofNat 1 := by rw [get_upd_other _ _ _ _ (by omega) (by omega), r₁10]
+  -- a2 := 8 len
+  let m₃ : Mach := { m₂ with pc := m₂.pc + 4, x := m₂.set 12 (W64.ofNat (addImm (m₂.get 0) (Int.ofNat (8 * len)))) }
+  have s₃ : Slice.Rv.step C en m₂ = .next [] m₃ := step_addi (At.get hat (j := 2) (by simp) rfl (by simp only [m₂, m₁]))
+  have r₃12 : m₃.get 12 = W64.ofNat (8 * len) := by rw [get_upd_same _ _ _ _ (by omega), get_zero, addi0 _ (by omega)]
+  have r₃11 : (m₃.get 11).val = dataBase + 8 * b := by rw [get_upd_other _ _ _ _ (by omega) (by omega), r₂11]
+  have r₃10 : m₃.get 10 = W64.ofNat 1 := by rw [get_upd_other _ _ _ _ (by omega) (by omega), r₂10]
+  -- a7 := 64
+  let m₄ : Mach := { m₃ with pc := m₃.pc + 4, x := m₃.set 17 (W64.ofNat (addImm (m₃.get 0) (Int.ofNat 64))) }
+  have s₄ : Slice.Rv.step C en m₃ = .next [] m₄ := step_addi (At.get hat (j := 3) (by simp) rfl (by simp only [m₃, m₂, m₁]))
+  have g17 : m₄.get 17 = sysWrite := by rw [get_upd_same _ _ _ _ (by omega), get_zero, addi0 64 (by omega)]; rfl
+  have g12 : m₄.get 12 = W64.ofNat (8 * len) := by rw [get_upd_other _ _ _ _ (by omega) (by omega), r₃12]
+  have g11 : (m₄.get 11).val = dataBase + 8 * b := by rw [get_upd_other _ _ _ _ (by omega) (by omega), r₃11]
+  have g10 : m₄.get 10 = W64.ofNat 1 := by rw [get_upd_other _ _ _ _ (by omega) (by omega), r₃10]
+  have g7 : m₄.get 7 = W64.ofNat dataBase := by
+    rw [get_upd_other _ _ _ _ (by omega) (by omega), get_upd_other _ _ _ _ (by omega) (by omega),
+      get_upd_other _ _ _ _ (by omega) (by omega), r₁7]
+  have p₄ : m₄.pc = m.pc + 16 := by simp only [m₄, m₃, m₂, m₁]
+  have mem₄ : m₄.mem = m.mem := rfl
+  have g12v : (m₄.get 12).val = 8 * len := by rw [g12, ofNat_val (by omega)]
+  -- the ecall
+  have f₅ : fetchI C m₄.pc = some .ecall := At.get hat (j := 4) (by simp) rfl (by rw [p₄])
+  obtain ⟨w, hf, hd⟩ := fetchI_parts f₅
+  have hne : ¬ (m₄.get 17 = sysExit) := by rw [g17]; decide
+  have has : ((List.range (m₄.get 12).val).map fun i => ((m₄.get 11).val + i) % 2 ^ 64) =
+      (List.range (8 * len)).map fun i => dataBase + 8 * b + i := by
+    rw [g12v, g11]
+    apply List.map_congr_left
+    intro i hi
+    have := List.mem_range.mp hi
+    exact Nat.mod_eq_of_lt (by omega)
+  have hall : (((List.range (m₄.get 12).val).map fun i => ((m₄.get 11).val + i) % 2 ^ 64).all (canRead C en)) = true := by
+    rw [has, List.all_eq_true]
+    intro a ha
+    obtain ⟨i, hi, rfl⟩ := List.mem_map.mp ha
+    have := List.mem_range.mp hi
+    have hs : dataSize = 4096 := rfl
+    have hin : inData (dataBase + 8 * b + i) = true := by
+      simp only [inData, Bool.and_eq_true, decide_eq_true_eq]; omega
+    simp [canRead, hin]
+  have hsz : (m₄.get 12).val ≤ dataSize := by
+    have hs : dataSize = 4096 := rfl
+    rw [g12v, hs]; omega
+  have hcond : m₄.get 10 = W64.ofNat 1 ∧ (m₄.get 12).val ≤ dataSize ∧
+      (((List.range (m₄.get 12).val).map fun i => ((m₄.get 11).val + i) % 2 ^ 64).all (canRead C en)) = true :=
+    ⟨g10, hsz, hall⟩
+  let m₅ : Mach := { m₄ with pc := m₄.pc + 4, x := m₄.set 10 (m₄.get 12) }
+  have s₅ : Slice.Rv.step C en m₄ = .out (.emit "out" (Slots.outBytesS t (List.range' b len)))
+      ((List.range (8 * len)).map fun i => .addr (Int.ofNat (dataBase + 8 * b + i))) m₅ := by
+    simp only [Slice.Rv.step, hf, hd, hne, g17, ↓reduceIte, sysWriteStep]
+    rw [if_pos hcond, has, List.map_map, List.map_map, ← out_bytes hinv hb, mem₄]
+    rfl
+  have hinv₅ : Inv m₅ t := Inv.mono_mem hinv (by rw [get_upd_other _ _ _ _ (by omega) (by omega), g7, h7]) rfl
+  refine ⟨m₅, ?_, by simp only [m₅, p₄], hinv₅⟩
+  have q₂ : m₂.pc = m.pc + 8 := by show m.pc + 4 + 4 = m.pc + 8; omega
+  have q₃ : m₃.pc = m.pc + 12 := by show m.pc + 4 + 4 + 4 = m.pc + 12; omega
+  have e := ExecE.pre ((Exec.step s₁).trans ((Exec.stepAt (q := m.pc + 4) s₂ rfl).trans ((Exec.stepAt (q := m.pc + 8) s₃ q₂).trans
+    (Exec.stepAt (q := m.pc + 12) s₄ q₃)))) (ExecE.out s₅)
+  rw [p₄] at e
+  exact e
 
 end LCore.Slice2.Lower

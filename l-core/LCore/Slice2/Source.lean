@@ -30,6 +30,10 @@ inductive Cmd where
   /-- `x := names[i]`, byte `i` of the input words `names`, read-only (RC-01): `crypto_verify_16`'s `x[i]`. -/
   | loadB  : String → List String → Expr → Cmd
   | store  : Expr → Expr → Cmd
+  /-- `names[i] = v`, the low byte of `v` into byte `i` of the words `names` (RC-02): `sodium_add`'s `a[i] = (unsigned char) c`. -/
+  | storeB : List String → Expr → Expr → Cmd
+  /-- One step that emits the bytes of the words `names` as `.emit "out"` (RC-02): a writable array, observed at the end. -/
+  | emitB  : List String → Cmd
   deriving DecidableEq, Repr
 
 structure Prog where
@@ -63,6 +67,24 @@ def byteAt (s : Store) (ns : List String) (i : Nat) : W64 :=
   | some y => byteOfWord (s y) (i % 8)
   | none => W64.ofNat 0
 
+/-- Byte `j` of `w` set to `b`'s low byte, little-endian. Written as the machine's `load8` reads a word, byte by byte, so that a
+    byte store on the machine is this on the slot's word. -/
+def setByte (w : W64) (j : Nat) (b : W64) : W64 :=
+  W64.ofNat ((List.range 8).foldr (fun i acc => (if i = j then b.val % 256 else w.val / 256 ^ i % 256) + 256 * acc) 0)
+
+/-- Byte `i` of the words `ns` set to `v`'s low byte, and nothing past their end. -/
+def storeAt (s : Store) (ns : List String) (i : Nat) (v : W64) : Store :=
+  match ns[i / 8]? with
+  | some y => upd s y (setByte (s y) (i % 8) v)
+  | none => s
+
+/-- The bytes of the words `ns`, little-endian. -/
+def outBytes (s : Store) (ns : List String) : List Nat :=
+  ns.flatMap fun y => (List.range 8).map fun j => (s y).val / 256 ^ j % 256
+
+/-- A step that emits `v`, and leaks nothing else. -/
+def etick (v : Ev) (p : List Nat) (r : Beh) : Beh := { tick [] p r with ev := v :: r.ev }
+
 /-- An access's leakage: its masked index. -/
 def addrLk (i : Nat) : Lk := .addr (Int.ofNat i)
 
@@ -84,6 +106,8 @@ def run (ret : Expr) : Nat → List Frame → Store → Arr → Beh
     | .load x e => tick [addrLk (idx (eval e s))] p (run ret n k (upd s x (a (idx (eval e s)))) a)
     | .loadB x ns e => tick [addrLk (bidx ns (eval e s))] p (run ret n k (upd s x (byteAt s ns (bidx ns (eval e s)))) a)
     | .store e v => tick [addrLk (idx (eval e s))] p (run ret n k s (updA a (idx (eval e s)) (eval v s)))
+    | .storeB ns e v => tick [addrLk (bidx ns (eval e s))] p (run ret n k (storeAt s ns (bidx ns (eval e s)) (eval v s)) a)
+    | .emitB ns => etick (.emit "out" (outBytes s ns)) p (run ret n k s a)
 
 def zeroA : Arr := fun _ => W64.ofNat 0
 
@@ -96,6 +120,15 @@ def sliceLang (E : Type) (P : Nat → Bool) : Lang where
   Adm i := ∀ k, cap ≤ k → i.1 k = W64.ofNat 0
 
 /-! ## Lawful, and a loop really can run forever -/
+
+theorem etick_ext {a b : Beh} (v : Ev) (p : List Nat) (h : Slice.Ext a b) :
+    Slice.Ext (etick v p a) (etick v p b) := by
+  refine ⟨fun hf => ?_, ?_, ?_, Nat.add_le_add_left h.2.2.2 _⟩
+  · rw [h.1 hf]
+  · obtain ⟨t, ht⟩ := h.2.1
+    exact ⟨t, by simp [etick, ← ht]⟩
+  · obtain ⟨t, ht⟩ := h.2.2.1
+    exact ⟨t, by simp [etick, tick, ← ht]⟩
 
 theorem run_ext (ret : Expr) : ∀ (n n' : Nat) (k : List Frame) (s : Store) (a : Arr), n ≤ n' →
     Ext (run ret n k s a) (run ret n' k s a) := by
@@ -131,13 +164,15 @@ theorem run_ext (ret : Expr) : ∀ (n n' : Nat) (k : List Frame) (s : Store) (a 
       | load x e => exact tick_ext _ _ (ih m' _ _ a hm)
       | loadB x ns e => exact tick_ext _ _ (ih m' _ _ a hm)
       | store e v => exact tick_ext _ _ (ih m' _ s _ hm)
+      | storeB ns e v => exact tick_ext _ _ (ih m' _ _ a hm)
+      | emitB ns => exact etick_ext _ _ (ih m' _ s a hm)
 
 def NoSeq (k : List Frame) : Prop := ∀ f ∈ k, ∀ a b, f.1 ≠ .seq a b
 
 theorem push_noSeq : ∀ (c : Cmd) (p : List Nat) (k : List Frame), NoSeq k → NoSeq (push c p k)
   | .seq a b, p, k, h => push_noSeq a _ _ (push_noSeq b _ k h)
   | .skip, _, k, h | .assign _ _, _, k, h | .ite _ _ _, _, k, h | .loop _ _, _, k, h
-  | .load _ _, _, k, h | .loadB _ _ _, _, k, h | .store _ _, _, k, h => by
+  | .load _ _, _, k, h | .loadB _ _ _, _, k, h | .store _ _, _, k, h | .storeB _ _ _, _, k, h | .emitB _, _, k, h => by
     intro f hf a b
     simp only [push, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -193,6 +228,12 @@ theorem run_diverge (ret : Expr) : ∀ (n : Nat) (k : List Frame) (s : Store) (a
       | store e v =>
         simp only [run, tick] at hf ⊢
         have := ih k s _ hk' hf; omega
+      | storeB ns e v =>
+        simp only [run, tick] at hf ⊢
+        have := ih k _ a hk' hf; omega
+      | emitB ns =>
+        simp only [run, etick, tick] at hf ⊢
+        have := ih k s a hk' hf; omega
 
 theorem sliceLang_lawful (E : Type) (P : Nat → Bool) : (sliceLang E P).Lawful where
   ev_mono p i n n' h := (run_ext _ n n' _ _ _ h).2.1
@@ -234,6 +275,10 @@ def highC (st : St) : Cmd → Option St
     else if ns.any (fun y => decide (y ∈ st.1)) then some (x :: st.1, st.2) else some (st.1.filter (· ≠ x), st.2)
   | .store e v =>
     if highE st.1 e then none else some (st.1, st.2 || highE st.1 v)
+  | .storeB ns e v =>
+    if highE st.1 e || ns.isEmpty then none
+    else if highE st.1 v then some (ns ++ st.1, st.2) else some st
+  | .emitB ns => if ns.any (fun y => decide (y ∈ st.1)) then none else some st
 
 /-- **The checker**: no secret guard, loop guard, index or result. A loop whose body raises something past its head is retried once from the
     head joined with the body's result, and refused if the body still raises something past that. -/
@@ -275,6 +320,46 @@ theorem byteAt_low {H : List String} {s s' : Store} {ns : List String} (h : Low 
     rw [h y (hns y (List.mem_of_getElem? hy))]
   · rfl
 
+/-- **A byte store leaves every word outside the array alone.** -/
+theorem storeAt_other {s : Store} {ns : List String} {i : Nat} {v : W64} {y : String} (hy : y ∉ ns) :
+    storeAt s ns i v y = s y := by
+  cases hz : ns[i / 8]? with
+  | none => simp only [storeAt, hz]
+  | some z =>
+    have hz' : z ∈ ns := List.mem_of_getElem? hz
+    have hne : y ≠ z := fun h => hy (h ▸ hz')
+    simp [storeAt, hz, upd, hne]
+
+/-- **A low byte stored at a public index keeps two low-equal stores low-equal.** -/
+theorem storeAt_low {H : List String} {s s' : Store} (h : Low H s s') (ns : List String) (i : Nat) {v v' : W64} (hv : v = v') :
+    Low H (storeAt s ns i v) (storeAt s' ns i v') := by
+  intro y hy
+  subst hv
+  cases hz : ns[i / 8]? with
+  | none => simp only [storeAt, hz]; exact h y hy
+  | some z =>
+    by_cases hyz : y = z
+    · subst hyz; simp [storeAt, hz, upd, h y hy]
+    · simp [storeAt, hz, upd, hyz, h y hy]
+
+/-- **A store of a secret byte: every word of the array may now hold a secret, and the rest stay low-equal.** -/
+theorem storeAt_high {H : List String} {s s' : Store} (h : Low H s s') (ns : List String) (i : Nat) (v v' : W64) :
+    Low (ns ++ H) (storeAt s ns i v) (storeAt s' ns i v') := by
+  intro y hy
+  have hyn : y ∉ ns := fun hn => hy (List.mem_append_left _ hn)
+  have hyH : y ∉ H := fun hn => hy (List.mem_append_right _ hn)
+  rw [storeAt_other hyn, storeAt_other hyn]
+  exact h y hyH
+
+/-- **The bytes of low words are the same in two runs.** -/
+theorem outBytes_low {H : List String} {s s' : Store} (h : Low H s s') {ns : List String} (hns : ∀ y ∈ ns, y ∉ H) :
+    outBytes s ns = outBytes s' ns := by
+  induction ns with
+  | nil => rfl
+  | cons y ys ih =>
+    simp only [outBytes, List.flatMap_cons] at ih ⊢
+    rw [h y (hns y List.mem_cons_self), ih (fun z hz => hns z (List.mem_cons_of_mem _ hz))]
+
 inductive FT (ret : Expr) : St → List Frame → Prop where
   | nil  : ∀ {st : St}, highE st.1 ret = false → FT ret st []
   | cons : ∀ {st s₁ s₂ : St} {c : Cmd} {p : List Nat} {k : List Frame},
@@ -291,7 +376,8 @@ theorem push_ft {ret : Expr} : ∀ (c : Cmd) (p : List Nat) {st s₁ s₂ : St} 
   | .skip, _, _, _, _, _, hc, hs, hk | .assign _ _, _, _, _, _, _, hc, hs, hk
   | .ite _ _ _, _, _, _, _, _, hc, hs, hk | .loop _ _, _, _, _, _, _, hc, hs, hk
   | .load _ _, _, _, _, _, _, hc, hs, hk | .loadB _ _ _, _, _, _, _, _, hc, hs, hk
-  | .store _ _, _, _, _, _, _, hc, hs, hk => FT.cons hc hs hk
+  | .store _ _, _, _, _, _, _, hc, hs, hk | .storeB _ _ _, _, _, _, _, _, hc, hs, hk
+  | .emitB _, _, _, _, _, _, hc, hs, hk => FT.cons hc hs hk
 
 theorem low_set {H : List String} {s s' : Store} {x : String} {v v' : W64} (hl : Low H s s') (hv : v = v') :
     Low (H.filter (· ≠ x)) (upd s x v) (upd s' x v') := by
@@ -474,6 +560,37 @@ theorem run_same {ret : Expr} : ∀ (n : Nat) (st : St) (k : List Frame) (s s' :
         simp only [run, hg]
         rw [hg] at hnew
         rw [ih _ _ _ _ _ _ hk' (LowS.mono hs hnew)]
+      | storeB ns e v =>
+        simp only [highC] at hc
+        split at hc
+        · simp at hc
+        rename_i he
+        simp only [Bool.or_eq_true, not_or] at he
+        have hg : eval e s = eval e s' := eval_low hl.1 e (by simpa using he.1)
+        have hnew : LowS s₁ (storeAt s ns (bidx ns (eval e s)) (eval v s)) (storeAt s' ns (bidx ns (eval e s')) (eval v s')) a a' := by
+          split at hc
+          · simp only [Option.some.injEq] at hc
+            subst hc
+            rw [hg]
+            exact ⟨storeAt_high hl.1 ns _ _ _, hl.2⟩
+          · rename_i hh
+            simp only [Option.some.injEq] at hc
+            subst hc
+            rw [hg]
+            exact ⟨storeAt_low hl.1 ns _ (eval_low hl.1 v (by simpa using hh)), hl.2⟩
+        simp only [run, hg]
+        rw [hg] at hnew
+        rw [ih _ _ _ _ _ _ hk' (LowS.mono hs hnew)]
+      | emitB ns =>
+        simp only [highC] at hc
+        split at hc
+        · simp at hc
+        rename_i hh
+        simp only [Option.some.injEq] at hc
+        subst hc
+        simp only [List.any_eq_true, decide_eq_true_eq, not_exists, not_and] at hh
+        simp only [run, outBytes_low hl.1 hh]
+        rw [ih _ _ s s' a a' hk' (LowS.mono hs hl)]
 
 /-- **`rel` on the source**: at every fuel, on inputs that agree at public positions, whatever the environment, whether or not the run finishes. -/
 theorem sliceCheck_rel {E : Type} {P : Nat → Bool} {p : Prog} (h : sliceCheck P p = true) :
@@ -506,7 +623,7 @@ def costK : List Frame → Nat
 theorem costK_push : ∀ (c : Cmd) (p : List Nat) (k : List Frame), costK (push c p k) = costOf c + costK k
   | .seq a b, p, k => by simp only [push, costK_push a, costK_push b, costOf]; omega
   | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
-  | .store _ _, _, _ => rfl
+  | .store _ _, _, _ | .storeB _ _ _, _, _ | .emitB _, _, _ => rfl
 
 def LF (k : List Frame) : Prop := ∀ f ∈ k, loopFree f.1 = true
 
@@ -515,7 +632,8 @@ theorem push_lf : ∀ (c : Cmd) (p : List Nat) (k : List Frame), loopFree c = tr
     simp only [loopFree, Bool.and_eq_true] at hc
     exact push_lf a _ _ hc.1 (push_lf b _ _ hc.2 hk)
   | .skip, _, _, hc, hk | .assign _ _, _, _, hc, hk | .ite _ _ _, _, _, hc, hk | .loop _ _, _, _, hc, hk
-  | .load _ _, _, _, hc, hk | .loadB _ _ _, _, _, hc, hk | .store _ _, _, _, hc, hk => by
+  | .load _ _, _, _, hc, hk | .loadB _ _ _, _, _, hc, hk | .store _ _, _, _, hc, hk
+  | .storeB _ _ _, _, _, hc, hk | .emitB _, _, _, hc, hk => by
     intro f hf
     simp only [push, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -541,6 +659,8 @@ theorem run_cost (ret : Expr) : ∀ (n : Nat) (k : List Frame) (s : Store) (a : 
       | load x e => have := ih k (upd s x (a (idx (eval e s)))) a hk'; simp only [run, tick, costK, costOf]; omega
       | loadB x ns e => have := ih k (upd s x (byteAt s ns (bidx ns (eval e s)))) a hk'; simp only [run, tick, costK, costOf]; omega
       | store e v => have := ih k s (updA a (idx (eval e s)) (eval v s)) hk'; simp only [run, tick, costK, costOf]; omega
+      | storeB ns e v => have := ih k (storeAt s ns (bidx ns (eval e s)) (eval v s)) a hk'; simp only [run, tick, costK, costOf]; omega
+      | emitB ns => have := ih k s a hk'; simp only [run, etick, tick, costK, costOf]; omega
       | loop e b => simp [loopFree] at hc
       | seq c₁ c₂ =>
         simp only [loopFree, Bool.and_eq_true] at hc
@@ -694,5 +814,15 @@ theorem arrayInLoop_leaks : ¬ Cert.rel (sliceLang Unit sec0) arrayInLoop := lea
 /-- **Accepted**: while the array is low, a load clears its target, even one that held a secret. -/
 theorem load_clears_when_low :
     sliceCheck sec0 { inputs := ["s", "n"], body := .seq (.assign "t" (.var "s")) (.load "t" (num 0)), ret := .var "t" } = true := by decide
+
+/-- **Refused, the index rule on a byte store** (RC-02), and the address leaks. -/
+def secretStoreB : Prog := { inputs := ["s", "n"], body := .storeB ["n"] (.var "s") (num 1), ret := num 0 }
+theorem secretStoreB_refused : sliceCheck sec0 secretStoreB = false := by decide
+theorem secretStoreB_leaks : ¬ Cert.rel (sliceLang Unit sec0) secretStoreB := leak_lk (n := 5) (a := 1) (a' := 2) (b := 1) (by decide)
+
+/-- **Refused, the output rule** (RC-02): an output of a secret word, and the output shows it. -/
+def secretEmit : Prog := { inputs := ["s", "n"], body := .emitB ["s"], ret := num 0 }
+theorem secretEmit_refused : sliceCheck sec0 secretEmit = false := by decide
+theorem secretEmit_leaks : ¬ Cert.rel (sliceLang Unit sec0) secretEmit := leak_ev (n := 5) (a := 1) (a' := 2) (b := 1) (by decide)
 
 end LCore.Slice2

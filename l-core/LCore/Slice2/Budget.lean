@@ -24,6 +24,8 @@ def evars : Expr → List String
 
 def assigns : Cmd → List String
   | .assign x _ | .load x _ | .loadB x _ _ => [x]
+  -- RC-02: a byte store writes its array's words. A counted program may not write a counter or an input this way, for now.
+  | .storeB ns _ _ => ns
   | .seq a b | .ite _ a b => assigns a ++ assigns b
   | .loop _ b => assigns b
   | _ => []
@@ -171,6 +173,18 @@ theorem plain_loadB {cs S : List String} {x : String} {ns : List String} {e : Ex
     Bool.not_eq_true'] at h
   exact h
 
+theorem plain_storeB {cs S : List String} {ns : List String} {e v : Expr} (h : plainC cs S (.storeB ns e v) = true) :
+    ∀ y ∈ ns, cs.contains y = false ∧ S.contains y = false := by
+  simp only [plainC, loopFree, assigns, Bool.true_and, List.all_eq_true, Bool.and_eq_true, Bool.not_eq_true'] at h
+  exact h
+
+theorem agree_storeAt {cs S : List String} (s : Store) {ns : List String} (hns : ∀ y ∈ ns, cs.contains y = false ∧ S.contains y = false)
+    (i : Nat) (v : W64) : Agree cs S (storeAt s ns i v) s := by
+  intro y hy
+  have : y ∉ ns := by
+    intro hm; have := hns y hm; rcases hy with hy | hy <;> simp_all
+  exact storeAt_other this
+
 theorem plain_seq {cs S : List String} {a b : Cmd} (h : plainC cs S (.seq a b) = true) : plainC cs S a = true ∧ plainC cs S b = true := by
   simp only [plainC, loopFree, assigns, List.all_append, Bool.and_eq_true] at h ⊢
   exact ⟨⟨h.1.1, h.2.1⟩, h.1.2, h.2.2⟩
@@ -188,7 +202,7 @@ theorem push_app : ∀ (c : Cmd) (p : List Nat) (k : List Frame), push c p k = p
     simp only [push]
     rw [push_app b _ k, push_app a _ (push b (p ++ [1]) [] ++ k), push_app a _ (push b (p ++ [1]) []), List.append_assoc]
   | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
-  | .store _ _, _, _ => rfl
+  | .store _ _, _, _ | .storeB _ _ _, _, _ | .emitB _, _, _ => rfl
 
 theorem push_plain_frames {cs S : List String} : ∀ (c : Cmd) (p : List Nat), plainC cs S c = true → ∀ f ∈ push c p [], IsPlain cs S f.1
   | .seq a b, p, h, f, hf => by
@@ -199,7 +213,8 @@ theorem push_plain_frames {cs S : List String} : ∀ (c : Cmd) (p : List Nat), p
     · exact push_plain_frames a _ ha f hf
     · exact push_plain_frames b _ hb f hf
   | .skip, _, h, f, hf | .assign _ _, _, h, f, hf | .ite _ _ _, _, h, f, hf | .loop _ _, _, h, f, hf
-  | .load _ _, _, h, f, hf | .loadB _ _ _, _, h, f, hf | .store _ _, _, h, f, hf => by
+  | .load _ _, _, h, f, hf | .loadB _ _ _, _, h, f, hf | .store _ _, _, h, f, hf | .storeB _ _ _, _, h, f, hf
+  | .emitB _, _, h, f, hf => by
     simp only [push, List.mem_singleton] at hf
     subst hf
     exact h
@@ -216,7 +231,8 @@ theorem pot_push_plain {cs S : List String} : ∀ (c : Cmd) (p : List Nat) (k : 
     have hx := (plain_assign h).1
     simp only [push, pot, hx, Bool.false_eq_true, ↓reduceIte, costOf]
   | .loop e b, _, _, _, h => by simp [plain_loop] at h
-  | .skip, _, _, _, _ | .ite _ _ _, _, _, _, _ | .load _ _, _, _, _, _ | .loadB _ _ _, _, _, _, _ | .store _ _, _, _, _, _ => rfl
+  | .skip, _, _, _, _ | .ite _ _ _, _, _, _, _ | .load _ _, _, _, _, _ | .loadB _ _ _, _, _, _, _ | .store _ _, _, _, _, _
+  | .storeB _ _ _, _, _, _, _ | .emitB _, _, _, _, _ => rfl
 
 /-! ## The potential reads only the counters and the inputs -/
 
@@ -251,7 +267,7 @@ theorem pot_agree {cs S : List String} : ∀ (k : List Frame) (s s' : Store), (�
       · cases hy
         simp only [pot]
         rw [h x (Or.inl hx), pot_agree k _ _ hk' h]
-    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ =>
+    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ =>
       simp only [pot]
       rw [pot_agree k _ _ hk' h]
 
@@ -296,7 +312,7 @@ theorem pot_mono {cs S : List String} (hD : ∀ y, cs.contains y = true → S.co
           · subst hxc; rw [upd_same]; exact Nat.mul_le_mul_right _ hv
           · rw [upd_other s v hxc]; exact Nat.le_refl _
         omega
-    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ =>
+    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ =>
       simp only [pot]
       have := pot_mono hD hc k s v hk hv
       omega
@@ -363,6 +379,12 @@ theorem step_plain (IH : ∀ k s a, Ok cs S k → (run ret m k s a).cost ≤ pot
     rw [pot_agree k _ s hall (agree_out s hx _)] at this
     simp only [run, tick_cost, pot, costOf]; omega
   | store e v => have := IH k s (updA a (idx (eval e s)) (eval v s)) hk; simp only [run, tick_cost, pot, costOf]; omega
+  | storeB ns e v =>
+    have hx := plain_storeB hc
+    have := IH k (storeAt s ns (bidx ns (eval e s)) (eval v s)) a hk
+    rw [pot_agree k _ s hall (agree_storeAt s hx _ _)] at this
+    simp only [run, tick_cost, pot, costOf]; omega
+  | emitB ns => have := IH k s a hk; simp only [run, etick, tick, pot, costOf]; omega
   | seq c₁ c₂ =>
     obtain ⟨h1, h2⟩ := plain_seq hc
     have := IH (push c₁ (p ++ [0]) (push c₂ (p ++ [1]) k)) s a (ok_push_plain (p ++ [0]) h1 (ok_push_plain (p ++ [1]) h2 hk))
@@ -480,11 +502,12 @@ theorem topC_frames {cs S : List String} : ∀ (c : Cmd) (q : List Nat), topC cs
       exact Or.inr (Or.inr ⟨y, B, d, rfl, hx, hd, hB⟩)
     | .lit _, _, h | .add _ _, _, h => simp [topC, plainC, loopFree] at h
     | .var _, .skip, h | .var _, .assign _ _, h | .var _, .ite _ _ _, h | .var _, .loop _ _, h | .var _, .load _ _, h
-    | .var _, .store _ _, h | .var _, .loadB _ _ _, h => simp [topC, plainC, loopFree] at h
+    | .var _, .store _ _, h | .var _, .loadB _ _ _, h | .var _, .storeB _ _ _, h | .var _, .emitB _, h => simp [topC, plainC, loopFree] at h
     | .var _, .seq _ .skip, h | .var _, .seq _ (.seq _ _), h | .var _, .seq _ (.ite _ _ _), h | .var _, .seq _ (.loop _ _), h
-    | .var _, .seq _ (.load _ _), h | .var _, .seq _ (.store _ _), h | .var _, .seq _ (.loadB _ _ _), h =>
+    | .var _, .seq _ (.load _ _), h | .var _, .seq _ (.store _ _), h | .var _, .seq _ (.loadB _ _ _), h
+    | .var _, .seq _ (.storeB _ _ _), h | .var _, .seq _ (.emitB _), h =>
       simp [topC, plainC, loopFree] at h
-  | skip | ite _ _ _ _ _ | load _ _ | loadB _ _ _ | store _ _ =>
+  | skip | ite _ _ _ _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ =>
     intro q h f hf
     simp only [push, List.mem_singleton] at hf; subst hf
     exact Or.inl h
