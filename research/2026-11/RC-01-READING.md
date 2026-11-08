@@ -7,6 +7,9 @@ reading says what it rests on.
 - `src/libsodium/crypto_verify/verify.c`, sha256 `44642761ec112967330b0bbc67fee47edb9f35e1dd9b4c8a40fb05fc4d568ea9`
 - `src/libsodium/include/sodium/crypto_verify_16.h`, sha256 `d3b4fbea4b6d2bf23a9a079939a181625be76a006af129732af86bf4b544456c`,
   which gives `#define crypto_verify_16_BYTES 16U`
+- `src/libsodium/include/sodium/crypto_verify_32.h`, sha256 `6ea1ea855b691a2b08510afe74f893d4ff44e40b14501d774d1a73dd79ad4e73`, which gives
+  `#define crypto_verify_32_BYTES 32U`, and `LICENSE` (ISC), sha256 `43964d976a6db3fb986af689d05f8ca0e9971878bccae709750dac8fdc4a99cf`.
+  Added 2026-11-08 (step 5). All four are vendored in `third_party/libsodium-1.0.20/`, and the build hashes them (`CSrc`, `Sha256`).
 
 ```c
 static inline int

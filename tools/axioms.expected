@@ -4724,6 +4724,7 @@ LCore.Slice2.CFront.verify32_ct	LCore.Slice2.CFront	Quot.sound,propext
 LCore.Slice2.CFront.verify32_ct_checks	LCore.Slice2.CFront	propext
 LCore.Slice2.CFront.words	LCore.Slice2.CFront	
 LCore.Slice2.CFront.wrong_length_refused	LCore.Slice2.CFront	propext
+LCore.Slice2.CSrc.PINS	LCore.Slice2.CSrc	
 LCore.Slice2.CSrc.divisionC	LCore.Slice2.CSrc	
 LCore.Slice2.CSrc.earlyExitC	LCore.Slice2.CSrc	
 LCore.Slice2.CSrc.maskPastC	LCore.Slice2.CSrc	
@@ -5029,6 +5030,17 @@ LCore.Slice2.Prog.noConfusion	LCore.Slice2.Source
 LCore.Slice2.Prog.noConfusionType	LCore.Slice2.Source	
 LCore.Slice2.Prog.recOn	LCore.Slice2.Source	
 LCore.Slice2.Prog.ret	LCore.Slice2.Source	
+LCore.Slice2.Sha256.H0	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.K	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.be32	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.compress	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.hex32	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.hexDigit	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.ofString	LCore.Slice2.Sha256	propext
+LCore.Slice2.Sha256.pad	LCore.Slice2.Sha256	
+LCore.Slice2.Sha256.rotr	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.selfTest	LCore.Slice2.Sha256	Quot.sound,propext
+LCore.Slice2.Sha256.sha256	LCore.Slice2.Sha256	Quot.sound,propext
 LCore.Slice2.Slots.Cov	LCore.Slice2.Slots	
 LCore.Slice2.Slots.NoSeqS	LCore.Slice2.Slots	
 LCore.Slice2.Slots.Rel	LCore.Slice2.Slots	propext
