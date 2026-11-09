@@ -351,19 +351,22 @@ theorem rvLang_lawful (P : Nat → Bool) : (rvLang P).Lawful where
 
 /-! ## The image -/
 
-/-- A static RV64 ELF with these two segments. Trust base: the loader places them as `init` says. -/
+/-- A static RV64 ELF with these two segments. Trust base: the loader places them as `init` says. The data segment's file offset is the
+    first page boundary after the code (CAP-01; it was 0x1000, which held code to 3920 bytes). Its address stays `dataBase`, so code up to
+    `dataBase - codeBase` bytes fits, and every ELF of code under 3920 bytes is unchanged. -/
 def elf (body data : List Byte) : List Byte :=
   let cbase := 0x10000
   let hdr := 64 + 2 * 56
   let csize := hdr + body.length
+  let doff := (csize + 0xfff) / 0x1000 * 0x1000
   let ident : List Byte := ([0x7f, 0x45, 0x4c, 0x46, 2, 1, 1] : List Nat).map byteOf ++ List.replicate 9 (byteOf 0)
   let head := ident ++ le 2 2 ++ le 2 243 ++ le 4 1 ++ le 8 (cbase + hdr) ++ le 8 64 ++ le 8 0 ++ le 4 0
     ++ le 2 64 ++ le 2 56 ++ le 2 2 ++ le 2 64 ++ le 2 0 ++ le 2 0
     ++ le 4 1 ++ le 4 5 ++ le 8 0 ++ le 8 cbase ++ le 8 cbase ++ le 8 csize ++ le 8 csize ++ le 8 0x1000
-    ++ le 4 1 ++ le 4 6 ++ le 8 0x1000 ++ le 8 dataBase ++ le 8 dataBase ++ le 8 data.length ++ le 8 dataSize
+    ++ le 4 1 ++ le 4 6 ++ le 8 doff ++ le 8 dataBase ++ le 8 dataBase ++ le 8 data.length ++ le 8 dataSize
     ++ le 8 0x1000
     ++ body
-  head ++ List.replicate (0x1000 - head.length) (byteOf 0) ++ data
+  head ++ List.replicate (doff - head.length) (byteOf 0) ++ data
 
 /-- The entry address is where `init` starts. -/
 theorem elf_entry : 0x10000 + (64 + 2 * 56) = codeBase := by decide

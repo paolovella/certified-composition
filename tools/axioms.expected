@@ -4875,6 +4875,19 @@ LCore.Slice2.CTBytes.verify16_counted	LCore.Slice2.CTBytes	propext
 LCore.Slice2.CTBytes.verify16_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
 LCore.Slice2.CTBytes.verify16_is_literal	LCore.Slice2.CTBytes	propext
 LCore.Slice2.CTBytes.verify16_pipeline	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.Caps.bigS	LCore.Slice2.Caps	
+LCore.Slice2.Caps.bigS_okP	LCore.Slice2.Caps	Classical.choice,Quot.sound,propext
+LCore.Slice2.Caps.chain	LCore.Slice2.Caps	
+LCore.Slice2.Caps.image_edge	LCore.Slice2.Caps	Classical.choice,Quot.sound,propext
+LCore.Slice2.Caps.manyOcc	LCore.Slice2.Caps	
+LCore.Slice2.Caps.manyOcc_fits	LCore.Slice2.Caps	
+LCore.Slice2.Caps.nameList	LCore.Slice2.Caps	
+LCore.Slice2.Caps.names	LCore.Slice2.Caps	propext
+LCore.Slice2.Caps.names_edge	LCore.Slice2.Caps	propext
+LCore.Slice2.Caps.rep	LCore.Slice2.Caps	
+LCore.Slice2.Caps.rep_okC	LCore.Slice2.Caps	
+LCore.Slice2.Caps.rep_sC	LCore.Slice2.Caps	Quot.sound,propext
+LCore.Slice2.Caps.seqAll	LCore.Slice2.Caps	propext
 LCore.Slice2.Cmd.assign.elim	LCore.Slice2.Source	
 LCore.Slice2.Cmd.assign.noConfusion	LCore.Slice2.Source	
 LCore.Slice2.Cmd.below	LCore.Slice2.Source	
@@ -5260,6 +5273,7 @@ LCore.Slice2.Slots.instReprSCmd	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.instReprSCmd.repr	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.instReprSProg	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.instReprSProg.repr	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.mem_uniq	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.outBytesS	LCore.Slice2.Slots	
 LCore.Slice2.Slots.outBytesS_map	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.pushS	LCore.Slice2.Slots	propext
@@ -5284,6 +5298,7 @@ LCore.Slice2.Slots.slotPass	LCore.Slice2.Slots	Classical.choice,Quot.sound,prope
 LCore.Slice2.Slots.spin_carried	LCore.Slice2.Slots	Classical.choice,Quot.sound,propext
 LCore.Slice2.Slots.spin_comp	LCore.Slice2.Slots	propext
 LCore.Slice2.Slots.storeAtS	LCore.Slice2.Slots	propext
+LCore.Slice2.Slots.uniq	LCore.Slice2.Slots	
 LCore.Slice2.St	LCore.Slice2.Source	
 LCore.Slice2.Sub	LCore.Slice2.Source	
 LCore.Slice2.Sub.refl	LCore.Slice2.Source	

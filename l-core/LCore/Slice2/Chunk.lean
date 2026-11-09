@@ -128,7 +128,7 @@ theorem exec_jmp {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {
 
 /-- `if`: the guard, then into an arm, with the first arm's jump pending. -/
 theorem exec_ite {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {e : SExpr} {a b : SCmd} {k : List TF} {f : Nat}
-    (hC : C.length ≤ 3000) (hoc : okC (.ite e a b) = true) (hat : At C m.pc (genC (.ite e a b))) (hok : FOk C k)
+    (hC : C.length ≤ 65360) (hoc : okC (.ite e a b) = true) (hat : At C m.pc (genC (.ite e a b))) (hok : FOk C k)
     (hch : Chain (m.pc + 4 * sC (.ite e a b)) k f) (hinv : Inv m t) :
     ∃ m', Exec C en (chunkC (.ite e a b) m.pc t) m m' ∧ FOk C (nextK (.ite e a b) m.pc k t) ∧
       Chain m'.pc (nextK (.ite e a b) m.pc k t) f ∧ Inv m' (nextT (.ite e a b) t) := by
@@ -168,7 +168,7 @@ theorem exec_ite {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {
 
 /-- `while`: the guard, then the body with the jump back and the loop pending, or past it. -/
 theorem exec_loop {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {e : SExpr} {b : SCmd} {k : List TF} {f : Nat}
-    (hC : C.length ≤ 3000) (hoc : okC (.loop e b) = true) (hat : At C m.pc (genC (.loop e b))) (hok : FOk C k)
+    (hC : C.length ≤ 65360) (hoc : okC (.loop e b) = true) (hat : At C m.pc (genC (.loop e b))) (hok : FOk C k)
     (hch : Chain (m.pc + 4 * sC (.loop e b)) k f) (hinv : Inv m t) :
     ∃ m', Exec C en (chunkC (.loop e b) m.pc t) m m' ∧ FOk C (nextK (.loop e b) m.pc k t) ∧
       Chain m'.pc (nextK (.loop e b) m.pc k t) f ∧ Inv m' (nextT (.loop e b) t) := by
@@ -209,7 +209,7 @@ theorem exec_loop {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} 
 
 /-- **One frame, on the machine**, whatever its environment. -/
 theorem chunk_exec {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {c : SCmd} {pc : Nat} {k : List TF} {f : Nat}
-    (hC : C.length ≤ 3000) (hok : FOk C (.cmd c pc :: k)) (hch : Chain m.pc (.cmd c pc :: k) f) (hinv : Inv m t) :
+    (hC : C.length ≤ 65360) (hok : FOk C (.cmd c pc :: k)) (hch : Chain m.pc (.cmd c pc :: k) f) (hinv : Inv m t) :
     ∃ m', ExecE C en (chunkC c pc t) (evC c t) m m' ∧ FOk C (nextK c pc k t) ∧ Chain m'.pc (nextK c pc k t) f ∧ Inv m' (nextT c t) := by
   obtain ⟨hns, hoc, hat, hok'⟩ := hok
   obtain ⟨hp, hch'⟩ := hch

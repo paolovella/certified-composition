@@ -224,9 +224,22 @@ def cvars : Cmd → List String
 
 def allVars (p : Prog) : List String := cvars p.body ++ evars p.ret
 
-/-- **Input `k` at slot `k`, and locals from slot 128.** The array is between them. -/
+/-- Each name once, at its first occurrence (CAP-01). Linear in the list for a fixed number of names, so the kernel evaluates it on long
+    programs. -/
+def uniq : List String → List String
+  | [] => []
+  | x :: xs => x :: (uniq xs).filter (· ≠ x)
+
+theorem mem_uniq : ∀ {L : List String} {x : String}, x ∈ uniq L ↔ x ∈ L
+  | [], _ => by simp [uniq]
+  | y :: ys, x => by
+    simp only [uniq, List.mem_cons, List.mem_filter, mem_uniq (L := ys), decide_eq_true_eq]
+    by_cases h : x = y <;> simp [h]
+
+/-- **Input `k` at slot `k`, and locals from slot 128, numbered by their first occurrence among distinct names** (CAP-01: before, by their
+    first position in `allVars`, which counts every occurrence, so a program with few names but many statements ran out of slots). -/
 def slotOf (p : Prog) (x : String) : Nat :=
-  if x ∈ p.inputs then Slice.Slots.idx p.inputs x else 128 + Slice.Slots.idx (allVars p) x
+  if x ∈ p.inputs then Slice.Slots.idx p.inputs x else 128 + Slice.Slots.idx (uniq (allVars p)) x
 
 theorem slotOf_inj {p : Prog} (hf : p.inputs.length ≤ 64) {x z : String} (hx : x ∈ allVars p)
     (hz : z ∈ allVars p) (he : slotOf p x = slotOf p z) : x = z := by
@@ -241,7 +254,7 @@ theorem slotOf_inj {p : Prog} (hf : p.inputs.length ≤ 64) {x z : String} (hx :
     · simp only [h1, h2, ↓reduceIte] at he
       have := Slice.Slots.idx_lt h2; omega
     · simp only [h1, h2, ↓reduceIte] at he
-      exact Slice.Slots.idx_inj hx hz (by omega)
+      exact Slice.Slots.idx_inj (mem_uniq.2 hx) (mem_uniq.2 hz) (by omega)
 
 /-- **A variable's slot is outside the array.** -/
 theorem slotOf_not_arr {p : Prog} (hf : p.inputs.length ≤ 64) (x : String) (i : Nat) (hi : i < 64) :
@@ -277,8 +290,9 @@ def cC (p : Prog) : Cmd → SCmd
 
 def compile (p : Prog) : SProg := { body := cC p p.body, ret := cE p p.ret }
 
-/-- Does it fit: 64 input words, 64 array words, and the locals, within the data segment's 512 slots? -/
-def fits (p : Prog) : Bool := decide (p.inputs.length ≤ 64) && decide (128 + (allVars p).length ≤ 512)
+/-- Does it fit: 64 input words, 64 array words, and the locals, within the 256 slots the lowering can address (`wordsMax`)? It counts
+    distinct names (CAP-01; it counted every occurrence, and refused 100 statements over 12 names). -/
+def fits (p : Prog) : Bool := decide (p.inputs.length ≤ 64) && decide (128 + (uniq (allVars p)).length ≤ 256)
 
 def comp (p : Prog) : Except String (SProg × Xform) :=
   if fits p then .ok (compile p, Xform.id) else .error "the program does not fit its data segment"

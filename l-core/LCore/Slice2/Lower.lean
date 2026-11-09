@@ -692,7 +692,7 @@ theorem exec_store {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots}
 
 /-- **A guard and its branch**: forward if the guard is zero. -/
 theorem exec_guard {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {e : SExpr} {off : Nat}
-    (hC : C.length ≤ 3000) (hoff : off < 4096) (hok : okE e 0 = true) (hinv : Inv m t)
+    (hC : C.length ≤ 65360) (hoff : off < 4096) (hok : okE e 0 = true) (hinv : Inv m t)
     (hat : At C m.pc (genE e 0 ++ [.beq 8 0 (Int.ofNat off)])) :
     ∃ m', Exec C en (mE e m.pc ++ [(m.pc + 4 * sE e, [])]) m m' ∧ Inv m' t ∧
       m'.pc = (if (evalS e t).val ≠ 0 then m.pc + 4 * (sE e + 1) else m.pc + 4 * sE e + off) := by

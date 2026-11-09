@@ -999,7 +999,7 @@ theorem Inv.mono_mem {m m' : Mach} {t : Slots} (h : Inv m t) (h7 : m'.get 7 = m.
     rw [this]; exact h.2 n hn⟩
 
 /-- **The machine plays what `walk` computes**, whatever its environment and its other registers hold. -/
-theorem walk_exec {C : List Byte} {en : Env} (hC : C.length ≤ 3000) (f : Nat) :
+theorem walk_exec {C : List Byte} {en : Env} (hC : C.length ≤ 65360) (f : Nat) :
     ∀ (N : Nat) (k : List TF) (t : Slots) (m : Mach), mK k ≤ N → FOk C k → Chain m.pc k f → Inv m t →
       ∃ m', Exec C en (walk N k t).1 m m' ∧ m'.pc = f ∧ Inv m' (walk N k t).2 := by
   intro N
@@ -1395,7 +1395,7 @@ def genP (p : SProg) : List Insn :=
     [.add 10 8 0, .addi 17 0 (Int.ofNat 93), .ecall]
 
 def okP (p : SProg) : Bool :=
-  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 3000)
+  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65360)
 
 def startPc : Nat := codeBase + 4
 def retPc (p : SProg) : Nat := startPc + 4 * sC p.body
@@ -1416,7 +1416,7 @@ def exitF (w : W64) (pc : Nat) : Nat → Beh
 theorem genP_length (p : SProg) : (genP p).length = 1 + sC p.body + sE p.ret + 3 := by
   simp only [genP, List.length_append, genC_length, genE_length, List.length_cons, List.length_nil]
 
-theorem init_inv {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 3000) (v : W64)
+theorem init_inv {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 65360) (v : W64)
     (hv : v = W64.ofNat dataBase) :
     Inv { (init C d e) with pc := codeBase + 4, x := (init C d e).set 7 v } (wordAt d) := by
   have hcb : codeBase = 0x100b0 := rfl
@@ -1448,7 +1448,7 @@ theorem k0_bound' (p : SProg) : mK (k0 p) ≤ mC p.body := by
 theorem lui_value : wordOfInt (sext 32 (0x20 * 2 ^ 12)) = W64.ofNat dataBase := by decide
 
 /-- The entry instruction sets the base register and leaves the slots as the input bytes say. -/
-theorem entry_exec {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 3000)
+theorem entry_exec {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 65360)
     (hl : fetchI C codeBase = some (.lui 7 0x20)) :
     ∃ m₁, Exec C e [(codeBase, [])] (init C d e) m₁ ∧ m₁.pc = codeBase + 4 ∧ Inv m₁ (wordAt d) := by
   obtain ⟨w₀, hf₀, hd₀⟩ := fetchI_parts hl
@@ -1504,7 +1504,7 @@ theorem exit_exec {C : List Byte} {e : Env} {m : Mach} {pc : Nat} (hp : m.pc = p
 
 /-- What compiled code looks like, found by position. -/
 structure Laid (C : List Byte) (p : SProg) : Prop where
-  size : C.length ≤ 3000
+  size : C.length ≤ 65360
   lui : fetchI C codeBase = some (.lui 7 0x20)
   body : At C startPc (genC p.body)
   res : At C (retPc p) (genE p.ret 0)
@@ -1524,7 +1524,7 @@ theorem genP_good {p : SProg} (hb : okC p.body = true) (hr : okE p.ret 0 = true)
   · subst hi; exact good_ecall
 
 theorem laid {p : SProg} (hb : okC p.body = true) (hr : okE p.ret 0 = true)
-    (hlen : 4 * (genP p).length ≤ 3000) : Laid (code (genP p)) p := by
+    (hlen : 4 * (genP p).length ≤ 65360) : Laid (code (genP p)) p := by
   have hat : At (code (genP p)) codeBase (genP p) := fun j hj => fetchI_code (genP_good hb hr) hj
   simp only [genP] at hat
   have atP := hat.left.left

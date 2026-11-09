@@ -261,7 +261,7 @@ theorem src_done (ret : SExpr) (n : Nat) (t : Slice.Slots.Slots) :
 /-! ## The machine is never ahead of the source -/
 
 /-- **`behind`**: at the same fuel, the machine's events are a prefix of the source's, its cost is bounded, and what it finishes the source has finished, alike. -/
-theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) (L : Nat) :
+theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) (L : Nat) :
     ∀ (m : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), Corr ks k → FS L k → FOk C k → Chain M.pc k r → Inv M t →
       (Slice.Rv.run C en m M).ev <+: (runS ret m ks t).ev ∧
       (Slice.Rv.run C en m M).cost ≤ L * (runS ret m ks t).cost + jc k + ((tailM ret r).length + 1) ∧
@@ -364,7 +364,7 @@ theorem jc_next {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots) : jc
   | _ => simp [nextK]
 
 /-- **`ahead`.** Induction on fuel and pending jumps together: a jump spends none of the source's fuel. -/
-theorem ahead {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) :
+theorem ahead {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) :
     ∀ (w n : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), 2 * n + jc k ≤ w → Corr ks k → FOk C k → Chain M.pc k r → Inv M t →
       (runS ret n ks t).out ≠ .fuel →
       ∃ m, (Slice.Rv.run C en m M).out = (runS ret n ks t).out ∧ (Slice.Rv.run C en m M).ev = (runS ret n ks t).ev := by
@@ -564,7 +564,7 @@ theorem view_mono (ret : SExpr) (f : Observer) : ∀ (m n : Nat) (ks : List SFra
         exact view_tickE he (ih n _ _ _ (by omega) (next_noSeq t hs) hr)
 
 /-- **`det`.** Two machines, in different environments, on what may be different inputs. If the source's two runs show the same at fuel `m`, the machines' do at fuel `m`. -/
-theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) (f : Observer) :
+theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) (f : Observer) :
     ∀ (m : Nat) (k : List TF) (ks : List SFrame) (t t' : Slice.Slots.Slots) (M M' : Mach), Corr ks k → Slots.NoSeqS ks → FOk C k →
       Chain M.pc k r → Chain M'.pc k r → Inv M t → Inv M' t' →
       (runS ret m ks t).view f = (runS ret m ks t').view f →
@@ -613,7 +613,7 @@ theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.l
 
 /-- **What the source has shown, the machine shows**, at some fuel, whether or not either finishes (RC-02). It replaces `fuel_ev`, which said that an
     unfinished source run has shown no event: an `emitB` makes that false. Induction on fuel and pending jumps together, as `ahead`. -/
-theorem catch_run {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) :
+theorem catch_run {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) :
     ∀ (w n : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), 2 * n + jc k ≤ w → Corr ks k → FOk C k →
       Chain M.pc k r → Inv M t → ∃ m, (runS ret n ks t).ev <+: (Slice.Rv.run C en m M).ev := by
   intro w
@@ -661,7 +661,7 @@ def genP (p : SProg) : List Insn :=
   [.lui 7 0x20] ++ genC p.body ++ genE p.ret 0 ++ [.add 10 8 0, .addi 17 0 (Int.ofNat 93), .ecall]
 
 def okP (p : SProg) : Bool :=
-  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 3000)
+  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65360)
 
 def startPc : Nat := codeBase + 4
 def retPc (p : SProg) : Nat := startPc + 4 * sC p.body
@@ -688,7 +688,7 @@ theorem genP_good {p : SProg} (hb : okC p.body = true) (hr : okE p.ret 0 = true)
   · subst hi; exact Slice.Lower.good_ecall
 
 structure Laid (C : List Byte) (p : SProg) : Prop where
-  size : C.length ≤ 3000
+  size : C.length ≤ 65360
   lui : fetchI C codeBase = some (.lui 7 0x20)
   body : At C startPc (genC p.body)
   tail : Tail C p.ret (retPc p)

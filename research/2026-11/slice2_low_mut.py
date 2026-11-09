@@ -14,6 +14,10 @@ CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
 M = [
+ # CAP-01: the caps lifted, each at its new edge (Slice2/Caps.lean)
+ ("fits allows one more local", 'LCore/Slice2/Slots.lean', "decide (128 + (uniq (allVars p)).length ≤ 256)", "decide (128 + (uniq (allVars p)).length ≤ 257)"),
+ ("uniq keeps duplicates", 'LCore/Slice2/Slots.lean', "  | x :: xs => x :: (uniq xs).filter (· ≠ x)", "  | x :: xs => x :: uniq xs"),
+ ("the image may be four bytes longer", 'LCore/Slice2/Pass.lean', "okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65360)", "okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65364)"),
  # RC-02 step 6: the budget's inputs, and byte stores
  ("a counter may be set from a written input", BUD, "def readIn (p : Prog) : List String := p.inputs.filter fun x => !(writtenB p.body).contains x",
   "def readIn (p : Prog) : List String := p.inputs"),
@@ -100,7 +104,7 @@ def build():
     """A resident-memory watchdog, not RLIMIT_AS: an address-space cap stops Lean creating threads, and every build then
     aborts with code 134 before checking a proof. That made the first run of this harness report 19 of 19 killed."""
     with tempfile.TemporaryFile('w+') as log:
-        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Bytes'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
+        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Bytes', 'LCore.Slice2.Caps'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
                              text=True, start_new_session=True)
         t0 = time.time()
         while p.poll() is None:
@@ -129,6 +133,9 @@ if rc != 0:
 print('baseline really compiled', flush=True)
 ERR = re.compile(r'^error: \S+\.lean:\d+')
 
+ONLY = os.environ.get('ONLY')
+if ONLY:
+    M = [m for m in M if m[0] in ONLY.split('|')]
 bad = 0
 for name, fn, old, new in M:
     path = os.path.join(WORK, fn)
