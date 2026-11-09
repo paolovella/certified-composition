@@ -21,6 +21,7 @@ def evars : Expr → List String
   | .var x => [x]
   | .add a b | .bin _ a b => evars a ++ evars b
   | .shr a _ => evars a
+  | .shl a _ => evars a
 
 def assigns : Cmd → List String
   | .assign x _ | .load x _ | .loadB x _ _ => [x]
@@ -125,6 +126,9 @@ theorem eval_agree {cs S : List String} {s s' : Store} (h : Agree cs S s s') : �
   | .shr a _, he => by
     simp only [evars] at he
     simp only [eval, eval_agree h a he]
+  | .shl a _, he => by
+    simp only [evars] at he
+    simp only [eval, eval_agree h a he]
 
 /-- An expression that reads only inputs is unchanged by a write to something that is not an input. -/
 theorem eval_upd_out {S : List String} {c : String} (hc : S.contains c = false) (s : Store) (v : W64) :
@@ -138,6 +142,9 @@ theorem eval_upd_out {S : List String} {c : String} (hc : S.contains c = false) 
     simp only [evars, List.all_append, Bool.and_eq_true] at he
     simp only [eval, eval_upd_out hc s v a he.1, eval_upd_out hc s v b he.2]
   | .shr a _, he => by
+    simp only [evars] at he
+    simp only [eval, eval_upd_out hc s v a he]
+  | .shl a _, he => by
     simp only [evars] at he
     simp only [eval, eval_upd_out hc s v a he]
 

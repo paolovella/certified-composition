@@ -180,6 +180,13 @@ MUTANTS = [
     ("jal links pc, not pc + 4", "x := m.set rd (W64.ofNat (m.pc + 4)) }", "x := m.set rd (W64.ofNat m.pc) }", False),
     ("jal: offset unsigned", "some (.jal (rdOf w) (sext 21", "some (.jal (rdOf w) (Int.ofNat", False),
     ("jal: imm bit 11 misplaced", "+ (w / 2 ^ 20 % 2) * 2 ^ 11 +", "+ (w / 2 ^ 20 % 2) * 2 ^ 12 +", False),
+    # W32-01 part 1: slli and sll
+    ("slli: shifts right", "x := m.set rd (W64.shl (m.get a) k) }", "x := m.set rd (W64.shr (m.get a) k) }", False),
+    ("slli: one short", "x := m.set rd (W64.shl (m.get a) k) }", "x := m.set rd (W64.shl (m.get a) (k - 1)) }", False),
+    ("slli: shamt 5 bits", "some (.slli (rdOf w) (rs1Of w) (w / 2 ^ 20 % 64))", "some (.slli (rdOf w) (rs1Of w) (w / 2 ^ 20 % 32))", False),
+    # Not masked at all, the model shifts by 2^64 - 1 at sll_amounts' last step, and Lean panics: a mask too wide is the runnable form
+    ("sll: amount masked to 7 bits", "(W64.shl (m.get a) ((m.get b).val % 64))", "(W64.shl (m.get a) ((m.get b).val % 128))", False),
+    ("sll: amount masked to 5 bits", "(W64.shl (m.get a) ((m.get b).val % 64))", "(W64.shl (m.get a) ((m.get b).val % 32))", False),
 ]
 
 def compare_all(d, gen):

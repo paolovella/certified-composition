@@ -125,6 +125,11 @@ def cases : List Case :=
   , ins "jal_forward" [.jal 0 8, .addi a0 0 9, .addi t0 0 1]
   , ins "jal_link" [.jal ra 8, .addi a0 0 9, .add a0 ra 0, .srli a0 a0 2]
   , ins "jal_backward" [.addi t0 0 3, .addi t0 t0 (-1), .addi a0 a0 2, .beq t0 0 8, .jal 0 (-12)]
+  -- W32-01 part 1: slli and sll, at the amounts 0, 1, 31, 32 and 63, with bits shifted out at the top
+  , ins "slli_edges" [.addi t0 0 (-1), .slli a0 t0 0, .slli s1 t0 63, .slli t1 t0 32, .addi t0 0 3, .slli t0 t0 31, .slli a0 t0 1]
+  , ins "slli_wide" [.ld t0 t2 0, .slli a0 t0 4, .slli s1 t0 33, .slli t1 t0 1] (inputWord 0xf123456789abcdef)
+  , ins "sll_amounts" [.ld t0 t2 0, .addi t1 0 1, .sll a0 t0 t1, .addi t1 0 31, .sll s1 t0 t1, .addi t1 0 32, .sll a0 t0 t1,
+      .addi t1 0 65, .sll s1 t0 t1, .addi t1 0 64, .sll a0 t0 t1, .addi t1 0 (-1), .sll s1 t0 t1] (inputWord 0x8000000180000003)
   , ins "jal_far" ([.jal 0 (4 * 1536)] ++ List.replicate 1535 (.addi a0 a0 1) ++ [.addi a0 0 5])
   , { name := "dev_compressed", deviates := true,
       body := code stub ++ le 2 0x4515 ++ le 2 0x0001 ++ code exit }

@@ -162,6 +162,20 @@ theorem good_srli {rd a k : Nat} (hd : rd < 32) (ha : a < 32) (hk : k < 64) : Go
   have h7 : W / 2 ^ 20 % 64 = k := by simp only [Nat.reducePow]; omega
   simp [decode, h1, h2, h3, h5, h6, h7]
 
+/-- **`slli` by a shift below 64** (W32-01). -/
+theorem good_slli {rd a k : Nat} (hd : rd < 32) (ha : a < 32) (hk : k < 64) : Good (.slli rd a k) := by
+  have hw : encode (.slli rd a k) = k * 1048576 + a * 32768 + 1 * 4096 + rd * 128 + 0x13 := rfl
+  refine ⟨?_, by rw [hw]; omega⟩
+  rw [hw]
+  generalize hW : k * 1048576 + a * 32768 + 1 * 4096 + rd * 128 + 0x13 = W
+  have h1 : W % 128 = 0x13 := by omega
+  have h2 : rdOf W = rd := by simp only [rdOf, Nat.reducePow]; omega
+  have h3 : rs1Of W = a := by simp only [rs1Of, Nat.reducePow]; omega
+  have h5 : f3Of W = 1 := by simp only [f3Of, Nat.reducePow]; omega
+  have h6 : W / 2 ^ 26 = 0 := by simp only [Nat.reducePow]; omega
+  have h7 : W / 2 ^ 20 % 64 = k := by simp only [Nat.reducePow]; omega
+  simp [decode, h1, h2, h3, h5, h6, h7]
+
 theorem good_ld {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (hi : i < 2048) :
     Good (.ld rd rs (Int.ofNat i)) := by
   have hw : encode (.ld rd rs (Int.ofNat i)) = i * 1048576 + rs * 32768 + 12288 + rd * 128 + 0x03 := by
@@ -460,12 +474,14 @@ def genE : SExpr → Nat → List Insn
   | .add a b, d => genE a d ++ genE b (d + 1) ++ [.add (8 + d) (8 + d) (8 + d + 1)]
   | .bin o a b, d => genE a d ++ genE b (d + 1) ++ [opInsn o (8 + d) (8 + d) (8 + d + 1)]
   | .shr a k, d => genE a d ++ [.srli (8 + d) (8 + d) k]
+  | .shl a k, d => genE a d ++ [.slli (8 + d) (8 + d) k]
 
 def sE : SExpr → Nat
   | .lit w => litLen w
   | .slot _ => 1
   | .add a b | .bin _ a b => sE a + sE b + 1
   | .shr a _ => sE a + 1
+  | .shl a _ => sE a + 1
 
 def sC : SCmd → Nat
   | .skip => 1
@@ -486,6 +502,7 @@ def okE : SExpr → Nat → Bool
   | .slot n, d => decide (n < wordsMax) && decide (d < 24)
   | .add a b, d | .bin _ a b, d => okE a d && okE b (d + 1) && decide (d + 1 < 24)
   | .shr a k, d => okE a d && decide (k < 64)
+  | .shl a k, d => okE a d && decide (k < 64)
 
 def okC : SCmd → Bool
   | .skip => true
@@ -498,6 +515,7 @@ theorem genE_length : ∀ (e : SExpr) (d : Nat), (genE e d).length = sE e
   | .slot _, _ => rfl
   | .add a b, d | .bin _ a b, d => by simp only [genE, sE, List.length_append, genE_length a, genE_length b]; rfl
   | .shr a _, d => by simp only [genE, sE, List.length_append, genE_length a]; rfl
+  | .shl a _, d => by simp only [genE, sE, List.length_append, genE_length a]; rfl
 
 theorem genC_length : ∀ c : SCmd, (genC c).length = sC c
   | .skip => rfl
@@ -518,6 +536,7 @@ theorem okE_depth : ∀ {e : SExpr} {d : Nat}, okE e d = true → d < 24
   | .lit _, _, h | .slot _, _, h => by simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h; exact h.2
   | .add a _, _, h | .bin _ a _, _, h => by simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h; omega
   | .shr a _, _, h => by simp only [okE, Bool.and_eq_true] at h; exact okE_depth h.1
+  | .shl a _, _, h => by simp only [okE, Bool.and_eq_true] at h; exact okE_depth h.1
 
 /-- **What a plan says**, from `litPlan` itself: a one-instruction plan is the old small case, and the others compute the literal on the
     machine's own functions, because `litPlan` checked that they do. -/
@@ -628,6 +647,13 @@ theorem genE_good : ∀ (e : SExpr) (d : Nat), okE e d = true → ∀ i ∈ genE
     · exact genE_good a d h.1 i hi
     · have hd : d < 24 := okE_depth h.1
       subst hi; exact good_srli (by omega) (by omega) h.2
+  | .shl a k, d, h, i, hi => by
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
+    simp only [genE, List.mem_append, List.mem_singleton] at hi
+    rcases hi with hi | hi
+    · exact genE_good a d h.1 i hi
+    · have hd : d < 24 := okE_depth h.1
+      subst hi; exact good_slli (by omega) (by omega) h.2
 
 theorem genC_good : ∀ c : SCmd, okC c = true → ∀ i ∈ genC c, Good i
   | .skip, _, i, hi => by
@@ -844,6 +870,7 @@ def mE : SExpr → Nat → List Micro
   | .slot n, pc => [(pc, [.addr (Int.ofNat (slotAddr n))])]
   | .add a b, pc | .bin _ a b, pc => mE a pc ++ mE b (pc + 4 * sE a) ++ [(pc + 4 * (sE a + sE b), [])]
   | .shr a _, pc => mE a pc ++ [(pc + 4 * sE a, [])]
+  | .shl a _, pc => mE a pc ++ [(pc + 4 * sE a, [])]
 
 /-- The list of instructions at `pc`. -/
 def At (C : List Byte) (pc : Nat) (L : List Insn) : Prop :=
@@ -1065,6 +1092,29 @@ theorem genE_exec {C : List Byte} {en : Env} : ∀ (e : SExpr) (d : Nat) (m : Ma
       rw [p₁]; exact this
     obtain ⟨w', hf, hd⟩ := fetchI_parts hat2
     have hs : Rv.step C en m₁ = .next [] { m₁ with pc := m₁.pc + 4, x := m₁.set (8 + d) (W64.shr (m₁.get (8 + d)) k) } := by
+      simp only [Rv.step, hf, hd]
+    have e₂ := Exec.step hs
+    refine ⟨_, e₁.trans (by rw [p₁] at e₂; exact e₂), ?_, ?_, ?_, ?_⟩
+    · simp only [sE]; omega
+    · simp only; rw [mem₁]
+    · rw [get_set (by omega)]
+      simp [evalS, v₁]
+    · intro y hy
+      rw [get_set (by omega)]
+      simp only [show y ≠ 8 + d by omega, ↓reduceIte]
+      rw [low₁ y hy]
+  | .shl a k, d, m, t, hok, hinv, hat => by
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at hok
+    obtain ⟨hoa, hk⟩ := hok
+    have hd24 : d < 24 := okE_depth hoa
+    simp only [genE] at hat
+    obtain ⟨m₁, e₁, p₁, mem₁, v₁, low₁⟩ := genE_exec a d m t hoa hinv hat.left
+    have hat2 : fetchI C m₁.pc = some (.slli (8 + d) (8 + d) k) := by
+      have := hat.right.head
+      simp only [List.length_append, genE_length] at this
+      rw [p₁]; exact this
+    obtain ⟨w', hf, hd⟩ := fetchI_parts hat2
+    have hs : Rv.step C en m₁ = .next [] { m₁ with pc := m₁.pc + 4, x := m₁.set (8 + d) (W64.shl (m₁.get (8 + d)) k) } := by
       simp only [Rv.step, hf, hd]
     have e₂ := Exec.step hs
     refine ⟨_, e₁.trans (by rw [p₁] at e₂; exact e₂), ?_, ?_, ?_, ?_⟩
@@ -1476,6 +1526,7 @@ theorem mE_length : ∀ (e : SExpr) (pc : Nat), (mE e pc).length = sE e
   | .slot _, _ => rfl
   | .add a b, pc | .bin _ a b, pc => by simp only [mE, sE, List.length_append, mE_length a, mE_length b]; rfl
   | .shr a _, pc => by simp only [mE, sE, List.length_append, mE_length a]; rfl
+  | .shl a _, pc => by simp only [mE, sE, List.length_append, mE_length a]; rfl
 
 /-- Every frame's command is at most `L` instructions. -/
 def FS (L : Nat) : List TF → Prop
