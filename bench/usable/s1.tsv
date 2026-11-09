@@ -1,0 +1,72 @@
+shape	size	image_bytes	theorem	kernel_ms	elab_ms	status	maxrss_kb
+verify	16	180	ok	40	44	ok	535680
+verify	16	180	ct	20	31	ok	535680
+verify	16	180	lit	66	75	ok	535680
+verify	16	180	pipe	0	2	ok	535680
+verify	16	180	bytes	0	2	ok	535680
+verify	16	180	counted	11	14	ok	535680
+verify	64	180	ok	82	99	ok	542036
+verify	64	180	ct	72	89	ok	542036
+verify	64	180	lit	79	91	ok	542036
+verify	64	180	pipe	0	2	ok	542036
+verify	64	180	bytes	0	2	ok	542036
+verify	64	180	counted	22	32	ok	542036
+line	10	324	ok	49	60	ok	545792
+line	10	324	ct	16	28	ok	545792
+line	10	324	lit	96	98	ok	545792
+line	10	324	pipe	0	2	ok	545792
+line	10	324	bytes	0	2	ok	545792
+line	30	804	ok	70	72	ok	569688
+line	30	804	ct	21	31	ok	569688
+line	30	804	lit	158	158	ok	569688
+line	30	804	pipe	0	2	ok	569688
+line	30	804	bytes	0	2	ok	569688
+line	100	-	pipeline	-	-	refused: ok false ct true fits false okP true	-
+line	100	2484	okP	116	107	ok	680664
+line	100	2484	ct	39	50	ok	680664
+line	100	2484	lit	415	385	ok	680664
+line	300	-	pipeline	-	-	refused: ok false ct true fits false okP false	-
+line	300	7284	okP	0	262	error: /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1/line300_kernel.lea	980140
+line	300	7284	ct	107	113	ok	980140
+line	300	7284	lit	1200	1060	ok	980140
+line	1000	-	pipeline	-	-	refused: ok false ct true fits false okP false	-
+line	1000	24084	okP	0	689	error: /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1/line1000_kernel.le	2112028
+line	1000	24084	ct	331	321	ok	2112028
+line	1000	24084	lit	3450	3070	ok	2112028
+line	3000	-	pipeline	-	-	refused: ok false ct true fits false okP false	-
+line	3000	72084	okP	2	2050	error: /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1/line3000_kernel.le	5396288
+line	3000	72084	ct	977	933	ok	5396288
+line	3000	72084	lit	11000	9130	ok	5396288
+loop	5	240	ok	40	48	ok	539936
+loop	5	240	ct	25	37	ok	539936
+loop	5	240	lit	72	83	ok	539936
+loop	5	240	pipe	0	2	ok	539936
+loop	5	240	bytes	0	2	ok	539936
+loop	5	240	counted	14	18	ok	539936
+loop	20	600	ok	61	73	ok	563072
+loop	20	600	ct	39	53	ok	563072
+loop	20	600	lit	116	130	ok	563072
+loop	20	600	pipe	0	2	ok	563072
+loop	20	600	bytes	0	2	ok	563072
+loop	20	600	counted	17	22	ok	563072
+loop	50	1320	ok	116	114	ok	615352
+loop	50	1320	ct	66	83	ok	615352
+loop	50	1320	lit	241	235	ok	615352
+loop	50	1320	pipe	0	2	ok	615352
+loop	50	1320	bytes	0	2	ok	615352
+loop	50	1320	counted	25	29	ok	615352
+loop	100	-	pipeline	-	-	refused: ok false ct true fits false okP true	-
+loop	100	2520	okP	137	132	ok	693164
+loop	100	2520	ct	120	129	ok	693164
+loop	100	2520	lit	523	388	ok	693164
+loop	100	2520	counted	32	39	ok	693164
+loop	150	-	pipeline	-	-	refused: ok false ct true fits false okP false	-
+loop	150	3720	okP	0	186	error: /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1/loop150_kernel.lea	774904
+loop	150	3720	ct	178	177	ok	774904
+loop	150	3720	lit	642	562	ok	774904
+loop	150	3720	counted	45	47	ok	774904
+loop	500	-	pipeline	-	-	refused: ok false ct true fits false okP false	-
+loop	500	12120	okP	0	88	error: /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1/loop500_kernel.lea	1359996
+loop	500	12120	ct	514	444	ok	1359996
+loop	500	12120	lit	1900	1620	ok	1359996
+loop	500	12120	counted	118	103	ok	1359996

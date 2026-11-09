@@ -1,0 +1,4 @@
+started: 2026-11-08T19:08:24+01:00
+head: 4394f4a
+command: bash -c cd l-core && python3 ../research/2026-11/usable/s1_run.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1 ../bench/usable/s1.tsv 1200 verify:8 verify:16 verify:32 verify:64 line:10 line:100 line:1000 line:3000 loop:5 loop:50 loop:150 loop:500
+log: tools/receipts/usable-s1.log

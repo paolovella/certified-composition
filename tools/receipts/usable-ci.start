@@ -1,0 +1,4 @@
+started: 2026-11-08T19:17:28+01:00
+head: 4394f4a
+command: bash tools/ci.sh
+log: tools/receipts/usable-ci.log
