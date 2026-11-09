@@ -1,0 +1,4 @@
+started: 2026-11-09T14:40:44+01:00
+head: 158f994
+command: bash tools/ci.sh
+log: tools/receipts/w32-ci.log

@@ -26,6 +26,7 @@ inductive SExpr where
   | add  : SExpr → SExpr → SExpr
   | bin  : Op → SExpr → SExpr → SExpr
   | shr  : SExpr → Nat → SExpr
+  | shl  : SExpr → Nat → SExpr
   deriving DecidableEq, Repr
 
 inductive SCmd where
@@ -50,6 +51,7 @@ def evalS : SExpr → Slots → W64
   | .add a b, t => W64.add (evalS a t) (evalS b t)
   | .bin o a b, t => o.w (evalS a t) (evalS b t)
   | .shr a k, t => W64.shr (evalS a t) k
+  | .shl a k, t => W64.shl (evalS a t) k
 
 abbrev SFrame := SCmd × List Nat
 
@@ -242,6 +244,7 @@ def evars : Expr → List String
   | .var x => [x]
   | .add a b | .bin _ a b => evars a ++ evars b
   | .shr a _ => evars a
+  | .shl a _ => evars a
 
 def cvars : Cmd → List String
   | .skip => []
@@ -304,6 +307,7 @@ def cE (p : Prog) : Expr → SExpr
   | .add a b => .add (cE p a) (cE p b)
   | .bin o a b => .bin o (cE p a) (cE p b)
   | .shr a k => .shr (cE p a) k
+  | .shl a k => .shl (cE p a) k
 
 def cC (p : Prog) : Cmd → SCmd
   | .skip => .skip
@@ -343,6 +347,9 @@ theorem evalS_cE {p : Prog} {s : Store} {t : Slots} (h : Rel p s t) :
     rw [evalS_cE h a (fun x hx => hv x (by simp [evars, hx])),
       evalS_cE h b (fun x hx => hv x (by simp [evars, hx]))]
   | .shr a _, hv => by
+    simp only [cE, evalS, eval]
+    rw [evalS_cE h a (fun x hx => hv x (by simp [evars, hx]))]
+  | .shl a _, hv => by
     simp only [cE, evalS, eval]
     rw [evalS_cE h a (fun x hx => hv x (by simp [evars, hx]))]
 

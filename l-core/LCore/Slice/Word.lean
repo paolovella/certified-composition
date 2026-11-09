@@ -30,6 +30,9 @@ def or (a b : W64) : W64 := ofNat (a.val ||| b.val)
 /-- Logical shift right by `k`, as RV64's `srli` (RC-01). -/
 def shr (a : W64) (k : Nat) : W64 := ofNat (a.val >>> k)
 
+/-- Shift left by `k`, the bits past 64 dropped, as RV64's `slli` (W32-01). -/
+def shl (a : W64) (k : Nat) : W64 := ofNat (a.val <<< k)
+
 /-- **It wraps**, so it is not addition on unbounded integers. -/
 theorem add_wraps : add (ofNat (2 ^ 64 - 1)) (ofNat 1) = ofNat 0 := by decide
 

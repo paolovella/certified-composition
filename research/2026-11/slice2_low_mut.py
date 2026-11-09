@@ -14,6 +14,12 @@ CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
 M = [
+ # W32-01 part 2: `e << k` (Slice2/Shl.lean)
+ ("a left shift moves one place too far", WRD, "def shl (a : W64) (k : Nat) : W64 := ofNat (a.val <<< k)", "def shl (a : W64) (k : Nat) : W64 := ofNat (a.val <<< (k + 1))"),
+ ("a left shift by 64 is accepted", OLD, "  | .shl a k, d => okE a d && decide (k < 64)\n", "  | .shl a k, d => okE a d && decide (k < 65)\n"),
+ ("a left shift is lowered to srli", OLD, "  | .shl a k, d => genE a d ++ [.slli (8 + d) (8 + d) k]", "  | .shl a k, d => genE a d ++ [.srli (8 + d) (8 + d) k]"),
+ ("the source reads << as >>", SRC, "  | .shl a k, s => W64.shl (eval a s) k", "  | .shl a k, s => W64.shr (eval a s) k"),
+ ("the taint rule forgets a left shift's operand", SRC, "  | .shl a _ => highE H a\n", "  | .shl _ _ => false\n"),
  # CAP-01 part 4b: long loops
  ("the long head's first jal lands short", LOW, "[.beq 8 0 (Int.ofNat 8), .jal 0 (Int.ofNat 8), .jal 0", "[.beq 8 0 (Int.ofNat 8), .jal 0 (Int.ofNat 4), .jal 0"),
  ("the long loop's exit lands one short", LOW, ".jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 2)))] ++ genC b", ".jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 1)))] ++ genC b"),
@@ -114,7 +120,7 @@ def build():
     """A resident-memory watchdog, not RLIMIT_AS: an address-space cap stops Lean creating threads, and every build then
     aborts with code 134 before checking a proof. That made the first run of this harness report 19 of 19 killed."""
     with tempfile.TemporaryFile('w+') as log:
-        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Bytes', 'LCore.Slice2.Caps'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
+        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Bytes', 'LCore.Slice2.Caps', 'LCore.Slice2.Shl'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
                              text=True, start_new_session=True)
         t0 = time.time()
         while p.poll() is None:

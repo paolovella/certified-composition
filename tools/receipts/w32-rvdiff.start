@@ -1,0 +1,4 @@
+started: 2026-11-09T14:12:15+01:00
+head: 158f994
+command: bash -c cd l-core && python3 test/rv_diff.py /tmp/claude-1000/-home-paolo-certified-composition-l-core/5c6dace1-3de6-5377-afed-d7b20dbdf59b/scratchpad/rvd
+log: tools/receipts/w32-rvdiff.log

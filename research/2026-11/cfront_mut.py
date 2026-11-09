@@ -18,7 +18,7 @@ M = [
  ("a missing define reads as 0", "    | none => none\n  | (.int, x) :: ps, .n k", "    | none => (bindArgs outer len defs ps as).map ((x, .lit 0) :: ·)\n  | (.int, x) :: ps, .n k"),
  ("the array length is not checked", "if F.inline || !(len == 8 || len == 16 || len == 32 || len == 64) ||", "if F.inline ||"),
  ("the inlined function need not be inline", "if !G.inline || G.name == F.name then none", "if G.name == F.name then none"),
- ("a shift may be 64 or more", "    if k < 64 then (rdE env loop a u).map", "    if true then (rdE env loop a u).map"),
+ ("a shift may be 64 or more", "  | .bin .shr a (.num k), u =>\n    if k < 64 then (rdE env loop a u).map", "  | .bin .shr a (.num k), u =>\n    if true then (rdE env loop a u).map"),
  ("the loop bound need not fit an int", "  | .num k => if k < 2 ^ 31 then some k else none\n  | .var x => match look env x with\n    | some (.lit k) => if k < 2 ^ 31", "  | .num k => some k\n  | .var x => match look env x with\n    | some (.lit k) => if true"),
  ("|= forgets the old value", "[.assign (str x) (.bin .or (.var (str x)) q.2.1)] ++ cs\n    | _ => none\n  | _ => none", "[.assign (str x) q.2.1] ++ cs\n    | _ => none\n  | _ => none"),
  ("the index is i + c, not N - c", "(.bin .sub (lit N) (.var \"c\"))", "(.add (lit N) (.var \"c\"))"),
@@ -38,16 +38,24 @@ M = [
  ("a written array is not emitted", "body := seqAll (cs ++ (F.params.filter (·.1 == .wptr)).map (fun p => .emitB (words p.2 len))),", "body := seqAll cs,"),
  ("+= reads as |=", "[.assign (str x) (.add (.var (str x)) q.2.1)] ++ cs", "[.assign (str x) (.bin .or (.var (str x)) q.2.1)] ++ cs"),
  ("+= lexes from + and = apart", "else if c == 43 && d == 61 then some .plusEq", ""),
+ # W32-01 part 2: `<<`. Its witnesses are Shl.lean's front-end section, compiled with the mutant.
+ ("<< lexes as two <", "  else if c == 60 && d == 60 then some .shl\n", ""),
+ ("<< binds tighter than +", "  | .sym .shl => if lvl == 3 then some .shl else none", "  | .sym .shl => if lvl == 4 then some .shl else none"),
+ ("<< reads as >>", "(q.1, .shl q.2.1 k, q.2.2)", "(q.1, .shr q.2.1 k, q.2.2)"),
+ ("a left shift may be 64 or more", "  | .bin .shl a (.num k), u =>\n    if k < 64 then", "  | .bin .shl a (.num k), u =>\n    if true then"),
  ("a word parameter without a stated value reads as 0", "    | some (_, k) => (bindD len defs ps).map ((x, .lit k) :: ·)\n    | none => none",
   "    | some (_, k) => (bindD len defs ps).map ((x, .lit k) :: ·)\n    | none => (bindD len defs ps).map ((x, .lit 0) :: ·)"),
 ]
 # Add.lean's witnesses of the direct entry, after the mutated front end, in one file: imports first, then both bodies.
 add = open('LCore/Slice2/Add.lean').read()
 add_body = add[add.index('namespace LCore.Slice2.Add'):]
+# W32-01: Shl.lean's front-end witnesses, in a namespace of their own.
+shl = open('LCore/Slice2/Shl.lean').read()
+shl_front = 'namespace LCore.Slice2.ShlF\n' + shl[shl.index('section Front'):shl.index('end Front')] + 'end Front\nend LCore.Slice2.ShlF\n'
 def combined(front):
     head, rest = front.split('namespace LCore.Slice2.CFront', 1)
     return head.replace('import LCore.Slice2.CSrc', 'import LCore.Slice2.CSrc\nimport LCore.Slice2.CTOut') + \
-        'namespace LCore.Slice2.CFront' + rest + '\n' + add_body
+        'namespace LCore.Slice2.CFront' + rest + '\n' + add_body + '\n' + shl_front
 # Vacuity: the unmutated copy must build clean, or every mutant counts as killed for nothing.
 p0 = sys.argv[1] + '/MutF.lean'
 open(p0, 'w').write(combined(src))

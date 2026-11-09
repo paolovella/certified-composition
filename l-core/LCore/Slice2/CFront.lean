@@ -6,7 +6,7 @@
 
   1. `lex`: characters to tokens. Hex and suffixes other than `U` are refused.
   2. `pFuns`: a recursive-descent parser, into a small syntax tree: functions, declarations, the counted `for`, `|=`, `return`, and the
-     operators `| ^ & >> + -` with C's precedence, array reads, casts, and calls with plain arguments.
+     operators `| ^ & >> << + -` with C's precedence, array reads, casts, and calls with plain arguments.
   3. `readC`: the entry function must be `return g(args);` for a `static inline` `g` in the same text, which is read by substitution. Then:
      - a `const unsigned char *` parameter of the stated length is a byte array, named by the entry's parameter, and a local pointer
        initialised from one, through a qualifier-only cast, is the same array;
@@ -33,6 +33,8 @@ open Ops (lit)
 
 inductive P where
   | lp | rp | lb | rb | lc | rc | semi | comma | star | eq | orEq | caret | amp | bar | minus | plus | lt | inc | shr
+  /-- `<<` (W32-01). -/
+  | shl
   /-- `+=` and `>>=` (RC-02), each one token, so `+ =` is not read as `+=`. -/
   | plusEq | shrEq
   /-- Lexed, so that the text is read, and read by no rule: `/ ! > # % != ==`. -/
@@ -61,6 +63,7 @@ def sym1 (c : Nat) : Option P :=
 def sym2 (c d : Nat) : Option P :=
   if c == 124 && d == 61 then some .orEq else if c == 43 && d == 43 then some .inc else if c == 43 && d == 61 then some .plusEq
   else if c == 62 && d == 62 then some .shr
+  else if c == 60 && d == 60 then some .shl
   else if (c == 33 || c == 61) && d == 61 then some .other else none
 
 def spanW (p : Nat → Bool) : List Nat → List Nat × List Nat
@@ -136,7 +139,7 @@ inductive Ty where
   deriving DecidableEq
 
 inductive COp where
-  | or | xor | and | shr | add | sub
+  | or | xor | and | shr | shl | add | sub
   deriving DecidableEq
 
 inductive CArg where
@@ -195,13 +198,14 @@ def classify (ws : List (List Nat)) (stars : Nat) (cst : Bool) : Option Ty :=
   else if stars == 0 && ws == [kUnsigned, kChar] then some .byte
   else none
 
-/-- C's binary operators by level, loosest first: `|`, `^`, `&`, `>>`, `+ -`. -/
+/-- C's binary operators by level, loosest first: `|`, `^`, `&`, `>> <<`, `+ -`. -/
 def opAt (lvl : Nat) (t : Tok) : Option COp :=
   match t with
   | .sym .bar => if lvl == 0 then some .or else none
   | .sym .caret => if lvl == 1 then some .xor else none
   | .sym .amp => if lvl == 2 then some .and else none
   | .sym .shr => if lvl == 3 then some .shr else none
+  | .sym .shl => if lvl == 3 then some .shl else none
   | .sym .plus => if lvl == 4 then some .add else none
   | .sym .minus => if lvl == 4 then some .sub else none
   | _ => none
@@ -369,6 +373,9 @@ def rdE (env : Env) (loop : Option (List Nat × Nat)) : CE → List (List Nat) �
   | .bin .shr a (.num k), u =>
     if k < 64 then (rdE env loop a u).map fun q => (q.1, .shr q.2.1 k, q.2.2) else none
   | .bin .shr _ _, _ => none
+  | .bin .shl a (.num k), u =>
+    if k < 64 then (rdE env loop a u).map fun q => (q.1, .shl q.2.1 k, q.2.2) else none
+  | .bin .shl _ _, _ => none
   | .bin o a b, u =>
     (rdE env loop a u).bind fun qa => (rdE env loop b qa.2.2).bind fun qb =>
       let e := match o with
@@ -377,7 +384,7 @@ def rdE (env : Env) (loop : Option (List Nat × Nat)) : CE → List (List Nat) �
         | .and => some (.bin .and qa.2.1 qb.2.1)
         | .sub => some (.bin .sub qa.2.1 qb.2.1)
         | .add => some (.add qa.2.1 qb.2.1)
-        | .shr => none
+        | .shr | .shl => none
       e.map fun e => (qa.1 ++ qb.1, e, qb.2.2)
   -- RC-02 (RC-02-READING section 3): a cast to a word is the identity on these values, and one to `unsigned char` keeps the low byte.
   | .cast .word e, u => rdE env loop e u

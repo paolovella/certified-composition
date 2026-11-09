@@ -275,6 +275,7 @@ def cE (p : Prog) : Expr → SExpr
   | .add a b => .add (cE p a) (cE p b)
   | .bin o a b => .bin o (cE p a) (cE p b)
   | .shr a k => .shr (cE p a) k
+  | .shl a k => .shl (cE p a) k
 
 def cC (p : Prog) : Cmd → SCmd
   | .skip => .skip
@@ -322,6 +323,9 @@ theorem evalS_cE {p : Prog} {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) 
     rw [evalS_cE h x (fun v hx => hv v (by simp [evars, hx])),
       evalS_cE h y (fun v hx => hv v (by simp [evars, hx]))]
   | .shr x _, hv => by
+    simp only [cE, evalS, eval]
+    rw [evalS_cE h x (fun v hx => hv v (by simp [evars, hx]))]
+  | .shl x _, hv => by
     simp only [cE, evalS, eval]
     rw [evalS_cE h x (fun v hx => hv v (by simp [evars, hx]))]
 
