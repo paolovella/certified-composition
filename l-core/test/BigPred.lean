@@ -15,9 +15,14 @@ def stmt (j : Nat) : LCore.Slice2.Cmd :=
 def big (n : Nat) : LCore.Slice2.Prog :=
   { inputs := ["x0", "x1", "x2", "x3"], body := LCore.Slice2.Caps.seqAll ((List.range n).map stmt), ret := .var "t0" }
 
+/-- A counted loop of 3 rounds over a 300-statement body: past `beq`'s reach, so the long form (CAP-01 4b). -/
+def bigLoop : LCore.Slice2.Prog :=
+  { inputs := ["x0", "x1", "x2", "x3"],
+    body := LCore.Slice2.For.forN "c" (.lit (W64.ofNat 3)) (LCore.Slice2.Caps.seqAll ((List.range 300).map stmt)), ret := .var "t0" }
+
 def main (args : List String) : IO Unit := do
   let dir := args.headD "."
-  let p := big 300
+  let p := if args.getD 1 "" == "loop" then bigLoop else big 300
   let img := code (genP (compile p))
   let w : Nat → W64 := fun k => W64.ofNat ([0x0123456789abcdef, 0xfedcba9876543210, 0x5555aaaa5555aaaa, 0x0f0f0f0f0f0f0f0f].getD k 0)
   let d := Slice.Slots.encBytes w

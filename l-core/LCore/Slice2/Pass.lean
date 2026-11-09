@@ -74,7 +74,9 @@ theorem Corr.next {ks : List SFrame} {k : List TF} (h : Corr ks k) (c : SCmd) (q
   | loop e b =>
     simp only [nextS, nextK]
     split
-    · exact Corr.push _ _ _ (Corr.jmp (Corr.cmd h))
+    · split
+      · exact Corr.push _ _ _ (Corr.jmp (Corr.cmd h))
+      · exact Corr.push _ _ _ (Corr.jmp (Corr.cmd h))
     · exact h
   | _ => exact h
 
@@ -131,7 +133,9 @@ def stepC : SCmd → Nat
   | .skip => 1
   | .set _ e => sE e + 1
   | .seq _ _ => 0
-  | .ite e _ _ | .loop e _ => sE e + 2
+  | .ite e _ _ => sE e + 2
+  -- CAP-01 4b: the long loop's head is one instruction longer
+  | .loop e b => if shortLoop e b then sE e + 2 else sE e + 3
   | .load _ e => sE e + 7
   | .loadB _ _ e => sE e + 4
   | .store e v => sE e + 5 + sE v + 1
@@ -142,7 +146,7 @@ def stepC : SCmd → Nat
 def stepMax : SCmd → Nat
   | .seq a b => max (stepMax a) (stepMax b)
   | .ite e a b => max (sE e + 2) (max (stepMax a) (stepMax b))
-  | .loop e b => max (sE e + 2) (stepMax b)
+  | .loop e b => max (stepC (.loop e b)) (stepMax b)
   -- Every other constructor is listed, not caught by `| c => _`: a match with overlapping patterns compiles through `propext`, and this
   -- definition is axiom-free without it (the manifest gate caught it, PR #21).
   | .skip => stepC .skip
@@ -194,7 +198,9 @@ theorem next_fs {L : Nat} {c : SCmd} {pc : Nat} {k : List TF} (t : Slice.Slots.S
     simp only [stepMax] at hc
     simp only [nextK]
     split
-    · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
+    · split
+      · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
+      · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
     · exact hk
   | _ => exact hk
 
@@ -216,12 +222,21 @@ theorem chunk_length {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots)
       · rw [jc_push]; simp only [jc]; omega
       · rw [jc_push]; omega
   | loop e b =>
-    simp only [chunkC, nextK, stepC, List.length_append, mE_length, List.length_cons, List.length_nil]
-    constructor
-    · omega
-    · split
-      · rw [jc_push]; simp only [jc]; omega
+    simp only [chunkC, nextK, stepC]
+    by_cases hs : shortLoop e b = true
+    · simp only [hs, ↓reduceIte, List.length_append, mE_length, List.length_cons, List.length_nil]
+      constructor
       · omega
+      · split
+        · rw [jc_push]; simp only [jc]; omega
+        · omega
+    · have hs' : shortLoop e b = false := by simpa using hs
+      simp only [hs', Bool.false_eq_true, ↓reduceIte, List.length_append, mE_length, List.length_cons, List.length_nil]
+      constructor
+      · omega
+      · split
+        · rw [jc_push]; simp only [jc]; omega
+        · omega
   | load x e => simp [chunkC, nextK, stepC, mIdx_length]
   | store e v => simp [chunkC, nextK, stepC, mIdx_length, mE_length]; omega
   | storeB ws e v => simp [chunkC, nextK, stepC, mE_length]; omega
@@ -359,7 +374,9 @@ theorem jc_next {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots) : jc
   | loop e b =>
     simp only [nextK]
     split
-    · rw [jc_push]; simp only [jc]; omega
+    · split
+      · rw [jc_push]; simp only [jc]; omega
+      · rw [jc_push]; simp only [jc]; omega
     · omega
   | _ => simp [nextK]
 
@@ -501,7 +518,8 @@ theorem same_step {c : SCmd} {t t' : Slice.Slots.Slots} (h : lkOf c t = lkOf c t
     · simp only [nextS, hg]
   | loop e b =>
     have hg := guard_same h
-    refine ⟨rfl, ?_, ?_⟩
+    refine ⟨?_, ?_, ?_⟩
+    · simp only [chunkC, hg]
     · simp only [nextK, hg]
     · simp only [nextS, hg]
   | load x e =>

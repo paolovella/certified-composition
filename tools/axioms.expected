@@ -4902,10 +4902,12 @@ LCore.Slice2.CTBytes.verify16_counted	LCore.Slice2.CTBytes	propext
 LCore.Slice2.CTBytes.verify16_ct_bytes	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
 LCore.Slice2.CTBytes.verify16_is_literal	LCore.Slice2.CTBytes	propext
 LCore.Slice2.CTBytes.verify16_pipeline	LCore.Slice2.CTBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.Caps.bigLoop	LCore.Slice2.Caps	
 LCore.Slice2.Caps.bigS	LCore.Slice2.Caps	
 LCore.Slice2.Caps.bigS_okP	LCore.Slice2.Caps	Classical.choice,Quot.sound,propext
 LCore.Slice2.Caps.chain	LCore.Slice2.Caps	
 LCore.Slice2.Caps.image_edge	LCore.Slice2.Caps	Classical.choice,Quot.sound,propext
+LCore.Slice2.Caps.long_loop_accepted	LCore.Slice2.Caps	Quot.sound,propext
 LCore.Slice2.Caps.manyOcc	LCore.Slice2.Caps	
 LCore.Slice2.Caps.manyOcc_fits	LCore.Slice2.Caps	
 LCore.Slice2.Caps.naive_split_refused	LCore.Slice2.Caps	
@@ -5107,6 +5109,7 @@ LCore.Slice2.Lower.guard_same	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.idx_exec	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.inv_store	LCore.Slice2.Lower	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.inv_storeB	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.jalOk	LCore.Slice2.Lower	
 LCore.Slice2.Lower.jc	LCore.Slice2.Pass	
 LCore.Slice2.Lower.jc_next	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.jc_push	LCore.Slice2.Pass	propext
@@ -5121,6 +5124,7 @@ LCore.Slice2.Lower.laid	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.lkOf	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.lkOf_length	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.load8_byte	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.longOk	LCore.Slice2.Lower	
 LCore.Slice2.Lower.mIdx	LCore.Slice2.Lower	
 LCore.Slice2.Lower.mIdx_length	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.maskOK	LCore.Slice2.Lower	
@@ -5146,7 +5150,9 @@ LCore.Slice2.Lower.push_fs	LCore.Slice2.Pass	Quot.sound,propext
 LCore.Slice2.Lower.retPc	LCore.Slice2.Pass	
 LCore.Slice2.Lower.rvPass	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.sC	LCore.Slice2.Lower	
+LCore.Slice2.Lower.sC_loop	LCore.Slice2.Lower	
 LCore.Slice2.Lower.same_step	LCore.Slice2.Pass	propext
+LCore.Slice2.Lower.shortLoop	LCore.Slice2.Lower	
 LCore.Slice2.Lower.slice_carries	LCore.Slice2.Pass	Classical.choice,Quot.sound,propext
 LCore.Slice2.Lower.src_done	LCore.Slice2.Pass	propext
 LCore.Slice2.Lower.src_nil	LCore.Slice2.Pass	propext
@@ -5160,6 +5166,7 @@ LCore.Slice2.Lower.step_add	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_addi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_andi	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_beq	LCore.Slice2.Lower	Quot.sound,propext
+LCore.Slice2.Lower.step_jal0	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_lbu	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_ld	LCore.Slice2.Lower	Quot.sound,propext
 LCore.Slice2.Lower.step_sb	LCore.Slice2.Lower	Quot.sound,propext

@@ -138,12 +138,28 @@ def sC : SCmd → Nat
   | .set _ e => sE e + 1
   | .seq a b => sC a + sC b
   | .ite e a b => sE e + 1 + sC a + 1 + sC b
-  | .loop e b => sE e + 1 + sC b + 1
+  | .loop e b =>
+    -- CAP-01 4b: a body past `beq`'s reach takes the long form, three instructions at the head and a `jal` back
+    if decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024) then sE e + 1 + sC b + 1 else sE e + 3 + sC b + 1
   | .load _ e => sE e + 5 + 2
   | .loadB _ _ e => sE e + 4
   | .store e v => sE e + 5 + sE v + 1
   | .storeB _ e v => sE e + 2 + sE v + 1
   | .emitB _ => 5
+
+/-- **Does a loop take the short form**, a `beq` each way: its body and its back edge within `beq`'s ±4 KB. -/
+def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)
+
+theorem sC_loop (e : SExpr) (b : SCmd) :
+    sC (.loop e b) = if shortLoop e b then sE e + 1 + sC b + 1 else sE e + 3 + sC b + 1 := rfl
+
+/-- **A `jal x0, i` that decodes to itself**, checked per program by `decide`, as `litPlan` checks literals (CAP-01). -/
+def jalOk (i : Int) : Bool :=
+  decide (decode (encode (.jal 0 i)) = some (.jal 0 i)) && decide (encode (.jal 0 i) < 4294967296)
+
+/-- The long loop's three jumps: over the far jump, to the exit, and back to the head. -/
+def longOk (e : SExpr) (b : SCmd) : Bool :=
+  jalOk (Int.ofNat 8) && jalOk (Int.ofNat (4 * (sC b + 2))) && jalOk (-(Int.ofNat (4 * (sE e + 3 + sC b))))
 
 /-- The masked index's address, in `x8`. -/
 def genIdx (e : SExpr) : List Insn :=
@@ -156,7 +172,11 @@ def genC : SCmd → List Insn
   | .ite e a b =>
     genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC a + 2)))] ++ genC a ++ [.beq 0 0 (Int.ofNat (4 * (sC b + 1)))] ++ genC b
   | .loop e b =>
-    genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC b + 2)))] ++ genC b ++ [.beq 0 0 (-(Int.ofNat (4 * (sE e + 1 + sC b))))]
+    if shortLoop e b then
+      genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC b + 2)))] ++ genC b ++ [.beq 0 0 (-(Int.ofNat (4 * (sE e + 1 + sC b))))]
+    else
+      genE e 0 ++ [.beq 8 0 (Int.ofNat 8), .jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 2)))] ++ genC b ++
+        [.jal 0 (-(Int.ofNat (4 * (sE e + 3 + sC b))))]
   | .load x e => genIdx e ++ [.ld 8 8 (Int.ofNat 512), .sd 8 7 (Int.ofNat (8 * x))]
   | .loadB x ws e =>
     genE e 0 ++ [.andi 8 8 (Int.ofNat (8 * ws.length - 1)), .add 8 8 7, .lbu 8 8 (Int.ofNat (8 * ws.headD 0)), .sd 8 7 (Int.ofNat (8 * x))]
@@ -174,7 +194,7 @@ def okC : SCmd → Bool
   | .set n e => decide (n < wordsMax) && okE e 0
   | .seq a b => okC a && okC b
   | .ite e a b => okE e 0 && okC a && okC b && decide (sC a + 2 < 1024) && decide (sC b + 1 < 1024)
-  | .loop e b => okE e 0 && okC b && decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)
+  | .loop e b => okE e 0 && okC b && (shortLoop e b || longOk e b)
   | .load x e => decide (x < wordsMax) && okE e 0
   | .loadB x ws e => decide (x < wordsMax) && okE e 0 && decide (ws = List.range' (ws.headD 0) ws.length) && maskOK ws.length &&
       decide (ws.headD 0 + ws.length ≤ 64)
@@ -192,7 +212,12 @@ theorem genC_length : ∀ c : SCmd, (genC c).length = sC c
   | .set n e => by simp only [genC, sC, List.length_append, genE_length]; rfl
   | .seq a b => by simp only [genC, sC, List.length_append, genC_length a, genC_length b]
   | .ite e a b => by simp only [genC, sC, List.length_append, genE_length, genC_length a, genC_length b]; rfl
-  | .loop e b => by simp only [genC, sC, List.length_append, genE_length, genC_length b]; rfl
+  | .loop e b => by
+    rw [sC_loop]
+    simp only [genC]
+    split
+    · simp only [List.length_append, genE_length, genC_length b]; rfl
+    · simp only [List.length_append, genE_length, genC_length b, List.length_cons, List.length_nil]
   | .load x e => by simp only [genC, sC, List.length_append, genIdx_length]; rfl
   | .loadB x ws e => by simp only [genC, sC, List.length_append, genE_length, List.length_cons, List.length_nil]
   | .store e v => by simp only [genC, sC, List.length_append, genIdx_length, genE_length]; rfl
@@ -235,15 +260,38 @@ theorem genC_good : ∀ c : SCmd, okC c = true → ∀ i ∈ genC c, Good i
     · subst hi; exact good_beq (by omega) (by omega) (by omega) (by omega)
     · exact genC_good b h3 i hi
   | .loop e b, h, i, hi => by
-    simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at h
-    simp only [genC, List.mem_append, List.mem_singleton] at hi
-    obtain ⟨⟨⟨h1, h2⟩, h3⟩, h4⟩ := h
-    rcases hi with ((hi | hi) | hi) | hi
-    · exact genE_good e 0 h1 i hi
-    · subst hi; exact good_beq (by omega) (by omega) (by omega) (by omega)
-    · exact genC_good b h2 i hi
-    · subst hi
-      exact good_beq_back (by omega) (by omega) (by omega) (by omega) (by omega)
+    simp only [okC, Bool.and_eq_true, Bool.or_eq_true] at h
+    obtain ⟨⟨h1, h2⟩, h34⟩ := h
+    simp only [genC] at hi
+    split at hi
+    · rename_i hs
+      simp only [shortLoop, Bool.and_eq_true, decide_eq_true_eq] at hs
+      simp only [List.mem_append, List.mem_singleton] at hi
+      rcases hi with ((hi | hi) | hi) | hi
+      · exact genE_good e 0 h1 i hi
+      · subst hi; exact good_beq (by omega) (by omega) (by omega) (by omega)
+      · exact genC_good b h2 i hi
+      · subst hi
+        exact good_beq_back (by omega) (by omega) (by omega) (by omega) (by omega)
+    · rename_i hs
+      have hl : longOk e b = true := by
+        rcases h34 with h | h
+        · exact absurd h hs
+        · exact h
+      have jal_good : ∀ j : Int, jalOk j = true → Good (.jal 0 j) := by
+        intro j hj
+        simp only [jalOk, Bool.and_eq_true] at hj
+        exact ⟨of_decide_eq_true hj.1, of_decide_eq_true hj.2⟩
+      simp only [longOk, Bool.and_eq_true] at hl
+      obtain ⟨⟨k1, k2⟩, k3⟩ := hl
+      simp only [List.mem_append, List.mem_cons, List.not_mem_nil, or_false] at hi
+      rcases hi with ((hi | hi | hi | hi) | hi) | hi
+      · exact genE_good e 0 h1 i hi
+      · subst hi; exact good_beq (by omega) (by omega) (by omega) (by omega)
+      · subst hi; exact jal_good _ k1
+      · subst hi; exact jal_good _ k2
+      · exact genC_good b h2 i hi
+      · subst hi; exact jal_good _ k3
   | .load x e, h, i, hi => by
     simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at h
     have hm : wordsMax = 256 := rfl
@@ -689,6 +737,13 @@ theorem exec_store {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots}
   have hpc : m₂.pc = m.pc + 4 * (sE e + 5) + 4 * sE v := by rw [p₂, p₁]
   refine ⟨_, ((e₁.trans e₂').trans (Exec.stepAt s₃ hpc)), ?_, hI⟩
   simp only [hpc]; omega
+
+/-- A `jal x0, i`: a jump, no link (CAP-01 4b). -/
+theorem step_jal0 {C : List Byte} {en : Env} {m : Mach} {i : Int} (h : fetchI C m.pc = some (.jal 0 i)) :
+    Slice.Rv.step C en m = .next [] { m with pc := addImm (W64.ofNat m.pc) i } := by
+  obtain ⟨w, hf, hd⟩ := fetchI_parts h
+  simp only [Slice.Rv.step, hf, hd]
+  rfl
 
 /-- **A guard and its branch**: forward if the guard is zero. -/
 theorem exec_guard {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {e : SExpr} {off : Nat}

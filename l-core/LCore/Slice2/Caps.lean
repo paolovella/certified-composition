@@ -10,6 +10,8 @@
   3. **Literals past 12 bits**: `lui` and `addi` for a signed 32-bit value, and those and a `srli` for one shifted right. The compiler keeps
      a plan only if the machine's own functions compute the literal from it (`Slice.Lower.litPlan`), so an RV64 edge where the naive split
      is wrong is refused, not miscompiled.
+  4. **Loops whose body is past `beq`'s ±4 KB** take a long form: `beq x8,x0,+8; jal x0,+8; jal x0,exit` at the head and a `jal` back,
+     each `jal` checked by `decide` to decode to itself (`Lower.longOk`). Short loops keep their form, so no image changes.
 -/
 import LCore.Slice2.OnMachine
 import LCore.Slice2.Pass
@@ -107,5 +109,25 @@ theorem target_literals :
 theorem naive_split_refused :
     pairVal (pairOf (sint (W64.ofNat 0x7ffff800))).1 (pairOf (sint (W64.ofNat 0x7ffff800))).2 = W64.ofNat 0xffffffff7ffff800 ∧
     litPlan (W64.ofNat 0x7ffff800) = none := by decide
+
+/-! ## Long loops -/
+
+open Lower (shortLoop longOk)
+
+/-- A loop over `n` copies of the two-instruction statement, guarded by slot 128. -/
+def bigLoop (n : Nat) : Slots.SProg := { body := .loop (.slot 128) (rep n), ret := .lit (W64.ofNat 0) }
+
+/-- **A body of 1201 instructions, past `beq`'s reach, is accepted, in the long form.** Proved from the length lemmas, with no image built. -/
+theorem long_loop_accepted : shortLoop (.slot 128) (rep 600) = false ∧ longOk (.slot 128) (rep 600) = true ∧ okP (bigLoop 600) = true := by
+  have hs : sC (rep 600) = 1201 := rep_sC 600
+  have he : Slice.Lower.sE (.slot 128) = 1 := rfl
+  refine ⟨?_, ?_, ?_⟩
+  · simp only [shortLoop, hs, he]; decide
+  · simp only [longOk, hs, he]; decide
+  · have hl : longOk (.slot 128) (rep 600) = true := by simp only [longOk, hs, he]; decide
+    have hsl : shortLoop (.slot 128) (rep 600) = false := by simp only [shortLoop, hs, he]; decide
+    have hlen : sC (.loop (.slot 128) (rep 600)) = 1206 := by rw [Lower.sC_loop, hsl, hs, he]; rfl
+    simp only [okP, bigLoop, Lower.genP_length, hlen, okC, rep_okC, hl, Bool.or_true, Bool.and_true, Bool.true_and]
+    decide
 
 end LCore.Slice2.Caps

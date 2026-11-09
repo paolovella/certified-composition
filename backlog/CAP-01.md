@@ -7,7 +7,7 @@ deps: [RC-02]
 closes: ['S-USABLE §1: the pipeline refuses 100 straight-line statements, by caps that are proof constants or bookkeeping']
 acceptance: line:300 and loop:150 from research/2026-11/usable/s1_gen.py compile and carry relView to their literal images; 0x61707865 and 0x7ffffffffffff are accepted literals; a branch arm of 2,000 instructions is accepted; every existing literal image (VS-1, VS-2, BOUND-01, RC-01) is byte-for-byte unchanged
 kill: if the 3,000-byte bound cannot be raised without a kernel change, stop and report
-status: in-progress
+status: done
 ---
 
 ## Plan
@@ -82,3 +82,28 @@ Riskiest first: 2, since it touches the pass proofs' hypotheses.
   - **A harness limit fixed.** `rv_diff.py`'s `word_at` read instructions only from the ELF's first 0x1000 bytes, so a load past them would have had its address left unchecked. It reads the whole image now.
   - **A change to 4c's plan.** The lowering's `jal` encodings will be checked per program by `okC`, by `decide` on `decode (encode i) = some i`, as part 3 did for literals. That replaces a bit-level `good_jal` lemma.
 - 2026-11-09, **4a's CI.** The first run was green but for `conf-typing builds` at 16 s, `CI-02` (receipt `cap01-ci5`). The rerun is green on all 28 steps (receipt `cap01-ci6`).
+- 2026-11-09, **4b's scope, narrowed before code: loops only.** HChaCha20 needs a long loop body, its 10-round loop, and no long `if` arm. A long `if` follows when a target needs one; the `if` arm limit of 1023 instructions stays, with its witnesses.
+  - The long loop: `genE e; beq x8,x0,+8; jal x0,+8; jal x0,exit; …body…; jal x0,head`.
+  - The short form is still used whenever it fits, so no image changes. `okC` checks, by `decide`, that the three `jal`s decode to themselves.
+- 2026-11-09, **4b and 4c done: long loops** (`Slice2/{Lower,Chunk,Pass}.lean`).
+  - **The code.** A body past `beq`'s reach takes `genE e; beq x8,x0,+8; jal x0,+8; jal x0,exit; …body…; jal x0,head`. `shortLoop` keeps every existing loop in its old form, so **no image changes**.
+  - **The checks.** `okC` accepts the long form only if `longOk`'s three `jal`s decode to themselves, by `decide` (`jalOk`). `genC_good` uses that check in place of a bit-level lemma.
+  - **The proofs.**
+    - `exec_loop` has both forms. In the long one, `exec_guard` runs with offset 8, and one `jal` step reaches the body or the exit.
+    - A jump frame (`TF.jmp`) may be a `jal x0` as well as a `beq x0, x0`, through `exec_jmp` and `step_jal0`.
+    - `stepC` of a long loop is one larger, `sE e + 3`. `Corr.next`, `next_fs`, `chunk_length`, `jc_next` and `same_step` gain the case.
+    - Ring 0 is untouched.
+  - **Witness:** `long_loop_accepted`, a body of 1201 instructions. The short form does not apply, `longOk` holds, and `okP` accepts it, proved from the length lemmas.
+    - The refusal side of `longOk` cannot be reached inside the image cap: a `jal` reaches ±1 MB, and an image may be 65360 bytes. The image cap refuses first, as `image_edge` shows.
+  - **QEMU** (`big_diff.py`, receipt `cap01-bigdiff2`): a 3-round loop over a 300-statement body, 7264 bytes, with 3 `jal`s in its image. QEMU exits 108 in 5434 instructions, as the model does. Lean's ELF and the Python writer's agree.
+  - **Mutants** (receipt `cap01-lowmut-loop`): 5 new, all killed. A `jal` short at the head, the exit and the back edge each one short, the short form reaching one further, and an unchecked `jal`.
+    - Two of them die on Lean's recursion limit while it unifies the changed instruction lists, not on a clean type error. That is still a refusal, as with the one RC-01 step 2b recorded.
+  - **Not done, by the narrowed scope:** long `if` arms. Their limit of 1023 instructions stays.
+- 2026-11-09, **part 4's full mutant run** (receipt `cap01-lowmut-all`): 81, all killed, every anchor unique.
+  - 4b moved six older anchors: the loop's exit, its two size rules, the literal rule, and the loop's step charge in `stepC` and `stepMax`. The script's uniqueness assert refused to run until each was moved to the text that now holds its rule.
+- 2026-11-09, **part 4's CI.** The first run was green but for `conf-typing builds` at 16 s, `CI-02` (receipt `cap01-ci7`). The rerun is green on all 28 steps (receipt `cap01-ci8`).
+- 2026-11-09, **done**, against the acceptance as revised, every part below witnessed and checked under QEMU.
+  - S-USABLE S1's `line:300` (7284 bytes), `loop:150` (3720 bytes) and `loop:500` (12128 bytes, the long form) pass the whole pipeline, transfers to the bytes included (receipt `cap01-s1b`). `loop:500`'s literal equation takes 2.1 s. All three were refused before CAP-01. "Run" is QEMU's word for `big_diff.py`'s two programs, not for these three.
+  - Literals such as `0x61707865` and `0x7ffffffffffff` are accepted.
+  - A loop body of 1201 instructions is accepted.
+  - A long `if` arm (2000 instructions) is **not** accepted: that part was narrowed to loops before code, and its 1023-instruction limit stands.

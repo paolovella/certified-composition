@@ -27,9 +27,16 @@ def old_elf(code, data):
 
 
 def main():
-    d = os.path.abspath(sys.argv[1])
+    bad = sum(one(os.path.abspath(sys.argv[1]) + "/" + which, which) for which in ("line", "loop"))
+    print(f"big-diff: {bad} failed")
+    return 1 if bad else 0
+
+
+def one(d, which):
+    """`line`: 300 statements, past the old ELF layout. `loop`: a counted loop over them, past beq's reach (CAP-01 4b)."""
     os.makedirs(d, exist_ok=True)
-    g = subprocess.run(["lake", "env", "lean", "--run", "test/BigPred.lean", d], capture_output=True, text=True)
+    print(f"--- {which}")
+    g = subprocess.run(["lake", "env", "lean", "--run", "test/BigPred.lean", d, which], capture_output=True, text=True)
     if g.returncode != 0:
         sys.exit(f"prediction failed: {g.stdout[-1500:]} {g.stderr[-800:]}")
     ok_s, n, ret, cost, out = open(f"{d}/pred.txt").read().split(maxsplit=4)
@@ -60,8 +67,12 @@ def main():
     differs = r.returncode != ret % 256
     print(f"{'ok  ' if differs else 'FAIL'} vacuity: the old layout's ELF does not give the model's result (rc {r.returncode})")
     bad += not differs
-    print(f"big-diff: {bad} failed")
-    return 1 if bad else 0
+    if which == "loop":
+        words = [int.from_bytes(code[k:k + 4], "little") for k in range(0, len(code), 4)]
+        jals = sum(1 for w in words if w & 127 == 0x6f)
+        print(f"{'ok  ' if jals == 3 else 'FAIL'} the long form is used: {jals} jal in the image")
+        bad += jals != 3
+    return bad
 
 
 sys.exit(main())
