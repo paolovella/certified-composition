@@ -4415,6 +4415,21 @@ LCore.Slice2.Add.bW	LCore.Slice2.Add
 LCore.Slice2.Add.read_add	LCore.Slice2.Add	propext
 LCore.Slice2.Add.sec8	LCore.Slice2.Add	
 LCore.Slice2.Add.sodiumAdd	LCore.Slice2.Add	
+LCore.Slice2.AddBytes.addC_ct_bytes	LCore.Slice2.AddBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.AddBytes.addImage	LCore.Slice2.AddBytes	
+LCore.Slice2.AddBytes.addNats	LCore.Slice2.AddBytes	
+LCore.Slice2.AddBytes.add_bound	LCore.Slice2.AddBytes	Quot.sound,propext
+LCore.Slice2.AddBytes.add_bound_bytes	LCore.Slice2.AddBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.AddBytes.add_budget_const	LCore.Slice2.AddBytes	propext
+LCore.Slice2.AddBytes.add_counted	LCore.Slice2.AddBytes	propext
+LCore.Slice2.AddBytes.add_ct_bytes	LCore.Slice2.AddBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.AddBytes.add_is_literal	LCore.Slice2.AddBytes	propext
+LCore.Slice2.AddBytes.add_pipeline	LCore.Slice2.AddBytes	Classical.choice,Quot.sound,propext
+LCore.Slice2.AddBytes.leaky	LCore.Slice2.AddBytes	
+LCore.Slice2.AddBytes.leakyImage	LCore.Slice2.AddBytes	propext
+LCore.Slice2.AddBytes.leaky_bytes_leak	LCore.Slice2.AddBytes	propext
+LCore.Slice2.AddBytes.leaky_refused	LCore.Slice2.AddBytes	propext
+LCore.Slice2.AddBytes.w8	LCore.Slice2.AddBytes	
 LCore.Slice2.Arr	LCore.Slice2.Source	
 LCore.Slice2.BoundBytes.budget_countUp	LCore.Slice2.BoundBytes	Classical.choice,Quot.sound,propext
 LCore.Slice2.BoundBytes.cappedImage	LCore.Slice2.BoundBytes	
@@ -4461,6 +4476,8 @@ LCore.Slice2.Budget.eval_upd_out	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.evars	LCore.Slice2.Budget	
 LCore.Slice2.Budget.fromAssigned	LCore.Slice2.Budget	
 LCore.Slice2.Budget.fromAssigned_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.fromWritten	LCore.Slice2.Budget	
+LCore.Slice2.Budget.fromWritten_rules	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.inputCounter	LCore.Slice2.Budget	
 LCore.Slice2.Budget.inputCounter_not_counted	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.isDec	LCore.Slice2.Budget	propext
@@ -4485,6 +4502,7 @@ LCore.Slice2.Budget.pot_mono	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.pot_push_plain	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.push_app	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.push_plain_frames	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.readIn	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.resetInBody	LCore.Slice2.Budget	
 LCore.Slice2.Budget.resetInBody_not_counted	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.run_pot	LCore.Slice2.Budget	Quot.sound,propext
@@ -4493,6 +4511,8 @@ LCore.Slice2.Budget.spin_not_counted	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.step_loop	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.step_plain	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.step_set	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.storeCounter_not_counted	LCore.Slice2.Budget	propext
+LCore.Slice2.Budget.storeOther_counted	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.tick_cost	LCore.Slice2.Budget	
 LCore.Slice2.Budget.topC	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.topC_frames	LCore.Slice2.Budget	Quot.sound,propext
@@ -4500,6 +4520,7 @@ LCore.Slice2.Budget.upd_comm	LCore.Slice2.Budget	Quot.sound,propext
 LCore.Slice2.Budget.upd_other	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.upd_same	LCore.Slice2.Budget	propext
 LCore.Slice2.Budget.upd_upd_same	LCore.Slice2.Budget	Quot.sound,propext
+LCore.Slice2.Budget.writtenB	LCore.Slice2.Budget	propext
 LCore.Slice2.Bytes.emptyArray_refused	LCore.Slice2.Bytes	propext
 LCore.Slice2.Bytes.layout_rules	LCore.Slice2.Bytes	propext
 LCore.Slice2.Bytes.readPublic_checks	LCore.Slice2.Bytes	propext

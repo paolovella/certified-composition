@@ -50,9 +50,21 @@ def topC (cs S : List String) : Cmd → Bool
   | .loop (.var c) (.seq B (.assign c' d)) => c' == c && cs.contains c && isDec c d && plainC cs S B
   | c => plainC cs S c
 
-/-- **The checker's budget rule.** The counters are the loop guards, and none of them is an input. -/
+/-- The input words a program writes by `storeB` (RC-02). -/
+def writtenB : Cmd → List String
+  | .storeB ns _ _ => ns
+  | .seq a b | .ite _ a b => writtenB a ++ writtenB b
+  | .loop _ b => writtenB b
+  | _ => []
+
+/-- **The inputs a counter may be set from**: those the program never writes (RC-02 step 6). A written input is an ordinary variable,
+    which no counter may read. Before RC-02 every input was one of these. -/
+def readIn (p : Prog) : List String := p.inputs.filter fun x => !(writtenB p.body).contains x
+
+/-- **The checker's budget rule.** The counters are the loop guards, set from inputs the program never writes, and none of them is an
+    input. -/
 def counted (p : Prog) : Bool :=
-  topC (counters p.body) p.inputs p.body && (counters p.body).all (fun c => !p.inputs.contains c)
+  topC (counters p.body) (readIn p) p.body && (counters p.body).all (fun c => !p.inputs.contains c)
 
 /-! ## The potential -/
 
@@ -513,11 +525,18 @@ theorem topC_frames {cs S : List String} : ∀ (c : Cmd) (q : List Nat), topC cs
     exact Or.inl h
 
 theorem counted_ok {p : Prog} (h : counted p = true) :
-    Ok (counters p.body) p.inputs (push p.body [] []) ∧ ∀ y, (counters p.body).contains y = true → p.inputs.contains y = false := by
+    Ok (counters p.body) (readIn p) (push p.body [] []) ∧ ∀ y, (counters p.body).contains y = true → (readIn p).contains y = false := by
   simp only [counted, Bool.and_eq_true, List.all_eq_true] at h
   refine ⟨ok_top (topC_frames _ _ h.1), fun y hy => ?_⟩
   have := h.2 y (List.contains_iff_mem.1 hy)
-  simpa using this
+  have hin : p.inputs.contains y = false := by simpa using this
+  cases hc : (readIn p).contains y with
+  | false => rfl
+  | true =>
+    have hm : y ∈ readIn p := List.contains_iff_mem.1 hc
+    have hi : p.inputs.contains y = true := List.contains_iff_mem.2 (List.mem_filter.1 hm).1
+    rw [hi] at hin
+    cases hin
 
 /-! ## The budget, on the source -/
 
@@ -588,5 +607,24 @@ def inputCounter : Prog where
   body := .loop (.var "n") (.seq .skip (.assign "n" (.add (.var "n") minusOne)))
   ret := num 0
 theorem inputCounter_not_counted : counted inputCounter = false := by decide
+
+/-- A counter set from input `n`, with or without a byte store into `n` first (RC-02 step 6). -/
+def fromWritten (store : Bool) : Prog where
+  inputs := ["s", "n"]
+  body := .seq (if store then .storeB ["n"] (num 0) (num 5) else .skip) (forN "c" (.var "n") .skip)
+  ret := num 0
+
+/-- **Refused, a counter set from an input the program writes**: the store could change the bound after the program read it. **Accepted**
+    without the store. -/
+theorem fromWritten_rules : counted (fromWritten true) = false ∧ counted (fromWritten false) = true := by decide
+
+/-- **Accepted, a byte store into an input no counter reads**: the store is an ordinary command. -/
+theorem storeOther_counted :
+    counted { inputs := ["s", "n"], body := .seq (.storeB ["s"] (num 0) (num 5)) (forN "c" (.var "n") .skip), ret := num 0 } = true := by
+  decide
+
+/-- **Refused, a byte store into a counter**: `assigns` counts it as a write, so the loop's bound could change while it runs. -/
+theorem storeCounter_not_counted :
+    counted { inputs := ["s", "n"], body := forN "c" (num 4) (.storeB ["c"] (num 0) (num 9)), ret := num 0 } = false := by decide
 
 end LCore.Slice2.Budget

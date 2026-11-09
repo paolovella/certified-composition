@@ -14,6 +14,11 @@ CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
 M = [
+ # RC-02 step 6: the budget's inputs, and byte stores
+ ("a counter may be set from a written input", BUD, "def readIn (p : Prog) : List String := p.inputs.filter fun x => !(writtenB p.body).contains x",
+  "def readIn (p : Prog) : List String := p.inputs"),
+ ("a byte store writes nothing, for the budget", BUD, "  | .storeB ns _ _ => ns\n  | .seq a b | .ite _ a b => assigns a ++ assigns b",
+  "  | .storeB _ _ _ => []\n  | .seq a b | .ite _ a b => assigns a ++ assigns b"),
  # RC-02 step 3: byte stores and outputs, through the lowering
  ("storeB writes the next byte", LOW, ".sb 9 8 (Int.ofNat (8 * ws.headD 0))]", ".sb 9 8 (Int.ofNat (8 * ws.headD 0 + 1))]"),
  ("storeB stores the address, not the value", LOW, ".sb 9 8 (Int.ofNat (8 * ws.headD 0))]", ".sb 8 8 (Int.ofNat (8 * ws.headD 0))]"),
@@ -61,7 +66,7 @@ M = [
  ("a loop round is charged one less", BUD, "(s c).val * (costOf B + 2) + 1 + pot cs k s", "(s c).val * (costOf B + 1) + 1 + pot cs k s"),
  ("setting a counter is not followed", BUD, "1 + pot cs k (if cs.contains x then upd s x (eval e s) else s)", "1 + pot cs k s"),
  ("a counted loop's body need not be plain", BUD, "c' == c && cs.contains c && isDec c d && plainC cs S B", "c' == c && cs.contains c && isDec c d"),
- ("a counter may be an input", BUD, "topC (counters p.body) p.inputs p.body && (counters p.body).all (fun c => !p.inputs.contains c)", "topC (counters p.body) p.inputs p.body"),
+ ("a counter may be an input", BUD, "topC (counters p.body) (readIn p) p.body && (counters p.body).all (fun c => !p.inputs.contains c)", "topC (counters p.body) (readIn p) p.body"),
  ("a decrement by two counts as one", BUD, "  | .add (.var y) (.lit w) => y == c && w.val == 2 ^ 64 - 1", "  | .add (.var y) (.lit w) => y == c && decide (2 ^ 64 - 2 ≤ w.val)"),
  ("countUp's budget is said to be one less", BUD, "budget countUp (inp 5 3) = 14 ∧", "budget countUp (inp 5 3) = 13 ∧"),
  ("the bytes' budget formula is one less per round", BYT, "≤ 8 * (4 * (wordAt u.1 1).val + 2) + 5 := by", "≤ 8 * (3 * (wordAt u.1 1).val + 2) + 5 := by"),
