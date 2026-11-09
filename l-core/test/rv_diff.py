@@ -50,8 +50,9 @@ def access(word, regs):
     return None
 
 def word_at(image, pc):
+    # CAP-01: code may run past the ELF's first page, so the bound is the file, not 0x1000; a pc is only ever in the code
     off = pc - 0x100b0 + 176
-    return int.from_bytes(image[off:off + 4], "little") if 176 <= off and off + 4 <= 0x1000 else 0
+    return int.from_bytes(image[off:off + 4], "little") if 176 <= off and off + 4 <= len(image) else 0
 
 def compare(pred, steps, image):
     """The first difference between the model's steps and QEMU's, or None."""
@@ -174,6 +175,11 @@ MUTANTS = [
     ("write returns 0", "x := m.set 10 (m.get 12) }", "x := m.set 10 (W64.ofNat 0) }", False),
     ("write number wrong", "def sysWrite : W64 := W64.ofNat 64", "def sysWrite : W64 := W64.ofNat 63", False),
     ("write to any descriptor", "if m.get 10 = W64.ofNat 1 ∧ len", "if True ∧ len", False),
+    # CAP-01 part 4a: jal
+    ("jal links nothing", "x := m.set rd (W64.ofNat (m.pc + 4)) }", "x := m.x }", False),
+    ("jal links pc, not pc + 4", "x := m.set rd (W64.ofNat (m.pc + 4)) }", "x := m.set rd (W64.ofNat m.pc) }", False),
+    ("jal: offset unsigned", "some (.jal (rdOf w) (sext 21", "some (.jal (rdOf w) (Int.ofNat", False),
+    ("jal: imm bit 11 misplaced", "+ (w / 2 ^ 20 % 2) * 2 ^ 11 +", "+ (w / 2 ^ 20 % 2) * 2 ^ 12 +", False),
 ]
 
 def compare_all(d, gen):

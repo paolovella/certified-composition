@@ -44,6 +44,8 @@ inductive Insn where
   /-- A byte store, the low byte of `rs2` (RC-02): `sodium_add`'s `a[i] = (unsigned char) c`. -/
   | sb   (rs2 rs1 : Nat) (imm : Int)
   | beq  (rs1 rs2 : Nat) (imm : Int)
+  /-- A jump of ±1 MB, linking `pc + 4` into `rd` (CAP-01): an `if` arm or a loop body past `beq`'s ±4 KB. -/
+  | jal  (rd : Nat) (imm : Int)
   | ecall
   deriving DecidableEq, Repr
 
@@ -71,6 +73,9 @@ def encode : Insn → Nat
     let i := bits imm 13
     (i / 4096 % 2) * 2 ^ 31 + (i / 32 % 64) * 2 ^ 25 + rs2 * 2 ^ 20 + rs1 * 2 ^ 15
       + (i / 2 % 16) * 2 ^ 8 + (i / 2048 % 2) * 2 ^ 7 + 0x63
+  | .jal rd imm =>
+    let i := bits imm 21
+    (i / 2 ^ 20 % 2) * 2 ^ 31 + (i / 2 % 1024) * 2 ^ 21 + (i / 2048 % 2) * 2 ^ 20 + (i / 4096 % 256) * 2 ^ 12 + rd * 2 ^ 7 + 0x6f
   | .ecall => 0x73
 
 def code (p : List Insn) : List Byte := p.flatMap fun i => le 4 (encode i)
@@ -114,6 +119,9 @@ def decode (w : Nat) : Option Insn :=
       some (.beq (rs1Of w) (rs2Of w) (sext 13
         ((w / 2 ^ 31) * 4096 + (w / 2 ^ 7 % 2) * 2048 + (w / 2 ^ 25 % 64) * 32 + (w / 2 ^ 8 % 16) * 2)))
     else none
+  | 0x6f =>
+    some (.jal (rdOf w) (sext 21
+      ((w / 2 ^ 31) * 2 ^ 20 + (w / 2 ^ 12 % 256) * 2 ^ 12 + (w / 2 ^ 20 % 2) * 2 ^ 11 + (w / 2 ^ 21 % 1024) * 2)))
   | 0x73 => if w = 0x73 then some .ecall else none
   | _ => none
 
@@ -247,6 +255,7 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
         else .fault [.addr (Int.ofNat a)]
       | .beq a b imm =>
         .next [] { m with pc := if m.get a = m.get b then addImm (W64.ofNat m.pc) imm else n }
+      | .jal rd imm => .next [] { m with pc := addImm (W64.ofNat m.pc) imm, x := m.set rd (W64.ofNat (m.pc + 4)) }
       | .ecall => if m.get 17 = sysExit then .exit (m.get 10) else if m.get 17 = sysWrite then sysWriteStep code e m n else .fault []
 
 /-- The event that returns a word: the same as the source's. -/

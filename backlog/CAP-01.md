@@ -67,3 +67,18 @@ Riskiest first: 2, since it touches the pass proofs' hypotheses.
   - **Mutants** (receipt `cap01-lowmut-lit`): 3 new, all killed. A split not checked, an `addi` reading `x0`, and a `srli` one short.
   - **A footprint caught and avoided.** The first build gave seven existing manifest lines `Classical.choice`, `genE_exec` among them. It came through `litPlan_three`'s use of `List.mem_map`. The bound `k < 64` is now `decide` over the concrete list, and no existing line changes.
 - 2026-11-09, **part 3's CI.** The first run was green but for `conf-typing builds` at 16 s, `CI-02` (receipt `cap01-ci3`). The rerun is green on all 28 steps (receipt `cap01-ci4`), with route 2 at 204 s.
+- 2026-11-09, **part 4's plan, before code: long branches over `jal`.**
+  - **Why it is needed:** `beq` reaches ±4 KB, so an `if` arm or a loop body is held to 1023 instructions (`okC`). HChaCha20's round body is about 96 statements, each several instructions, with 32-bit masking on top. That is likely past the limit.
+  - **4a, the machine:** `jal rd imm`, J-type, 21-bit offset, `rd := pc + 4`, in `rvLang`. Compared with QEMU in `rv_diff.py` (forward, backward, link register, far), with broken models, and `good_jal`.
+  - **4b, the lowering.** The short form stays whenever an arm fits, so existing images do not change. Past the limit:
+    - `if`: `beq x8, x0, +8; jal x0, +8; jal x0, else; …then…; jal x0, end; …else…`.
+    - `while`: the same at the head, and `jal x0, head` as the back edge.
+  - **4c, the proofs:** `exec_guard`'s long form. A jump frame (`TF.jmp`) may be a `jal x0` as well as a `beq x0, x0`. `okC`'s bounds become the `jal` range for long arms.
+  - **Witnesses:** an arm of 2000 instructions accepted, and one past `jal`'s range refused by the length rule. QEMU runs a long `if` both ways and a long loop. Mutants per rule.
+- 2026-11-09, **4a done: `jal` in the machine** (`Slice/Rv.lean`).
+  - J-type, a 21-bit offset, `rd := pc + 4`. Every existing proof and image builds unchanged.
+  - **QEMU** (receipt `cap01-rvdiff-jal`): 54 cases and 439 steps equal, 4 new. They cover a forward jump, the link register, a backward loop, and a 6144-byte jump past `beq`'s reach, with immediate bits 11 and 12 set.
+  - **Broken models** (receipt `cap01-rvmut-jal`): 51, all caught, 4 new: no link, a link of `pc`, an unsigned offset, and bit 11 misplaced.
+  - **A harness limit fixed.** `rv_diff.py`'s `word_at` read instructions only from the ELF's first 0x1000 bytes, so a load past them would have had its address left unchecked. It reads the whole image now.
+  - **A change to 4c's plan.** The lowering's `jal` encodings will be checked per program by `okC`, by `decide` on `decode (encode i) = some i`, as part 3 did for literals. That replaces a bit-level `good_jal` lemma.
+- 2026-11-09, **4a's CI.** The first run was green but for `conf-typing builds` at 16 s, `CI-02` (receipt `cap01-ci5`). The rerun is green on all 28 steps (receipt `cap01-ci6`).

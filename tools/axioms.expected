@@ -4105,6 +4105,8 @@ LCore.Slice.Rv.Insn.ctorElim	LCore.Slice.Rv
 LCore.Slice.Rv.Insn.ctorElimType	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ctorIdx	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ecall.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.jal.elim	LCore.Slice.Rv	
+LCore.Slice.Rv.Insn.jal.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.lbu.elim	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.lbu.noConfusion	LCore.Slice.Rv	
 LCore.Slice.Rv.Insn.ld.elim	LCore.Slice.Rv	
