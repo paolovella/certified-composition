@@ -52,3 +52,18 @@ Riskiest first: 2, since it touches the pass proofs' hypotheses.
   - **What changes at the merge:** `verify16Image`, certified in RC-01 and on `master`, becomes a different 180-byte image with the same certificate, the same budget and the same QEMU and clang results. The certificate is a theorem about whatever the pipeline produces, re-proved here. It is not a claim about those particular bytes.
 - 2026-11-09, **parts 1 and 2's full mutant run** (`slice2_low_mut.py`, receipt `cap01-lowmut`): 73, all killed, with `LCore.Slice2.Caps` in the build.
 - 2026-11-09, **parts 1 and 2's CI: green on all 28 steps** (receipt `cap01-ci`). Route 2 took 240 s against 319, up from 197, about as estimated for `names_edge`.
+- 2026-11-09, **part 3 done: literals past 12 bits** (`Slice/Lower.lean`: `LitP`, `litPlan`, `genLit`; `Slice2/Caps.lean`).
+  - **The design: translation validation per literal.**
+    - `litPlan` picks one `addi`, a `lui` and an `addi`, or those and a `srli`. It keeps a plan only if the value the machine computes from it equals the literal, on the machine's own functions (`wordOfInt`, `sext`, `addImm`, `W64.shr`), by `decide`.
+    - `genE_exec` uses that check (`litPlan_two`, `litPlan_three`), so no lemma about splitting a word into a high and a low part is needed.
+    - Small literals keep their one `addi` of `litImm w`, so **every existing image is unchanged**.
+  - **No `slli` yet**, so arbitrary 64-bit constants are refused. Shifted signed 32-bit values cover the targets: HChaCha20's four constants in two instructions each, `0xffffffff` and fe25519's `0x7ffffffffffff` mask in three (`target_literals`).
+  - **An RV64 edge, found by the test and caught by the check.**
+    - `lui` sign-extends, so the naive split of `0x7ffff800`, `lui 0x80000; addi -2048`, gives `0xffffffff7ffff800`. `litPlan` computes that and refuses the literal (`naive_split_refused`).
+    - The values `0x7ffff800` to `0x7ffffffe` are refused until `slli` (`W32-01`). `0x7fffffff` is built as `-1 >> 33`.
+    - My test assumed every signed 32-bit value is accepted. That was wrong, and the test was corrected to the rule.
+  - **Two witnesses restated at the new boundary, because the rule they witness changed by design.** VS-1's `large_literal_refused` and VS-2's `literal_rule` refused 2048 and `2^64 - 2049`, which are now built in two instructions. Each now refuses `0x123456789abcdef0`, which no plan builds, and accepts 2048.
+  - **QEMU** (`test/lit_diff.py`, receipt `cap01-litdiff`): 39 accepted literals, each written out under QEMU equal to the model's output and to the literal. The targets are accepted, `0x7ffff800` is refused, all three plan sizes are used, and an unbuildable constant is refused.
+  - **Mutants** (receipt `cap01-lowmut-lit`): 3 new, all killed. A split not checked, an `addi` reading `x0`, and a `srli` one short.
+  - **A footprint caught and avoided.** The first build gave seven existing manifest lines `Classical.choice`, `genE_exec` among them. It came through `litPlan_three`'s use of `List.mem_map`. The bound `k < 64` is now `decide` over the concrete list, and no existing line changes.
+- 2026-11-09, **part 3's CI.** The first run was green but for `conf-typing builds` at 16 s, `CI-02` (receipt `cap01-ci3`). The rerun is green on all 28 steps (receipt `cap01-ci4`), with route 2 at 204 s.

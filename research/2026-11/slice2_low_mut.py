@@ -14,6 +14,10 @@ CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
 M = [
+ # CAP-01 part 3: literals past 12 bits
+ ("a literal's split is not checked", OLD, "  else if pairVal (pairOf (sint w)).1 (pairOf (sint w)).2 = w then some", "  else if true then some"),
+ ("the addi of a pair reads x0", OLD, "  | some (.two hi lo) => [.lui r hi, .addi r r lo]", "  | some (.two hi lo) => [.lui r hi, .addi r 0 lo]"),
+ ("the srli of a shifted literal is one short", OLD, "  | some (.three hi lo k) => [.lui r hi, .addi r r lo, .srli r r k]", "  | some (.three hi lo k) => [.lui r hi, .addi r r lo, .srli r r (k - 1)]"),
  # CAP-01: the caps lifted, each at its new edge (Slice2/Caps.lean)
  ("fits allows one more local", 'LCore/Slice2/Slots.lean', "decide (128 + (uniq (allVars p)).length ≤ 256)", "decide (128 + (uniq (allVars p)).length ≤ 257)"),
  ("uniq keeps duplicates", 'LCore/Slice2/Slots.lean', "  | x :: xs => x :: (uniq xs).filter (· ≠ x)", "  | x :: xs => x :: uniq xs"),

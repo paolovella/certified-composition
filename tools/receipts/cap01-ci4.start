@@ -1,0 +1,4 @@
+started: 2026-11-09T11:10:04+01:00
+head: 394248a
+command: bash tools/ci.sh
+log: tools/receipts/cap01-ci4.log

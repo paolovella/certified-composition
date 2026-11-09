@@ -24,13 +24,17 @@ theorem pipeline_comp (P : Nat → Bool) {p : Prog} (hf : fits p = true) (hk : o
 
 /-! ## Literals: the rule that lets a compiled loop count down -/
 
-/-- **Accepted**: `-1`, and the most negative immediate. **Refused**: one past each end, so the rule is not "any literal". -/
+/-- **One instruction**: `-1`, the most negative immediate, and 2047. **Two, past each end** (CAP-01: before CAP-01 these were refused):
+    2048 and `2^64 - 2049`, as `lui` and `addi`. **Three**: `0xffffffff`, a signed 32-bit value shifted right. **Refused**: a literal no
+    plan builds, so the rule is not "any literal". -/
 theorem literal_rule :
-    okP { body := .skip, ret := .lit (W64.ofNat (2 ^ 64 - 1)) } = true ∧
-    okP { body := .skip, ret := .lit (W64.ofNat (2 ^ 64 - 2048)) } = true ∧
-    okP { body := .skip, ret := .lit (W64.ofNat (2 ^ 64 - 2049)) } = false ∧
-    okP { body := .skip, ret := .lit (W64.ofNat 2047) } = true ∧
-    okP { body := .skip, ret := .lit (W64.ofNat 2048) } = false := by
+    Slice.Lower.litLen (W64.ofNat (2 ^ 64 - 1)) = 1 ∧ Slice.Lower.litLen (W64.ofNat (2 ^ 64 - 2048)) = 1 ∧
+    Slice.Lower.litLen (W64.ofNat 2047) = 1 ∧
+    Slice.Lower.litLen (W64.ofNat (2 ^ 64 - 2049)) = 2 ∧ Slice.Lower.litLen (W64.ofNat 2048) = 2 ∧
+    Slice.Lower.litLen (W64.ofNat 0xffffffff) = 3 ∧
+    okP { body := .skip, ret := .lit (W64.ofNat 2048) } = true ∧
+    okP { body := .skip, ret := .lit (W64.ofNat 0xffffffff) } = true ∧
+    okP { body := .skip, ret := .lit (W64.ofNat 0x123456789abcdef0) } = false := by
   decide
 
 /-! ## `scan`: a loop over the array at a public index -/

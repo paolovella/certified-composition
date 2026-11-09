@@ -7,6 +7,9 @@
   2. **The image may be up to `dataBase - codeBase` = 65360 bytes.** It was 3000, a constant in the pass proofs, held below what the ELF
      writer could place: the data segment sat at file offset 0x1000, which held code to 3920 bytes. `Rv.elf` now puts it at the first page
      boundary after the code, and every pass proof holds at the new bound unchanged.
+  3. **Literals past 12 bits**: `lui` and `addi` for a signed 32-bit value, and those and a `srli` for one shifted right. The compiler keeps
+     a plan only if the machine's own functions compute the literal from it (`Slice.Lower.litPlan`), so an RV64 edge where the naive split
+     is wrong is refused, not miscompiled.
 -/
 import LCore.Slice2.OnMachine
 import LCore.Slice2.Pass
@@ -88,5 +91,21 @@ theorem bigS_okP (n : Nat) : okP (bigS n) = decide (4 * (2 * n + 6) ≤ 65360) :
 theorem image_edge : okP (bigS 8167) = true ∧ okP (bigS 8168) = false := by
   rw [bigS_okP, bigS_okP]
   decide
+
+/-! ## Literals -/
+
+open Slice.Lower (litLen litPlan pairVal pairOf sint)
+
+/-- **The targets' constants are built**: HChaCha20's four in two instructions each, `0xffffffff` and fe25519's `0x7ffffffffffff` mask in
+    three. -/
+theorem target_literals :
+    litLen (W64.ofNat 0x61707865) = 2 ∧ litLen (W64.ofNat 0x3320646e) = 2 ∧ litLen (W64.ofNat 0x79622d32) = 2 ∧
+    litLen (W64.ofNat 0x6b206574) = 2 ∧ litLen (W64.ofNat 0xffffffff) = 3 ∧ litLen (W64.ofNat 0x7ffffffffffff) = 3 := by decide
+
+/-- **The check catches a wrong split**: on RV64 `lui` sign-extends, so `0x7ffff800` split as `lui 0x80000; addi -2048` is
+    `0xffffffff7ffff800`. `litPlan` computes that, finds no other plan, and the literal is refused. -/
+theorem naive_split_refused :
+    pairVal (pairOf (sint (W64.ofNat 0x7ffff800))).1 (pairOf (sint (W64.ofNat 0x7ffff800))).2 = W64.ofNat 0xffffffff7ffff800 ∧
+    litPlan (W64.ofNat 0x7ffff800) = none := by decide
 
 end LCore.Slice2.Caps
