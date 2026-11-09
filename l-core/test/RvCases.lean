@@ -121,6 +121,11 @@ def cases : List Case :=
       body := code (stub ++ [.addi a0 0 2, .add a1 t2 0, .addi a2 0 1, .addi a7 0 64, .ecall, .addi a0 0 0] ++ exit), data := inputWord 0x0a }
   , { name := "dev_write_unreadable", deviates := true,
       body := code (stub ++ [.addi a0 0 1, .addi a1 0 0, .addi a2 0 1, .addi a7 0 64, .ecall, .addi a0 0 0] ++ exit) }
+  -- CAP-01 part 4a: jal, forward, linking, backward, and past beq's reach
+  , ins "jal_forward" [.jal 0 8, .addi a0 0 9, .addi t0 0 1]
+  , ins "jal_link" [.jal ra 8, .addi a0 0 9, .add a0 ra 0, .srli a0 a0 2]
+  , ins "jal_backward" [.addi t0 0 3, .addi t0 t0 (-1), .addi a0 a0 2, .beq t0 0 8, .jal 0 (-12)]
+  , ins "jal_far" ([.jal 0 (4 * 1536)] ++ List.replicate 1535 (.addi a0 a0 1) ++ [.addi a0 0 5])
   , { name := "dev_compressed", deviates := true,
       body := code stub ++ le 2 0x4515 ++ le 2 0x0001 ++ code exit }
   , { name := "dev_unknown_syscall", deviates := true,

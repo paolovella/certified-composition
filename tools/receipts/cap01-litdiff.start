@@ -1,0 +1,4 @@
+started: 2026-11-09T10:52:35+01:00
+head: 394248a
+command: bash -c cd l-core && python3 test/lit_diff.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/ld
+log: tools/receipts/cap01-litdiff.log

@@ -14,6 +14,20 @@ CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
 M = [
+ # CAP-01 part 4b: long loops
+ ("the long head's first jal lands short", LOW, "[.beq 8 0 (Int.ofNat 8), .jal 0 (Int.ofNat 8), .jal 0", "[.beq 8 0 (Int.ofNat 8), .jal 0 (Int.ofNat 4), .jal 0"),
+ ("the long loop's exit lands one short", LOW, ".jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 2)))] ++ genC b", ".jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 1)))] ++ genC b"),
+ ("the long loop's back edge lands one short", LOW, "        [.jal 0 (-(Int.ofNat (4 * (sE e + 3 + sC b))))]", "        [.jal 0 (-(Int.ofNat (4 * (sE e + 2 + sC b))))]"),
+ ("the short form may reach one further", LOW, "def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)", "def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sC b + 2 < 1025) && decide (sE e + 1 + sC b < 1024)"),
+ ("a long loop's jal is not checked", LOW, "  decide (decode (encode (.jal 0 i)) = some (.jal 0 i)) && decide (encode (.jal 0 i) < 4294967296)", "  true"),
+ # CAP-01 part 3: literals past 12 bits
+ ("a literal's split is not checked", OLD, "  else if pairVal (pairOf (sint w)).1 (pairOf (sint w)).2 = w then some", "  else if true then some"),
+ ("the addi of a pair reads x0", OLD, "  | some (.two hi lo) => [.lui r hi, .addi r r lo]", "  | some (.two hi lo) => [.lui r hi, .addi r 0 lo]"),
+ ("the srli of a shifted literal is one short", OLD, "  | some (.three hi lo k) => [.lui r hi, .addi r r lo, .srli r r k]", "  | some (.three hi lo k) => [.lui r hi, .addi r r lo, .srli r r (k - 1)]"),
+ # CAP-01: the caps lifted, each at its new edge (Slice2/Caps.lean)
+ ("fits allows one more local", 'LCore/Slice2/Slots.lean', "decide (128 + (uniq (allVars p)).length ≤ 256)", "decide (128 + (uniq (allVars p)).length ≤ 257)"),
+ ("uniq keeps duplicates", 'LCore/Slice2/Slots.lean', "  | x :: xs => x :: (uniq xs).filter (· ≠ x)", "  | x :: xs => x :: uniq xs"),
+ ("the image may be four bytes longer", 'LCore/Slice2/Pass.lean', "okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65360)", "okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65364)"),
  # RC-02 step 6: the budget's inputs, and byte stores
  ("a counter may be set from a written input", BUD, "def readIn (p : Prog) : List String := p.inputs.filter fun x => !(writtenB p.body).contains x",
   "def readIn (p : Prog) : List String := p.inputs"),
@@ -31,10 +45,10 @@ M = [
  ("store writes the wrong word", LOW, "| .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 512)]", "| .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 504)]"),
  ("store stores the wrong register", LOW, "| .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 512)]", "| .store e v => genIdx e ++ genE v 1 ++ [.sd 8 8 (Int.ofNat 512)]"),
  ("the index mask misses the array's size", LOW, "genE e 0 ++ [.andi 8 8 (Int.ofNat 63)", "genE e 0 ++ [.andi 8 8 (Int.ofNat 127)"),
- ("the loop's exit lands one short", LOW, ".loop e b =>\n    genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC b + 2)))]", ".loop e b =>\n    genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC b + 1)))]"),
+ ("the loop's exit lands one short", LOW, "    if shortLoop e b then\n      genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC b + 2)))]", "    if shortLoop e b then\n      genE e 0 ++ [.beq 8 0 (Int.ofNat (4 * (sC b + 1)))]"),
  ("the loop's back edge lands one short", LOW, "(-(Int.ofNat (4 * (sE e + 1 + sC b))))", "(-(Int.ofNat (4 * (sE e + sC b))))"),
- ("a body too big for the exit branch is accepted", LOW, "okC b && decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)", "okC b && decide (sE e + 1 + sC b < 1024)"),
- ("a body too big for the back edge is accepted", LOW, "okC b && decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)", "okC b && decide (sC b + 2 < 1024)"),
+ ("a body too big for the exit branch is accepted", LOW, "def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)", "def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sE e + 1 + sC b < 1024)"),
+ ("a body too big for the back edge is accepted", LOW, "def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sC b + 2 < 1024) && decide (sE e + 1 + sC b < 1024)", "def shortLoop (e : SExpr) (b : SCmd) : Bool := decide (sC b + 2 < 1024)"),
  ("an array load's address does not show", CHK, "(pc + 4 * (sE e + 5), [.addr (Int.ofNat (arrAddr (idx (evalS e t))))])", "(pc + 4 * (sE e + 5), [])"),
  ("a loop forgets to run again", CHK, "(.jmp (pc + 4 * (sE e + 1 + sC b)) pc :: .cmd (.loop e b) pc :: k)", "(.jmp (pc + 4 * (sE e + 1 + sC b)) pc :: k)"),
  ("the budget loses its constant", PAS, "cost c := stepL p * c + tailC p", "cost c := stepL p * c"),
@@ -44,7 +58,7 @@ M = [
  ("the exit is the wrong syscall", PAS, ".addi 17 0 (Int.ofNat 93), .ecall]\n\ndef okP", ".addi 17 0 (Int.ofNat 94), .ecall]\n\ndef okP"),
  ("the data pointer is wrong", PAS, "[.lui 7 0x20] ++ genC p.body", "[.lui 7 0x21] ++ genC p.body"),
  ("a literal's immediate is off by one", OLD, "else -(Int.ofNat (18446744073709551616 - w.val))", "else -(Int.ofNat (18446744073709551617 - w.val))"),
- ("any literal is accepted", OLD, "(decide (w.val < 2048) || decide (18446744073709549568 ≤ w.val)) && decide (d < 24)", "decide (d < 24)"),
+ ("any literal is accepted", OLD, "(match litPlan w with | some q => planOk q | none => false) && decide (d < 24)", "decide (d < 24)"),
  ("the negative immediate reaches one too far", OLD, "theorem good_addi_neg {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (h0 : 0 < i) (hi : i ≤ 2048) :", "theorem good_addi_neg {rd rs i : Nat} (hd : rd < 32) (hs : rs < 32) (h0 : 0 < i) (hi : i ≤ 2049) :"),
  ("one byte of scan's literal is wrong", IMG, "[183, 3, 2, 0, 3, 180, 131, 0,", "[183, 3, 2, 0, 3, 180, 3, 0,"),
  ("one byte of spin's literal is wrong", IMG, "[183, 3, 2, 0, 19, 4, 16, 0,", "[183, 3, 2, 0, 19, 4, 17, 0,"),
@@ -72,8 +86,8 @@ M = [
  ("the bytes' budget formula is one less per round", BYT, "≤ 8 * (4 * (wordAt u.1 1).val + 2) + 5 := by", "≤ 8 * (3 * (wordAt u.1 1).val + 2) + 5 := by"),
  ("the source budget is said to be 4n + 1", BYT, "budget countUp i = 4 * (i 1).val + 2 := by", "budget countUp i = 4 * (i 1).val + 1 := by"),
  ("the capped budget on the bytes is one less", BYT, "theorem capped_bound_bytes : Cert.bound (rvLang sec0) 97 cappedImage := by", "theorem capped_bound_bytes : Cert.bound (rvLang sec0) 96 cappedImage := by"),
- ("a loop step is charged one less", PAS, "  | .ite e _ _ | .loop e _ => sE e + 2\n", "  | .ite e _ _ | .loop e _ => sE e + 1\n"),
- ("stepMax forgets a loop's body", PAS, "  | .loop e b => max (sE e + 2) (stepMax b)\n", "  | .loop e b => sE e + 2\n"),
+ ("a loop step is charged one less", PAS, "  | .loop e b => if shortLoop e b then sE e + 2 else sE e + 3", "  | .loop e b => if shortLoop e b then sE e + 1 else sE e + 3"),
+ ("stepMax forgets a loop's body", PAS, "  | .loop e b => max (stepC (.loop e b)) (stepMax b)\n", "  | .loop e b => stepC (.loop e b)\n"),
  ("one byte of countUp's literal is wrong", BYT, "[183, 3, 2, 0, 3, 180, 131, 0, 35, 176, 131, 64, 3, 180, 3, 64, 99, 4, 4, 4,", "[183, 3, 2, 0, 3, 180, 131, 0, 35, 176, 131, 64, 3, 180, 3, 64, 99, 4, 4, 5,"),
  ("xor means or", WRD, "  | .xor => W64.xor\n", "  | .xor => W64.or\n"),
  ("a shift moves one place too far", WRD, "def shr (a : W64) (k : Nat) : W64 := ofNat (a.val >>> k)", "def shr (a : W64) (k : Nat) : W64 := ofNat (a.val >>> (k + 1))"),
@@ -100,7 +114,7 @@ def build():
     """A resident-memory watchdog, not RLIMIT_AS: an address-space cap stops Lean creating threads, and every build then
     aborts with code 134 before checking a proof. That made the first run of this harness report 19 of 19 killed."""
     with tempfile.TemporaryFile('w+') as log:
-        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Bytes'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
+        p = subprocess.Popen(['lake', 'build', 'LCore.Slice2.Bytes', 'LCore.Slice2.Caps'], cwd=WORK, stdout=log, stderr=subprocess.STDOUT,
                              text=True, start_new_session=True)
         t0 = time.time()
         while p.poll() is None:
@@ -129,6 +143,9 @@ if rc != 0:
 print('baseline really compiled', flush=True)
 ERR = re.compile(r'^error: \S+\.lean:\d+')
 
+ONLY = os.environ.get('ONLY')
+if ONLY:
+    M = [m for m in M if m[0] in ONLY.split('|')]
 bad = 0
 for name, fn, old, new in M:
     path = os.path.join(WORK, fn)

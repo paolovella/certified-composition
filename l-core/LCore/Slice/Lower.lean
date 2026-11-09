@@ -399,15 +399,71 @@ def wordsMax : Nat := 256
 def litImm (w : W64) : Int :=
   if w.val < 2048 then Int.ofNat w.val else -(Int.ofNat (18446744073709551616 - w.val))
 
+/-! ### Literals (CAP-01)
+
+  A literal is built by one `addi` if it fits 12 bits, as before, so no existing image changes. Otherwise by `lui` and `addi`, a signed
+  32-bit value, or by those and a `srli`, a signed 32-bit value shifted right, which covers masks such as `0xffffffff`.
+
+  **The compiler checks its own literals**: `litPlan` keeps a plan only if the value the machine computes from it, by the machine's own
+  functions (`wordOfInt`, `sext`, `addImm`, `W64.shr`), is the literal. `genE_exec` uses that check, so no lemma about how a word splits
+  into a high and a low part is needed. Translation validation, one literal at a time. -/
+
+inductive LitP where
+  | one (imm : Int)
+  | two (hi : Nat) (lo : Int)
+  | three (hi : Nat) (lo : Int) (k : Nat)
+
+def smallLit (w : W64) : Bool := decide (w.val < 2048) || decide (18446744073709549568 ≤ w.val)
+
+/-- A word as a signed value. -/
+def sint (w : W64) : Int := if w.val < 2 ^ 63 then Int.ofNat w.val else Int.ofNat w.val - 2 ^ 64
+
+/-- A `lui` field and an `addi` immediate for a signed 32-bit value. -/
+def pairOf (v : Int) : Nat × Int :=
+  let lo := sext 12 (v % 4096).toNat
+  ((((v - lo) / 4096) % 1048576).toNat, lo)
+
+/-- **What `lui r hi; addi r r lo` leaves in `r`**, by the machine's step for each. -/
+def pairVal (hi : Nat) (lo : Int) : W64 := W64.ofNat (addImm (wordOfInt (sext 32 (hi * 2 ^ 12))) lo)
+
+def litPlan (w : W64) : Option LitP :=
+  if smallLit w then some (.one (litImm w))
+  else if pairVal (pairOf (sint w)).1 (pairOf (sint w)).2 = w then some (.two (pairOf (sint w)).1 (pairOf (sint w)).2)
+  else ((List.range 63).map (· + 1)).findSome? fun k =>
+    [w.val * 2 ^ k % 2 ^ 64, (w.val * 2 ^ k + (2 ^ k - 1)) % 2 ^ 64].findSome? fun u =>
+      if W64.shr (pairVal (pairOf (sint (W64.ofNat u))).1 (pairOf (sint (W64.ofNat u))).2) k = w then
+        some (.three (pairOf (sint (W64.ofNat u))).1 (pairOf (sint (W64.ofNat u))).2 k)
+      else none
+
+/-- The plan's fields fit their encodings. -/
+def planOk : LitP → Bool
+  | .one _ => true
+  | .two hi lo | .three hi lo _ => decide (hi < 1048576) && decide (-2048 ≤ lo) && decide (lo < 2048)
+
+def litLen (w : W64) : Nat :=
+  match litPlan w with
+  | some (.one _) => 1
+  | some (.two _ _) => 2
+  | some (.three _ _ _) => 3
+  | none => 0
+
+def genLit (w : W64) (r : Nat) : List Insn :=
+  match litPlan w with
+  | some (.one i) => [.addi r 0 i]
+  | some (.two hi lo) => [.lui r hi, .addi r r lo]
+  | some (.three hi lo k) => [.lui r hi, .addi r r lo, .srli r r k]
+  | none => []
+
 def genE : SExpr → Nat → List Insn
-  | .lit w, d => [.addi (8 + d) 0 (litImm w)]
+  | .lit w, d => genLit w (8 + d)
   | .slot n, d => [.ld (8 + d) 7 (Int.ofNat (8 * n))]
   | .add a b, d => genE a d ++ genE b (d + 1) ++ [.add (8 + d) (8 + d) (8 + d + 1)]
   | .bin o a b, d => genE a d ++ genE b (d + 1) ++ [opInsn o (8 + d) (8 + d) (8 + d + 1)]
   | .shr a k, d => genE a d ++ [.srli (8 + d) (8 + d) k]
 
 def sE : SExpr → Nat
-  | .lit _ | .slot _ => 1
+  | .lit w => litLen w
+  | .slot _ => 1
   | .add a b | .bin _ a b => sE a + sE b + 1
   | .shr a _ => sE a + 1
 
@@ -426,7 +482,7 @@ def genC : SCmd → List Insn
 
 /-- Does this fit the instructions: small literals, low slots, enough registers? -/
 def okE : SExpr → Nat → Bool
-  | .lit w, d => (decide (w.val < 2048) || decide (18446744073709549568 ≤ w.val)) && decide (d < 24)
+  | .lit w, d => (match litPlan w with | some q => planOk q | none => false) && decide (d < 24)
   | .slot n, d => decide (n < wordsMax) && decide (d < 24)
   | .add a b, d | .bin _ a b, d => okE a d && okE b (d + 1) && decide (d + 1 < 24)
   | .shr a k, d => okE a d && decide (k < 64)
@@ -438,7 +494,8 @@ def okC : SCmd → Bool
   | .ite e a b => okE e 0 && okC a && okC b && decide (sC a + 2 < 1024) && decide (sC b + 1 < 1024)
 
 theorem genE_length : ∀ (e : SExpr) (d : Nat), (genE e d).length = sE e
-  | .lit _, _ | .slot _, _ => rfl
+  | .lit w, _ => by simp only [genE, sE, genLit, litLen]; split <;> rfl
+  | .slot _, _ => rfl
   | .add a b, d | .bin _ a b, d => by simp only [genE, sE, List.length_append, genE_length a, genE_length b]; rfl
   | .shr a _, d => by simp only [genE, sE, List.length_append, genE_length a]; rfl
 
@@ -462,16 +519,89 @@ theorem okE_depth : ∀ {e : SExpr} {d : Nat}, okE e d = true → d < 24
   | .add a _, _, h | .bin _ a _, _, h => by simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h; omega
   | .shr a _, _, h => by simp only [okE, Bool.and_eq_true] at h; exact okE_depth h.1
 
+/-- **What a plan says**, from `litPlan` itself: a one-instruction plan is the old small case, and the others compute the literal on the
+    machine's own functions, because `litPlan` checked that they do. -/
+theorem litPlan_one {w : W64} {i : Int} (h : litPlan w = some (.one i)) : smallLit w = true ∧ i = litImm w := by
+  simp only [litPlan] at h
+  split at h
+  · rename_i hs; simp only [Option.some.injEq, LitP.one.injEq] at h; exact ⟨hs, h.symm⟩
+  · split at h
+    · simp at h
+    · obtain ⟨k, _, hk⟩ := List.exists_of_findSome?_eq_some h
+      obtain ⟨u, _, hu⟩ := List.exists_of_findSome?_eq_some hk
+      split at hu <;> simp at hu
+
+theorem litPlan_two {w : W64} {hi : Nat} {lo : Int} (h : litPlan w = some (.two hi lo)) : pairVal hi lo = w := by
+  simp only [litPlan] at h
+  split at h
+  · simp at h
+  · split at h
+    · rename_i he; simp only [Option.some.injEq, LitP.two.injEq] at h; obtain ⟨rfl, rfl⟩ := h; exact he
+    · obtain ⟨k, _, hk⟩ := List.exists_of_findSome?_eq_some h
+      obtain ⟨u, _, hu⟩ := List.exists_of_findSome?_eq_some hk
+      split at hu <;> simp at hu
+
+theorem litPlan_three {w : W64} {hi : Nat} {lo : Int} {k : Nat} (h : litPlan w = some (.three hi lo k)) :
+    W64.shr (pairVal hi lo) k = w ∧ k < 64 := by
+  simp only [litPlan] at h
+  split at h
+  · simp at h
+  · split at h
+    · simp at h
+    · obtain ⟨k', hk', hk⟩ := List.exists_of_findSome?_eq_some h
+      obtain ⟨u, _, hu⟩ := List.exists_of_findSome?_eq_some hk
+      split at hu
+      · rename_i he
+        simp only [Option.some.injEq, LitP.three.injEq] at hu
+        obtain ⟨rfl, rfl, rfl⟩ := hu
+        have hb : ∀ x ∈ (List.range 63).map (· + 1), x < 64 := by decide
+        exact ⟨he, hb _ hk'⟩
+      · simp at hu
+
+/-- An `addi` immediate in the 12-bit range, either sign. -/
+theorem good_addi_int {rd rs : Nat} {lo : Int} (hd : rd < 32) (hs : rs < 32) (h1 : -2048 ≤ lo) (h2 : lo < 2048) :
+    Good (.addi rd rs lo) := by
+  rcases Int.lt_or_le lo 0 with hn | hp
+  · have he : lo = -(Int.ofNat (-lo).toNat) := by rw [Int.ofNat_eq_coe]; omega
+    rw [he]
+    exact good_addi_neg hd hs (by omega) (by omega)
+  · have he : lo = Int.ofNat lo.toNat := by rw [Int.ofNat_eq_coe]; omega
+    rw [he]
+    exact good_addi hd hs (by omega)
+
 theorem genE_good : ∀ (e : SExpr) (d : Nat), okE e d = true → ∀ i ∈ genE e d, Good i
   | .lit w, d, h, i, hi => by
-    simp only [okE, Bool.and_eq_true, Bool.or_eq_true, decide_eq_true_eq] at h
-    simp only [genE, List.mem_singleton] at hi
-    subst hi
-    have hw := w.isLt
-    simp only [litImm]
-    split
-    · exact good_addi (by omega) (by omega) (by assumption)
-    · exact good_addi_neg (by omega) (by omega) (by simp only [Nat.reducePow] at hw; omega) (by omega)
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
+    obtain ⟨hp, hd⟩ := h
+    simp only [genE, genLit] at hi
+    split at hi
+    · rename_i i₀ heq
+      simp only [List.mem_singleton] at hi
+      subst hi
+      obtain ⟨hs, rfl⟩ := litPlan_one heq
+      have hw := w.isLt
+      simp only [smallLit, Bool.or_eq_true, decide_eq_true_eq] at hs
+      simp only [litImm]
+      split
+      · exact good_addi (by omega) (by omega) (by assumption)
+      · exact good_addi_neg (by omega) (by omega) (by simp only [Nat.reducePow] at hw; omega) (by omega)
+    · rename_i hi₀ lo heq
+      rw [heq] at hp
+      simp only [planOk, Bool.and_eq_true, decide_eq_true_eq] at hp
+      simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hi
+      rcases hi with rfl | rfl
+      · exact good_lui (by omega) hp.1.1
+      · exact good_addi_int (by omega) (by omega) hp.1.2 hp.2
+    · rename_i hi₀ lo k heq
+      rw [heq] at hp
+      simp only [planOk, Bool.and_eq_true, decide_eq_true_eq] at hp
+      have hk := (litPlan_three heq).2
+      simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hi
+      rcases hi with rfl | rfl | rfl
+      · exact good_lui (by omega) hp.1.1
+      · exact good_addi_int (by omega) (by omega) hp.1.2 hp.2
+      · exact good_srli (by omega) (by omega) hk
+    · simp at hi
   | .slot n, d, h, i, hi => by
     simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at h
     have hm : wordsMax = 256 := rfl
@@ -706,7 +836,11 @@ theorem addrs8_slot {n : Nat} (hn : n < wordsMax) {x : Nat} (hx : x ∈ addrs8 (
 /-! ## Expressions -/
 
 def mE : SExpr → Nat → List Micro
-  | .lit _, pc => [(pc, [])]
+  | .lit w, pc => match litPlan w with
+    | some (.one _) => [(pc, [])]
+    | some (.two _ _) => [(pc, []), (pc + 4, [])]
+    | some (.three _ _ _) => [(pc, []), (pc + 4, []), (pc + 8, [])]
+    | none => []
   | .slot n, pc => [(pc, [.addr (Int.ofNat (slotAddr n))])]
   | .add a b, pc | .bin _ a b, pc => mE a pc ++ mE b (pc + 4 * sE a) ++ [(pc + 4 * (sE a + sE b), [])]
   | .shr a _, pc => mE a pc ++ [(pc + 4 * sE a, [])]
@@ -768,16 +902,59 @@ theorem genE_exec {C : List Byte} {en : Env} : ∀ (e : SExpr) (d : Nat) (m : Ma
     ∃ m', Exec C en (mE e m.pc) m m' ∧ m'.pc = m.pc + 4 * sE e ∧ m'.mem = m.mem ∧
       m'.get (8 + d) = evalS e t ∧ ∀ y, y < 8 + d → m'.get y = m.get y
   | .lit w, d, m, t, hok, _, hat => by
-    simp only [okE, Bool.and_eq_true, Bool.or_eq_true, decide_eq_true_eq] at hok
-    obtain ⟨w', hf, hd⟩ := fetchI_parts (hat.head)
-    have hs : Rv.step C en m = .next [] { m with pc := m.pc + 4, x := m.set (8 + d) w } := by
-      have hv : W64.ofNat (addImm (m.get 0) (litImm w)) = w := litImm_value m w hok.1
-      simp only [Rv.step, hf, hd, hv]
-    refine ⟨_, Exec.step hs, rfl, rfl, ?_, ?_⟩
-    · rw [get_set (by omega)]; simp [evalS]
-    · intro y hy
-      rw [get_set (by omega)]
-      simp [show y ≠ 8 + d by omega]
+    simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at hok
+    have hr : 8 + d ≠ 0 := by omega
+    -- reading register `8 + d` after a write to it, or another register after a write to `8 + d`
+    have same : ∀ (mm : Mach) (q : Nat) (v : W64), ({ mm with pc := q, x := mm.set (8 + d) v } : Mach).get (8 + d) = v := by
+      intro mm q v; rw [get_set hr]; simp
+    have other : ∀ (mm : Mach) (q : Nat) (v : W64) (y : Nat), y < 8 + d →
+        ({ mm with pc := q, x := mm.set (8 + d) v } : Mach).get y = mm.get y := by
+      intro mm q v y hy; rw [get_set hr]; simp [show y ≠ 8 + d by omega]
+    simp only [genE, genLit] at hat
+    simp only [mE, sE, litLen]
+    split at hat
+    · rename_i i₀ heq
+      obtain ⟨hs, rfl⟩ := litPlan_one heq
+      simp only [smallLit, Bool.or_eq_true, decide_eq_true_eq] at hs
+      obtain ⟨w', hf, hd⟩ := fetchI_parts (hat.head)
+      have hs' : Rv.step C en m = .next [] { m with pc := m.pc + 4, x := m.set (8 + d) w } := by
+        have hv : W64.ofNat (addImm (m.get 0) (litImm w)) = w := litImm_value m w hs
+        simp only [Rv.step, hf, hd, hv]
+      refine ⟨_, Exec.step hs', rfl, rfl, by rw [same]; simp [evalS], fun y hy => other _ _ _ y hy⟩
+    · rename_i hi lo heq
+      have hv := litPlan_two heq
+      obtain ⟨w₁, hf₁, hd₁⟩ := fetchI_parts (hat.head)
+      let m₁ : Mach := { m with pc := m.pc + 4, x := m.set (8 + d) (wordOfInt (sext 32 (hi * 2 ^ 12))) }
+      have s₁ : Rv.step C en m = .next [] m₁ := by simp only [Rv.step, hf₁, hd₁, m₁]
+      have f₂ : fetchI C m₁.pc = some (.addi (8 + d) (8 + d) lo) := hat 1 (by simp)
+      obtain ⟨w₂, hf₂, hd₂⟩ := fetchI_parts f₂
+      let m₂ : Mach := { m₁ with pc := m₁.pc + 4, x := m₁.set (8 + d) (W64.ofNat (addImm (m₁.get (8 + d)) lo)) }
+      have s₂ : Rv.step C en m₁ = .next [] m₂ := by simp only [Rv.step, hf₂, hd₂, m₂]
+      have v₂ : m₂.get (8 + d) = w := by
+        simp only [m₂]; rw [same, same]; exact hv
+      refine ⟨m₂, (Exec.step s₁).trans (Exec.stepAt s₂ rfl), rfl, rfl, by rw [v₂]; simp [evalS], fun y hy => ?_⟩
+      simp only [m₂]; rw [other _ _ _ y hy]; simp only [m₁]; rw [other _ _ _ y hy]
+    · rename_i hi lo k heq
+      obtain ⟨hv, _⟩ := litPlan_three heq
+      obtain ⟨w₁, hf₁, hd₁⟩ := fetchI_parts (hat.head)
+      let m₁ : Mach := { m with pc := m.pc + 4, x := m.set (8 + d) (wordOfInt (sext 32 (hi * 2 ^ 12))) }
+      have s₁ : Rv.step C en m = .next [] m₁ := by simp only [Rv.step, hf₁, hd₁, m₁]
+      have f₂ : fetchI C m₁.pc = some (.addi (8 + d) (8 + d) lo) := hat 1 (by simp)
+      obtain ⟨w₂, hf₂, hd₂⟩ := fetchI_parts f₂
+      let m₂ : Mach := { m₁ with pc := m₁.pc + 4, x := m₁.set (8 + d) (W64.ofNat (addImm (m₁.get (8 + d)) lo)) }
+      have s₂ : Rv.step C en m₁ = .next [] m₂ := by simp only [Rv.step, hf₂, hd₂, m₂]
+      have f₃ : fetchI C m₂.pc = some (.srli (8 + d) (8 + d) k) := hat 2 (by simp)
+      obtain ⟨w₃, hf₃, hd₃⟩ := fetchI_parts f₃
+      let m₃ : Mach := { m₂ with pc := m₂.pc + 4, x := m₂.set (8 + d) (W64.shr (m₂.get (8 + d)) k) }
+      have s₃ : Rv.step C en m₂ = .next [] m₃ := by simp only [Rv.step, hf₃, hd₃, m₃]
+      have v₃ : m₃.get (8 + d) = w := by
+        simp only [m₃, m₂]; rw [same, same, same]; exact hv
+      refine ⟨m₃, (Exec.step s₁).trans ((Exec.stepAt s₂ rfl).trans (Exec.stepAt s₃ rfl)), rfl, rfl,
+        by rw [v₃]; simp [evalS], fun y hy => ?_⟩
+      simp only [m₃]; rw [other _ _ _ y hy]; simp only [m₂]; rw [other _ _ _ y hy]; simp only [m₁]; rw [other _ _ _ y hy]
+    · rename_i heq
+      rw [heq] at hok
+      simp at hok
   | .slot n, d, m, t, hok, hinv, hat => by
     simp only [okE, Bool.and_eq_true, decide_eq_true_eq] at hok
     obtain ⟨w', hf, hd⟩ := fetchI_parts (hat.head)
@@ -999,7 +1176,7 @@ theorem Inv.mono_mem {m m' : Mach} {t : Slots} (h : Inv m t) (h7 : m'.get 7 = m.
     rw [this]; exact h.2 n hn⟩
 
 /-- **The machine plays what `walk` computes**, whatever its environment and its other registers hold. -/
-theorem walk_exec {C : List Byte} {en : Env} (hC : C.length ≤ 3000) (f : Nat) :
+theorem walk_exec {C : List Byte} {en : Env} (hC : C.length ≤ 65360) (f : Nat) :
     ∀ (N : Nat) (k : List TF) (t : Slots) (m : Mach), mK k ≤ N → FOk C k → Chain m.pc k f → Inv m t →
       ∃ m', Exec C en (walk N k t).1 m m' ∧ m'.pc = f ∧ Inv m' (walk N k t).2 := by
   intro N
@@ -1295,7 +1472,8 @@ theorem walk_same (ret : SExpr) : ∀ (N : Nat) (k : List TF) (ks : List SFrame)
           rw [ih _ _ t t' M (by omega) (by omega) (Corr.push b _ _ h) hl]
 
 theorem mE_length : ∀ (e : SExpr) (pc : Nat), (mE e pc).length = sE e
-  | .lit _, _ | .slot _, _ => rfl
+  | .lit w, _ => by simp only [mE, sE, litLen]; split <;> rfl
+  | .slot _, _ => rfl
   | .add a b, pc | .bin _ a b, pc => by simp only [mE, sE, List.length_append, mE_length a, mE_length b]; rfl
   | .shr a _, pc => by simp only [mE, sE, List.length_append, mE_length a]; rfl
 
@@ -1395,7 +1573,7 @@ def genP (p : SProg) : List Insn :=
     [.add 10 8 0, .addi 17 0 (Int.ofNat 93), .ecall]
 
 def okP (p : SProg) : Bool :=
-  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 3000)
+  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65360)
 
 def startPc : Nat := codeBase + 4
 def retPc (p : SProg) : Nat := startPc + 4 * sC p.body
@@ -1416,7 +1594,7 @@ def exitF (w : W64) (pc : Nat) : Nat → Beh
 theorem genP_length (p : SProg) : (genP p).length = 1 + sC p.body + sE p.ret + 3 := by
   simp only [genP, List.length_append, genC_length, genE_length, List.length_cons, List.length_nil]
 
-theorem init_inv {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 3000) (v : W64)
+theorem init_inv {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 65360) (v : W64)
     (hv : v = W64.ofNat dataBase) :
     Inv { (init C d e) with pc := codeBase + 4, x := (init C d e).set 7 v } (wordAt d) := by
   have hcb : codeBase = 0x100b0 := rfl
@@ -1448,7 +1626,7 @@ theorem k0_bound' (p : SProg) : mK (k0 p) ≤ mC p.body := by
 theorem lui_value : wordOfInt (sext 32 (0x20 * 2 ^ 12)) = W64.ofNat dataBase := by decide
 
 /-- The entry instruction sets the base register and leaves the slots as the input bytes say. -/
-theorem entry_exec {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 3000)
+theorem entry_exec {C : List Byte} {d : Nat → Byte} {e : Env} (hC : C.length ≤ 65360)
     (hl : fetchI C codeBase = some (.lui 7 0x20)) :
     ∃ m₁, Exec C e [(codeBase, [])] (init C d e) m₁ ∧ m₁.pc = codeBase + 4 ∧ Inv m₁ (wordAt d) := by
   obtain ⟨w₀, hf₀, hd₀⟩ := fetchI_parts hl
@@ -1504,7 +1682,7 @@ theorem exit_exec {C : List Byte} {e : Env} {m : Mach} {pc : Nat} (hp : m.pc = p
 
 /-- What compiled code looks like, found by position. -/
 structure Laid (C : List Byte) (p : SProg) : Prop where
-  size : C.length ≤ 3000
+  size : C.length ≤ 65360
   lui : fetchI C codeBase = some (.lui 7 0x20)
   body : At C startPc (genC p.body)
   res : At C (retPc p) (genE p.ret 0)
@@ -1524,7 +1702,7 @@ theorem genP_good {p : SProg} (hb : okC p.body = true) (hr : okE p.ret 0 = true)
   · subst hi; exact good_ecall
 
 theorem laid {p : SProg} (hb : okC p.body = true) (hr : okE p.ret 0 = true)
-    (hlen : 4 * (genP p).length ≤ 3000) : Laid (code (genP p)) p := by
+    (hlen : 4 * (genP p).length ≤ 65360) : Laid (code (genP p)) p := by
   have hat : At (code (genP p)) codeBase (genP p) := fun j hj => fetchI_code (genP_good hb hr) hj
   simp only [genP] at hat
   have atP := hat.left.left
@@ -1817,9 +1995,11 @@ theorem clean_ignores_busy_env (n : Nat) :
       Rv.run (code (genP (compile clean))) env0 n (init (code (genP (compile clean))) (encBytes (inp 5 3)) env0) :=
   compiled_ignores_env clean_ok n _ _ _
 
-/-- **Refused**: a literal too large for the slice's instructions. -/
+/-- **Refused**: a literal no plan builds: not 12 bits, not a signed 32-bit value, nor one shifted right (CAP-01). **Accepted**: 2048,
+    which this witness refused before CAP-01, now as `lui` and `addi`. -/
 theorem large_literal_refused :
-    okP { body := .skip, ret := .lit (W64.ofNat 2048) } = false := by decide
+    okP { body := .skip, ret := .lit (W64.ofNat 0x123456789abcdef0) } = false ∧
+    okP { body := .skip, ret := .lit (W64.ofNat 2048) } = true := by decide
 
 /-- **Refused**: a slot beyond the instructions' reach. -/
 theorem high_slot_refused :

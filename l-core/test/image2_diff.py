@@ -49,9 +49,10 @@ def elf(code, data):
     ident = bytes([0x7f, 0x45, 0x4c, 0x46, 2, 1, 1]) + bytes(9)
     head = ident + struct.pack("<HHIQQQIHHHHHH", 2, 243, 1, 0x10000 + hdr, 64, 0, 0, 64, 56, 2, 64, 0, 0)
     head += struct.pack("<IIQQQQQQ", 1, 5, 0, 0x10000, 0x10000, hdr + len(code), hdr + len(code), 0x1000)
-    head += struct.pack("<IIQQQQQQ", 1, 6, 0x1000, 0x20000, 0x20000, len(data), 0x1000, 0x1000)
+    doff = (hdr + len(code) + 0xfff) // 0x1000 * 0x1000  # CAP-01: the first page boundary after the code
+    head += struct.pack("<IIQQQQQQ", 1, 6, doff, 0x20000, 0x20000, len(data), 0x1000, 0x1000)
     body = head + code
-    return body + bytes(0x1000 - len(body)) + data
+    return body + bytes(doff - len(body)) + data
 
 
 def write(d, name, code, a, b):

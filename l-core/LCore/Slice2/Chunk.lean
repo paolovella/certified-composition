@@ -30,7 +30,10 @@ def chunkC (c : SCmd) (pc : Nat) (t : Slice.Slots.Slots) : List Micro :=
   | .skip => [(pc, [])]
   | .set n e => mE e pc ++ [(pc + 4 * sE e, [.addr (Int.ofNat (slotAddr n))])]
   | .seq _ _ => []
-  | .ite e _ _ | .loop e _ => mE e pc ++ [(pc + 4 * sE e, [])]
+  | .ite e _ _ => mE e pc ++ [(pc + 4 * sE e, [])]
+  | .loop e b =>
+    if shortLoop e b then mE e pc ++ [(pc + 4 * sE e, [])]
+    else mE e pc ++ [(pc + 4 * sE e, []), (if (evalS e t).val ≠ 0 then pc + 4 * sE e + 4 else pc + 4 * sE e + 8, [])]
   | .load x e =>
     mIdx e pc ++ [(pc + 4 * (sE e + 5), [.addr (Int.ofNat (arrAddr (idx (evalS e t))))]),
       (pc + 4 * (sE e + 5) + 4, [.addr (Int.ofNat (slotAddr x))])]
@@ -77,7 +80,8 @@ def nextK (c : SCmd) (pc : Nat) (k : List TF) (t : Slice.Slots.Slots) : List TF 
     else pushT b (pc + 4 * (sE e + 1 + sC a + 1)) k
   | .loop e b =>
     if (evalS e t).val ≠ 0 then
-      pushT b (pc + 4 * (sE e + 1)) (.jmp (pc + 4 * (sE e + 1 + sC b)) pc :: .cmd (.loop e b) pc :: k)
+      if shortLoop e b then pushT b (pc + 4 * (sE e + 1)) (.jmp (pc + 4 * (sE e + 1 + sC b)) pc :: .cmd (.loop e b) pc :: k)
+      else pushT b (pc + 4 * (sE e + 3)) (.jmp (pc + 4 * (sE e + 3 + sC b)) pc :: .cmd (.loop e b) pc :: k)
     else k
   | _ => k
 
@@ -85,7 +89,7 @@ def nextK (c : SCmd) (pc : Nat) (k : List TF) (t : Slice.Slots.Slots) : List TF 
 def FOk (C : List Byte) : List TF → Prop
   | [] => True
   | .cmd c pc :: k => (∀ a b, c ≠ .seq a b) ∧ okC c = true ∧ At C pc (genC c) ∧ FOk C k
-  | .jmp p q :: k => (∃ i, fetchI C p = some (.beq 0 0 i) ∧ addImm (W64.ofNat p) i = q) ∧ FOk C k
+  | .jmp p q :: k => (∃ i, (fetchI C p = some (.beq 0 0 i) ∨ fetchI C p = some (.jal 0 i)) ∧ addImm (W64.ofNat p) i = q) ∧ FOk C k
 
 /-- The frames run in order, ending at `f`. -/
 def Chain : Nat → List TF → Nat → Prop
@@ -119,16 +123,19 @@ theorem push_chain : ∀ (c : SCmd) (pc : Nat) (k : List TF) (f : Nat), Chain (p
 
 /-- A jump, forward or back. -/
 theorem exec_jmp {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {i : Int} {q : Nat}
-    (hf : fetchI C m.pc = some (.beq 0 0 i)) (ha : addImm (W64.ofNat m.pc) i = q) (hinv : Inv m t) :
+    (hf : fetchI C m.pc = some (.beq 0 0 i) ∨ fetchI C m.pc = some (.jal 0 i)) (ha : addImm (W64.ofNat m.pc) i = q) (hinv : Inv m t) :
     ∃ m', Exec C en [(m.pc, [])] m m' ∧ m'.pc = q ∧ Inv m' t := by
-  have hs := step_beq (en := en) hf
-  refine ⟨_, Exec.step hs, ?_, Inv.mono_mem hinv rfl rfl⟩
-  show (if m.get 0 = m.get 0 then addImm (W64.ofNat m.pc) i else m.pc + 4) = q
-  rw [if_pos rfl, ha]
+  rcases hf with hf | hf
+  · have hs := step_beq (en := en) hf
+    refine ⟨_, Exec.step hs, ?_, Inv.mono_mem hinv rfl rfl⟩
+    show (if m.get 0 = m.get 0 then addImm (W64.ofNat m.pc) i else m.pc + 4) = q
+    rw [if_pos rfl, ha]
+  · have hs := step_jal0 (en := en) hf
+    exact ⟨_, Exec.step hs, ha, Inv.mono_mem hinv rfl rfl⟩
 
 /-- `if`: the guard, then into an arm, with the first arm's jump pending. -/
 theorem exec_ite {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {e : SExpr} {a b : SCmd} {k : List TF} {f : Nat}
-    (hC : C.length ≤ 3000) (hoc : okC (.ite e a b) = true) (hat : At C m.pc (genC (.ite e a b))) (hok : FOk C k)
+    (hC : C.length ≤ 65360) (hoc : okC (.ite e a b) = true) (hat : At C m.pc (genC (.ite e a b))) (hok : FOk C k)
     (hch : Chain (m.pc + 4 * sC (.ite e a b)) k f) (hinv : Inv m t) :
     ∃ m', Exec C en (chunkC (.ite e a b) m.pc t) m m' ∧ FOk C (nextK (.ite e a b) m.pc k t) ∧
       Chain m'.pc (nextK (.ite e a b) m.pc k t) f ∧ Inv m' (nextT (.ite e a b) t) := by
@@ -151,7 +158,7 @@ theorem exec_ite {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {
   refine ⟨m', e', ?_, ?_, hi'⟩
   · simp only [nextK]
     split
-    · refine push_fok a _ _ ho2 atA ⟨⟨_, atJ, ?_⟩, hok⟩
+    · refine push_fok a _ _ ho2 atA ⟨⟨_, Or.inl atJ, ?_⟩, hok⟩
       rw [addImm_val _ _ (by rw [hv]; omega), hv]; omega
     · exact push_fok b _ _ ho3 atB hok
   · simp only [nextK]
@@ -166,50 +173,116 @@ theorem exec_ite {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {
         rw [show m.pc + 4 * (sE e + 1 + sC a + 1) + 4 * sC b = m.pc + 4 * (sE e + 1 + sC a + 1 + sC b) by omega]
         exact hch)
 
-/-- `while`: the guard, then the body with the jump back and the loop pending, or past it. -/
+/-- `while`: the guard, then the body with the jump back and the loop pending, or past it. Short form: a `beq` each way. Long form
+    (CAP-01 4b): `beq x8,x0,+8; jal x0,+8; jal x0,exit` at the head, and a `jal` back. -/
 theorem exec_loop {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {e : SExpr} {b : SCmd} {k : List TF} {f : Nat}
-    (hC : C.length ≤ 3000) (hoc : okC (.loop e b) = true) (hat : At C m.pc (genC (.loop e b))) (hok : FOk C k)
+    (hC : C.length ≤ 65360) (hoc : okC (.loop e b) = true) (hat : At C m.pc (genC (.loop e b))) (hok : FOk C k)
     (hch : Chain (m.pc + 4 * sC (.loop e b)) k f) (hinv : Inv m t) :
     ∃ m', Exec C en (chunkC (.loop e b) m.pc t) m m' ∧ FOk C (nextK (.loop e b) m.pc k t) ∧
       Chain m'.pc (nextK (.loop e b) m.pc k t) f ∧ Inv m' (nextT (.loop e b) t) := by
   have hoc0 := hoc
   have hat0 := hat
-  simp only [okC, Bool.and_eq_true, decide_eq_true_eq] at hoc
-  obtain ⟨⟨⟨ho1, ho2⟩, ho3⟩, ho4⟩ := hoc
-  simp only [genC] at hat
-  have atG := Slice.Lower.At.left (Slice.Lower.At.left hat)
-  have atB := Slice.Lower.At.right (Slice.Lower.At.left hat)
-  simp only [List.length_append, genE_length, List.length_cons, List.length_nil, Nat.zero_add] at atB
-  have atJ := (Slice.Lower.At.right hat).head
-  simp only [List.length_append, genE_length, genC_length, List.length_cons, List.length_nil, Nat.zero_add] at atJ
-  obtain ⟨m', e', hi', hp'⟩ := exec_guard (en := en) (t := t) (off := 4 * (sC b + 2)) hC (by omega) ho1
-    (show Inv m t from hinv) atG
+  simp only [okC, Bool.and_eq_true, Bool.or_eq_true] at hoc
+  obtain ⟨⟨ho1, ho2⟩, ho34⟩ := hoc
   have hch0 := hch
-  simp only [sC] at hch
-  have hbd := fetchI_bound atJ
+  rw [sC_loop] at hch
+  simp only [genC] at hat
   have hcb : codeBase = 0x100b0 := rfl
-  have hv : (W64.ofNat (m.pc + 4 * (sE e + 1 + sC b))).val = m.pc + 4 * (sE e + 1 + sC b) := ofNat_val (by omega)
-  refine ⟨m', e', ?_, ?_, hi'⟩
-  · simp only [nextK]
-    split
-    · refine push_fok b _ _ ho2 atB ⟨⟨_, atJ, ?_⟩, (by intro x y h; cases h), hoc0, hat0, hok⟩
-      have hs : 0 < sE e + 1 + sC b := by omega
-      rw [addImm_back _ _ (by omega) (by rw [hv]; omega), hv]; omega
-    · exact hok
-  · simp only [nextK]
-    split
-    · rename_i hg
-      rw [hp', if_pos hg]
-      refine push_chain b _ _ _ ⟨by omega, rfl, ?_⟩
-      exact hch0
-    · rename_i hg
-      rw [hp', if_neg hg]
-      rw [show m.pc + 4 * sE e + 4 * (sC b + 2) = m.pc + 4 * (sE e + 1 + sC b + 1) by omega]
-      exact hch
+  by_cases hs : shortLoop e b = true
+  · -- the short form, as before
+    have hsb := hs
+    simp only [shortLoop, Bool.and_eq_true, decide_eq_true_eq] at hsb
+    obtain ⟨ho3, ho4⟩ := hsb
+    simp only [hs, ↓reduceIte] at hat hch
+    have atG := Slice.Lower.At.left (Slice.Lower.At.left hat)
+    have atB := Slice.Lower.At.right (Slice.Lower.At.left hat)
+    simp only [List.length_append, genE_length, List.length_cons, List.length_nil, Nat.zero_add] at atB
+    have atJ := (Slice.Lower.At.right hat).head
+    simp only [List.length_append, genE_length, genC_length, List.length_cons, List.length_nil, Nat.zero_add] at atJ
+    obtain ⟨m', e', hi', hp'⟩ := exec_guard (en := en) (t := t) (off := 4 * (sC b + 2)) hC (by omega) ho1
+      (show Inv m t from hinv) atG
+    have hbd := fetchI_bound atJ
+    have hv : (W64.ofNat (m.pc + 4 * (sE e + 1 + sC b))).val = m.pc + 4 * (sE e + 1 + sC b) := ofNat_val (by omega)
+    refine ⟨m', by simp only [chunkC, hs, ↓reduceIte]; exact e', ?_, ?_, hi'⟩
+    · simp only [nextK, hs, ↓reduceIte]
+      split
+      · refine push_fok b _ _ ho2 atB ⟨⟨_, Or.inl atJ, ?_⟩, (by intro x y h; cases h), hoc0, hat0, hok⟩
+        have hs' : 0 < sE e + 1 + sC b := by omega
+        rw [addImm_back _ _ (by omega) (by rw [hv]; omega), hv]; omega
+      · exact hok
+    · simp only [nextK, hs, ↓reduceIte]
+      split
+      · rename_i hg
+        rw [hp', if_pos hg]
+        refine push_chain b _ _ _ ⟨by omega, rfl, ?_⟩
+        exact hch0
+      · rename_i hg
+        rw [hp', if_neg hg]
+        rw [show m.pc + 4 * sE e + 4 * (sC b + 2) = m.pc + 4 * (sE e + 1 + sC b + 1) by omega]
+        exact hch
+  · -- the long form
+    have hl : longOk e b = true := by
+      rcases ho34 with h | h
+      · exact absurd h hs
+      · exact h
+    have hs' : shortLoop e b = false := by simpa using hs
+    simp only [hs', Bool.false_eq_true, ↓reduceIte] at hat hch
+    have atH := Slice.Lower.At.left (Slice.Lower.At.left hat)
+    have atG := Slice.Lower.At.left atH
+    have atT := Slice.Lower.At.right atH
+    simp only [genE_length] at atT
+    have atB := Slice.Lower.At.right (Slice.Lower.At.left hat)
+    simp only [List.length_append, genE_length, List.length_cons, List.length_nil, Nat.zero_add] at atB
+    have atJ := (Slice.Lower.At.right hat).head
+    simp only [List.length_append, genE_length, genC_length, List.length_cons, List.length_nil, Nat.zero_add] at atJ
+    have atG' : At C m.pc (genE e 0 ++ [.beq 8 0 (Int.ofNat 8)]) := by
+      have h3 : genE e 0 ++ [.beq 8 0 (Int.ofNat 8), .jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 2)))] =
+          (genE e 0 ++ [.beq 8 0 (Int.ofNat 8)]) ++ [.jal 0 (Int.ofNat 8), .jal 0 (Int.ofNat (4 * (sC b + 2)))] := by simp
+      rw [h3] at atH
+      exact Slice.Lower.At.left atH
+    obtain ⟨m', e', hi', hp'⟩ := exec_guard (en := en) (t := t) (off := 8) hC (by omega) ho1 (show Inv m t from hinv) atG'
+    have hj1 : fetchI C (m.pc + 4 * sE e + 4) = some (.jal 0 (Int.ofNat 8)) := by
+      have := atT 1 (by simp); simpa using this
+    have hj2 : fetchI C (m.pc + 4 * sE e + 8) = some (.jal 0 (Int.ofNat (4 * (sC b + 2)))) := by
+      have := atT 2 (by simp); simpa using this
+    have hbd := fetchI_bound atJ
+    have hv : (W64.ofNat (m.pc + 4 * (sE e + 3 + sC b))).val = m.pc + 4 * (sE e + 3 + sC b) := ofNat_val (by omega)
+    by_cases hg : (evalS e t).val ≠ 0
+    · -- into the body: the guard falls through to `jal x0, +8`
+      have hpc : m'.pc = m.pc + 4 * sE e + 4 := by rw [hp', if_pos hg]; omega
+      have hjv : (W64.ofNat (m.pc + 4 * sE e + 4)).val = m.pc + 4 * sE e + 4 := ofNat_val (by have := fetchI_bound hj1; omega)
+      obtain ⟨m'', e'', p'', i''⟩ := exec_jmp (en := en) (t := t) (m := m') (i := Int.ofNat 8) (q := m.pc + 4 * sE e + 12)
+        (Or.inr (by rw [hpc]; exact hj1)) (by rw [hpc, addImm_val _ _ (by rw [hjv]; omega), hjv]; try omega) hi'
+      refine ⟨m'', ?_, ?_, ?_, i''⟩
+      · simp only [chunkC, hs', Bool.false_eq_true, ↓reduceIte, if_pos hg]
+        have := e'.trans e''
+        rw [hpc] at this
+        simpa [List.append_assoc] using this
+      · simp only [nextK, if_pos hg, hs', Bool.false_eq_true, ↓reduceIte]
+        refine push_fok b _ _ ho2 atB ⟨⟨_, Or.inr atJ, ?_⟩, (by intro x y h; cases h), hoc0, hat0, hok⟩
+        have h0 : 0 < sE e + 3 + sC b := by omega
+        rw [addImm_back _ _ (by omega) (by rw [hv]; omega), hv]; omega
+      · simp only [nextK, if_pos hg, hs', Bool.false_eq_true, ↓reduceIte]
+        rw [p'']
+        refine push_chain b _ _ _ ⟨by omega, rfl, ?_⟩
+        exact hch0
+    · -- past it: the guard jumps to `jal x0, exit`
+      have hpc : m'.pc = m.pc + 4 * sE e + 8 := by rw [hp', if_neg hg]
+      have hjv : (W64.ofNat (m.pc + 4 * sE e + 8)).val = m.pc + 4 * sE e + 8 := ofNat_val (by have := fetchI_bound hj2; omega)
+      obtain ⟨m'', e'', p'', i''⟩ := exec_jmp (en := en) (t := t) (m := m') (i := Int.ofNat (4 * (sC b + 2)))
+        (q := m.pc + 4 * (sE e + 3 + sC b + 1)) (Or.inr (by rw [hpc]; exact hj2))
+        (by rw [hpc, addImm_val _ _ (by rw [hjv]; omega), hjv]; try omega) hi'
+      refine ⟨m'', ?_, ?_, ?_, i''⟩
+      · simp only [chunkC, hs', Bool.false_eq_true, ↓reduceIte, if_neg hg]
+        have := e'.trans e''
+        rw [hpc] at this
+        simpa [List.append_assoc] using this
+      · simp only [nextK, if_neg hg]; exact hok
+      · simp only [nextK, if_neg hg]; rw [p'']; exact hch
 
 /-- **One frame, on the machine**, whatever its environment. -/
 theorem chunk_exec {C : List Byte} {en : Env} {m : Mach} {t : Slice.Slots.Slots} {c : SCmd} {pc : Nat} {k : List TF} {f : Nat}
-    (hC : C.length ≤ 3000) (hok : FOk C (.cmd c pc :: k)) (hch : Chain m.pc (.cmd c pc :: k) f) (hinv : Inv m t) :
+    (hC : C.length ≤ 65360) (hok : FOk C (.cmd c pc :: k)) (hch : Chain m.pc (.cmd c pc :: k) f) (hinv : Inv m t) :
     ∃ m', ExecE C en (chunkC c pc t) (evC c t) m m' ∧ FOk C (nextK c pc k t) ∧ Chain m'.pc (nextK c pc k t) f ∧ Inv m' (nextT c t) := by
   obtain ⟨hns, hoc, hat, hok'⟩ := hok
   obtain ⟨hp, hch'⟩ := hch

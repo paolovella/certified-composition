@@ -44,6 +44,8 @@ inductive Insn where
   /-- A byte store, the low byte of `rs2` (RC-02): `sodium_add`'s `a[i] = (unsigned char) c`. -/
   | sb   (rs2 rs1 : Nat) (imm : Int)
   | beq  (rs1 rs2 : Nat) (imm : Int)
+  /-- A jump of ±1 MB, linking `pc + 4` into `rd` (CAP-01): an `if` arm or a loop body past `beq`'s ±4 KB. -/
+  | jal  (rd : Nat) (imm : Int)
   | ecall
   deriving DecidableEq, Repr
 
@@ -71,6 +73,9 @@ def encode : Insn → Nat
     let i := bits imm 13
     (i / 4096 % 2) * 2 ^ 31 + (i / 32 % 64) * 2 ^ 25 + rs2 * 2 ^ 20 + rs1 * 2 ^ 15
       + (i / 2 % 16) * 2 ^ 8 + (i / 2048 % 2) * 2 ^ 7 + 0x63
+  | .jal rd imm =>
+    let i := bits imm 21
+    (i / 2 ^ 20 % 2) * 2 ^ 31 + (i / 2 % 1024) * 2 ^ 21 + (i / 2048 % 2) * 2 ^ 20 + (i / 4096 % 256) * 2 ^ 12 + rd * 2 ^ 7 + 0x6f
   | .ecall => 0x73
 
 def code (p : List Insn) : List Byte := p.flatMap fun i => le 4 (encode i)
@@ -114,6 +119,9 @@ def decode (w : Nat) : Option Insn :=
       some (.beq (rs1Of w) (rs2Of w) (sext 13
         ((w / 2 ^ 31) * 4096 + (w / 2 ^ 7 % 2) * 2048 + (w / 2 ^ 25 % 64) * 32 + (w / 2 ^ 8 % 16) * 2)))
     else none
+  | 0x6f =>
+    some (.jal (rdOf w) (sext 21
+      ((w / 2 ^ 31) * 2 ^ 20 + (w / 2 ^ 12 % 256) * 2 ^ 12 + (w / 2 ^ 20 % 2) * 2 ^ 11 + (w / 2 ^ 21 % 1024) * 2)))
   | 0x73 => if w = 0x73 then some .ecall else none
   | _ => none
 
@@ -247,6 +255,7 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
         else .fault [.addr (Int.ofNat a)]
       | .beq a b imm =>
         .next [] { m with pc := if m.get a = m.get b then addImm (W64.ofNat m.pc) imm else n }
+      | .jal rd imm => .next [] { m with pc := addImm (W64.ofNat m.pc) imm, x := m.set rd (W64.ofNat (m.pc + 4)) }
       | .ecall => if m.get 17 = sysExit then .exit (m.get 10) else if m.get 17 = sysWrite then sysWriteStep code e m n else .fault []
 
 /-- The event that returns a word: the same as the source's. -/
@@ -351,19 +360,22 @@ theorem rvLang_lawful (P : Nat → Bool) : (rvLang P).Lawful where
 
 /-! ## The image -/
 
-/-- A static RV64 ELF with these two segments. Trust base: the loader places them as `init` says. -/
+/-- A static RV64 ELF with these two segments. Trust base: the loader places them as `init` says. The data segment's file offset is the
+    first page boundary after the code (CAP-01; it was 0x1000, which held code to 3920 bytes). Its address stays `dataBase`, so code up to
+    `dataBase - codeBase` bytes fits, and every ELF of code under 3920 bytes is unchanged. -/
 def elf (body data : List Byte) : List Byte :=
   let cbase := 0x10000
   let hdr := 64 + 2 * 56
   let csize := hdr + body.length
+  let doff := (csize + 0xfff) / 0x1000 * 0x1000
   let ident : List Byte := ([0x7f, 0x45, 0x4c, 0x46, 2, 1, 1] : List Nat).map byteOf ++ List.replicate 9 (byteOf 0)
   let head := ident ++ le 2 2 ++ le 2 243 ++ le 4 1 ++ le 8 (cbase + hdr) ++ le 8 64 ++ le 8 0 ++ le 4 0
     ++ le 2 64 ++ le 2 56 ++ le 2 2 ++ le 2 64 ++ le 2 0 ++ le 2 0
     ++ le 4 1 ++ le 4 5 ++ le 8 0 ++ le 8 cbase ++ le 8 cbase ++ le 8 csize ++ le 8 csize ++ le 8 0x1000
-    ++ le 4 1 ++ le 4 6 ++ le 8 0x1000 ++ le 8 dataBase ++ le 8 dataBase ++ le 8 data.length ++ le 8 dataSize
+    ++ le 4 1 ++ le 4 6 ++ le 8 doff ++ le 8 dataBase ++ le 8 dataBase ++ le 8 data.length ++ le 8 dataSize
     ++ le 8 0x1000
     ++ body
-  head ++ List.replicate (0x1000 - head.length) (byteOf 0) ++ data
+  head ++ List.replicate (doff - head.length) (byteOf 0) ++ data
 
 /-- The entry address is where `init` starts. -/
 theorem elf_entry : 0x10000 + (64 + 2 * 56) = codeBase := by decide

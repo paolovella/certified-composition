@@ -74,7 +74,9 @@ theorem Corr.next {ks : List SFrame} {k : List TF} (h : Corr ks k) (c : SCmd) (q
   | loop e b =>
     simp only [nextS, nextK]
     split
-    · exact Corr.push _ _ _ (Corr.jmp (Corr.cmd h))
+    · split
+      · exact Corr.push _ _ _ (Corr.jmp (Corr.cmd h))
+      · exact Corr.push _ _ _ (Corr.jmp (Corr.cmd h))
     · exact h
   | _ => exact h
 
@@ -131,7 +133,9 @@ def stepC : SCmd → Nat
   | .skip => 1
   | .set _ e => sE e + 1
   | .seq _ _ => 0
-  | .ite e _ _ | .loop e _ => sE e + 2
+  | .ite e _ _ => sE e + 2
+  -- CAP-01 4b: the long loop's head is one instruction longer
+  | .loop e b => if shortLoop e b then sE e + 2 else sE e + 3
   | .load _ e => sE e + 7
   | .loadB _ _ e => sE e + 4
   | .store e v => sE e + 5 + sE v + 1
@@ -142,7 +146,7 @@ def stepC : SCmd → Nat
 def stepMax : SCmd → Nat
   | .seq a b => max (stepMax a) (stepMax b)
   | .ite e a b => max (sE e + 2) (max (stepMax a) (stepMax b))
-  | .loop e b => max (sE e + 2) (stepMax b)
+  | .loop e b => max (stepC (.loop e b)) (stepMax b)
   -- Every other constructor is listed, not caught by `| c => _`: a match with overlapping patterns compiles through `propext`, and this
   -- definition is axiom-free without it (the manifest gate caught it, PR #21).
   | .skip => stepC .skip
@@ -194,7 +198,9 @@ theorem next_fs {L : Nat} {c : SCmd} {pc : Nat} {k : List TF} (t : Slice.Slots.S
     simp only [stepMax] at hc
     simp only [nextK]
     split
-    · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
+    · split
+      · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
+      · exact push_fs _ _ _ (by omega) ⟨hc0, hk⟩
     · exact hk
   | _ => exact hk
 
@@ -216,12 +222,21 @@ theorem chunk_length {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots)
       · rw [jc_push]; simp only [jc]; omega
       · rw [jc_push]; omega
   | loop e b =>
-    simp only [chunkC, nextK, stepC, List.length_append, mE_length, List.length_cons, List.length_nil]
-    constructor
-    · omega
-    · split
-      · rw [jc_push]; simp only [jc]; omega
+    simp only [chunkC, nextK, stepC]
+    by_cases hs : shortLoop e b = true
+    · simp only [hs, ↓reduceIte, List.length_append, mE_length, List.length_cons, List.length_nil]
+      constructor
       · omega
+      · split
+        · rw [jc_push]; simp only [jc]; omega
+        · omega
+    · have hs' : shortLoop e b = false := by simpa using hs
+      simp only [hs', Bool.false_eq_true, ↓reduceIte, List.length_append, mE_length, List.length_cons, List.length_nil]
+      constructor
+      · omega
+      · split
+        · rw [jc_push]; simp only [jc]; omega
+        · omega
   | load x e => simp [chunkC, nextK, stepC, mIdx_length]
   | store e v => simp [chunkC, nextK, stepC, mIdx_length, mE_length]; omega
   | storeB ws e v => simp [chunkC, nextK, stepC, mE_length]; omega
@@ -261,7 +276,7 @@ theorem src_done (ret : SExpr) (n : Nat) (t : Slice.Slots.Slots) :
 /-! ## The machine is never ahead of the source -/
 
 /-- **`behind`**: at the same fuel, the machine's events are a prefix of the source's, its cost is bounded, and what it finishes the source has finished, alike. -/
-theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) (L : Nat) :
+theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) (L : Nat) :
     ∀ (m : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), Corr ks k → FS L k → FOk C k → Chain M.pc k r → Inv M t →
       (Slice.Rv.run C en m M).ev <+: (runS ret m ks t).ev ∧
       (Slice.Rv.run C en m M).cost ≤ L * (runS ret m ks t).cost + jc k + ((tailM ret r).length + 1) ∧
@@ -359,12 +374,14 @@ theorem jc_next {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots) : jc
   | loop e b =>
     simp only [nextK]
     split
-    · rw [jc_push]; simp only [jc]; omega
+    · split
+      · rw [jc_push]; simp only [jc]; omega
+      · rw [jc_push]; simp only [jc]; omega
     · omega
   | _ => simp [nextK]
 
 /-- **`ahead`.** Induction on fuel and pending jumps together: a jump spends none of the source's fuel. -/
-theorem ahead {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) :
+theorem ahead {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) :
     ∀ (w n : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), 2 * n + jc k ≤ w → Corr ks k → FOk C k → Chain M.pc k r → Inv M t →
       (runS ret n ks t).out ≠ .fuel →
       ∃ m, (Slice.Rv.run C en m M).out = (runS ret n ks t).out ∧ (Slice.Rv.run C en m M).ev = (runS ret n ks t).ev := by
@@ -501,7 +518,8 @@ theorem same_step {c : SCmd} {t t' : Slice.Slots.Slots} (h : lkOf c t = lkOf c t
     · simp only [nextS, hg]
   | loop e b =>
     have hg := guard_same h
-    refine ⟨rfl, ?_, ?_⟩
+    refine ⟨?_, ?_, ?_⟩
+    · simp only [chunkC, hg]
     · simp only [nextK, hg]
     · simp only [nextS, hg]
   | load x e =>
@@ -564,7 +582,7 @@ theorem view_mono (ret : SExpr) (f : Observer) : ∀ (m n : Nat) (ks : List SFra
         exact view_tickE he (ih n _ _ _ (by omega) (next_noSeq t hs) hr)
 
 /-- **`det`.** Two machines, in different environments, on what may be different inputs. If the source's two runs show the same at fuel `m`, the machines' do at fuel `m`. -/
-theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) (f : Observer) :
+theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) (f : Observer) :
     ∀ (m : Nat) (k : List TF) (ks : List SFrame) (t t' : Slice.Slots.Slots) (M M' : Mach), Corr ks k → Slots.NoSeqS ks → FOk C k →
       Chain M.pc k r → Chain M'.pc k r → Inv M t → Inv M' t' →
       (runS ret m ks t).view f = (runS ret m ks t').view f →
@@ -613,7 +631,7 @@ theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.l
 
 /-- **What the source has shown, the machine shows**, at some fuel, whether or not either finishes (RC-02). It replaces `fuel_ev`, which said that an
     unfinished source run has shown no event: an `emitB` makes that false. Induction on fuel and pending jumps together, as `ahead`. -/
-theorem catch_run {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) :
+theorem catch_run {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 65360) (ht : Tail C ret r) :
     ∀ (w n : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), 2 * n + jc k ≤ w → Corr ks k → FOk C k →
       Chain M.pc k r → Inv M t → ∃ m, (runS ret n ks t).ev <+: (Slice.Rv.run C en m M).ev := by
   intro w
@@ -661,7 +679,7 @@ def genP (p : SProg) : List Insn :=
   [.lui 7 0x20] ++ genC p.body ++ genE p.ret 0 ++ [.add 10 8 0, .addi 17 0 (Int.ofNat 93), .ecall]
 
 def okP (p : SProg) : Bool :=
-  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 3000)
+  okC p.body && okE p.ret 0 && decide (4 * (genP p).length ≤ 65360)
 
 def startPc : Nat := codeBase + 4
 def retPc (p : SProg) : Nat := startPc + 4 * sC p.body
@@ -688,7 +706,7 @@ theorem genP_good {p : SProg} (hb : okC p.body = true) (hr : okE p.ret 0 = true)
   · subst hi; exact Slice.Lower.good_ecall
 
 structure Laid (C : List Byte) (p : SProg) : Prop where
-  size : C.length ≤ 3000
+  size : C.length ≤ 65360
   lui : fetchI C codeBase = some (.lui 7 0x20)
   body : At C startPc (genC p.body)
   tail : Tail C p.ret (retPc p)

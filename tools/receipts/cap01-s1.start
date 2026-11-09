@@ -1,0 +1,4 @@
+started: 2026-11-09T09:59:31+01:00
+head: e098b07
+command: bash -c cd l-core && python3 /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1tools/s1_run.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1cap /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s1cap/s1.tsv 900 verify:16 line:30 line:100 line:300
+log: tools/receipts/cap01-s1.log

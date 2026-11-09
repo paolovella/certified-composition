@@ -1,0 +1,4 @@
+started: 2026-11-09T11:26:32+01:00
+head: 36f7791
+command: bash -c cd l-core && python3 test/rv_diff.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/rvj
+log: tools/receipts/cap01-rvdiff-jal.log

@@ -1,0 +1,4 @@
+started: 2026-11-09T12:07:39+01:00
+head: a388243
+command: python3 research/2026-11/slice2_low_mut.py /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/lm6
+log: tools/receipts/cap01-lowmut-loop.log

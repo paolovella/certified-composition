@@ -31,3 +31,4 @@ import LCore.Slice2.Out
 import LCore.Slice2.CTOut
 import LCore.Slice2.Add
 import LCore.Slice2.AddBytes
+import LCore.Slice2.Caps
