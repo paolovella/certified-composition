@@ -27,6 +27,12 @@ M = [
  ("result: accepts a secret", "| some st => !highE st.1 p.ret", "| some _ => true"),
  ("semantics: an access leaks nothing, load", "| .load x e => tick [addrLk (idx (eval e s))] p", "| .load x e => tick [] p"),
  ("semantics: an access leaks nothing, store", "| .store e v => tick [addrLk (idx (eval e s))] p", "| .store e v => tick [] p"),
+ # RC-02 step 3: byte stores and outputs
+ ("storeB: accepts a secret index", "  | .storeB ns e v =>\n    if highE st.1 e || ns.isEmpty then none", "  | .storeB ns e v =>\n    if false || ns.isEmpty then none"),
+ ("storeB: a secret value leaves the words low", "else if highE st.1 v then some (ns ++ st.1, st.2) else some st", "else some st"),
+ ("emitB: accepts a secret word", "| .emitB ns => if ns.any (fun y => decide (y ∈ st.1)) then none else some st", "| .emitB ns => some st"),
+ ("semantics: a byte store leaks nothing", "| .storeB ns e v => tick [addrLk (bidx ns (eval e s))] p", "| .storeB ns e v => tick [] p"),
+ ("semantics: an output emits nothing", "| .emitB ns => etick (.emit \"out\" (outBytes s ns)) p", "| .emitB ns => tick [] p"),
 ]
 bad = 0
 for name, old, new in M:

@@ -14,6 +14,8 @@ abbrev sp := 2
 abbrev ra := 1
 abbrev t1 := 6
 abbrev s1 := 9
+abbrev a1 := 11
+abbrev a2 := 12
 
 /-- Every case first sets its own stack, as the compiled program will, and ends by exiting. -/
 def stub : List Insn := [.lui sp 0x21, .lui t2 0x20]
@@ -27,6 +29,7 @@ def trace (c : List Byte) (e : Env) : Nat → Mach → List (Mach × List Lk) ×
   | n + 1, m =>
     match step c e m with
     | .next l m' => let r := trace c e n m'; ((m, l) :: r.1, r.2)
+    | .out _ l m' => let r := trace c e n m'; ((m, l) :: r.1, r.2)
     | .exit w => ([(m, [])], "done", w)
     | .fault l => ([(m, l)], "abort", W64.ofNat 0)
 
@@ -34,12 +37,18 @@ def hex (n : Nat) : String :=
   let s := (Nat.toDigits 16 n).asString
   String.ofList (List.replicate (16 - s.length) '0') ++ s
 
-/-- A step's PC, registers, and the address it leaks, or `-`. -/
+/-- A step's PC, registers, the first address it leaks or `-`, and how many addresses it leaks (RC-02: `write` leaks a range). -/
 def line (x : Mach × List Lk) : String :=
   let a := match x.2 with
-    | [.addr (.ofNat a)] => hex a
+    | .addr (.ofNat a) :: _ => hex a
     | _ => "-"
-  " ".intercalate (hex x.1.pc :: ((List.range 31).map fun i => hex (x.1.get (i + 1)).val) ++ [a])
+  let k := (x.2.filter fun l => match l with | .addr _ => true | _ => false).length
+  " ".intercalate (hex x.1.pc :: ((List.range 31).map fun i => hex (x.1.get (i + 1)).val) ++ [a, hex k])
+
+/-- The bytes a run writes to stdout: the payloads of its `.emit "out"` events. -/
+def stdoutOf (b : Beh) : List Nat := b.ev.flatMap fun v => match v with
+  | .emit "out" d => d
+  | _ => []
 
 /-- An input as the data segment's bytes, with the rest zero. -/
 def dataFn (d : List Byte) : Nat → Byte := fun off => d.getD off (byteOf 0)
@@ -98,6 +107,20 @@ def cases : List Case :=
   , ins "fault_past_data" [.lui t0 0x22, .ld a0 t0 0]
   , { name := "fault_illegal", body := code (stub ++ [.addi a0 0 1]) ++ le 4 0xffffffff }
   , { name := "fault_past_code", body := code (stub ++ [.addi a0 0 1]) }
+  -- RC-02 step 2: sb, and write(1, buf, len).
+  , ins "sb_bytes" [.addi t0 0 0x1ab, .sb t0 t2 0, .addi t1 0 (-1), .sb t1 t2 3, .sb t0 t2 7, .ld a0 t2 0] (inputWord 0x1122334455667788)
+  , ins "sb_offsets" [.addi t0 t2 16, .addi t1 0 0x7f, .sb t1 t0 (-15), .sb t1 t0 (-1), .ld a0 t2 0, .ld s1 t2 8]
+  , ins "fault_sb_code" [.lui t0 0x10, .addi t0 t0 0xb0, .sb t0 t0 0, .addi a0 0 1]
+  , ins "write_input" [.addi a0 0 1, .add a1 t2 0, .addi a2 0 5, .addi a7 0 64, .ecall, .add s1 a0 0, .addi a0 0 0] (inputWord 0x0a6f6c6c6568)
+  , ins "write_after_sb" [.addi t0 0 0x4c, .sb t0 t2 1, .addi a0 0 1, .add a1 t2 0, .addi a2 0 3, .addi a7 0 64, .ecall, .addi a0 0 0]
+      (inputWord 0x0a2a41)
+  , ins "write_offset_twice" [.addi a0 0 1, .addi a1 t2 2, .addi a2 0 2, .addi a7 0 64, .ecall, .addi a0 0 1, .addi a1 t2 0, .addi a2 0 1,
+      .addi a7 0 64, .ecall, .addi a0 0 0] (inputWord 0x0a5958575655)
+  , ins "write_zero_len" [.addi a0 0 1, .add a1 t2 0, .addi a2 0 0, .addi a7 0 64, .ecall, .addi a0 a0 7]
+  , { name := "dev_write_fd2", deviates := true,
+      body := code (stub ++ [.addi a0 0 2, .add a1 t2 0, .addi a2 0 1, .addi a7 0 64, .ecall, .addi a0 0 0] ++ exit), data := inputWord 0x0a }
+  , { name := "dev_write_unreadable", deviates := true,
+      body := code (stub ++ [.addi a0 0 1, .addi a1 0 0, .addi a2 0 1, .addi a7 0 64, .ecall, .addi a0 0 0] ++ exit) }
   , { name := "dev_compressed", deviates := true,
       body := code stub ++ le 2 0x4515 ++ le 2 0x0001 ++ code exit }
   , { name := "dev_unknown_syscall", deviates := true,
@@ -116,6 +139,7 @@ def writeCase (dir : String) (c : Case) : IO Unit := do
   let beh := run c.body envLinux 200 (init c.body (dataFn c.data) envLinux)
   let head := s!"{r.2.1} {hex r.2.2.val} {beh.cost} {if c.deviates then "deviates" else "exact"}"
   IO.FS.writeFile (path ++ ".pred") ("\n".intercalate (head :: r.1.map line) ++ "\n")
+  IO.FS.writeBinFile (path ++ ".stdout") (ByteArray.mk ((stdoutOf beh).map fun n => n.toUInt8).toArray)
 
 end RvCases
 

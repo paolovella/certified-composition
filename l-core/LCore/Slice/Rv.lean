@@ -6,9 +6,10 @@
   test evidence on chosen cases. S-SAIL's proof route is the later link.
 
   **Where it is known to be wrong**, on purpose. It aborts on what it does not model, and the real machine may carry
-  on: a compressed instruction runs, and an unknown syscall returns an error. A jump outside the code is an abort
-  here, whatever is mapped there. So a certificate on `rvLang` says nothing about a program that uses these, and the
-  compiled programs must not. `test/rv_diff.py` runs both first kinds as expected deviations.
+  on: a compressed instruction runs, an unknown syscall returns an error, and a `write` to another descriptor or from
+  unreadable memory writes or returns an error (RC-02). A jump outside the code is an abort here, whatever is mapped
+  there. So a certificate on `rvLang` says nothing about a program that uses these, and the compiled programs must not.
+  `test/rv_diff.py` runs each of these kinds but the jump as an expected deviation, and requires the model to abort in each.
 
   **Not modelled at all:** timing (cost counts instructions retired), speculation, and attacker-readable residue.
 -/
@@ -40,6 +41,8 @@ inductive Insn where
   | lbu  (rd rs1 : Nat) (imm : Int)
   | ld   (rd rs1 : Nat) (imm : Int)
   | sd   (rs2 rs1 : Nat) (imm : Int)
+  /-- A byte store, the low byte of `rs2` (RC-02): `sodium_add`'s `a[i] = (unsigned char) c`. -/
+  | sb   (rs2 rs1 : Nat) (imm : Int)
   | beq  (rs1 rs2 : Nat) (imm : Int)
   | ecall
   deriving DecidableEq, Repr
@@ -61,6 +64,9 @@ def encode : Insn → Nat
   | .sd rs2 rs1 imm =>
     let i := bits imm 12
     (i / 32) * 2 ^ 25 + rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + 3 * 2 ^ 12 + (i % 32) * 2 ^ 7 + 0x23
+  | .sb rs2 rs1 imm =>
+    let i := bits imm 12
+    (i / 32) * 2 ^ 25 + rs2 * 2 ^ 20 + rs1 * 2 ^ 15 + (i % 32) * 2 ^ 7 + 0x23
   | .beq rs1 rs2 imm =>
     let i := bits imm 13
     (i / 4096 % 2) * 2 ^ 31 + (i / 32 % 64) * 2 ^ 25 + rs2 * 2 ^ 20 + rs1 * 2 ^ 15
@@ -100,7 +106,9 @@ def decode (w : Nat) : Option Insn :=
     else if f3Of w = 4 then some (.lbu (rdOf w) (rs1Of w) (sext 12 (w / 2 ^ 20)))
     else none
   | 0x23 =>
-    if f3Of w = 3 then some (.sd (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w))) else none
+    if f3Of w = 3 then some (.sd (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w)))
+    else if f3Of w = 0 then some (.sb (rs2Of w) (rs1Of w) (sext 12 ((w / 2 ^ 25) * 32 + rdOf w)))
+    else none
   | 0x63 =>
     if f3Of w = 0 then
       some (.beq (rs1Of w) (rs2Of w) (sext 13
@@ -173,11 +181,29 @@ def fetch (code : List Byte) (pc : Nat) : Option Nat :=
 /-- What one step did. A fault's leakage is what it tried. -/
 inductive Step where
   | next  (l : List Lk) (m : Mach)
+  /-- A step that emits an event and carries on: the `write` syscall (RC-02). -/
+  | out   (v : Ev) (l : List Lk) (m : Mach)
   | exit  (w : W64)
   | fault (l : List Lk)
 
 /-- The exit syscall's number. -/
 def sysExit : W64 := W64.ofNat 93
+
+/-- The write syscall's number, and the one file descriptor the model writes to: stdout. -/
+def sysWrite : W64 := W64.ofNat 64
+
+/-- **`write(1, buf, len)`, as the event `.emit "out" bytes`** (RC-02). It reads `len` bytes from `buf`, each of which must be
+    readable, and leaks each address it reads. It returns `len` in `a0`, as Linux does for a complete write to stdout.
+
+    **Known to be wrong, on purpose:** another descriptor, an unreadable byte or a length over `dataSize` aborts here. Linux
+    would write to that descriptor, or return `-EBADF` or `-EFAULT`. Compiled programs write stdout from the data segment. -/
+def sysWriteStep (code : List Byte) (e : Env) (m : Mach) (n : Nat) : Step :=
+  let a := (m.get 11).val
+  let len := (m.get 12).val
+  let as := (List.range len).map fun i => (a + i) % 2 ^ 64
+  if m.get 10 = W64.ofNat 1 ∧ len ≤ dataSize ∧ as.all (canRead code e) = true then
+    .out (.emit "out" (as.map fun b => (m.mem b).val)) (as.map fun b => .addr (Int.ofNat b)) { m with pc := n, x := m.set 10 (m.get 12) }
+  else .fault []
 
 /-- **One instruction.** -/
 def step (code : List Byte) (e : Env) (m : Mach) : Step :=
@@ -209,6 +235,11 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
         if canRead code e a then
           .next [.addr (Int.ofNat a)] { m with pc := n, x := m.set rd (W64.ofNat (m.mem a).val) }
         else .fault [.addr (Int.ofNat a)]
+      | .sb rv rs imm =>
+        let a := addImm (m.get rs) imm
+        if canWrite code e a then
+          .next [.addr (Int.ofNat a)] { m with pc := n, mem := fun b => if b = a then byteOf (m.get rv).val else m.mem b }
+        else .fault [.addr (Int.ofNat a)]
       | .sd rv rs imm =>
         let a := addImm (m.get rs) imm
         if (addrs8 a).all (canWrite code e) then
@@ -216,7 +247,7 @@ def step (code : List Byte) (e : Env) (m : Mach) : Step :=
         else .fault [.addr (Int.ofNat a)]
       | .beq a b imm =>
         .next [] { m with pc := if m.get a = m.get b then addImm (W64.ofNat m.pc) imm else n }
-      | .ecall => if m.get 17 = sysExit then .exit (m.get 10) else .fault []
+      | .ecall => if m.get 17 = sysExit then .exit (m.get 10) else if m.get 17 = sysWrite then sysWriteStep code e m n else .fault []
 
 /-- The event that returns a word: the same as the source's. -/
 def retEv (w : W64) : Ev := .ext "ret" [Int.ofNat w.val]
@@ -230,6 +261,9 @@ def run (code : List Byte) (e : Env) : Nat → Mach → Beh
     | .next l m' =>
       let r := run code e n m'
       { r with cost := 1 + r.cost, lk := mark :: (l ++ r.lk) }
+    | .out v l m' =>
+      let r := run code e n m'
+      { r with ev := v :: r.ev, cost := 1 + r.cost, lk := mark :: (l ++ r.lk) }
     | .exit w => { ev := [retEv w], lk := [mark], cost := 1, out := .done }
     | .fault l => { ev := [], lk := mark :: l, cost := 0, out := .abort }
 
@@ -277,6 +311,13 @@ theorem run_ext (c : List Byte) (e : Env) : ∀ (n n' : Nat) (m : Mach), n ≤ n
       · simp only at hf ⊢; rw [h1 hf]
       · simp [← ht]
       · simp only; omega
+    | out v l m' =>
+      obtain ⟨h1, ⟨u, hu⟩, ⟨t, ht⟩, h4⟩ := ih k' m' hk
+      refine ⟨fun hf => ?_, ⟨u, ?_⟩, ⟨t, ?_⟩, ?_⟩
+      · simp only at hf ⊢; rw [h1 hf]
+      · simp [← hu]
+      · simp [← ht]
+      · simp only; omega
     | exit w => exact ⟨fun _ => rfl, List.prefix_refl _, List.prefix_refl _, Nat.le_refl _⟩
     | fault l => exact ⟨fun _ => rfl, List.prefix_refl _, List.prefix_refl _, Nat.le_refl _⟩
 
@@ -291,6 +332,10 @@ theorem run_diverge (c : List Byte) (e : Env) : ∀ (n : Nat) (m : Mach),
     revert hf
     cases step c e m with
     | next l m' =>
+      intro hf
+      simp only at hf ⊢
+      have := ih m' hf; omega
+    | out v l m' =>
       intro hf
       simp only at hf ⊢
       have := ih m' hf; omega

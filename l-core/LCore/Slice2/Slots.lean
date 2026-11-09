@@ -27,6 +27,10 @@ inductive SCmd where
   /-- Byte `i` of the slots `ws` (RC-01). -/
   | loadB : Nat → List Nat → SExpr → SCmd
   | store : SExpr → SExpr → SCmd
+  /-- A byte of the slots `ws` set to a value's low byte (RC-02). -/
+  | storeB : List Nat → SExpr → SExpr → SCmd
+  /-- One step that emits the bytes of the slots `ws` (RC-02). -/
+  | emitB : List Nat → SCmd
   deriving DecidableEq, Repr
 
 structure SProg where
@@ -52,6 +56,16 @@ def byteAtS (t : Slots) (ws : List Nat) (i : Nat) : W64 :=
   | some w => byteOfWord (t w) (i % 8)
   | none => W64.ofNat 0
 
+/-- Byte `i` of the slots `ws` set to `v`'s low byte, and nothing past their end. -/
+def storeAtS (t : Slots) (ws : List Nat) (i : Nat) (v : W64) : Slots :=
+  match ws[i / 8]? with
+  | some w => updS t w (setByte (t w) (i % 8) v)
+  | none => t
+
+/-- The bytes of the slots `ws`, little-endian. -/
+def outBytesS (t : Slots) (ws : List Nat) : List Nat :=
+  ws.flatMap fun w => (List.range 8).map fun j => (t w).val / 256 ^ j % 256
+
 def runS (ret : SExpr) : Nat → List SFrame → Slots → Beh
   | _, [], t => { ev := [retEv (evalS ret t)], lk := [], cost := 0, out := .done }
   | 0, _ :: _, _ => { ev := [], lk := [], cost := 0, out := .fuel }
@@ -69,6 +83,8 @@ def runS (ret : SExpr) : Nat → List SFrame → Slots → Beh
     | .load x e => tick [addrLk (idx (evalS e t))] p (runS ret n k (updS t x (t (arrBase + idx (evalS e t)))))
     | .loadB x ws e => tick [addrLk (bidxS ws (evalS e t))] p (runS ret n k (updS t x (byteAtS t ws (bidxS ws (evalS e t)))))
     | .store e v => tick [addrLk (idx (evalS e t))] p (runS ret n k (updS t (arrBase + idx (evalS e t)) (evalS v t)))
+    | .storeB ws e v => tick [addrLk (bidxS ws (evalS e t))] p (runS ret n k (storeAtS t ws (bidxS ws (evalS e t)) (evalS v t)))
+    | .emitB ws => etick (.emit "out" (outBytesS t ws)) p (runS ret n k t)
 
 /-- **The slot language.** Its input is the data segment's bytes. -/
 def slotLang (E : Type) (P : Nat → Bool) : Lang where
@@ -114,13 +130,15 @@ theorem runS_ext (ret : SExpr) : ∀ (n n' : Nat) (k : List SFrame) (t : Slots),
       | load x e => exact tick_ext _ _ (ih m' _ _ hm)
       | loadB x ws e => exact tick_ext _ _ (ih m' _ _ hm)
       | store e v => exact tick_ext _ _ (ih m' _ _ hm)
+      | storeB ws e v => exact tick_ext _ _ (ih m' _ _ hm)
+      | emitB ws => exact etick_ext _ _ (ih m' _ t hm)
 
 def NoSeqS (k : List SFrame) : Prop := ∀ f ∈ k, ∀ a b, f.1 ≠ .seq a b
 
 theorem pushS_noSeq : ∀ (c : SCmd) (p : List Nat) (k : List SFrame), NoSeqS k → NoSeqS (pushS c p k)
   | .seq a b, p, k, h => pushS_noSeq a _ _ (pushS_noSeq b _ k h)
   | .skip, _, k, h | .set _ _, _, k, h | .ite _ _ _, _, k, h | .loop _ _, _, k, h
-  | .load _ _, _, k, h | .loadB _ _ _, _, k, h | .store _ _, _, k, h => by
+  | .load _ _, _, k, h | .loadB _ _ _, _, k, h | .store _ _, _, k, h | .storeB _ _ _, _, k, h | .emitB _, _, k, h => by
     intro f hf a b
     simp only [pushS, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -175,6 +193,12 @@ theorem runS_diverge (ret : SExpr) : ∀ (n : Nat) (k : List SFrame) (t : Slots)
       | store e v =>
         simp only [runS, tick] at hf ⊢
         have := ih k _ hk' hf; omega
+      | storeB ws e v =>
+        simp only [runS, tick] at hf ⊢
+        have := ih k _ hk' hf; omega
+      | emitB ws =>
+        simp only [runS, etick, tick] at hf ⊢
+        have := ih k t hk' hf; omega
 
 theorem slotLang_lawful (E : Type) (P : Nat → Bool) : (slotLang E P).Lawful where
   ev_mono p i n n' h := (runS_ext _ n n' _ _ h).2.1
@@ -195,6 +219,8 @@ def cvars : Cmd → List String
   | .load x e => x :: evars e
   | .loadB x ns e => x :: ns ++ evars e
   | .store e v => evars e ++ evars v
+  | .storeB ns e v => ns ++ evars e ++ evars v
+  | .emitB ns => ns
 
 def allVars (p : Prog) : List String := cvars p.body ++ evars p.ret
 
@@ -246,6 +272,8 @@ def cC (p : Prog) : Cmd → SCmd
   | .load x e => .load (slotOf p x) (cE p e)
   | .loadB x ns e => .loadB (slotOf p x) (ns.map (slotOf p)) (cE p e)
   | .store e v => .store (cE p e) (cE p v)
+  | .storeB ns e v => .storeB (ns.map (slotOf p)) (cE p e) (cE p v)
+  | .emitB ns => .emitB (ns.map (slotOf p))
 
 def compile (p : Prog) : SProg := { body := cC p p.body, ret := cE p p.ret }
 
@@ -291,7 +319,7 @@ theorem pushS_cC (p : Prog) : ∀ (c : Cmd) (q : List Nat) (k : List Frame),
     simp only [cC, pushS, push]
     rw [pushS_cC p b, pushS_cC p a]
   | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
-  | .store _ _, _, _ => rfl
+  | .store _ _, _, _ | .storeB _ _ _, _, _ | .emitB _, _, _ => rfl
 
 def Cov (p : Prog) (k : List Frame) : Prop := ∀ f ∈ k, ∀ x ∈ cvars f.1, x ∈ allVars p
 
@@ -301,7 +329,8 @@ theorem push_cov {p : Prog} : ∀ (c : Cmd) (q : List Nat) (k : List Frame),
     apply push_cov a _ _ (fun x hx => hc x (by simp [cvars, hx]))
     exact push_cov b _ _ (fun x hx => hc x (by simp [cvars, hx])) hk
   | .skip, _, k, hc, hk | .assign _ _, _, k, hc, hk | .ite _ _ _, _, k, hc, hk | .loop _ _, _, k, hc, hk
-  | .load _ _, _, k, hc, hk | .loadB _ _ _, _, k, hc, hk | .store _ _, _, k, hc, hk => by
+  | .load _ _, _, k, hc, hk | .loadB _ _ _, _, k, hc, hk | .store _ _, _, k, hc, hk
+  | .storeB _ _ _, _, k, hc, hk | .emitB _, _, k, hc, hk => by
     intro f hf
     simp only [push, List.mem_cons] at hf
     rcases hf with rfl | hf
@@ -315,6 +344,15 @@ theorem byteAtS_map {p : Prog} {s : Store} {a : Arr} {t : Slots} (h : Rel p s a 
   cases hy : ns[i / 8]? with
   | none => rfl
   | some y => simp only [Option.map_some]; rw [h.1 y (hns y (List.mem_of_getElem? hy))]
+
+/-- **The slots' bytes are the store's**, for words of the program's own variables. -/
+theorem outBytesS_map {p : Prog} {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) : ∀ {ns : List String},
+    (∀ y ∈ ns, y ∈ allVars p) → outBytesS t (ns.map (slotOf p)) = outBytes s ns
+  | [], _ => rfl
+  | y :: ys, hns => by
+    have ih := outBytesS_map h (ns := ys) (fun z hz => hns z (List.mem_cons_of_mem _ hz))
+    simp only [outBytesS, outBytes, List.map_cons, List.flatMap_cons] at ih ⊢
+    rw [h.1 y (hns y List.mem_cons_self), ih]
 
 /-- Setting a variable's slot keeps the relation. -/
 theorem rel_set {p : Prog} (hf : p.inputs.length ≤ 64) {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) {x : String}
@@ -338,6 +376,22 @@ theorem rel_store {p : Prog} (hf : p.inputs.length ≤ 64) {s : Store} {a : Arr}
     · subst hji; simp [updS, updA]
     · have hne : arrBase + j ≠ arrBase + i := by omega
       simp [updS, updA, hne, hji, h.2 j hj]
+
+/-- **A byte store keeps the relation**, for an array of the program's own variables. -/
+theorem rel_storeB {p : Prog} (hf : p.inputs.length ≤ 64) {s : Store} {a : Arr} {t : Slots} (h : Rel p s a t) {ns : List String}
+    (hns : ∀ y ∈ ns, y ∈ allVars p) (i : Nat) (v : W64) :
+    Rel p (storeAt s ns i v) a (storeAtS t (ns.map (slotOf p)) i v) := by
+  cases hy : ns[i / 8]? with
+  | none =>
+    have : (ns.map (slotOf p))[i / 8]? = none := by simp [List.getElem?_map, hy]
+    simp only [storeAt, storeAtS, hy, this]
+    exact h
+  | some y =>
+    have hm : (ns.map (slotOf p))[i / 8]? = some (slotOf p y) := by simp [List.getElem?_map, hy]
+    have hyv : y ∈ allVars p := hns y (List.mem_of_getElem? hy)
+    simp only [storeAt, storeAtS, hy, hm]
+    rw [h.1 y hyv]
+    exact rel_set hf h hyv _
 
 /-- **Step for step, the compiled frames show what the source's show**, at every fuel. -/
 theorem runS_sim {p : Prog} (hf : p.inputs.length ≤ 64) (hret : ∀ x ∈ evars p.ret, x ∈ allVars p) :
@@ -412,6 +466,15 @@ theorem runS_sim {p : Prog} (hf : p.inputs.length ≤ 64) (hret : ∀ x ∈ evar
         have he := evalS_cE hr e (fun y hy => hc0 y (by simp [cvars, hy]))
         have hv := evalS_cE hr v (fun y hy => hc0 y (by simp [cvars, hy]))
         rw [he, hv, ih k _ _ _ hk (rel_store hf hr (idx_lt _) _)]
+      | storeB ns e v =>
+        simp only [List.map, cF, cC, runS, run]
+        have he := evalS_cE hr e (fun y hy => hc0 y (by simp [cvars, hy]))
+        have hv := evalS_cE hr v (fun y hy => hc0 y (by simp [cvars, hy]))
+        have hi : bidxS (ns.map (slotOf p)) (eval e s) = bidx ns (eval e s) := by simp [bidxS, bidx]
+        rw [he, hv, hi, ih k _ _ _ hk (rel_storeB hf hr (fun y (hy : y ∈ ns) => hc0 y (by simp [cvars, hy])) _ _)]
+      | emitB ns =>
+        simp only [List.map, cF, cC, runS, run]
+        rw [outBytesS_map hr (fun y (hy : y ∈ ns) => hc0 y (by simp [cvars, hy])), ih k s a t hk hr]
 
 /-- **The initial slots hold the initial store and an empty array**, on admissible inputs. -/
 theorem init_rel {p : Prog} {v : Nat → W64} (hv : ∀ k, cap ≤ k → v k = W64.ofNat 0) :

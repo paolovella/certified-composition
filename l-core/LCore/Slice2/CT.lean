@@ -29,6 +29,15 @@ def ctCheck (P : Nat → Bool) (p : Prog) : Bool := (highC (highInit P p.inputs 
 
 theorem tick_view (f : Observer) (l : List Lk) (q : List Nat) (r : Beh) : (tick l q r).view f = tick l q (r.view f) := rfl
 
+theorem etick_view_congr (f : Observer) (v : Ev) (q : List Nat) {r r' : Beh} (h : r.view f = r'.view f) :
+    (etick v q r).view f = (etick v q r').view f := by
+  have he := congrArg Beh.ev h
+  have hl := congrArg Beh.lk h
+  have hc := congrArg Beh.cost h
+  have ho := congrArg Beh.out h
+  simp only [Beh.view] at he hl hc ho
+  simp only [etick, tick, Beh.view, List.filter_cons, he, hl, hc, ho]
+
 /-- **The result is all that a program's `ret` changes, and `noRet` does not read it.** -/
 theorem run_view_ret (ret ret' : Expr) : ∀ (n : Nat) (k : List Frame) (s : Store) (a : Arr),
     (run ret n k s a).view noRet = (run ret' n k s a).view noRet := by
@@ -46,7 +55,8 @@ theorem run_view_ret (ret ret' : Expr) : ∀ (n : Nat) (k : List Frame) (s : Sto
     | cons f k =>
       obtain ⟨c, q⟩ := f
       cases c with
-      | skip | assign _ _ | load _ _ | loadB _ _ _ | store _ _ => simp only [run, tick_view, ih]
+      | skip | assign _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ => simp only [run, tick_view, ih]
+      | emitB ns => simp only [run]; exact etick_view_congr _ _ _ (ih _ _ _)
       | seq c₁ c₂ => exact ih _ _ _
       | ite e c₁ c₂ => simp only [run]; split <;> simp only [tick_view, ih]
       | loop e b => simp only [run]; split <;> simp only [tick_view, ih]

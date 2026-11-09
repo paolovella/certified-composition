@@ -14,6 +14,19 @@ CAP_KB = 12 * 2 ** 20
 TIMEOUT = 1500
 
 M = [
+ # RC-02 step 6: the budget's inputs, and byte stores
+ ("a counter may be set from a written input", BUD, "def readIn (p : Prog) : List String := p.inputs.filter fun x => !(writtenB p.body).contains x",
+  "def readIn (p : Prog) : List String := p.inputs"),
+ ("a byte store writes nothing, for the budget", BUD, "  | .storeB ns _ _ => ns\n  | .seq a b | .ite _ a b => assigns a ++ assigns b",
+  "  | .storeB _ _ _ => []\n  | .seq a b | .ite _ a b => assigns a ++ assigns b"),
+ # RC-02 step 3: byte stores and outputs, through the lowering
+ ("storeB writes the next byte", LOW, ".sb 9 8 (Int.ofNat (8 * ws.headD 0))]", ".sb 9 8 (Int.ofNat (8 * ws.headD 0 + 1))]"),
+ ("storeB stores the address, not the value", LOW, ".sb 9 8 (Int.ofNat (8 * ws.headD 0))]", ".sb 8 8 (Int.ofNat (8 * ws.headD 0))]"),
+ ("emitB writes one word short", LOW, ".addi 12 0 (Int.ofNat (8 * ws.length))", ".addi 12 0 (Int.ofNat (8 * ws.length - 8))"),
+ ("emitB writes from the next word", LOW, ".addi 11 7 (Int.ofNat (8 * ws.headD 0))", ".addi 11 7 (Int.ofNat (8 * ws.headD 0 + 8))"),
+ ("emitB writes to stderr", LOW, "[.addi 10 0 (Int.ofNat 1), .addi 11 7", "[.addi 10 0 (Int.ofNat 2), .addi 11 7"),
+ ("an output's addresses do not show", CHK, "(pc + 16, (List.range (8 * ws.length)).map fun i => .addr (Int.ofNat (dataBase + 8 * ws.headD 0 + i)))]", "(pc + 16, [])]"),
+ ("an output emits nothing on the machine", CHK, "| .emitB ws => [.emit \"out\" (Slots.outBytesS t ws)]", "| .emitB ws => []"),
  ("load reads the wrong word", LOW, "| .load x e => genIdx e ++ [.ld 8 8 (Int.ofNat 512), .sd 8 7", "| .load x e => genIdx e ++ [.ld 8 8 (Int.ofNat 504), .sd 8 7"),
  ("store writes the wrong word", LOW, "| .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 512)]", "| .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 504)]"),
  ("store stores the wrong register", LOW, "| .store e v => genIdx e ++ genE v 1 ++ [.sd 9 8 (Int.ofNat 512)]", "| .store e v => genIdx e ++ genE v 1 ++ [.sd 8 8 (Int.ofNat 512)]"),
@@ -53,7 +66,7 @@ M = [
  ("a loop round is charged one less", BUD, "(s c).val * (costOf B + 2) + 1 + pot cs k s", "(s c).val * (costOf B + 1) + 1 + pot cs k s"),
  ("setting a counter is not followed", BUD, "1 + pot cs k (if cs.contains x then upd s x (eval e s) else s)", "1 + pot cs k s"),
  ("a counted loop's body need not be plain", BUD, "c' == c && cs.contains c && isDec c d && plainC cs S B", "c' == c && cs.contains c && isDec c d"),
- ("a counter may be an input", BUD, "topC (counters p.body) p.inputs p.body && (counters p.body).all (fun c => !p.inputs.contains c)", "topC (counters p.body) p.inputs p.body"),
+ ("a counter may be an input", BUD, "topC (counters p.body) (readIn p) p.body && (counters p.body).all (fun c => !p.inputs.contains c)", "topC (counters p.body) (readIn p) p.body"),
  ("a decrement by two counts as one", BUD, "  | .add (.var y) (.lit w) => y == c && w.val == 2 ^ 64 - 1", "  | .add (.var y) (.lit w) => y == c && decide (2 ^ 64 - 2 ≤ w.val)"),
  ("countUp's budget is said to be one less", BUD, "budget countUp (inp 5 3) = 14 ∧", "budget countUp (inp 5 3) = 13 ∧"),
  ("the bytes' budget formula is one less per round", BYT, "≤ 8 * (4 * (wordAt u.1 1).val + 2) + 5 := by", "≤ 8 * (3 * (wordAt u.1 1).val + 2) + 5 := by"),

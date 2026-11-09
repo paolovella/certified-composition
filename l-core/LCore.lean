@@ -27,3 +27,7 @@ import LCore.Slice2.CT
 import LCore.Slice2.CSrc
 import LCore.Slice2.CFront
 import LCore.Slice2.CTBytes
+import LCore.Slice2.Out
+import LCore.Slice2.CTOut
+import LCore.Slice2.Add
+import LCore.Slice2.AddBytes

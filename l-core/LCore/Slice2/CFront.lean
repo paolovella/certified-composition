@@ -33,6 +33,8 @@ open Ops (lit)
 
 inductive P where
   | lp | rp | lb | rb | lc | rc | semi | comma | star | eq | orEq | caret | amp | bar | minus | plus | lt | inc | shr
+  /-- `+=` and `>>=` (RC-02), each one token, so `+ =` is not read as `+=`. -/
+  | plusEq | shrEq
   /-- Lexed, so that the text is read, and read by no rule: `/ ! > # % != ==`. -/
   | other
   deriving DecidableEq
@@ -57,7 +59,8 @@ def sym1 (c : Nat) : Option P :=
   else none
 
 def sym2 (c d : Nat) : Option P :=
-  if c == 124 && d == 61 then some .orEq else if c == 43 && d == 43 then some .inc else if c == 62 && d == 62 then some .shr
+  if c == 124 && d == 61 then some .orEq else if c == 43 && d == 43 then some .inc else if c == 43 && d == 61 then some .plusEq
+  else if c == 62 && d == 62 then some .shr
   else if (c == 33 || c == 61) && d == 61 then some .other else none
 
 def spanW (p : Nat → Bool) : List Nat → List Nat × List Nat
@@ -89,6 +92,11 @@ def lexF : Nat → List Nat → Option (List Tok)
       if startsIdc (dropU (spanW isDigit (c :: r)).2) then none
       else (lexF f (dropU (spanW isDigit (c :: r)).2)).map (Tok.num (digits (spanW isDigit (c :: r)).1 0) :: ·)
     else match r with
+      | d :: e :: r'' =>
+        if c == 62 && d == 62 && e == 61 then (lexF f r'').map (Tok.sym .shrEq :: ·)
+        else match sym2 c d with
+          | some p => (lexF f (e :: r'')).map (Tok.sym p :: ·)
+          | none => (sym1 c).bind fun p => (lexF f r).map (Tok.sym p :: ·)
       | d :: r' => match sym2 c d with
         | some p => (lexF f r').map (Tok.sym p :: ·)
         | none => (sym1 c).bind fun p => (lexF f r).map (Tok.sym p :: ·)
@@ -112,14 +120,19 @@ def kFast16 := kw ['u','i','n','t','_','f','a','s','t','1','6','_','t']
 def kU64 := kw ['u','i','n','t','6','4','_','t']
 def kReturn := kw ['r','e','t','u','r','n']
 def kFor := kw ['f','o','r']
+def kSizeT := kw ['s','i','z','e','_','t']
+def kVoid := kw ['v','o','i','d']
 
 def isQual (w : List Nat) : Bool := w == kConst || w == kVolatile
-def isTyWord (w : List Nat) : Bool := isQual w || w == kUnsigned || w == kChar || w == kInt || w == kLong || w == kFast16 || w == kU64
+def isTyWord (w : List Nat) : Bool :=
+  isQual w || w == kUnsigned || w == kChar || w == kInt || w == kLong || w == kFast16 || w == kU64 || w == kSizeT
 
 /-! ## The syntax tree -/
 
 inductive Ty where
   | ptr | word | int
+  /-- RC-02: a pointer to `unsigned char` without `const`, an array the function writes; and `unsigned char` itself, for a cast. -/
+  | wptr | byte
   deriving DecidableEq
 
 inductive COp where
@@ -143,12 +156,18 @@ inductive CS where
   | forN : List Nat → Nat → List Nat → CE → List Nat → List CS → CS
   | orEq : List Nat → CE → CS
   | ret  : CE → CS
+  /-- RC-02: `x += e`, `x >>= k`, `a[e] = e'`. -/
+  | addEq : List Nat → CE → CS
+  | shrEq : List Nat → Nat → CS
+  | store : List Nat → CE → CE → CS
 
 structure CFun where
   inline : Bool
   name   : List Nat
   params : List (Ty × List Nat)
   body   : List CS
+  /-- RC-02: a `void` function, which returns no value. -/
+  isVoid : Bool
 
 /-! ## The parser -/
 
@@ -161,10 +180,19 @@ def takeTy : List Tok → List (List Nat) × Nat × List Tok
   | .sym .star :: r => ((takeTy r).1, (takeTy r).2.1 + 1, (takeTy r).2.2)
   | r => ([], 0, r)
 
-def classify (ws : List (List Nat)) (stars : Nat) : Option Ty :=
-  if stars == 1 && ws == [kUnsigned, kChar] then some .ptr
-  else if stars == 0 && (ws == [kFast16] || ws == [kUnsigned, kLong] || ws == [kU64]) then some .word
+/-- Whether a type's words, before its name, include `const`. -/
+def constIn : List Tok → Bool
+  | .id w :: r => if w == kConst then true else if isTyWord w then constIn r else false
+  | .sym .star :: r => constIn r
+  | _ => false
+
+/-- A type, from its words without qualifiers, its stars, and whether `const` was among them: a pointer to `unsigned char` is read-only
+    with `const` and written without it (RC-02). -/
+def classify (ws : List (List Nat)) (stars : Nat) (cst : Bool) : Option Ty :=
+  if stars == 1 && ws == [kUnsigned, kChar] then some (if cst then .ptr else .wptr)
+  else if stars == 0 && (ws == [kFast16] || ws == [kUnsigned, kLong] || ws == [kU64] || ws == [kSizeT]) then some .word
   else if stars == 0 && ws == [kInt] then some .int
+  else if stars == 0 && ws == [kUnsigned, kChar] then some .byte
   else none
 
 /-- C's binary operators by level, loosest first: `|`, `^`, `&`, `>>`, `+ -`. -/
@@ -212,7 +240,7 @@ def pP : Nat → List Tok → Option (CE × List Tok)
   | f + 1, .sym .lp :: r =>
     match takeTy r with
     | ([], 0, _) => (pE f 0 r).bind fun q => (closing .rp q.2).map fun r' => (q.1, r')
-    | (ws, n, .sym .rp :: r') => (classify ws n).bind fun t => (pP f r').map fun q => (.cast t q.1, q.2)
+    | (ws, n, .sym .rp :: r') => (classify ws n (constIn r)).bind fun t => (pP f r').map fun q => (.cast t q.1, q.2)
     | _ => none
   | _, _ => none
 end
@@ -234,13 +262,20 @@ def pS : Nat → List Tok → Option (CS × List Tok)
       | _ => none
     else if isTyWord w then
       match takeTy (.id w :: r) with
-      | (ws, n, .id x :: .sym .semi :: r') => (classify ws n).map fun t => (.decl t x none, r')
+      | (ws, n, .id x :: .sym .semi :: r') => (classify ws n (constIn (.id w :: r))).map fun t => (.decl t x none, r')
       | (ws, n, .id x :: .sym .eq :: r') =>
-        (classify ws n).bind fun t => (pE f 0 r').bind fun q => (closing .semi q.2).map fun r'' => (.decl t x (some q.1), r'')
+        (classify ws n (constIn (.id w :: r))).bind fun t => (pE f 0 r').bind fun q =>
+          (closing .semi q.2).map fun r'' => (.decl t x (some q.1), r'')
       | _ => none
     else
       match r with
       | .sym .orEq :: r' => (pE f 0 r').bind fun q => (closing .semi q.2).map fun r'' => (.orEq w q.1, r'')
+      | .sym .plusEq :: r' => (pE f 0 r').bind fun q => (closing .semi q.2).map fun r'' => (.addEq w q.1, r'')
+      | .sym .shrEq :: .num k :: .sym .semi :: r' => some (.shrEq w k, r')
+      | .sym .lb :: r' => (pE f 0 r').bind fun q =>
+        match q.2 with
+        | .sym .rb :: .sym .eq :: r2 => (pE f 0 r2).bind fun q2 => (closing .semi q2.2).map fun r3 => (.store w q.1 q2.1, r3)
+        | _ => none
       | _ => none
   | _, _ => none
 /-- Statements up to and including the closing brace. -/
@@ -254,19 +289,19 @@ def pParams : Nat → List Tok → Option (List (Ty × List Nat) × List Tok)
   | 0, _ => none
   | f + 1, ts =>
     match takeTy ts with
-    | (ws, n, .id x :: .sym .comma :: r) => (classify ws n).bind fun t => (pParams f r).map fun q => ((t, x) :: q.1, q.2)
-    | (ws, n, .id x :: .sym .rp :: r) => (classify ws n).map fun t => ([(t, x)], r)
+    | (ws, n, .id x :: .sym .comma :: r) => (classify ws n (constIn ts)).bind fun t => (pParams f r).map fun q => ((t, x) :: q.1, q.2)
+    | (ws, n, .id x :: .sym .rp :: r) => (classify ws n (constIn ts)).map fun t => ([(t, x)], r)
     | _ => none
 
-/-- `[static inline] int name(params) { body }`. -/
+/-- `[static inline] int name(params) { body }`, or `void name(params) { body }` (RC-02). -/
 def pFun (f : Nat) : List Tok → Option (CFun × List Tok)
   | .id s :: .id i :: .id t :: .id nm :: .sym .lp :: r =>
     if s == kStatic && i == kInline && t == kInt then
-      (pParams f r).bind fun q => (closing .lc q.2).bind fun r' => (pSs f r').map fun q' => (⟨true, nm, q.1, q'.1⟩, q'.2)
+      (pParams f r).bind fun q => (closing .lc q.2).bind fun r' => (pSs f r').map fun q' => (⟨true, nm, q.1, q'.1, false⟩, q'.2)
     else none
   | .id t :: .id nm :: .sym .lp :: r =>
-    if t == kInt then
-      (pParams f r).bind fun q => (closing .lc q.2).bind fun r' => (pSs f r').map fun q' => (⟨false, nm, q.1, q'.1⟩, q'.2)
+    if t == kInt || t == kVoid then
+      (pParams f r).bind fun q => (closing .lc q.2).bind fun r' => (pSs f r').map fun q' => (⟨false, nm, q.1, q'.1, t == kVoid⟩, q'.2)
     else none
   | _ => none
 
@@ -283,6 +318,8 @@ def parse (cs : List Nat) : Option (List CFun) :=
 /-- What a C name is bound to: a byte array (the entry's name for it, and its length), a literal, a word local, or an `int` index. -/
 inductive Bd where
   | arr  : List Nat → Nat → Bd
+  /-- RC-02: an array the function writes, the entry's name for it, and its length. -/
+  | warr : List Nat → Nat → Bd
   | lit  : Nat → Bd
   | word : Bd
   | int  : Bd
@@ -325,7 +362,7 @@ def rdE (env : Env) (loop : Option (List Nat × Nat)) : CE → List (List Nat) �
     | some .int => some ([], .var (str x), u)
     | _ => none
   | .idx a i, u => match look env a with
-    | some (.arr base len) =>
+    | some (.arr base len) | some (.warr base len) =>
       if u.contains base || !inRange loop len i then none
       else (rdE env loop i u).map fun q => (q.1 ++ [.loadB (tmp base) (words base len) q.2.1], .var (tmp base), base :: q.2.2)
     | _ => none
@@ -342,6 +379,9 @@ def rdE (env : Env) (loop : Option (List Nat × Nat)) : CE → List (List Nat) �
         | .add => some (.add qa.2.1 qb.2.1)
         | .shr => none
       e.map fun e => (qa.1 ++ qb.1, e, qb.2.2)
+  -- RC-02 (RC-02-READING section 3): a cast to a word is the identity on these values, and one to `unsigned char` keeps the low byte.
+  | .cast .word e, u => rdE env loop e u
+  | .cast .byte e, u => (rdE env loop e u).map fun q => (q.1, .bin .and q.2.1 (lit 255), q.2.2)
   | .cast _ _, _ => none
   | .call _ _, _ => none
 
@@ -503,5 +543,92 @@ theorem wrong_length_refused : readC CSrc.verify16C kV16 8 [(kB16, 16)] = none :
 
 /-- **And the define matters**: without `crypto_verify_16_BYTES`, the call has an argument the reading cannot bind. -/
 theorem missing_define_refused : readC CSrc.verify16C kV16 16 [] = none := by decide +kernel
+
+/-! ## RC-02: a direct `void` entry, whose arrays are read and written
+
+  `sodium_add` is not a wrapper around a `static inline` function: it is the entry itself. `readD` reads such an entry
+  (`RC-02-READING` §3 and §6):
+  - a `const unsigned char *` parameter is a read-only array, and one without `const` an array the function writes;
+  - a word parameter, such as `const size_t len`, is bound to its stated value;
+  - `size_t`, `uint_fast16_t` and the other word types are words, and the loop index may be one;
+  - in the loop body, `x |= e`, `x += e` and `x >>= k` on a word local other than the index, and `a[i] = e` into a written array at an index in range;
+  - at the end, each written array is emitted, in parameter order, and the result is 0.
+
+  Its own names start with `#`, which a C identifier cannot: the loop counter is `#c`, so a C local may be named `c`, as `sodium_add`'s
+  carry is. Temporaries are still `t` plus an array's name, so a C local may not start with `t`, nor contain a digit, as the array words do. -/
+
+/-- A name `readD` may give to a C local: no digit, not starting with `t`. -/
+def okLocalD (x : List Nat) : Bool := !x.any isDigit && x.head? != some 116
+
+def wordLocal (env : Env) (x i : List Nat) : Bool :=
+  x != i && (match look env x with | some .word => true | _ => false)
+
+/-- A loop body for `readD`. -/
+def rdBodyD (env : Env) (loop : List Nat × Nat) : List CS → Option (List Cmd)
+  | [] => some []
+  | .orEq x e :: r =>
+    if wordLocal env x loop.1 then (rdE env (some loop) e []).bind fun q =>
+      (rdBodyD env loop r).map fun cs => q.1 ++ [.assign (str x) (.bin .or (.var (str x)) q.2.1)] ++ cs
+    else none
+  | .addEq x e :: r =>
+    if wordLocal env x loop.1 then (rdE env (some loop) e []).bind fun q =>
+      (rdBodyD env loop r).map fun cs => q.1 ++ [.assign (str x) (.add (.var (str x)) q.2.1)] ++ cs
+    else none
+  | .shrEq x k :: r =>
+    if wordLocal env x loop.1 && k < 64 then (rdBodyD env loop r).map fun cs => .assign (str x) (.shr (.var (str x)) k) :: cs
+    else none
+  | .store a ix e :: r =>
+    match look env a with
+    | some (.warr base len) =>
+      if !inRange (some loop) len ix then none
+      else (rdE env (some loop) ix []).bind fun qi => (rdE env (some loop) e qi.2.2).bind fun qe =>
+        (rdBodyD env loop r).map fun cs => qi.1 ++ qe.1 ++ [.storeB (words base len) qi.2.1 qe.2.1] ++ cs
+    | _ => none
+  | _ => none
+
+def isIdx (env : Env) (i : List Nat) : Bool :=
+  match look env i with | some .word | some .int => true | _ => false
+
+/-- A `void` entry's body: declarations and counted loops, and no `return`. -/
+def rdSD : Env → List CS → Option (List Cmd)
+  | _, [] => some []
+  | env, .decl .word x none :: r => if okLocalD x then rdSD ((x, .word) :: env) r else none
+  | env, .decl .word x (some e) :: r =>
+    if !okLocalD x then none
+    else (rdE env none e []).bind fun q => (rdSD ((x, .word) :: env) r).map fun cs => q.1 ++ [.assign (str x) q.2.1] ++ cs
+  | env, .forN i k i2 b i3 body :: r =>
+    if k == 0 && i2 == i && i3 == i && isIdx env i then
+      (bound env b).bind fun N => (rdBodyD env (i, N) body).bind fun cs => (rdSD env r).map fun rest =>
+        For.forN "#c" (lit N) (seqAll (.assign (str i) (.bin .sub (lit N) (.var "#c")) :: cs)) :: rest
+    else none
+  | _, _ => none
+
+/-- Bind a direct entry's parameters: arrays of the stated length, and word parameters to their stated values. -/
+def bindD (len : Nat) (defs : List (List Nat × Nat)) : List (Ty × List Nat) → Option Env
+  | [] => some []
+  | (.ptr, x) :: ps => if okLocalD x then (bindD len defs ps).map ((x, .arr x len) :: ·) else none
+  | (.wptr, x) :: ps => if okLocalD x then (bindD len defs ps).map ((x, .warr x len) :: ·) else none
+  | (.word, x) :: ps =>
+    match defs.find? (·.1 == x) with
+    | some (_, k) => (bindD len defs ps).map ((x, .lit k) :: ·)
+    | none => none
+  | _ => none
+
+def isArr (p : Ty × List Nat) : Bool := p.1 == .ptr || p.1 == .wptr
+
+/-- **The front end, for a direct `void` entry**: its arrays of length `len`, its word parameters' stated values, to an L program. -/
+def readD (src : List Nat) (entry : List Nat) (len : Nat) (defs : List (List Nat × Nat)) : Option Prog :=
+  (parse src).bind fun fs => (findFun fs entry).bind fun F =>
+    if F.inline || !F.isVoid || !(len == 8 || len == 16 || len == 32 || len == 64) then none
+    else (bindD len defs F.params).bind fun env => (rdSD env F.body).map fun cs =>
+      { inputs := (F.params.filter isArr).flatMap (fun p => words p.2 len),
+        body := seqAll (cs ++ (F.params.filter (·.1 == .wptr)).map (fun p => .emitB (words p.2 len))),
+        ret := lit 0 }
+
+def kAdd := kw ['s','o','d','i','u','m','_','a','d','d']
+def kLen := kw ['l','e','n']
+
+/-- `sodium_add` at the length of its call in `crypto_core_ed25519_scalar_add`, `crypto_core_ed25519_SCALARBYTES`, 32. -/
+def readAdd (src : List Nat) : Option Prog := readD src kAdd 32 [(kLen, 32)]
 
 end LCore.Slice2.CFront

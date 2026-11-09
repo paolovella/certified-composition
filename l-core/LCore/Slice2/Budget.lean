@@ -24,6 +24,8 @@ def evars : Expr → List String
 
 def assigns : Cmd → List String
   | .assign x _ | .load x _ | .loadB x _ _ => [x]
+  -- RC-02: a byte store writes its array's words. A counted program may not write a counter or an input this way, for now.
+  | .storeB ns _ _ => ns
   | .seq a b | .ite _ a b => assigns a ++ assigns b
   | .loop _ b => assigns b
   | _ => []
@@ -48,9 +50,21 @@ def topC (cs S : List String) : Cmd → Bool
   | .loop (.var c) (.seq B (.assign c' d)) => c' == c && cs.contains c && isDec c d && plainC cs S B
   | c => plainC cs S c
 
-/-- **The checker's budget rule.** The counters are the loop guards, and none of them is an input. -/
+/-- The input words a program writes by `storeB` (RC-02). -/
+def writtenB : Cmd → List String
+  | .storeB ns _ _ => ns
+  | .seq a b | .ite _ a b => writtenB a ++ writtenB b
+  | .loop _ b => writtenB b
+  | _ => []
+
+/-- **The inputs a counter may be set from**: those the program never writes (RC-02 step 6). A written input is an ordinary variable,
+    which no counter may read. Before RC-02 every input was one of these. -/
+def readIn (p : Prog) : List String := p.inputs.filter fun x => !(writtenB p.body).contains x
+
+/-- **The checker's budget rule.** The counters are the loop guards, set from inputs the program never writes, and none of them is an
+    input. -/
 def counted (p : Prog) : Bool :=
-  topC (counters p.body) p.inputs p.body && (counters p.body).all (fun c => !p.inputs.contains c)
+  topC (counters p.body) (readIn p) p.body && (counters p.body).all (fun c => !p.inputs.contains c)
 
 /-! ## The potential -/
 
@@ -171,6 +185,18 @@ theorem plain_loadB {cs S : List String} {x : String} {ns : List String} {e : Ex
     Bool.not_eq_true'] at h
   exact h
 
+theorem plain_storeB {cs S : List String} {ns : List String} {e v : Expr} (h : plainC cs S (.storeB ns e v) = true) :
+    ∀ y ∈ ns, cs.contains y = false ∧ S.contains y = false := by
+  simp only [plainC, loopFree, assigns, Bool.true_and, List.all_eq_true, Bool.and_eq_true, Bool.not_eq_true'] at h
+  exact h
+
+theorem agree_storeAt {cs S : List String} (s : Store) {ns : List String} (hns : ∀ y ∈ ns, cs.contains y = false ∧ S.contains y = false)
+    (i : Nat) (v : W64) : Agree cs S (storeAt s ns i v) s := by
+  intro y hy
+  have : y ∉ ns := by
+    intro hm; have := hns y hm; rcases hy with hy | hy <;> simp_all
+  exact storeAt_other this
+
 theorem plain_seq {cs S : List String} {a b : Cmd} (h : plainC cs S (.seq a b) = true) : plainC cs S a = true ∧ plainC cs S b = true := by
   simp only [plainC, loopFree, assigns, List.all_append, Bool.and_eq_true] at h ⊢
   exact ⟨⟨h.1.1, h.2.1⟩, h.1.2, h.2.2⟩
@@ -188,7 +214,7 @@ theorem push_app : ∀ (c : Cmd) (p : List Nat) (k : List Frame), push c p k = p
     simp only [push]
     rw [push_app b _ k, push_app a _ (push b (p ++ [1]) [] ++ k), push_app a _ (push b (p ++ [1]) []), List.append_assoc]
   | .skip, _, _ | .assign _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
-  | .store _ _, _, _ => rfl
+  | .store _ _, _, _ | .storeB _ _ _, _, _ | .emitB _, _, _ => rfl
 
 theorem push_plain_frames {cs S : List String} : ∀ (c : Cmd) (p : List Nat), plainC cs S c = true → ∀ f ∈ push c p [], IsPlain cs S f.1
   | .seq a b, p, h, f, hf => by
@@ -199,7 +225,8 @@ theorem push_plain_frames {cs S : List String} : ∀ (c : Cmd) (p : List Nat), p
     · exact push_plain_frames a _ ha f hf
     · exact push_plain_frames b _ hb f hf
   | .skip, _, h, f, hf | .assign _ _, _, h, f, hf | .ite _ _ _, _, h, f, hf | .loop _ _, _, h, f, hf
-  | .load _ _, _, h, f, hf | .loadB _ _ _, _, h, f, hf | .store _ _, _, h, f, hf => by
+  | .load _ _, _, h, f, hf | .loadB _ _ _, _, h, f, hf | .store _ _, _, h, f, hf | .storeB _ _ _, _, h, f, hf
+  | .emitB _, _, h, f, hf => by
     simp only [push, List.mem_singleton] at hf
     subst hf
     exact h
@@ -216,7 +243,8 @@ theorem pot_push_plain {cs S : List String} : ∀ (c : Cmd) (p : List Nat) (k : 
     have hx := (plain_assign h).1
     simp only [push, pot, hx, Bool.false_eq_true, ↓reduceIte, costOf]
   | .loop e b, _, _, _, h => by simp [plain_loop] at h
-  | .skip, _, _, _, _ | .ite _ _ _, _, _, _, _ | .load _ _, _, _, _, _ | .loadB _ _ _, _, _, _, _ | .store _ _, _, _, _, _ => rfl
+  | .skip, _, _, _, _ | .ite _ _ _, _, _, _, _ | .load _ _, _, _, _, _ | .loadB _ _ _, _, _, _, _ | .store _ _, _, _, _, _
+  | .storeB _ _ _, _, _, _, _ | .emitB _, _, _, _, _ => rfl
 
 /-! ## The potential reads only the counters and the inputs -/
 
@@ -251,7 +279,7 @@ theorem pot_agree {cs S : List String} : ∀ (k : List Frame) (s s' : Store), (�
       · cases hy
         simp only [pot]
         rw [h x (Or.inl hx), pot_agree k _ _ hk' h]
-    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ =>
+    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ =>
       simp only [pot]
       rw [pot_agree k _ _ hk' h]
 
@@ -296,7 +324,7 @@ theorem pot_mono {cs S : List String} (hD : ∀ y, cs.contains y = true → S.co
           · subst hxc; rw [upd_same]; exact Nat.mul_le_mul_right _ hv
           · rw [upd_other s v hxc]; exact Nat.le_refl _
         omega
-    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ =>
+    | skip | seq _ _ | ite _ _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ =>
       simp only [pot]
       have := pot_mono hD hc k s v hk hv
       omega
@@ -363,6 +391,12 @@ theorem step_plain (IH : ∀ k s a, Ok cs S k → (run ret m k s a).cost ≤ pot
     rw [pot_agree k _ s hall (agree_out s hx _)] at this
     simp only [run, tick_cost, pot, costOf]; omega
   | store e v => have := IH k s (updA a (idx (eval e s)) (eval v s)) hk; simp only [run, tick_cost, pot, costOf]; omega
+  | storeB ns e v =>
+    have hx := plain_storeB hc
+    have := IH k (storeAt s ns (bidx ns (eval e s)) (eval v s)) a hk
+    rw [pot_agree k _ s hall (agree_storeAt s hx _ _)] at this
+    simp only [run, tick_cost, pot, costOf]; omega
+  | emitB ns => have := IH k s a hk; simp only [run, etick, tick, pot, costOf]; omega
   | seq c₁ c₂ =>
     obtain ⟨h1, h2⟩ := plain_seq hc
     have := IH (push c₁ (p ++ [0]) (push c₂ (p ++ [1]) k)) s a (ok_push_plain (p ++ [0]) h1 (ok_push_plain (p ++ [1]) h2 hk))
@@ -480,21 +514,29 @@ theorem topC_frames {cs S : List String} : ∀ (c : Cmd) (q : List Nat), topC cs
       exact Or.inr (Or.inr ⟨y, B, d, rfl, hx, hd, hB⟩)
     | .lit _, _, h | .add _ _, _, h => simp [topC, plainC, loopFree] at h
     | .var _, .skip, h | .var _, .assign _ _, h | .var _, .ite _ _ _, h | .var _, .loop _ _, h | .var _, .load _ _, h
-    | .var _, .store _ _, h | .var _, .loadB _ _ _, h => simp [topC, plainC, loopFree] at h
+    | .var _, .store _ _, h | .var _, .loadB _ _ _, h | .var _, .storeB _ _ _, h | .var _, .emitB _, h => simp [topC, plainC, loopFree] at h
     | .var _, .seq _ .skip, h | .var _, .seq _ (.seq _ _), h | .var _, .seq _ (.ite _ _ _), h | .var _, .seq _ (.loop _ _), h
-    | .var _, .seq _ (.load _ _), h | .var _, .seq _ (.store _ _), h | .var _, .seq _ (.loadB _ _ _), h =>
+    | .var _, .seq _ (.load _ _), h | .var _, .seq _ (.store _ _), h | .var _, .seq _ (.loadB _ _ _), h
+    | .var _, .seq _ (.storeB _ _ _), h | .var _, .seq _ (.emitB _), h =>
       simp [topC, plainC, loopFree] at h
-  | skip | ite _ _ _ _ _ | load _ _ | loadB _ _ _ | store _ _ =>
+  | skip | ite _ _ _ _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ =>
     intro q h f hf
     simp only [push, List.mem_singleton] at hf; subst hf
     exact Or.inl h
 
 theorem counted_ok {p : Prog} (h : counted p = true) :
-    Ok (counters p.body) p.inputs (push p.body [] []) ∧ ∀ y, (counters p.body).contains y = true → p.inputs.contains y = false := by
+    Ok (counters p.body) (readIn p) (push p.body [] []) ∧ ∀ y, (counters p.body).contains y = true → (readIn p).contains y = false := by
   simp only [counted, Bool.and_eq_true, List.all_eq_true] at h
   refine ⟨ok_top (topC_frames _ _ h.1), fun y hy => ?_⟩
   have := h.2 y (List.contains_iff_mem.1 hy)
-  simpa using this
+  have hin : p.inputs.contains y = false := by simpa using this
+  cases hc : (readIn p).contains y with
+  | false => rfl
+  | true =>
+    have hm : y ∈ readIn p := List.contains_iff_mem.1 hc
+    have hi : p.inputs.contains y = true := List.contains_iff_mem.2 (List.mem_filter.1 hm).1
+    rw [hi] at hin
+    cases hin
 
 /-! ## The budget, on the source -/
 
@@ -565,5 +607,24 @@ def inputCounter : Prog where
   body := .loop (.var "n") (.seq .skip (.assign "n" (.add (.var "n") minusOne)))
   ret := num 0
 theorem inputCounter_not_counted : counted inputCounter = false := by decide
+
+/-- A counter set from input `n`, with or without a byte store into `n` first (RC-02 step 6). -/
+def fromWritten (store : Bool) : Prog where
+  inputs := ["s", "n"]
+  body := .seq (if store then .storeB ["n"] (num 0) (num 5) else .skip) (forN "c" (.var "n") .skip)
+  ret := num 0
+
+/-- **Refused, a counter set from an input the program writes**: the store could change the bound after the program read it. **Accepted**
+    without the store. -/
+theorem fromWritten_rules : counted (fromWritten true) = false ∧ counted (fromWritten false) = true := by decide
+
+/-- **Accepted, a byte store into an input no counter reads**: the store is an ordinary command. -/
+theorem storeOther_counted :
+    counted { inputs := ["s", "n"], body := .seq (.storeB ["s"] (num 0) (num 5)) (forN "c" (.var "n") .skip), ret := num 0 } = true := by
+  decide
+
+/-- **Refused, a byte store into a counter**: `assigns` counts it as a write, so the loop's bound could change while it runs. -/
+theorem storeCounter_not_counted :
+    counted { inputs := ["s", "n"], body := forN "c" (num 4) (.storeB ["c"] (num 0) (num 9)), ret := num 0 } = false := by decide
 
 end LCore.Slice2.Budget

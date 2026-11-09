@@ -24,6 +24,7 @@ def lkOf (c : SCmd) (t : Slice.Slots.Slots) : List Lk :=
   | .ite e _ _ | .loop e _ => if (evalS e t).val ≠ 0 then [.branch true] else [.branch false]
   | .load _ e | .store e _ => [addrLk (idx (evalS e t))]
   | .loadB _ ws e => [addrLk (Slots.bidxS ws (evalS e t))]
+  | .storeB ws e _ => [addrLk (Slots.bidxS ws (evalS e t))]
   | _ => []
 
 /-- The source's frames after a command. -/
@@ -33,19 +34,22 @@ def nextS (c : SCmd) (q : List Nat) (ks : List SFrame) (t : Slice.Slots.Slots) :
   | .loop e b => if (evalS e t).val ≠ 0 then pushS b (q ++ [0]) ((.loop e b, q) :: ks) else ks
   | _ => ks
 
+/-- **A source step**: it emits `evs` (RC-02: only `emitB` emits), leaks `l`, at position `q`. With no events it is `tick`. -/
+def tickE (evs : List Ev) (l : List Lk) (q : List Nat) (r : Beh) : Beh := { tick l q r with ev := evs ++ r.ev }
+
 theorem src_step (ret : SExpr) {c : SCmd} (hc : ∀ a b, c ≠ .seq a b) (n : Nat) (q : List Nat) (ks : List SFrame) (t : Slice.Slots.Slots) :
-    runS ret (n + 1) ((c, q) :: ks) t = tick (lkOf c t) q (runS ret n (nextS c q ks t) (nextT c t)) := by
+    runS ret (n + 1) ((c, q) :: ks) t = tickE (evC c t) (lkOf c t) q (runS ret n (nextS c q ks t) (nextT c t)) := by
   cases c with
   | seq a b => exact absurd rfl (hc a b)
-  | skip | set _ _ | load _ _ | loadB _ _ _ | store _ _ => rfl
+  | skip | set _ _ | load _ _ | loadB _ _ _ | store _ _ | storeB _ _ _ | emitB _ => rfl
   | ite e a b =>
     by_cases hg : (evalS e t).val ≠ 0
-    · simp [runS, lkOf, nextS, nextT, hg]
-    · simp [runS, lkOf, nextS, nextT, hg]
+    · simp [runS, lkOf, nextS, nextT, hg, tickE, evC, tick]
+    · simp [runS, lkOf, nextS, nextT, hg, tickE, evC, tick]
   | loop e b =>
     by_cases hg : (evalS e t).val ≠ 0
-    · simp [runS, lkOf, nextS, nextT, hg]
-    · simp [runS, lkOf, nextS, nextT, hg]
+    · simp [runS, lkOf, nextS, nextT, hg, tickE, evC, tick]
+    · simp [runS, lkOf, nextS, nextT, hg, tickE, evC, tick]
 
 /-- Source frames and target frames: the same commands, with the target's jumps in between. -/
 inductive Corr : List SFrame → List TF → Prop where
@@ -56,7 +60,8 @@ inductive Corr : List SFrame → List TF → Prop where
 theorem Corr.push : ∀ (c : SCmd) (q : List Nat) (pc : Nat) {ks : List SFrame} {k : List TF}, Corr ks k → Corr (pushS c q ks) (pushT c pc k)
   | .seq a b, q, pc, _, _, h => Corr.push a _ _ (Corr.push b _ _ h)
   | .skip, _, _, _, _, h | .set _ _, _, _, _, _, h | .ite _ _ _, _, _, _, _, h | .loop _ _, _, _, _, _, h
-  | .load _ _, _, _, _, _, h | .loadB _ _ _, _, _, _, _, h | .store _ _, _, _, _, _, h => Corr.cmd h
+  | .load _ _, _, _, _, _, h | .loadB _ _ _, _, _, _, _, h | .store _ _, _, _, _, _, h | .storeB _ _ _, _, _, _, _, h
+  | .emitB _, _, _, _, _, h => Corr.cmd h
 
 theorem Corr.next {ks : List SFrame} {k : List TF} (h : Corr ks k) (c : SCmd) (q : List Nat) (pc : Nat) (t : Slice.Slots.Slots) :
     Corr (nextS c q ks t) (nextK c pc k t) := by
@@ -130,6 +135,8 @@ def stepC : SCmd → Nat
   | .load _ e => sE e + 7
   | .loadB _ _ e => sE e + 4
   | .store e v => sE e + 5 + sE v + 1
+  | .storeB _ e v => sE e + 2 + sE v + 1
+  | .emitB _ => 5
 
 /-- The largest `stepC` over every frame a command can push, its branches and loop body included. -/
 def stepMax : SCmd → Nat
@@ -143,11 +150,13 @@ def stepMax : SCmd → Nat
   | .load x e => stepC (.load x e)
   | .loadB x ws e => stepC (.loadB x ws e)
   | .store e v => stepC (.store e v)
+  | .storeB ws e v => stepC (.storeB ws e v)
+  | .emitB ws => stepC (.emitB ws)
 
 theorem stepC_le : ∀ (c : SCmd), stepC c ≤ stepMax c
   | .seq _ _ => Nat.zero_le _
   | .ite _ _ _ | .loop _ _ => Nat.le_max_left _ _
-  | .skip | .set _ _ | .load _ _ | .loadB _ _ _ | .store _ _ => Nat.le_refl _
+  | .skip | .set _ _ | .load _ _ | .loadB _ _ _ | .store _ _ | .storeB _ _ _ | .emitB _ => Nat.le_refl _
 
 def FS (L : Nat) : List TF → Prop
   | [] => True
@@ -164,12 +173,13 @@ theorem push_fs {L : Nat} : ∀ (c : SCmd) (pc : Nat) (k : List TF), stepMax c �
     simp only [stepMax] at h
     exact push_fs a _ _ (by omega) (push_fs b _ _ (by omega) hk)
   | .skip, _, _, h, hk | .set _ _, _, _, h, hk | .ite _ _ _, _, _, h, hk | .loop _ _, _, _, h, hk
-  | .load _ _, _, _, h, hk | .loadB _ _ _, _, _, h, hk | .store _ _, _, _, h, hk => ⟨h, hk⟩
+  | .load _ _, _, _, h, hk | .loadB _ _ _, _, _, h, hk | .store _ _, _, _, h, hk | .storeB _ _ _, _, _, h, hk
+  | .emitB _, _, _, h, hk => ⟨h, hk⟩
 
 theorem jc_push : ∀ (c : SCmd) (pc : Nat) (k : List TF), jc (pushT c pc k) = jc k
   | .seq a b, pc, k => by simp only [pushT, jc_push a, jc_push b]
   | .skip, _, _ | .set _ _, _, _ | .ite _ _ _, _, _ | .loop _ _, _, _ | .load _ _, _, _ | .loadB _ _ _, _, _
-  | .store _ _, _, _ => rfl
+  | .store _ _, _, _ | .storeB _ _ _, _, _ | .emitB _, _, _ => rfl
 
 theorem next_fs {L : Nat} {c : SCmd} {pc : Nat} {k : List TF} (t : Slice.Slots.Slots) (hc : stepMax c ≤ L) (hk : FS L k) : FS L (nextK c pc k t) := by
   cases c with
@@ -214,6 +224,8 @@ theorem chunk_length {c : SCmd} (pc : Nat) (k : List TF) (t : Slice.Slots.Slots)
       · omega
   | load x e => simp [chunkC, nextK, stepC, mIdx_length]
   | store e v => simp [chunkC, nextK, stepC, mIdx_length, mE_length]; omega
+  | storeB ws e v => simp [chunkC, nextK, stepC, mE_length]; omega
+  | emitB ws => simp [chunkC, nextK, stepC]
 
 /-! ## The end of a run -/
 
@@ -304,7 +316,7 @@ theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length
     have hjc : jc (.cmd c pc :: k) = jc k := rfl
     rw [e' m]
     by_cases hm : m < (chunkC c pc t).length
-    · obtain ⟨o1, o2, o3⟩ := play_short (F := fun j => Slice.Rv.run C en j m') hm
+    · obtain ⟨o1, o2, o3⟩ := play_short (F := fun j => addEv (evC c t) (Slice.Rv.run C en j m')) hm
       refine ⟨by rw [o2]; exact List.nil_prefix, ?_, fun h => absurd o1 h⟩
       cases m with
       | zero => omega
@@ -319,17 +331,21 @@ theorem behind {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length
       obtain ⟨h1, h2, h3⟩ := ih a (by omega) _ _ _ m' (hc'.next c q pc t) hS' hf' hch' i'
       have hx := runS_ext ret a n (nextS c q ks t) (nextT c t) hle
       have hm2 := Nat.mul_le_mul_left L hx.2.2.2
-      obtain ⟨o1, o2, o3⟩ := play_long (c := chunkC c pc t) (F := fun j => Slice.Rv.run C en j m') a
+      obtain ⟨o1, o2, o3⟩ := play_long (c := chunkC c pc t) (F := fun j => addEv (evC c t) (Slice.Rv.run C en j m')) a
       rw [o1, o2, o3, hn, src_step ret hns n q ks t]
-      refine ⟨List.IsPrefix.trans h1 hx.2.1, ?_, ?_⟩
+      refine ⟨?_, ?_, ?_⟩
+      · show evC c t ++ _ <+: evC c t ++ _
+        exact (List.prefix_append_right_inj _).mpr (List.IsPrefix.trans h1 hx.2.1)
       · show _ ≤ L * (1 + _) + _ + _
         rw [Nat.mul_add, Nat.mul_one]
+        show _ + (Slice.Rv.run C en a m').cost ≤ _
         omega
       · intro ho
         obtain ⟨u1, u2⟩ := h3 ho
         have hnf : (runS ret a (nextS c q ks t) (nextT c t)).out ≠ .fuel := by rw [← u1]; exact ho
         have he := hx.1 hnf
-        exact ⟨by show _ = (runS ret n _ _).out; rw [← he]; exact u1, by show _ = (runS ret n _ _).ev; rw [← he]; exact u2⟩
+        exact ⟨by show _ = (runS ret n _ _).out; rw [← he]; exact u1,
+          by show evC c t ++ _ = evC c t ++ (runS ret n _ _).ev; rw [← he, u2]⟩
 
 /-! ## What the source finishes, the machine finishes -/
 
@@ -385,10 +401,10 @@ theorem ahead {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length 
       simp only [jc] at hw
       rw [src_step ret hns n q ks t] at hout ⊢
       obtain ⟨a, h1, h2⟩ := ih (2 * n + jc (nextK c pc k t)) (by omega) n _ _ _ m' (Nat.le_refl _) (hc'.next c q pc t) hf' hch' i' hout
-      obtain ⟨o1, o2, _⟩ := play_long (c := chunkC c pc t) (F := fun j => Slice.Rv.run C en j m') a
+      obtain ⟨o1, o2, _⟩ := play_long (c := chunkC c pc t) (F := fun j => addEv (evC c t) (Slice.Rv.run C en j m')) a
       refine ⟨(chunkC c pc t).length + a, ?_, ?_⟩
-      · rw [e', o1, h1]; rfl
-      · rw [e', o2, h2]; rfl
+      · rw [e', o1]; exact h1
+      · rw [e', o2]; show evC c t ++ _ = evC c t ++ _; rw [h2]
 
 /-! ## Two machines -/
 
@@ -413,6 +429,57 @@ theorem view_peel {f : Observer} {l l' : List Lk} {q q' : List Nat} {r r' : Beh}
   have hc' : r.cost = r'.cost := by omega
   refine ⟨h1, ?_⟩
   simp only [Beh.view, he, h2, hc', ho]
+
+/-- Filtering by channel keeps as many events from two lists with the same channels. -/
+theorem filter_chan_length (f : Observer) : ∀ {a b : List Ev}, a.map Ev.chan = b.map Ev.chan →
+    (a.filter (fun e => f e.chan)).length = (b.filter (fun e => f e.chan)).length
+  | [], [], _ => rfl
+  | [], _ :: _, h => by simp at h
+  | _ :: _, [], h => by simp at h
+  | x :: a, y :: b, h => by
+    simp only [List.map_cons, List.cons.injEq] at h
+    have ih := filter_chan_length f (a := a) (b := b) h.2
+    simp only [List.filter_cons, h.1]
+    split <;> simp [ih]
+
+/-- **What a frame emits has the same channels in every run**: only its payload depends on the data. -/
+theorem evC_chan (c : SCmd) (t t' : Slice.Slots.Slots) : (evC c t).map Ev.chan = (evC c t').map Ev.chan := by
+  cases c <;> rfl
+
+theorem view_tickE {f : Observer} {evs evs' : List Ev} {l : List Lk} {q : List Nat} {r r' : Beh}
+    (he : evs.filter (fun e => f e.chan) = evs'.filter (fun e => f e.chan)) (h : r.view f = r'.view f) :
+    (tickE evs l q r).view f = (tickE evs' l q r').view f := by
+  have hv := congrArg Beh.ev h
+  have hl := congrArg Beh.lk h
+  have hc := congrArg Beh.cost h
+  have ho := congrArg Beh.out h
+  simp only [Beh.view] at hv hl hc ho
+  simp only [tickE, tick, Beh.view, List.filter_append, he, hv, hl, hc, ho]
+
+/-- One source step off the front of two equal views, events included. -/
+theorem view_peelE {f : Observer} {evs evs' : List Ev} {l l' : List Lk} {q q' : List Nat} {r r' : Beh}
+    (h : (tickE evs l q r).view f = (tickE evs' l' q' r').view f) (hch : evs.map Ev.chan = evs'.map Ev.chan) (hl : l.length = l'.length) :
+    evs.filter (fun e => f e.chan) = evs'.filter (fun e => f e.chan) ∧ l = l' ∧ r.view f = r'.view f := by
+  have he := congrArg Beh.ev h
+  have hk := congrArg Beh.lk h
+  have hc := congrArg Beh.cost h
+  have ho := congrArg Beh.out h
+  simp only [Beh.view, tickE, tick, List.filter_append] at he hk hc ho
+  obtain ⟨e1, e2⟩ := List.append_inj he (filter_chan_length f hch)
+  obtain ⟨h1, h2⟩ := List.append_inj (List.cons.inj hk).2 hl
+  have hc' : r.cost = r'.cost := by omega
+  refine ⟨e1, h1, ?_⟩
+  simp only [Beh.view, e2, h2, hc', ho]
+
+theorem view_addEv {f : Observer} {evs evs' : List Ev} {r r' : Beh}
+    (he : evs.filter (fun e => f e.chan) = evs'.filter (fun e => f e.chan)) (h : r.view f = r'.view f) :
+    (addEv evs r).view f = (addEv evs' r').view f := by
+  have hv := congrArg Beh.ev h
+  have hl := congrArg Beh.lk h
+  have hc := congrArg Beh.cost h
+  have ho := congrArg Beh.out h
+  simp only [Beh.view] at hv hl hc ho
+  simp only [addEv, Beh.view, List.filter_append, he, hv, hl, hc, ho]
 
 theorem lkOf_length (c : SCmd) (t t' : Slice.Slots.Slots) : (lkOf c t).length = (lkOf c t').length := by
   cases c <;> simp only [lkOf] <;> (try split) <;> (try split) <;> rfl
@@ -446,6 +513,10 @@ theorem same_step {c : SCmd} {t t' : Slice.Slots.Slots} (h : lkOf c t = lkOf c t
   | store e v =>
     simp only [lkOf, addrLk, List.cons.injEq, Lk.addr.injEq, Int.ofNat.injEq, and_true] at h
     exact ⟨by simp only [chunkC, h], rfl, rfl⟩
+  | storeB ws e v =>
+    simp only [lkOf, addrLk, List.cons.injEq, Lk.addr.injEq, Int.ofNat.injEq, and_true] at h
+    exact ⟨by simp only [chunkC, h], rfl, rfl⟩
+  | emitB ws => exact ⟨rfl, rfl, rfl⟩
 
 theorem next_noSeq {c : SCmd} {q : List Nat} {ks : List SFrame} (t : Slice.Slots.Slots) (h : Slots.NoSeqS ((c, q) :: ks)) : Slots.NoSeqS (nextS c q ks t) := by
   have ht : Slots.NoSeqS ks := fun x hx => h x (List.mem_cons_of_mem _ hx)
@@ -486,11 +557,11 @@ theorem view_mono (ret : SExpr) (f : Observer) : ∀ (m n : Nat) (ks : List SFra
         have hns : ∀ a b, c ≠ .seq a b := hs _ List.mem_cons_self
         rw [src_step ret hns m q ks t, src_step ret hns m q ks t'] at h
         rw [src_step ret hns n q ks t, src_step ret hns n q ks t']
-        obtain ⟨hl, hr⟩ := view_peel h (lkOf_length c t t')
+        obtain ⟨he, hl, hr⟩ := view_peelE h (evC_chan c t t') (lkOf_length c t t')
         obtain ⟨_, _, ss⟩ := same_step hl 0 [] q ks
         rw [← ss] at hr ⊢
         rw [← hl]
-        exact view_tick (ih n _ _ _ (by omega) (next_noSeq t hs) hr)
+        exact view_tickE he (ih n _ _ _ (by omega) (next_noSeq t hs) hr)
 
 /-- **`det`.** Two machines, in different environments, on what may be different inputs. If the source's two runs show the same at fuel `m`, the machines' do at fuel `m`. -/
 theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) (f : Observer) :
@@ -530,34 +601,59 @@ theorem det_run {C : List Byte} {en en' : Env} {ret : SExpr} {r : Nat} (hC : C.l
     | zero => rfl
     | succ n =>
       rw [src_step ret hns n q ks t, src_step ret hns n q ks t'] at hv
-      obtain ⟨hl, hr⟩ := view_peel hv (lkOf_length c t t')
+      obtain ⟨he, hl, hr⟩ := view_peelE hv (evC_chan c t t') (lkOf_length c t t')
       obtain ⟨sc, sk, ss⟩ := same_step hl pc k q ks
       rw [← sk] at f2 c2
       rw [← ss] at hr
       rw [e1 (n + 1), e2 (n + 1), ← sc]
       apply play_congr
       intro a ha
-      exact ih a (by omega) _ _ _ _ m1 m2 (hc'.next c q pc t) (next_noSeq t hn) f1 c1 c2 i1 i2
-        (view_mono ret f n a _ _ _ (by omega) (next_noSeq t hn) hr)
+      exact view_addEv he (ih a (by omega) _ _ _ _ m1 m2 (hc'.next c q pc t) (next_noSeq t hn) f1 c1 c2 i1 i2
+        (view_mono ret f n a _ _ _ (by omega) (next_noSeq t hn) hr))
 
-/-- Unfinished source runs have shown no event. -/
-theorem fuel_ev (ret : SExpr) : ∀ (n : Nat) (ks : List SFrame) (t : Slice.Slots.Slots), Slots.NoSeqS ks → (runS ret n ks t).out = .fuel → (runS ret n ks t).ev = [] := by
-  intro n
-  induction n with
-  | zero =>
-    intro ks t _ h
-    cases ks with
-    | nil => simp [runS] at h
-    | cons _ _ => rfl
-  | succ n ih =>
-    intro ks t hs h
-    cases ks with
-    | nil => simp [runS] at h
-    | cons x ks =>
-      obtain ⟨c, q⟩ := x
-      have hns : ∀ a b, c ≠ .seq a b := hs _ List.mem_cons_self
-      rw [src_step ret hns n q ks t] at h ⊢
-      exact ih _ _ (next_noSeq t hs) h
+/-- **What the source has shown, the machine shows**, at some fuel, whether or not either finishes (RC-02). It replaces `fuel_ev`, which said that an
+    unfinished source run has shown no event: an `emitB` makes that false. Induction on fuel and pending jumps together, as `ahead`. -/
+theorem catch_run {C : List Byte} {en : Env} {ret : SExpr} {r : Nat} (hC : C.length ≤ 3000) (ht : Tail C ret r) :
+    ∀ (w n : Nat) (k : List TF) (ks : List SFrame) (t : Slice.Slots.Slots) (M : Mach), 2 * n + jc k ≤ w → Corr ks k → FOk C k →
+      Chain M.pc k r → Inv M t → ∃ m, (runS ret n ks t).ev <+: (Slice.Rv.run C en m M).ev := by
+  intro w
+  induction w using Nat.strongRecOn with
+  | ind w ih =>
+  intro n k ks t M hw hc hf hch hinv
+  cases hc with
+  | nil =>
+    have hp : M.pc = r := hch
+    obtain ⟨_, he⟩ := src_done ret n t
+    obtain ⟨_, h2⟩ := play_fin (evalS ret t) (r + 4 * sE ret + 8) (tailM ret r) _ (Nat.lt_succ_self _)
+    refine ⟨(tailM ret r).length + 1, ?_⟩
+    rw [tail_exec (en := en) ht hp hinv, h2, he]
+    exact List.prefix_refl _
+  | @jmp ks k p q hc' =>
+    obtain ⟨⟨i, hfe, ha⟩, hf'⟩ := hf
+    obtain ⟨hp, hch'⟩ := hch
+    subst hp
+    obtain ⟨m', e', p', i'⟩ := exec_jmp (en := en) hfe ha hinv
+    simp only [jc] at hw
+    obtain ⟨a, h1⟩ := ih (2 * n + jc k) (by omega) n k ks t m' (Nat.le_refl _) hc' hf' (by rw [p']; exact hch') i'
+    obtain ⟨_, o2, _⟩ := play_long (c := [(M.pc, [])]) (F := fun j => Slice.Rv.run C en j m') a
+    refine ⟨[(M.pc, ([] : List Lk))].length + a, ?_⟩
+    rw [e', o2]
+    exact h1
+  | @cmd ks k c q pc hc' =>
+    have hns := hf.1
+    obtain ⟨m', e', hf', hch', i'⟩ := chunk_exec (en := en) hC hf hch hinv
+    cases n with
+    | zero => exact ⟨0, List.nil_prefix⟩
+    | succ n =>
+      have hj := jc_next (c := c) pc k t
+      simp only [jc] at hw
+      rw [src_step ret hns n q ks t]
+      obtain ⟨a, h1⟩ := ih (2 * n + jc (nextK c pc k t)) (by omega) n _ _ _ m' (Nat.le_refl _) (hc'.next c q pc t) hf' hch' i'
+      obtain ⟨_, o2, _⟩ := play_long (c := chunkC c pc t) (F := fun j => addEv (evC c t) (Slice.Rv.run C en j m')) a
+      refine ⟨(chunkC c pc t).length + a, ?_⟩
+      rw [e', o2]
+      show evC c t ++ _ <+: evC c t ++ _
+      exact (List.prefix_append_right_inj _).mpr h1
 
 /-! ## The program -/
 
@@ -678,6 +774,14 @@ theorem ahead_top {p : SProg} (hok : okP p = true) (n : Nat) (d : Nat → Byte) 
   obtain ⟨a, h1, h2⟩ := ahead (en := e) hl.size hl.tail _ n (k0 p) (ks0 p) (wordAt d) m₁ (Nat.le_refl _) (k0_corr p) (k0_fok hl (okP_body hok)) c₁ i₁ hf
   exact ⟨a + 1, by rw [e₁ a]; exact h1, by rw [e₁ a]; exact h2⟩
 
+/-- `catch_run`, from the first byte. -/
+theorem catch_top {p : SProg} (hok : okP p = true) (n : Nat) (d : Nat → Byte) (e : Env) :
+    ∃ m, (runS p.ret n (ks0 p) (wordAt d)).ev <+: (Slice.Rv.run (code (genP p)) e m (init (code (genP p)) d e)).ev := by
+  have hl := laid hok
+  obtain ⟨m₁, e₁, c₁, i₁⟩ := entry (d := d) (e := e) hl
+  obtain ⟨a, h1⟩ := catch_run (en := e) hl.size hl.tail _ n (k0 p) (ks0 p) (wordAt d) m₁ (Nat.le_refl _) (k0_corr p) (k0_fok hl (okP_body hok)) c₁ i₁
+  exact ⟨a + 1, by rw [e₁ a]; exact h1⟩
+
 /-- `det`, from the first byte. -/
 theorem det_top {p : SProg} (hok : okP p = true) (f : Observer) (m : Nat) (d d' : Nat → Byte) (e e' : Env)
     (hv : (runS p.ret m (ks0 p) (wordAt d)).view f = (runS p.ret m (ks0 p) (wordAt d')).view f) :
@@ -741,16 +845,7 @@ def rvPass (P : Nat → Bool) : PassCert (slotLang Env P) (rvLang P) where
     exact ahead_top hok n i.1 i.2 hf
   catch_up p p' t h n i _ := by
     obtain ⟨hok, rfl, rfl⟩ := compR_ok h
-    by_cases hf : (runS p.ret n (ks0 p) (wordAt i.1)).out = .fuel
-    · refine ⟨0, ?_⟩
-      show (runS p.ret n (ks0 p) (wordAt i.1)).ev <+: _
-      rw [fuel_ev p.ret n _ _ (ks0_noSeq p) hf]
-      exact List.nil_prefix
-    · obtain ⟨m, _, h2⟩ := ahead_top hok n i.1 i.2 hf
-      refine ⟨m, ?_⟩
-      show (runS p.ret n (ks0 p) (wordAt i.1)).ev <+: (Slice.Rv.run _ i.2 m (init _ i.1 i.2)).ev
-      rw [h2]
-      exact List.prefix_refl _
+    exact catch_top hok n i.1 i.2
   reflect p p' t h m i _ hf := by
     obtain ⟨hok, rfl, rfl⟩ := compR_ok h
     obtain ⟨h1, h2⟩ := (behind_top hok m i.1 i.2).2.2 hf
