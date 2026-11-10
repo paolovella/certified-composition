@@ -7,7 +7,7 @@ deps: [F5]
 closes: ['F5: certificates on separate languages, not carried through a pass']
 acceptance: one lawful language, indexed by window, of which ucmdLangS, ucmdLangI and ucmdLangH are proved special cases; one theorem giving a single program its properties together; splitPass carries them at every window; no frozen statement changes
 kill: if det for the pointwise family cannot be proved on the revised window, or the design needs a kernel change, stop and bring the evidence to the user. Fallback, already designed - typing preservation (step 5), which carries only bcheck's rel
-status: planned
+status: killed
 ---
 
 ## Plan
@@ -97,3 +97,7 @@ transient fault only stops later addresses, so the source's list still fixes the
   a nested branch, loses a known leak. The user decides. Until then, do not start the steps above.
 - 2026-11-03, **held by the user's decision: the vertical slice comes first** (VS-1). The directive question is not
   decided. It returns with what VS-1 finds about `enc`.
+- 2026-11-10, **killed: superseded by `UNI-01`**, by the user's decisions of that day ([`PLAN-2026-11`](../PLAN-2026-11.md) §0 and §6). Status `planned` to `killed`.
+  - Why: this item joined three `UCmd` languages by a window index. The route chosen on 2026-11-06 grows the slice language, so every row is re-proved on one compiled language, and there is no family to join.
+  - What it leaves: the directive question goes to `S-SPEC`, which reports on 2027-01-12. The fallback named in this item's kill rule (typing preservation) is not needed, because the slice's passes carry certificates by `PassCert`.
+  - Nothing above was started, so no code is abandoned.

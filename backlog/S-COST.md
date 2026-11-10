@@ -7,7 +7,7 @@ deps: [PH1]
 closes: ['per-cycle budgets']
 acceptance: bench/cost.tsv
 kill: -
-status: planned
+status: blocked
 ---
 
 ## Plan
@@ -15,4 +15,4 @@ status: planned
 See PLAN-2026-10.md. Write the concrete steps here before starting work.
 
 ## Log
-
+- 2026-11-10, **parked** ([`PLAN-2026-11`](../PLAN-2026-11.md) §6). Status `planned` to `blocked`. What it asked is measured in passing by `BLIND-01`, whose ports are agent cells through the engine.
