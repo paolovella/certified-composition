@@ -48,3 +48,4 @@ Plan (to be refined before code):
      natural alternative exists. Revisit when PH3 re-states the certificates on L's Core,
      where the meaning is being redesigned anyway.
   - Recommendation: option 2 now; carry the rule into PH3's `Cert` design.
+- 2026-11-10, **stays blocked; its question is inherited** ([`PLAN-2026-11`](../PLAN-2026-11.md) §6). The kill rule fired on 2026-10-28. `S-HEAP` reads this item first, and `HEAP-02` carries a kill rule on false refusals of safe heap tasks.

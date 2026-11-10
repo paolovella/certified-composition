@@ -34,3 +34,4 @@ Recommended: route 1 now, route 2 as part of PH3's sinks.
   - `certcheck` adds a note to an accepted program for each `fs` emit with a non-literal path.
     The note is Ring 3 text, and the verdict is unchanged. Checked: blind 06 gets the note, and
     `examples/handler.uc` does not.
+- 2026-11-10, **where route 2 closes** ([`PLAN-2026-11`](../PLAN-2026-11.md) §3): in `INJ-01`, milestone M4, 2027-02-12. Sinks are typed there, and a string cleaned for `sql` is refused at `fs`. Until then this item stays open with route 1 done. Whether it can close at M0 on route 1 alone is judged against its acceptance on branch `expr-04/san-scope`.

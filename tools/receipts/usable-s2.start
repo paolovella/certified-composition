@@ -1,0 +1,4 @@
+started: 2026-11-08T19:13:46+01:00
+head: 4394f4a
+command: bash research/2026-11/usable/s2_run.sh /tmp/claude-1000/-home-paolo-certified-composition/1918deab-ffb6-4810-9d38-18dad0d1ad51/scratchpad/s2 bench/usable/s2.tsv 1200 1 4 16 64 256
+log: tools/receipts/usable-s2.log

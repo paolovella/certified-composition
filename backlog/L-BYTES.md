@@ -7,7 +7,7 @@ deps: [VS-2]
 closes: ['VS-1: the path to bytes is for a separate language; bcheck and the map stop before machine code']
 acceptance: decided after VS-2; at minimum, one vulnerability-map row holds on literal bytes, by transfer from the checker that row names
 kill: -
-status: planned
+status: in-progress
 ---
 
 ## Plan
@@ -27,3 +27,4 @@ links the two languages. So no checker or row in the map reaches machine code.
 - 2026-11-06: VS-2 is done, so this item is no longer blocked: the route is the user's to choose. [`VS-2-ACCOUNT`](../research/2026-11/VS-2-ACCOUNT.md) §6 recommends growing `sliceLang`, since loops, an array and negative immediates each reached bytes in one step, and `UCmd`'s unbounded integers still cannot.
 - 2026-11-06, **correction of record** to the entry above. It said `UCmd`'s unbounded integers ~~still cannot~~ reach bytes. That is false: CakeML compiles unbounded integers to RISC-V through a verified bignum runtime ([`VS-2-RESEARCH`](../research/2026-11/VS-2-RESEARCH.md) §1). The reason that holds is narrower: for secret data a bignum's size shows in its time and addresses, which `rel` observes. So lowering `UCmd` needs a constant-time bignum runtime or bounded integers. The recommendation to grow `sliceLang` stands, for that reason.
 - 2026-11-06, **the route is chosen, by the user: grow `sliceLang`** into L's core, one construct at a time, each through to the bytes. The first is a counted `for` loop with a budget (`BOUND-01`, also the user's decision). `UCmd`'s rows are re-proved on the grown language, one at a time.
+- 2026-11-10, **where this closes** ([`PLAN-2026-11`](../PLAN-2026-11.md) §3 and §6): at milestone M3, 2027-01-08, when the first rows that held on `UCmd` alone (7 and 4) hold on a literal image. Status `planned` to `in-progress`: the chosen route has been running since `BOUND-01`. Rows 3, 14, 6 and 9 are items of their own (`INJ-01`, `PATH-01`, `HEAP-02`, `SPEC-02`).

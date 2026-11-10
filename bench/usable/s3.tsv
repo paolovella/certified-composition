@@ -1,0 +1,12 @@
+commit	step	construct	machine_add	machine_del	source_add	source_del	slots_add	slots_del	lower_add	lower_del	budget_add	budget_del	witness_add	witness_del	kernel_add	kernel_del	files
+b2c3026	RC-01 2a	5 ALU instructions in the machine	35	1	0	0	0	0	60	0	0	0	0	0	0	0	3
+934ea34	RC-01 2b	^ | & - and >> k in the language	19	0	12	2	18	3	107	5	10	3	74	0	0	0	8
+f9df3c6	RC-01 3a	lbu in the machine	12	1	0	0	0	0	17	0	0	0	0	0	0	0	2
+930edb5	RC-01 3	loadB: byte arrays as inputs	0	0	60	4	37	3	195	7	22	9	117	0	0	0	7
+e54172b	RC-01 4	ctCheck and the widened loop rule	0	0	51	16	0	0	0	0	0	0	177	2	0	0	3
+ec359bc	VS-2 3	andi in the machine	12	1	0	0	0	0	0	0	0	0	0	0	0	0	2
+bde850b	VS-2 4	while, and an array at a public index (source)	0	0	607	0	0	0	0	0	0	0	0	0	0	0	1
+8157fee	VS-2 5	the same, through slots	0	0	0	0	511	0	0	0	0	0	0	0	0	0	1
+e31d9c9	VS-2 6	the same, through the lowering	0	0	0	0	0	0	1547	10	0	0	82	0	0	0	5
+0bd40ae	BOUND-01 2	counted loops forN, forMax	0	0	0	0	0	0	0	0	95	0	0	0	0	0	1
+44ec2c5	BOUND-01 3	the checker's budget over counted loops	0	0	0	0	0	0	0	0	549	0	0	0	0	0	1

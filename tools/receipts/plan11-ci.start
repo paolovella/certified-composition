@@ -1,0 +1,4 @@
+started: 2026-11-10T01:06:24+01:00
+head: 07fd693
+command: bash tools/ci.sh
+log: tools/receipts/plan11-ci.log
