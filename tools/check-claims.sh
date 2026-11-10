@@ -1443,9 +1443,14 @@ rm -f /tmp/axiom-claims.$$
 
 # The process itself (PLAN-2026-10 s10, WI-001). Every piece below exists because its absence
 # caused a mishap here; a process nobody checks rots exactly like the loop-rule sentence did.
-# (a) The session protocol and plan of record exist and point at each other.
+# (a) The session protocol and plan of record exist and point at each other. Since 2026-11-10 the plan of record is
+# PLAN-2026-11.md (scope, order, dates) and PLAN-2026-10.md is its design. CLAUDE.md says so in those words, and
+# names both files.
+if ! grep -qF 'The plan of record is [`PLAN-2026-11.md`](PLAN-2026-11.md)' CLAUDE.md 2>/dev/null || [ ! -f PLAN-2026-11.md ]; then
+  echo "DRIFT: CLAUDE.md missing or no longer names the plan of record PLAN-2026-11.md"; fail=1
+fi
 if ! grep -q "PLAN-2026-10.md" CLAUDE.md 2>/dev/null || [ ! -f PLAN-2026-10.md ]; then
-  echo "DRIFT: CLAUDE.md missing or no longer names the plan of record PLAN-2026-10.md"; fail=1
+  echo "DRIFT: CLAUDE.md missing or no longer names PLAN-2026-10.md, the design the plan of record stands on"; fail=1
 fi
 # (b) The kill switch holds one of its three values; anything else must not be read as "full".
 if ! grep -qxE 'full|cells-only|off' AUTONOMY 2>/dev/null; then
@@ -1732,6 +1737,64 @@ while IFS= read -r f; do
 done < <(find . \( -name .lake -o -name .git \) -prune -o \( -name lakefile.toml -o -name lakefile.lean \) -print)
 on=$(grep -rlE 'set_option[[:space:]]+autoImplicit[[:space:]]+true' --include='*.lean' --exclude-dir=.lake --exclude-dir=.git . 2>/dev/null | tr '\n' ' ')
 [ -z "$on" ] || { echo "DRIFT: set_option autoImplicit true in: $on"; fail=1; }
+
+# (s) The schedule is data (PLAN-2026-11 §3 and §8; PLAN-11). tools/milestones.tsv has one row per milestone:
+# id, date, status (open | done | cut), earlier dates ("-", or a comma list, oldest first), acceptance.
+#   1. The file and the plan's table agree: each row's id and date are on one row of §3's table, and each row of
+#      that table is in the file. So the plan cannot show one date while this rule reads another.
+#   2. A row still `open` more than 7 days after its date is drift. The ways out are the three the plan names:
+#      the milestone is done, it is cut, or its date is moved.
+#   3. A moved date keeps its earlier dates in the fourth column, and the plan's log (§9) has the words
+#      "<id> moved from <earlier date>" for each. A cut row has "<id> cut" there. So neither happens without a record.
+# What this cannot see: a date changed in both places with no earlier date kept, and a row marked `done` that is
+# not. The file is under tools/, so both need the user's key, and the base gate reads BASE's copy.
+# The rule depends on the day it runs. MILESTONES_TODAY=YYYY-MM-DD replays it at another date.
+ms=tools/milestones.tsv; msplan=PLAN-2026-11.md
+if [ ! -f "$ms" ] || [ ! -f "$msplan" ]; then
+  echo "DRIFT: $ms or $msplan is missing: the schedule has no data, or no plan to compare it with"; fail=1
+else
+  ms_today="${MILESTONES_TODAY:-$(date +%F)}"
+  if ! ms_today_s=$(date -u -d "$ms_today" +%s 2>/dev/null); then
+    echo "DRIFT: MILESTONES_TODAY=$ms_today is not a date"; fail=1; ms_today_s=$(date -u +%s)
+  fi
+  ms_table=$(sed -n '/^## 3\. Milestones/,/^## 4\. /p' "$msplan")
+  ms_log=$(sed -n '/^## 9\. /,$p' "$msplan")
+  ms_ids=" "
+  while IFS=$'\t' read -r mid mdate mstatus mwas macc; do
+    case "$mid" in ''|'#'*|id) continue ;; esac
+    ms_ids="$ms_ids$mid "
+    if ! echo "$mdate" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || ! mdate_s=$(date -u -d "$mdate" +%s 2>/dev/null); then
+      echo "DRIFT: $ms: $mid has the date '$mdate', which is not YYYY-MM-DD"; fail=1; continue
+    fi
+    [ -n "$macc" ] || { echo "DRIFT: $ms: $mid has no acceptance"; fail=1; }
+    echo "$ms_table" | grep -qF "| $mid | $mdate |" \
+      || { echo "DRIFT: $ms has $mid on $mdate, and $msplan §3's table has no row '| $mid | $mdate |'"; fail=1; }
+    case "$mstatus" in
+      open)
+        if [ $(( (ms_today_s - mdate_s) / 86400 )) -gt 7 ]; then
+          echo "DRIFT: milestone $mid was due $mdate and is still open on $ms_today, more than 7 days later: mark it done, cut it, or move its date, each with its record ($msplan §5 and §9)"; fail=1
+        fi ;;
+      done) ;;
+      cut)
+        echo "$ms_log" | grep -qF "$mid cut" \
+          || { echo "DRIFT: $ms: $mid is cut, and $msplan §9 does not say '$mid cut'"; fail=1; } ;;
+      *) echo "DRIFT: $ms: $mid has the status '$mstatus' (open, done or cut)"; fail=1 ;;
+    esac
+    if [ "$mwas" != "-" ]; then
+      for d in $(echo "$mwas" | tr ',' ' '); do
+        if ! echo "$d" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+          echo "DRIFT: $ms: $mid has the earlier date '$d', which is not YYYY-MM-DD"; fail=1
+        elif ! echo "$ms_log" | grep -qF "$mid moved from $d"; then
+          echo "DRIFT: $ms: $mid moved from $d, and $msplan §9 does not say '$mid moved from $d'"; fail=1
+        fi
+      done
+    fi
+  done < "$ms"
+  [ "$ms_ids" != " " ] || { echo "DRIFT: $ms has no milestone rows"; fail=1; }
+  for mid in $(echo "$ms_table" | sed -n -E 's/^\| ([A-Za-z0-9.]+) \| [0-9]{4}-[0-9]{2}-[0-9]{2} \|.*/\1/p'); do
+    case "$ms_ids" in *" $mid "*) ;; *) echo "DRIFT: $msplan §3 has the milestone $mid, and $ms has no row for it"; fail=1 ;; esac
+  done
+fi
 
 [ $fail -eq 0 ] && echo "check-claims: clean"
 exit $fail
