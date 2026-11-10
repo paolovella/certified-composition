@@ -1,8 +1,8 @@
 # Certified composition
 
 This repo is becoming **L**: a secure language whose compiler carries every certificate down to RISC-V bytes, on top of a small frozen
-kernel that no party can weaken. The plan of record is [`PLAN-2026-10.md`](PLAN-2026-10.md), and [`STATE.md`](STATE.md) says where each
-item stands. "Bulletproof" is always relative to a stated model, a spec and a trusted base, and each claim below names its versions.
+kernel that no party can weaken. The plan of record is [`PLAN-2026-11.md`](PLAN-2026-11.md): what L 1.0 is, in dated milestones. Its design
+is [`PLAN-2026-10.md`](PLAN-2026-10.md). [`STATE.md`](STATE.md) says where each item stands and which milestone is next. "Bulletproof" is always relative to a stated model, a spec and a trusted base, and each claim below names its versions.
 
 Four Lean 4 packages, each `no sorry` and axiom-audited:
 

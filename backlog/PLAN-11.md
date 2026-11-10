@@ -48,3 +48,27 @@ The user approved the plan the same day. This item lands it in two parts, since 
   - `PLAN-2026-10.md` has the pointer at its head.
   - **Two differences from the approved text**, recorded in `PLAN-2026-11` §9: `milestones.tsv` goes under `tools/` (part 2), and `FLAG-01` asks for the handler's C text by 2026-12-04.
   - **Not done here:** part 2, and M0's judging of `F1`, `F3`, `F5`, `EXPR-01` and `EXPR-04`.
+  - Checked: `bash tools/ci.sh` green on 28 steps (receipt `plan11-ci`). Commit `e6e50d3`, PR #26 on top of #25.
+- 2026-11-10, **part 2 proposed**, on branch `g0/plan-2026-11`, from `e6e50d3`. It is Ring 0: it waits for the user's key, and this item stays `in-progress` until that merge.
+  - `tools/milestones.tsv`: 13 rows, all `open`, none moved.
+  - `tools/check-claims.sh`:
+    - Rule (a) asks `CLAUDE.md` for the sentence that names `PLAN-2026-11.md` as the plan of record, and still asks it for `PLAN-2026-10.md`.
+    - Rule (s) is the plan's three checks (late and open; the file and the table agree; a moved date has its record).
+    - Rule (s) also has five checks the plan did not list: the status is one of three, a cut has its record, a row has an acceptance, the file exists and has rows, and each row of the table is in the file.
+  - `tools/render-state.sh`: a "Schedule" section, with the next open milestone and the days to it, or the late one and the days since, then every row. Tried in a scratch repository with a late row, a done row, a cut row, all rows done, and no file.
+  - `tools/guard-selftest.sh`: 14 new cases, 10 refused and 4 accepted.
+    - Open and 8 days late is refused; open and 7 days late is accepted; done and years past is accepted. So the boundary is the one written, and it is the lateness that fires.
+    - A date that differs from the plan's is refused.
+    - Moved with no record is refused; moved twice with one record is refused; moved twice with both is accepted.
+    - Cut with no record is refused; cut with its record is accepted.
+    - A status that is not one, a row with no acceptance, a row deleted and the file deleted are each refused.
+    - `CLAUDE.md` without `PLAN-2026-11.md` is refused. The older case, without `PLAN-2026-10.md`, still is.
+    - The self-test fixes the day once (`MILESTONES_TODAY`) and every case inherits it, so a run across midnight cannot split "7 days ago" from "today".
+  - **What the rule cannot see:** a false `done`, and a date changed in the file and the table together with no earlier date kept. Both are edits under `tools/`.
+  - **What it costs:** the rule depends on the day. Eight days after a missed date `check-claims` is red everywhere until a record is merged with the key, and that includes the self-test's accepted cases. `PLAN-2026-11` §8 says so.
+    - **Each refusal fires for its own reason.** A drift case passes if any guard fires, so each refused mutation was applied to an export and the `DRIFT` lines printed: one line each, and it is the clause the case is named for.
+    - The self-test went from 103 cases to 117 and from 34 s to 37 s, against a budget of 49 s.
+  - The rule was replayed on the unchanged tree: clean today and at `MILESTONES_TODAY=2026-11-20`, drift for M0 at `2026-11-21`, and drift for a value that is not a date.
+  - Checked: `bash tools/ci.sh` green on 28 steps (receipt `g0plan11-ci`, 858 s). Inside CI the self-test took 42 s, 7 s under its budget and 7 s more than in the run before (`plan11-ci`, 35 s). About 3 s of that is the 14 cases; the rest is the load of a full run. The next cases added to it will need the budget looked at, which is the user's decision.
+  - `CLAUDE.md`: the pointer. `README.md` names both plans too.
+  - `PLAN-2026-11.md`: §3 and §8 say what the rule does, with a correction of record in §9 for the two sentences that said nothing checked the dates, and the status note at its head is corrected the same way.

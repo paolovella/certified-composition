@@ -1,0 +1,19 @@
+# The schedule of PLAN-2026-11 §3, as data. Read by tools/check-claims.sh rule (s) and tools/render-state.sh.
+# Columns, tab-separated: id, date, status (open | done | cut), earlier dates ("-", or a comma list, oldest first), acceptance.
+# A date is moved here and in the plan's table together, the date it had goes in the fourth column, and the plan's
+# log (§9) says why in a line "<id> moved from <earlier date>". A cut needs a line "<id> cut".
+# This file is Ring 0: it changes with the user's key.
+id	date	status	was	acceptance
+M0	2026-11-13	open	-	Landed: PRs #23, #24, #25 and spike/usable merged; PLAN-2026-11 is the plan of record; every item filed; stale work closed or recorded
+M1	2026-11-27	open	-	HChaCha20 (CPP-01, RC-03): constant-time with a budget on its image, as RC-03 states
+D1	2026-12-01	open	-	ROUTE2-01 decided by the user
+M2	2026-12-18	open	-	Engine on (PH2): AUTONOMY is cells-only; each planted failure triggers what it should
+M3	2027-01-08	open	-	Event rows on bytes (L-IO, MED-01, ISO-01, REL-01): rows 7 and 4 on a literal image, with witnesses
+D2	2027-01-12	open	-	S-SPEC and S-HEAP report a measured verdict each; the user decides
+M4	2027-02-12	open	-	Sink rows on bytes (STR-01, INJ-01, PATH-01): rows 3 and 14 on a literal image, with teeth
+M5	2027-02-26	open	-	Memory rows on bytes (HEAP-01, HEAP-02, HEAP-03): row 6 on a literal image, with teeth
+M6	2027-03-19	open	-	Speculation row (SPEC-01, SPEC-02): row 9 on the speculating model; a gadget refused, and leaking in the model
+M7	2027-03-26	open	-	Flagship (UNI-01, SEAM-01, FLAG-01): PLAN-2026-11 §2, points 2 and 3
+M8	2027-04-09	open	-	Blind measure (BLIND-01): PLAN-2026-11 §2, points 4 and 5
+RC	2027-04-16	open	-	Release candidate (MUSEUM-01, PH3): PLAN-2026-11 §2, points 1 and 6
+1.0	2027-04-30	open	-	Tag l-1.0 (V1): all of PLAN-2026-11 §2

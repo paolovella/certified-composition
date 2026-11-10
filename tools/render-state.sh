@@ -25,6 +25,36 @@ field() { sed -n "s/^$2: //p" "$1" | head -1; }
     echo "- **jobs with no end receipt (incident unless still running):**"
     echo "$open_jobs" | sed 's/^/  - /'
   fi
+  # The schedule (PLAN-2026-11 §3), read from tools/milestones.tsv: the next open milestone and the
+  # days to it, then every row. The days are counted from the day this file was rendered, which the
+  # heading states, so a stale STATE.md shows its own age.
+  if [ -f tools/milestones.tsv ]; then
+    today=$(date +%F); today_s=$(date -u -d "$today" +%s)
+    plural() { if [ "$1" -eq 1 ]; then echo "1 day"; else echo "$1 days"; fi; }
+    echo
+    echo "## Schedule, as rendered on $today"
+    echo
+    rows=$(grep -vE '^(#|id	|$)' tools/milestones.tsv | sort -t'	' -k2,2 || true)
+    next=$(echo "$rows" | awk -F'\t' '$3=="open"' | head -1)
+    if [ -n "$next" ]; then
+      IFS='	' read -r mid mdate _ _ macc <<< "$next"
+      days=$(( ($(date -u -d "$mdate" +%s) - today_s) / 86400 ))
+      if [ "$days" -ge 0 ]; then echo "- **next: $mid, $mdate, in $(plural "$days").** $macc"
+      else echo "- **late: $mid was due $mdate, $(plural $(( -days ))) ago.** $macc"; fi
+    else
+      echo "- no milestone is open"
+    fi
+    echo
+    echo "| id | date | status | days left | earlier dates |"
+    echo "|---|---|---|---|---|"
+    echo "$rows" | while IFS='	' read -r mid mdate mstatus mwas macc; do
+      left="-"
+      if [ "$mstatus" = open ]; then left=$(( ($(date -u -d "$mdate" +%s) - today_s) / 86400 )); fi
+      echo "| $mid | $mdate | $mstatus | $left | $mwas |"
+    done
+  else
+    echo "- **tools/milestones.tsv is missing: the schedule cannot be shown**"
+  fi
   echo
   for st in in-progress planned blocked done killed; do
     files=$(grep -l "^status: $st$" backlog/*.md 2>/dev/null || true)
@@ -38,6 +68,6 @@ field() { sed -n "s/^$2: //p" "$1" | head -1; }
     done
     echo
   done
-  echo "Plan of record: PLAN-2026-10.md. Protocol: CLAUDE.md."
+  echo "Plan of record: PLAN-2026-11.md (its design: PLAN-2026-10.md). Protocol: CLAUDE.md."
 } > "$out"
 echo "wrote $out"

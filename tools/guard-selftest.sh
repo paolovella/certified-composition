@@ -20,6 +20,9 @@ pass=0; fail=0
 # case writes its line to $res/<number>; the lines are printed in case order once all finish,
 # and the counts are taken from them.
 GUARD_JOBS="${GUARD_JOBS:-8}"
+# Rule (s) depends on the day. The day is fixed once here and inherited by every case, so a run that
+# crosses midnight cannot split a mutation's "7 days ago" from the check's "today".
+export MILESTONES_TODAY="${MILESTONES_TODAY:-$(date +%F)}"
 res=$(mktemp -d)
 trap 'rm -rf "$res"' EXIT
 ncase=0
@@ -303,6 +306,67 @@ run_case "module claim breaks" drift \
 # the process guards (PLAN-2026-10 s10): each one is broken the way it would rot
 run_case "CLAUDE.md loses the plan of record" drift \
   bash -c 'sed -i "s/PLAN-2026-10.md/PLAN-OLD.md/g" CLAUDE.md'
+
+run_case "CLAUDE.md loses PLAN-2026-11" drift \
+  bash -c 'grep -q "PLAN-2026-11.md" CLAUDE.md && sed -i "s/PLAN-2026-11.md/PLAN-OLD.md/g" CLAUDE.md'
+
+# the schedule guard, rule (s) (PLAN-2026-11 s3 and s8; PLAN-11). Each refusal has an accepted twin
+# that differs from it in the one thing the rule reads, so the twin shows which clause fired.
+# ms_set <id> <date> <status> <earlier dates>: rewrite one row of the file and that id's date in the
+# plan's table, and fail unless both landed. ms_log <words>: add a line to the plan's log (s9, the
+# last section).
+ms_set() {
+  sed -i -E "s/^$1\t[0-9-]+\t[a-z]+\t[^\t]+\t/$1\t$2\t$3\t$4\t/" tools/milestones.tsv \
+    && grep -qP "^$1\t$2\t$3\t$4\t" tools/milestones.tsv \
+    && sed -i -E "s/^\| $1 \| [0-9-]+ \|/| $1 | $2 |/" PLAN-2026-11.md \
+    && grep -qF "| $1 | $2 |" PLAN-2026-11.md
+}
+ms_log() { printf '\n- 2027-04-02, **%s:** a witness.\n' "$1" >> PLAN-2026-11.md; }
+export -f ms_set ms_log
+
+run_case "milestone open, 8 days late" drift \
+  bash -c 'ms_set M0 "$(date -u -d "$MILESTONES_TODAY 8 days ago" +%F)" open -'
+
+run_case "milestone open, 7 days late" pass \
+  bash -c 'ms_set M0 "$(date -u -d "$MILESTONES_TODAY 7 days ago" +%F)" open -'
+
+run_case "milestone done, years past" pass \
+  bash -c 'ms_set M0 2020-01-03 done -'
+
+run_case "milestone date differs from plan" drift \
+  bash -c 'sed -i -E "s/^M8\t[0-9-]+\t/M8\t2099-01-02\t/" tools/milestones.tsv \
+           && grep -qP "^M8\t2099-01-02\t" tools/milestones.tsv'
+
+run_case "milestone moved, no record" drift \
+  bash -c 'ms_set M8 2099-01-02 open 2027-04-09'
+
+run_case "milestone moved twice, one record" drift \
+  bash -c 'ms_set M8 2099-01-02 open 2027-04-09,2027-05-07 \
+           && ms_log "M8 moved from 2027-04-09 to 2027-05-07"'
+
+run_case "milestone moved twice, both records" pass \
+  bash -c 'ms_set M8 2099-01-02 open 2027-04-09,2027-05-07 \
+           && ms_log "M8 moved from 2027-04-09 to 2027-05-07" \
+           && ms_log "M8 moved from 2027-05-07 to 2099-01-02"'
+
+run_case "milestone cut, no record" drift \
+  bash -c 'ms_set M8 2099-01-02 cut -'
+
+run_case "milestone cut, with its record" pass \
+  bash -c 'ms_set M8 2099-01-02 cut - && ms_log "M8 cut"'
+
+run_case "milestone status is not a status" drift \
+  bash -c 'ms_set M8 2099-01-02 almost -'
+
+run_case "milestone loses its acceptance" drift \
+  bash -c 'grep -qP "^M8\t[^\t]+\t[^\t]+\t[^\t]+\t." tools/milestones.tsv \
+           && sed -i -E "s/^(M8\t[^\t]+\t[^\t]+\t[^\t]+\t).*/\1/" tools/milestones.tsv'
+
+run_case "milestone row deleted from the file" drift \
+  bash -c 'grep -qP "^M8\t" tools/milestones.tsv && sed -i "/^M8\t/d" tools/milestones.tsv'
+
+run_case "milestones file deleted" drift \
+  bash -c 'rm tools/milestones.tsv'
 
 run_case "kill switch set to a bogus value" drift \
   bash -c 'echo yolo > AUTONOMY'

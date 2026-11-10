@@ -1,0 +1,4 @@
+started: 2026-11-10T12:02:48+01:00
+head: e6e50d3
+command: bash tools/ci.sh
+log: tools/receipts/g0plan11-ci.log
